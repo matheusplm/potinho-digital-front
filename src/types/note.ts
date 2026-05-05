@@ -50,3 +50,11 @@ export interface StatsResponse {
   completion: number
   byRarity: Record<Rarity, { owned: number; total: number }>
 }
+
+export interface PackOddsItem {
+  rarity: Rarity
+  label: string
+  percent: number
+}
+
+export type PackOddsResponse = PackOddsItem[]

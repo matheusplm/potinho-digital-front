@@ -3,16 +3,17 @@ import LocalMallIcon from '@mui/icons-material/LocalMall'
 import { Alert, Box, Button, Chip, Snackbar, Stack, Typography } from '@mui/material'
 import { useState } from 'react'
 import { PackOpenDialog } from '../components/PackOpenDialog'
-import { useOpenPackMutation, usePackStatusQuery } from '../hooks/useNotes'
-import type { OpenPackResponse } from '../types/note'
+import { useOpenPackMutation, usePackOddsQuery, usePackStatusQuery } from '../hooks/useNotes'
+import type { OpenPackResponse, Rarity } from '../types/note'
 
-const RARITY_ODDS = [
-  { label: 'Comum',    chipBg: '#f1f5f9',                                 chipColor: '#475569', odds: '60%' },
-  { label: 'Incomum',  chipBg: '#dbeafe',                                 chipColor: '#1e40af', odds: '25%' },
-  { label: 'Raro',     chipBg: '#1e3a8a',                                 chipColor: '#bfdbfe', odds: '10%' },
-  { label: 'Mítico',   chipBg: 'linear-gradient(135deg,#ec4899,#8b5cf6)', chipColor: '#fff',    odds: '4%'  },
-  { label: 'Lendário', chipBg: 'linear-gradient(135deg,#fbbf24,#f59e0b)', chipColor: '#451a03', odds: '1%'  },
-]
+// Estilo visual por raridade — responsabilidade da UI, não da API
+const rarityChipStyle: Record<Rarity, { chipBg: string; chipColor: string }> = {
+  comum:    { chipBg: '#f1f5f9',                                 chipColor: '#475569' },
+  incomum:  { chipBg: '#dbeafe',                                 chipColor: '#1e40af' },
+  raro:     { chipBg: '#1e3a8a',                                 chipColor: '#bfdbfe' },
+  mitico:   { chipBg: 'linear-gradient(135deg,#ec4899,#8b5cf6)', chipColor: '#fff'    },
+  lendario: { chipBg: 'linear-gradient(135deg,#fbbf24,#f59e0b)', chipColor: '#451a03' },
+}
 
 const STARS = [
   { size: 18, left: '7%',  delay: '0s',   dur: '8s',  opacity: 0.22 },
@@ -30,6 +31,7 @@ export function PackPage() {
   const [packResult, setPackResult] = useState<OpenPackResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  const packOddsQuery = usePackOddsQuery()
   const canOpen = packStatusQuery.data?.canOpen ?? true
   const remaining = packStatusQuery.data?.remainingOpensToday ?? 3
 
@@ -216,18 +218,21 @@ export function PackPage() {
             CHANCES DE RARIDADE
           </Typography>
           <Stack spacing={0.65}>
-            {RARITY_ODDS.map((r) => (
-              <Stack key={r.label} direction="row" justifyContent="space-between" alignItems="center">
-                <Chip label={r.label} size="small" sx={{
-                  height: 18, fontSize: '0.64rem', fontWeight: 700,
-                  background: r.chipBg, color: r.chipColor,
-                  '& .MuiChip-label': { px: 0.8 },
-                }} />
-                <Typography sx={{ fontSize: '0.8rem', color: '#4a5568', fontWeight: 700 }}>
-                  {r.odds}
-                </Typography>
-              </Stack>
-            ))}
+            {(packOddsQuery.data ?? []).map((item) => {
+              const style = rarityChipStyle[item.rarity]
+              return (
+                <Stack key={item.rarity} direction="row" justifyContent="space-between" alignItems="center">
+                  <Chip label={item.label} size="small" sx={{
+                    height: 18, fontSize: '0.64rem', fontWeight: 700,
+                    background: style.chipBg, color: style.chipColor,
+                    '& .MuiChip-label': { px: 0.8 },
+                  }} />
+                  <Typography sx={{ fontSize: '0.8rem', color: '#4a5568', fontWeight: 700 }}>
+                    {item.percent}%
+                  </Typography>
+                </Stack>
+              )
+            })}
           </Stack>
         </Box>
       </Stack>

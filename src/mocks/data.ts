@@ -1,4 +1,4 @@
-import type { Note, PackReward, Rarity, StatsResponse } from '../types/note'
+import type { Note, PackOddsResponse, PackReward, Rarity, StatsResponse } from '../types/note'
 
 interface NoteSeed {
   id: string
@@ -88,6 +88,26 @@ export function openPack(collection: Note[]): PackReward[] {
   }
 
   return rewards
+}
+
+// Exibe as odds na mesma ordem e com os mesmos pesos usados em openPack(),
+// garantindo que UI e lógica nunca fiquem fora de sincronia.
+const RARITY_DISPLAY_ORDER: Rarity[] = ['comum', 'incomum', 'raro', 'mitico', 'lendario']
+
+const rarityLabels: Record<Rarity, string> = {
+  comum: 'Comum',
+  incomum: 'Incomum',
+  raro: 'Raro',
+  mitico: 'Mítico',
+  lendario: 'Lendário',
+}
+
+export function getPackOdds(): PackOddsResponse {
+  return RARITY_DISPLAY_ORDER.map((rarity) => ({
+    rarity,
+    label: rarityLabels[rarity],
+    percent: rarityWeights[rarity],
+  }))
 }
 
 export function computeStats(collection: Note[]): StatsResponse {

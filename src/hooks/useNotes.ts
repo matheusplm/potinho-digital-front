@@ -47,6 +47,14 @@ export function usePackStatusQuery() {
   })
 }
 
+export function usePackOddsQuery() {
+  return useQuery({
+    queryKey: ['pack-odds'],
+    queryFn: api.getPackOdds,
+    staleTime: Infinity, // odds não mudam em runtime
+  })
+}
+
 export function useDailyNoteStatusQuery() {
   return useQuery({
     queryKey: ['daily-note-status'],

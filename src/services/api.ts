@@ -4,6 +4,7 @@ import type {
   DailyNoteStatusResponse,
   Note,
   OpenPackResponse,
+  PackOddsResponse,
   PackStatusResponse,
   StatsResponse,
 } from '../types/note'
@@ -28,6 +29,7 @@ export const api = {
   getCollection: () => request<CollectionResponse>('/api/collection'),
   getStats: () => request<StatsResponse>('/api/stats'),
   getPackStatus: () => request<PackStatusResponse>('/api/packs/status'),
+  getPackOdds: () => request<PackOddsResponse>('/api/packs/odds'),
   getDailyNoteStatus: () => request<DailyNoteStatusResponse>('/api/daily-note/status'),
   getNoteById: (id: string) => request<Note>(`/api/notes/${id}`),
   openPack: () =>
