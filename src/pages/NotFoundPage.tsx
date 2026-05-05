@@ -1,13 +1,61 @@
-import { Button, Stack, Typography } from '@mui/material'
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
+import { Box, Button, Stack, Typography } from '@mui/material'
 import { Link as RouterLink } from 'react-router-dom'
 
 export function NotFoundPage() {
   return (
-    <Stack spacing={2} sx={{ py: 8, alignItems: 'center' }}>
-      <Typography variant="h6">Tela nao encontrada</Typography>
-      <Button component={RouterLink} to="/" variant="contained">
-        Voltar para inicio
-      </Button>
-    </Stack>
+    <Box
+      sx={{
+        height: '100dvh',
+        background: 'linear-gradient(145deg, #f4f8ff 0%, #eef4ff 45%, #f7efff 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Stack spacing={2.5} alignItems="center" sx={{ px: 3, textAlign: 'center' }}>
+        <Box
+          sx={{
+            width: 80,
+            height: 80,
+            borderRadius: '50%',
+            bgcolor: 'rgba(244, 63, 94, 0.07)',
+            border: '2px dashed rgba(244, 63, 94, 0.22)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <FavoriteBorderIcon sx={{ fontSize: 34, color: '#f43f5e', opacity: 0.45 }} />
+        </Box>
+
+        <Stack spacing={0.5}>
+          <Typography variant="h5" sx={{ color: '#1f2a44' }}>
+            Ops, essa tela não existe
+          </Typography>
+          <Typography variant="body2" sx={{ color: '#4a5568', maxWidth: 260 }}>
+            Parece que você se perdeu no caminho...
+          </Typography>
+        </Stack>
+
+        <Button
+          component={RouterLink}
+          to="/"
+          variant="contained"
+          sx={{
+            borderRadius: 3,
+            fontWeight: 700,
+            textTransform: 'none',
+            px: 3.5,
+            py: 1.1,
+            background: 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)',
+            boxShadow: '0 4px 16px rgba(29, 78, 216, 0.3)',
+            fontSize: '0.95rem',
+          }}
+        >
+          Voltar para o início
+        </Button>
+      </Stack>
+    </Box>
   )
 }

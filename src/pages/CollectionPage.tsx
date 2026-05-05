@@ -1,9 +1,11 @@
+import Inventory2Icon from '@mui/icons-material/Inventory2'
+import FavoriteIcon from '@mui/icons-material/Favorite'
 import {
+  Box,
   CircularProgress,
   FormControl,
   InputLabel,
   MenuItem,
-  Paper,
   Select,
   Stack,
   TextField,
@@ -19,12 +21,15 @@ import type { Note, Rarity } from '../types/note'
 type SortOption = 'raridade' | 'nome' | 'recentes'
 
 const rarityOrder: Record<Rarity, number> = {
-  comum: 1,
-  incomum: 2,
-  raro: 3,
-  lendario: 4,
-  mitico: 5,
+  comum: 1, incomum: 2, raro: 3, lendario: 4, mitico: 5,
 }
+
+const FLOATING = [
+  { size: 12, left: '6%',  delay: '0s',   dur: '10s', opacity: 0.13 },
+  { size:  9, left: '22%', delay: '3s',   dur: '13s', opacity: 0.10 },
+  { size: 15, left: '72%', delay: '1.5s', dur: '9s',  opacity: 0.12 },
+  { size: 10, left: '88%', delay: '5s',   dur: '12s', opacity: 0.09 },
+]
 
 export function CollectionPage() {
   const collectionQuery = useCollectionQuery()
@@ -35,16 +40,12 @@ export function CollectionPage() {
   const [rarityFilter, setRarityFilter] = useState<'todas' | Rarity>('todas')
 
   function handleToggleFavorite(note: Note) {
-    toggleFavoriteMutation.mutate({
-      id: note.id,
-      favorite: !note.favorite,
-    })
+    toggleFavoriteMutation.mutate({ id: note.id, favorite: !note.favorite })
   }
 
   const organizedNotes = useMemo(() => {
     const sourceNotes = collectionQuery.data?.items ?? []
     const normalizedSearch = searchTerm.trim().toLowerCase()
-
     const filtered = sourceNotes.filter((note) => {
       const matchOwnership =
         ownershipFilter === 'todos' ||
@@ -55,112 +56,174 @@ export function CollectionPage() {
         normalizedSearch.length === 0 ||
         note.title.toLowerCase().includes(normalizedSearch) ||
         note.message.toLowerCase().includes(normalizedSearch)
-
       return matchOwnership && matchRarity && matchSearch
     })
-
     return [...filtered].sort((a, b) => {
-      if (sortBy === 'nome') {
-        return a.title.localeCompare(b.title, 'pt-BR')
-      }
-
+      if (sortBy === 'nome') return a.title.localeCompare(b.title, 'pt-BR')
       if (sortBy === 'recentes') {
-        const dateA = a.obtainedAt ? new Date(a.obtainedAt).getTime() : 0
-        const dateB = b.obtainedAt ? new Date(b.obtainedAt).getTime() : 0
-        return dateB - dateA
+        return (b.obtainedAt ? new Date(b.obtainedAt).getTime() : 0) -
+               (a.obtainedAt ? new Date(a.obtainedAt).getTime() : 0)
       }
-
       return rarityOrder[b.rarity] - rarityOrder[a.rarity]
     })
   }, [collectionQuery.data?.items, searchTerm, sortBy, ownershipFilter, rarityFilter])
 
-  if (collectionQuery.isPending) {
-    return (
-      <Stack sx={{ py: 4, alignItems: 'center' }}>
-        <CircularProgress />
-      </Stack>
-    )
-  }
-
   return (
-    <Stack spacing={2}>
-      <Typography variant="h6">Albuns estilo cartinha</Typography>
-      <Paper sx={{ p: 1.5 }}>
-        <Stack spacing={1.5}>
-          <TextField
-            value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
-            label="Pesquisar bilhete"
-            placeholder="Digite titulo ou mensagem"
-            size="small"
-            fullWidth
-          />
+    <Box sx={{ height: '100%', position: 'relative', overflow: 'hidden',
+      background: 'linear-gradient(145deg, #f4f8ff 0%, #eef4ff 45%, #f7efff 100%)' }}>
 
-          <Stack direction="row" spacing={1}>
-            <FormControl fullWidth size="small">
-              <InputLabel id="sort-label">Ordenar</InputLabel>
-              <Select
-                labelId="sort-label"
-                value={sortBy}
-                label="Ordenar"
-                onChange={(event) => setSortBy(event.target.value as SortOption)}
-              >
-                <MenuItem value="raridade">Raridade</MenuItem>
-                <MenuItem value="nome">Nome</MenuItem>
-                <MenuItem value="recentes">Mais recentes</MenuItem>
-              </Select>
-            </FormControl>
+      {/* Background icon */}
+      <Inventory2Icon sx={{
+        position: 'absolute', bottom: -80, left: -80,
+        fontSize: 520, color: '#1d4ed8', opacity: 0.045,
+        transform: 'rotate(-18deg)', pointerEvents: 'none',
+      }} />
 
-            <FormControl fullWidth size="small">
-              <InputLabel id="rarity-filter-label">Raridade</InputLabel>
-              <Select
-                labelId="rarity-filter-label"
-                value={rarityFilter}
-                label="Raridade"
-                onChange={(event) => setRarityFilter(event.target.value as 'todas' | Rarity)}
-              >
-                <MenuItem value="todas">Todas</MenuItem>
-                <MenuItem value="comum">Comum</MenuItem>
-                <MenuItem value="incomum">Incomum</MenuItem>
-                <MenuItem value="raro">Raro</MenuItem>
-                <MenuItem value="lendario">Lendario</MenuItem>
-                <MenuItem value="mitico">Mitico</MenuItem>
-              </Select>
-            </FormControl>
+      {/* Floating hearts */}
+      {FLOATING.map((h, i) => (
+        <FavoriteIcon key={i} sx={{
+          position: 'absolute', bottom: '-4px', left: h.left,
+          fontSize: h.size, color: '#f43f5e', opacity: h.opacity, pointerEvents: 'none',
+          animation: `col-float-${i} ${h.dur} ${h.delay} ease-in infinite`,
+          [`@keyframes col-float-${i}`]: {
+            '0%':   { transform: 'translateY(0) rotate(-6deg)', opacity: 0 },
+            '8%':   { opacity: h.opacity },
+            '92%':  { opacity: h.opacity * 0.5 },
+            '100%': { transform: 'translateY(-105vh) rotate(10deg)', opacity: 0 },
+          },
+        }} />
+      ))}
+
+      {/* Main: sticky header + scrollable list */}
+      <Stack sx={{ height: '100%', position: 'relative', zIndex: 1 }}>
+
+        {/* ── Sticky header ── */}
+        <Box sx={{
+          px: 2.5, pt: 2.4, pb: 1.6, flexShrink: 0,
+          background: 'linear-gradient(to bottom, rgba(244,248,255,0.98) 80%, rgba(244,248,255,0))',
+        }}>
+          <Stack direction="row" justifyContent="space-between" alignItems="flex-end" sx={{ mb: 1.8 }}>
+            <Stack spacing={0.2}>
+              <Typography variant="h5" sx={{ color: '#1f2a44', lineHeight: 1.1 }}>
+                Coleção
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#4a5568' }}>
+                {collectionQuery.data
+                  ? `${collectionQuery.data.owned} de ${collectionQuery.data.total} bilhetes`
+                  : 'Carregando...'}
+              </Typography>
+            </Stack>
+
+            {collectionQuery.data && (
+              <Box sx={{ position: 'relative', width: 44, height: 44 }}>
+                <CircularProgress variant="determinate" value={100} size={44} thickness={4}
+                  sx={{ color: 'rgba(29,78,216,0.1)', position: 'absolute', top: 0, left: 0 }} />
+                <CircularProgress variant="determinate"
+                  value={Math.round((collectionQuery.data.owned / collectionQuery.data.total) * 100)}
+                  size={44} thickness={4}
+                  sx={{ color: '#f43f5e', position: 'absolute', top: 0, left: 0 }} />
+                <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Typography sx={{ fontSize: '0.6rem', fontWeight: 800, color: '#1f2a44', lineHeight: 1 }}>
+                    {Math.round((collectionQuery.data.owned / collectionQuery.data.total) * 100)}%
+                  </Typography>
+                </Box>
+              </Box>
+            )}
           </Stack>
 
-          <ToggleButtonGroup
-            color="primary"
-            value={ownershipFilter}
-            exclusive
-            onChange={(_, value: 'todos' | 'coletados' | 'faltando' | null) => {
-              if (value) {
-                setOwnershipFilter(value)
-              }
-            }}
-            fullWidth
-            size="small"
-          >
-            <ToggleButton value="todos">Todos</ToggleButton>
-            <ToggleButton value="coletados">Coletados</ToggleButton>
-            <ToggleButton value="faltando">Faltando</ToggleButton>
-          </ToggleButtonGroup>
-        </Stack>
-      </Paper>
+          {/* Filters */}
+          <Box sx={{
+            p: 1.6, borderRadius: 3,
+            background: 'rgba(255, 253, 251, 0.94)',
+            border: '1.5px solid rgba(30, 64, 175, 0.09)',
+            boxShadow: '0 4px 18px rgba(0,0,0,0.05)',
+          }}>
+            <Stack spacing={1.3}>
+              <TextField
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Pesquisar bilhete..."
+                size="small"
+                fullWidth
+                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2.5, bgcolor: 'rgba(248,250,252,0.8)' } }}
+              />
 
-      <Stack spacing={1.5}>
-        {organizedNotes.length === 0 ? (
-          <Paper sx={{ p: 2 }}>
-            <Typography color="text.secondary">
-              Nenhum bilhete encontrado com os filtros atuais.
-            </Typography>
-          </Paper>
-        ) : (
-          organizedNotes.map((note) => (
-            <NoteCard key={note.id} note={note} onToggleFavorite={handleToggleFavorite} />
-          ))
-        )}
+              <Stack direction="row" spacing={1}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Ordenar</InputLabel>
+                  <Select value={sortBy} label="Ordenar"
+                    onChange={(e) => setSortBy(e.target.value as SortOption)}
+                    sx={{ borderRadius: 2.5 }}>
+                    <MenuItem value="raridade">Raridade</MenuItem>
+                    <MenuItem value="nome">Nome</MenuItem>
+                    <MenuItem value="recentes">Mais recentes</MenuItem>
+                  </Select>
+                </FormControl>
+
+                <FormControl fullWidth size="small">
+                  <InputLabel>Raridade</InputLabel>
+                  <Select value={rarityFilter} label="Raridade"
+                    onChange={(e) => setRarityFilter(e.target.value as 'todas' | Rarity)}
+                    sx={{ borderRadius: 2.5 }}>
+                    <MenuItem value="todas">Todas</MenuItem>
+                    <MenuItem value="comum">Comum</MenuItem>
+                    <MenuItem value="incomum">Incomum</MenuItem>
+                    <MenuItem value="raro">Raro</MenuItem>
+                    <MenuItem value="lendario">Lendário</MenuItem>
+                    <MenuItem value="mitico">Mítico</MenuItem>
+                  </Select>
+                </FormControl>
+              </Stack>
+
+              <ToggleButtonGroup
+                value={ownershipFilter} exclusive fullWidth size="small"
+                onChange={(_, v: 'todos' | 'coletados' | 'faltando' | null) => { if (v) setOwnershipFilter(v) }}
+                sx={{
+                  gap: 0.5,
+                  '& .MuiToggleButton-root': {
+                    borderRadius: '20px !important',
+                    border: '1px solid rgba(30,64,175,0.15) !important',
+                    textTransform: 'none', fontWeight: 600, fontSize: '0.82rem', py: 0.55,
+                    '&.Mui-selected': {
+                      bgcolor: '#1d4ed8', color: '#fff',
+                      '&:hover': { bgcolor: '#1e40af' },
+                    },
+                  },
+                }}
+              >
+                <ToggleButton value="todos">Todos</ToggleButton>
+                <ToggleButton value="coletados">Coletados</ToggleButton>
+                <ToggleButton value="faltando">Faltando</ToggleButton>
+              </ToggleButtonGroup>
+            </Stack>
+          </Box>
+        </Box>
+
+        {/* ── Scrollable list ── */}
+        <Box sx={{ flex: 1, overflowY: 'auto', px: 2.5, pb: 3 }}>
+          {collectionQuery.isPending ? (
+            <Stack alignItems="center" sx={{ py: 6 }}>
+              <CircularProgress size={32} sx={{ color: '#1d4ed8' }} />
+            </Stack>
+          ) : organizedNotes.length === 0 ? (
+            <Box sx={{
+              mt: 1, p: 3, borderRadius: 3, textAlign: 'center',
+              background: 'rgba(255,253,251,0.92)',
+              border: '1.5px solid rgba(30,64,175,0.08)',
+            }}>
+              <Typography sx={{ color: '#94a3b8', fontSize: '0.92rem' }}>
+                Nenhum bilhete encontrado com os filtros atuais.
+              </Typography>
+            </Box>
+          ) : (
+            <Stack spacing={1.4} sx={{ pt: 0.5 }}>
+              {organizedNotes.map((note) => (
+                <NoteCard key={note.id} note={note} onToggleFavorite={handleToggleFavorite} />
+              ))}
+            </Stack>
+          )}
+        </Box>
       </Stack>
-    </Stack>
+    </Box>
   )
 }
