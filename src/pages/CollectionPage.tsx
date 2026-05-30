@@ -182,7 +182,7 @@ export function CollectionPage() {
                 <ToggleButton value="faltando">Faltando</ToggleButton>
               </ToggleButtonGroup>
             </Stack>
-          </Box>
+          </Card>
         </Box>
 
         {/* ── Scrollable list ── */}
