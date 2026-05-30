@@ -26,23 +26,18 @@ export function FavoritesPage() {
   return (
     <Box sx={{
       height: '100%', position: 'relative', overflow: 'hidden',
-      /* Gradiente mais quente/rosado — página do amor */
       background: 'linear-gradient(155deg, #fff5f7 0%, #ffe4ed 35%, #f5eeff 100%)',
     }}>
-
-      {/* Background icon */}
       <FavoriteIcon sx={{
         position: 'absolute', top: -60, right: -60,
-        fontSize: 460, color: '#f43f5e', opacity: 0.055,
-        pointerEvents: 'none',
+        fontSize: 460, color: '#f43f5e', opacity: 0.055, pointerEvents: 'none',
         animation: 'fav-bg-pulse 5s ease-in-out infinite',
         '@keyframes fav-bg-pulse': {
-          '0%, 100%': { transform: 'scale(1)' },
-          '50%':      { transform: 'scale(1.04)' },
+          '0%,100%': { transform: 'scale(1)' },
+          '50%':     { transform: 'scale(1.04)' },
         },
       }} />
 
-      {/* Floating hearts */}
       {FLOATING.map((h, i) => (
         <FavoriteIcon key={i} sx={{
           position: 'absolute', bottom: '-4px', left: h.left,
@@ -57,10 +52,7 @@ export function FavoritesPage() {
         }} />
       ))}
 
-      {/* Content */}
       <Stack sx={{ height: '100%', position: 'relative', zIndex: 1 }}>
-
-        {/* ── Header ── */}
         <Box sx={{
           px: 2.5, pt: 2.4, pb: 1.6, flexShrink: 0,
           background: 'linear-gradient(to bottom, rgba(255,245,247,0.98) 80%, rgba(255,245,247,0))',
@@ -68,16 +60,13 @@ export function FavoritesPage() {
           <Stack direction="row" spacing={1.2} alignItems="center">
             <Box sx={{
               width: 44, height: 44, borderRadius: '50%',
-              background: 'rgba(244, 63, 94, 0.1)',
-              border: '1.5px solid rgba(244, 63, 94, 0.2)',
+              background: 'rgba(244,63,94,0.1)', border: '1.5px solid rgba(244,63,94,0.2)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
             }}>
               <FavoriteIcon sx={{ fontSize: 22, color: '#f43f5e' }} />
             </Box>
             <Stack spacing={0.15}>
-              <Typography variant="h5" sx={{ color: '#1f2a44', lineHeight: 1.1 }}>
-                Favoritos
-              </Typography>
+              <Typography variant="h5" sx={{ color: '#1f2a44', lineHeight: 1.1 }}>Favoritos</Typography>
               <Typography variant="body2" sx={{ color: '#6b7280' }}>
                 {collectionQuery.isPending
                   ? 'Carregando...'
@@ -89,24 +78,22 @@ export function FavoritesPage() {
           </Stack>
         </Box>
 
-        {/* ── Content ── */}
         <Box sx={{ flex: 1, overflowY: 'auto', px: 2.5, pb: 3 }}>
           {collectionQuery.isPending ? (
-            <Stack alignItems="center" sx={{ py: 6 }}>
+            <Stack alignItems="center" justifyContent="center" sx={{ height: '100%' }}>
               <CircularProgress size={32} sx={{ color: '#f43f5e' }} />
             </Stack>
 
           ) : favoriteNotes.length === 0 ? (
-            <Stack alignItems="center" spacing={2} sx={{ pt: 6 }}>
-              {/* Decorative rings */}
+            <Stack alignItems="center" justifyContent="center" spacing={2} sx={{ height: '100%' }}>
               <Box sx={{ position: 'relative', width: 100, height: 100 }}>
                 <Box sx={{
                   position: 'absolute', inset: 0, borderRadius: '50%',
                   border: '2px dashed rgba(244,63,94,0.2)',
                   animation: 'empty-ring-1 3s ease-in-out infinite',
                   '@keyframes empty-ring-1': {
-                    '0%, 100%': { transform: 'scale(1)', opacity: 0.5 },
-                    '50%':      { transform: 'scale(1.1)', opacity: 0.2 },
+                    '0%,100%': { transform: 'scale(1)', opacity: 0.5 },
+                    '50%':     { transform: 'scale(1.1)', opacity: 0.2 },
                   },
                 }} />
                 <Box sx={{
@@ -114,30 +101,19 @@ export function FavoritesPage() {
                   border: '1.5px dashed rgba(244,63,94,0.3)',
                   animation: 'empty-ring-2 3s ease-in-out infinite reverse',
                   '@keyframes empty-ring-2': {
-                    '0%, 100%': { transform: 'scale(1)', opacity: 0.6 },
-                    '50%':      { transform: 'scale(1.08)', opacity: 0.3 },
+                    '0%,100%': { transform: 'scale(1)', opacity: 0.6 },
+                    '50%':     { transform: 'scale(1.08)', opacity: 0.3 },
                   },
                 }} />
-                <Box sx={{
-                  position: 'absolute', inset: 0, display: 'flex',
-                  alignItems: 'center', justifyContent: 'center',
-                }}>
+                <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <FavoriteBorderIcon sx={{ fontSize: 38, color: '#f43f5e', opacity: 0.4 }} />
                 </Box>
               </Box>
-
               <Stack spacing={0.6} alignItems="center">
-                <Typography sx={{
-                  color: '#1f2a44', fontWeight: 700, fontSize: '1.05rem',
-                  fontFamily: '"Playfair Display", Georgia, serif',
-                  fontStyle: 'italic',
-                }}>
+                <Typography sx={{ color: '#1f2a44', fontWeight: 700, fontSize: '1.05rem', fontFamily: '"Playfair Display",Georgia,serif', fontStyle: 'italic' }}>
                   Nenhum favorito ainda
                 </Typography>
-                <Typography sx={{
-                  color: '#9ca3af', fontSize: '0.88rem',
-                  textAlign: 'center', maxWidth: 250, lineHeight: 1.55,
-                }}>
+                <Typography sx={{ color: '#9ca3af', fontSize: '0.88rem', textAlign: 'center', maxWidth: 250, lineHeight: 1.55 }}>
                   Toque no coração de um bilhete coletado para adicioná-lo aqui.
                 </Typography>
               </Stack>
