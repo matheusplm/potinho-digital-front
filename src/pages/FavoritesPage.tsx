@@ -78,14 +78,14 @@ export function FavoritesPage() {
           </Stack>
         </Box>
 
-        <Box sx={{ flex: 1, overflowY: 'auto', px: 2.5, pb: 3 }}>
+        <Box sx={{ flex: 1, overflowY: 'auto', px: 2.5, pb: 3, display: 'flex', flexDirection: 'column' }}>
           {collectionQuery.isPending ? (
-            <Stack alignItems="center" justifyContent="center" sx={{ height: '100%' }}>
+            <Stack alignItems="center" justifyContent="center" sx={{ flex: 1 }}>
               <CircularProgress size={32} sx={{ color: '#f43f5e' }} />
             </Stack>
 
           ) : favoriteNotes.length === 0 ? (
-            <Stack alignItems="center" justifyContent="center" spacing={2} sx={{ height: '100%' }}>
+            <Stack alignItems="center" justifyContent="center" spacing={2} sx={{ flex: 1 }}>
               <Box sx={{ position: 'relative', width: 100, height: 100 }}>
                 <Box sx={{
                   position: 'absolute', inset: 0, borderRadius: '50%',
