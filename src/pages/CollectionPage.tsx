@@ -15,6 +15,7 @@ import {
 } from '@mui/material'
 import { useMemo, useState } from 'react'
 import { NoteCard } from '../components/NoteCard'
+import { Card } from '../components/ui'
 import { useCollectionQuery, useToggleFavoriteMutation, useRaritiesQuery } from '../hooks/useNotes'
 import type { Note } from '../types/note'
 
@@ -130,12 +131,7 @@ export function CollectionPage() {
           </Stack>
 
           {/* Filters */}
-          <Box sx={{
-            p: 1.6, borderRadius: '10px',
-            background: 'rgba(255, 253, 251, 0.94)',
-            border: '1px solid rgba(30, 64, 175, 0.08)',
-            boxShadow: '0 2px 12px rgba(0,0,0,0.05)',
-          }}>
+          <Card sx={{ p: 1.6 }}>
             <Stack spacing={1.3}>
               <TextField
                 value={searchTerm}

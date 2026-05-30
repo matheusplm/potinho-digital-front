@@ -1,5 +1,6 @@
 export { Input } from './Input'
 export { Button } from './Button'
+export { Card } from './Card'
 export { SegmentedControl } from './SegmentedControl'
 export type { SegmentedOption } from './SegmentedControl'
 export { toast } from './toast'

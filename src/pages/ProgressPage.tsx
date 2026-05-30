@@ -2,6 +2,7 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import QueryStatsIcon from '@mui/icons-material/QueryStats'
 import { Box, CircularProgress, LinearProgress, Stack, Typography } from '@mui/material'
 import { useStatsQuery, useRaritiesQuery } from '../hooks/useNotes'
+import { Card } from '../components/ui'
 
 const STARS = [
   { size: 14, left: '9%',  delay: '0s',   dur: '9s',  opacity: 0.15 },
@@ -57,13 +58,7 @@ export function ProgressPage() {
             </Stack>
           ) : statsQuery.data ? (
             <Stack spacing={2}>
-              <Box sx={{
-                p: 2.8, borderRadius: 3.5,
-                background: 'rgba(255,253,251,0.94)',
-                border: '1.5px solid rgba(30,64,175,0.09)',
-                boxShadow: '0 6px 28px rgba(0,0,0,0.06)',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1.5,
-              }}>
+              <Card sx={{ p: 2.8, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1.5 }}>
                 <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, letterSpacing: 0.8, fontSize: '0.68rem' }}>
                   COLEÇÃO TOTAL
                 </Typography>
@@ -100,13 +95,7 @@ export function ProgressPage() {
                 const isComplete = pct === 100
 
                 return (
-                  <Box key={rarity.id} sx={{
-                    p: 1.8, borderRadius: 3,
-                    background: rarity.cardBg,
-                    border: `1.5px solid ${rarity.borderColor}`,
-                    boxShadow: rarity.shadow,
-                    position: 'relative', overflow: 'hidden',
-                  }}>
+                  <Card key={rarity.id} sx={{ p: 1.8, background: rarity.cardBg, borderColor: rarity.borderColor, boxShadow: rarity.shadow, position: 'relative', overflow: 'hidden' }}>
                     {isComplete && (
                       <Box sx={{
                         position: 'absolute', inset: 0, borderRadius: 'inherit',

@@ -3,7 +3,7 @@ import LocalMallIcon from '@mui/icons-material/LocalMall'
 import { Box, Stack, Typography } from '@mui/material'
 import { useState } from 'react'
 import { PackOpenDialog } from '../components/PackOpenDialog'
-import { Button, toast } from '../components/ui'
+import { Button, Card, toast } from '../components/ui'
 import { useCardConfig } from '../context/CardConfigContext'
 import { useOpenPackMutation, usePackOddsQuery, usePackStatusQuery } from '../hooks/useNotes'
 import type { OpenPackResponse } from '../types/note'
@@ -152,7 +152,7 @@ export function PackPage() {
           </Typography>
         </Stack>
 
-        <Box sx={{ width: '100%', maxWidth: 300, p: 2, borderRadius: '12px', background: 'rgba(255,253,251,0.95)', border: '1px solid rgba(99,102,241,0.1)', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
+        <Card sx={{ width: '100%', maxWidth: 300, p: 2 }}>
           <Typography sx={{ color: '#94a3b8', fontWeight: 700, letterSpacing: 1, fontSize: '0.65rem', mb: 1.5, textTransform: 'uppercase' }}>
             Chances de raridade
           </Typography>
