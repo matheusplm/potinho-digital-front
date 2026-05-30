@@ -172,9 +172,6 @@ export function HomePage() {
           <Typography variant="body2" sx={{ color: '#4a5568', textAlign: 'center', fontSize: '0.93rem', lineHeight: 1.55 }}>
             {user?.name ? `Olá, ${user.name.split(' ')[0]} 💙` : 'Um potinho de bilhetinhos feito com amor.'}
           </Typography>
-          <Typography variant="caption" sx={{ color: '#a0aec0', fontSize: '0.74rem', fontStyle: 'italic' }}>
-            feito por Matheus
-          </Typography>
         </Stack>
 
         <Box sx={{ position: 'relative', width: 280, height: 280, maxWidth: '86%', flexShrink: 0 }}>
@@ -349,7 +346,7 @@ export function HomePage() {
           )}
 
           <Tooltip title={notificationsEnabled ? 'Notificações já estão ativas' : 'Avisa quando o pacotinho diário liberar'} placement="top">
-            <span>
+            <span style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
               <MuiButton
                 variant={notificationsEnabled ? 'contained' : 'outlined'}
                 size="small"
