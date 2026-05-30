@@ -45,7 +45,7 @@ export function ProgressPage() {
           background: 'linear-gradient(to bottom,rgba(244,248,255,0.98) 80%,rgba(244,248,255,0))',
         }}>
           <Stack spacing={0.25}>
-            <Typography variant="h5" sx={{ color: '#1f2a44', lineHeight: 1.1 }}>Progresso</Typography>
+            <Typography variant="h5" sx={{ color: '#1f2a44', lineHeight: 1.1, letterSpacing: '-0.3px' }}>Progresso</Typography>
             <Typography variant="body2" sx={{ color: '#4a5568' }}>Sua jornada de coleção</Typography>
           </Stack>
         </Box>

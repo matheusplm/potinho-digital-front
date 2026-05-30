@@ -1,6 +1,6 @@
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import LocalMallIcon from '@mui/icons-material/LocalMall'
-import { Box, Chip, Stack, Typography } from '@mui/material'
+import { Box, Stack, Typography } from '@mui/material'
 import { useState } from 'react'
 import { PackOpenDialog } from '../components/PackOpenDialog'
 import { Button, toast } from '../components/ui'
@@ -69,7 +69,7 @@ export function PackPage() {
 
       <Stack sx={{ height: '100%', alignItems: 'center', justifyContent: 'space-evenly', px: 2.5, py: 2.5, position: 'relative', zIndex: 1 }}>
         <Stack spacing={0.5} alignItems="center">
-          <Typography variant="h5" sx={{ color: '#1f2a44', textAlign: 'center' }}>Pacotinho</Typography>
+          <Typography variant="h5" sx={{ color: '#1f2a44', textAlign: 'center', lineHeight: 1.1, letterSpacing: '-0.3px' }}>Pacotinho</Typography>
           <Typography variant="body2" sx={{ color: '#4a5568', textAlign: 'center', maxWidth: 270, lineHeight: 1.55 }}>
             Cada abertura traz 3 bilhetinhos com chance de raridade especial.
           </Typography>
@@ -152,23 +152,37 @@ export function PackPage() {
           </Typography>
         </Stack>
 
-        <Box sx={{ width: '100%', maxWidth: 300, p: 1.6, borderRadius: 3, background: 'rgba(255,253,251,0.92)', border: '1.5px solid rgba(99,102,241,0.1)', boxShadow: '0 4px 18px rgba(0,0,0,0.05)' }}>
-          <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, letterSpacing: 0.7, display: 'block', mb: 1, fontSize: '0.68rem' }}>
-            CHANCES DE RARIDADE
+        <Box sx={{ width: '100%', maxWidth: 300, p: 2, borderRadius: '12px', background: 'rgba(255,253,251,0.95)', border: '1px solid rgba(99,102,241,0.1)', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
+          <Typography sx={{ color: '#94a3b8', fontWeight: 700, letterSpacing: 1, fontSize: '0.65rem', mb: 1.5, textTransform: 'uppercase' }}>
+            Chances de raridade
           </Typography>
-          <Stack spacing={0.65}>
+          <Stack spacing={1.2}>
             {(packOddsQuery.data ?? []).map((item) => {
               const cfg = rarities[item.rarity]
+              const barColor = cfg?.captionColor ?? '#6366f1'
+              const trackColor = cfg?.chipBg ?? '#e0e7ff'
               return (
-                <Stack key={item.rarity} direction="row" justifyContent="space-between" alignItems="center">
-                  <Chip
-                    label={cfg ? `${cfg.emoji} ${cfg.label}` : item.label}
-                    size="small"
-                    sx={{ height: 18, fontSize: '0.64rem', fontWeight: 700, background: cfg?.chipBg ?? '#f1f5f9', color: cfg?.chipColor ?? '#475569', '& .MuiChip-label': { px: 0.8 } }}
-                  />
-                  <Typography sx={{ fontSize: '0.8rem', color: '#4a5568', fontWeight: 700 }}>
-                    {item.percent}%
-                  </Typography>
+                <Stack key={item.rarity} spacing={0.5}>
+                  <Stack direction="row" justifyContent="space-between" alignItems="center">
+                    <Stack direction="row" spacing={0.6} alignItems="center">
+                      {cfg?.emoji && <Typography sx={{ fontSize: '0.78rem', lineHeight: 1 }}>{cfg.emoji}</Typography>}
+                      <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, color: '#1e3a5f' }}>
+                        {cfg?.label ?? item.label}
+                      </Typography>
+                    </Stack>
+                    <Typography sx={{ fontSize: '0.75rem', fontWeight: 800, color: barColor }}>
+                      {item.percent}%
+                    </Typography>
+                  </Stack>
+                  <Box sx={{ height: 5, borderRadius: '4px', bgcolor: trackColor, overflow: 'hidden' }}>
+                    <Box sx={{
+                      height: '100%',
+                      width: `${item.percent}%`,
+                      borderRadius: '4px',
+                      bgcolor: barColor,
+                      transition: 'width 0.6s ease',
+                    }} />
+                  </Box>
                 </Stack>
               )
             })}

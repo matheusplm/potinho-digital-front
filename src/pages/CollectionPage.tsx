@@ -102,7 +102,7 @@ export function CollectionPage() {
         }}>
           <Stack direction="row" justifyContent="space-between" alignItems="flex-end" sx={{ mb: 1.8 }}>
             <Stack spacing={0.2}>
-              <Typography variant="h5" sx={{ color: '#1f2a44', lineHeight: 1.1 }}>
+              <Typography variant="h5" sx={{ color: '#1f2a44', lineHeight: 1.1, letterSpacing: '-0.3px' }}>
                 Coleção
               </Typography>
               <Typography variant="body2" sx={{ color: '#4a5568' }}>

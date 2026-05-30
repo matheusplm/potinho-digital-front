@@ -69,7 +69,7 @@ export function FavoritesPage() {
               <FavoriteIcon sx={{ fontSize: 22, color: '#f43f5e' }} />
             </Box>
             <Stack spacing={0.15}>
-              <Typography variant="h5" sx={{ color: '#1f2a44', lineHeight: 1.1 }}>Favoritos</Typography>
+              <Typography variant="h5" sx={{ color: '#1f2a44', lineHeight: 1.1, letterSpacing: '-0.3px' }}>Favoritos</Typography>
               <Typography variant="body2" sx={{ color: '#6b7280' }}>
                 {collectionQuery.isPending
                   ? 'Carregando...'
