@@ -32,13 +32,13 @@ function AppRoutes() {
     <CardConfigProvider>
       <Routes>
         <Route element={<MobileLayout />}>
-          <Route index element={<HomePage />} />
+          <Route index element={<Navigate to="/home" replace />} />
+          <Route path="home" element={<HomePage />} />
           <Route path="colecao" element={<CollectionPage />} />
           <Route path="pacotinho" element={<PackPage />} />
           <Route path="favoritos" element={<FavoritesPage />} />
           <Route path="progresso" element={<ProgressPage />} />
           <Route path="config" element={<ConfigPage />} />
-          <Route path="inicio" element={<Navigate to="/" replace />} />
         </Route>
         <Route path="test" element={<TestPage />} />
         <Route path="*" element={<NotFoundPage />} />

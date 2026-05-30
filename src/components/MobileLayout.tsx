@@ -12,14 +12,14 @@ import { useMemo } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 
-type NavPath = '/' | '/colecao' | '/pacotinho' | '/favoritos' | '/progresso'
+type NavPath = '/home' | '/colecao' | '/pacotinho' | '/favoritos' | '/progresso'
 
 function resolveNavValue(pathname: string): NavPath {
   if (pathname.startsWith('/colecao')) return '/colecao'
   if (pathname.startsWith('/pacotinho')) return '/pacotinho'
   if (pathname.startsWith('/favoritos')) return '/favoritos'
   if (pathname.startsWith('/progresso')) return '/progresso'
-  return '/'
+  return '/home'
 }
 
 export function MobileLayout() {
@@ -69,7 +69,7 @@ export function MobileLayout() {
             '& .Mui-selected': { color: '#1d4ed8' },
           }}
         >
-          <BottomNavigationAction label="Início"    value="/"          icon={<HomeIcon />} />
+          <BottomNavigationAction label="Início"    value="/home"      icon={<HomeIcon />} />
           <BottomNavigationAction label="Coleção"   value="/colecao"   icon={<Inventory2Icon />} />
           <BottomNavigationAction label="Pacote"    value="/pacotinho" icon={<AutoAwesomeIcon />} />
           <BottomNavigationAction label="Favoritos" value="/favoritos" icon={<FavoriteIcon />} />
