@@ -8,6 +8,7 @@ import { ConfigPage } from './pages/ConfigPage'
 import { FavoritesPage } from './pages/FavoritesPage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
+import { TestPage } from './pages/TestPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { PackPage } from './pages/PackPage'
 import { ProgressPage } from './pages/ProgressPage'
@@ -21,6 +22,7 @@ function AppRoutes() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/test" element={<TestPage />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     )
