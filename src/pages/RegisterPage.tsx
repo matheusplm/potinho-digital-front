@@ -6,7 +6,7 @@ import { keyframes } from '@emotion/react'
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { api } from '../services/api'
-import { Button, Input } from '../components/ui'
+import { Button, Input, SegmentedControl } from '../components/ui'
 
 const fadeSlide = keyframes`
   from { opacity: 0; transform: translateY(28px); }
@@ -99,25 +99,15 @@ export function RegisterPage() {
         <Box sx={{ width: 40, height: 3, borderRadius: 2, background: mode === 'criar' ? 'linear-gradient(90deg, #1d4ed8, #e11d48)' : 'linear-gradient(90deg, #e11d48, #7c3aed)', mb: 4, transition: 'background 0.4s ease' }} />
 
         <Box sx={{ width: '100%', maxWidth: 320 }}>
-          <Box sx={{ display: 'flex', p: 0.5, mb: 3, borderRadius: 1.5, bgcolor: 'rgba(0,0,0,0.06)' }}>
-            {([
-              { id: 'criar' as const, icon: <AutoAwesomeIcon sx={{ fontSize: 16 }} />, label: 'Criar potinho', color: '#1d4ed8' },
-              { id: 'convite' as const, icon: <FavoriteBorderIcon sx={{ fontSize: 16 }} />, label: 'Tenho convite', color: '#e11d48' },
-            ]).map((opt) => (
-              <Box key={opt.id} onClick={() => setMode(opt.id)} sx={{
-                flex: 1, py: 1, px: 1.2, borderRadius: 1, cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.7,
-                bgcolor: mode === opt.id ? '#fff' : 'transparent',
-                boxShadow: mode === opt.id ? '0 1px 6px rgba(0,0,0,0.1)' : 'none',
-                transition: 'all 0.2s',
-                '& svg': { color: mode === opt.id ? opt.color : '#94a3b8', transition: 'color 0.2s' },
-              }}>
-                {opt.icon}
-                <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, color: mode === opt.id ? opt.color : '#64748b', transition: 'color 0.2s', whiteSpace: 'nowrap' }}>
-                  {opt.label}
-                </Typography>
-              </Box>
-            ))}
+          <Box sx={{ mb: 3 }}>
+            <SegmentedControl
+              value={mode}
+              onChange={setMode}
+              options={[
+                { id: 'criar', label: 'Criar potinho', icon: <AutoAwesomeIcon />, activeColor: '#1d4ed8' },
+                { id: 'convite', label: 'Tenho convite', icon: <FavoriteBorderIcon />, activeColor: '#e11d48' },
+              ]}
+            />
           </Box>
 
           <Box component="form" onSubmit={handleSubmit}>
