@@ -25,7 +25,8 @@ export function FavoritesPage() {
 
   return (
     <Box sx={{
-      height: '100%', position: 'relative', overflow: 'hidden',
+      height: '100%', display: 'flex', flexDirection: 'column',
+      position: 'relative', overflow: 'hidden',
       background: 'linear-gradient(155deg, #fff5f7 0%, #ffe4ed 35%, #f5eeff 100%)',
     }}>
       <FavoriteIcon sx={{
@@ -52,7 +53,7 @@ export function FavoritesPage() {
         }} />
       ))}
 
-      <Stack sx={{ height: '100%', position: 'relative', zIndex: 1 }}>
+      <Stack sx={{ flex: 1, minHeight: 0, position: 'relative', zIndex: 1 }}>
         <Box sx={{
           px: 2.5, pt: 2.4, pb: 1.6, flexShrink: 0,
           background: 'linear-gradient(to bottom, rgba(255,245,247,0.98) 80%, rgba(255,245,247,0))',
