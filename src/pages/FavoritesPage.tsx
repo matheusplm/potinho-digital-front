@@ -79,57 +79,55 @@ export function FavoritesPage() {
           </Stack>
         </Box>
 
-        <Box sx={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
-          {collectionQuery.isPending ? (
-            <Stack alignItems="center" justifyContent="center" sx={{ position: 'absolute', inset: 0 }}>
-              <CircularProgress size={32} sx={{ color: '#f43f5e' }} />
-            </Stack>
+        {collectionQuery.isPending ? (
+          <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <CircularProgress size={32} sx={{ color: '#f43f5e' }} />
+          </Box>
 
-          ) : favoriteNotes.length === 0 ? (
-            <Stack alignItems="center" justifyContent="center" spacing={2} sx={{ position: 'absolute', inset: 0 }}>
-              <Box sx={{ position: 'relative', width: 100, height: 100 }}>
-                <Box sx={{
-                  position: 'absolute', inset: 0, borderRadius: '50%',
-                  border: '2px dashed rgba(244,63,94,0.2)',
-                  animation: 'empty-ring-1 3s ease-in-out infinite',
-                  '@keyframes empty-ring-1': {
-                    '0%,100%': { transform: 'scale(1)', opacity: 0.5 },
-                    '50%':     { transform: 'scale(1.1)', opacity: 0.2 },
-                  },
-                }} />
-                <Box sx={{
-                  position: 'absolute', inset: 14, borderRadius: '50%',
-                  border: '1.5px dashed rgba(244,63,94,0.3)',
-                  animation: 'empty-ring-2 3s ease-in-out infinite reverse',
-                  '@keyframes empty-ring-2': {
-                    '0%,100%': { transform: 'scale(1)', opacity: 0.6 },
-                    '50%':     { transform: 'scale(1.08)', opacity: 0.3 },
-                  },
-                }} />
-                <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <FavoriteBorderIcon sx={{ fontSize: 38, color: '#f43f5e', opacity: 0.4 }} />
-                </Box>
+        ) : favoriteNotes.length === 0 ? (
+          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+            <Box sx={{ position: 'relative', width: 100, height: 100 }}>
+              <Box sx={{
+                position: 'absolute', inset: 0, borderRadius: '50%',
+                border: '2px dashed rgba(244,63,94,0.2)',
+                animation: 'empty-ring-1 3s ease-in-out infinite',
+                '@keyframes empty-ring-1': {
+                  '0%,100%': { transform: 'scale(1)', opacity: 0.5 },
+                  '50%':     { transform: 'scale(1.1)', opacity: 0.2 },
+                },
+              }} />
+              <Box sx={{
+                position: 'absolute', inset: 14, borderRadius: '50%',
+                border: '1.5px dashed rgba(244,63,94,0.3)',
+                animation: 'empty-ring-2 3s ease-in-out infinite reverse',
+                '@keyframes empty-ring-2': {
+                  '0%,100%': { transform: 'scale(1)', opacity: 0.6 },
+                  '50%':     { transform: 'scale(1.08)', opacity: 0.3 },
+                },
+              }} />
+              <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <FavoriteBorderIcon sx={{ fontSize: 38, color: '#f43f5e', opacity: 0.4 }} />
               </Box>
-              <Stack spacing={0.6} alignItems="center">
-                <Typography sx={{ color: '#1f2a44', fontWeight: 700, fontSize: '1.05rem', fontFamily: '"Playfair Display",Georgia,serif', fontStyle: 'italic' }}>
-                  Nenhum favorito ainda
-                </Typography>
-                <Typography sx={{ color: '#9ca3af', fontSize: '0.88rem', textAlign: 'center', maxWidth: 250, lineHeight: 1.55 }}>
-                  Toque no coração de um bilhete coletado para adicioná-lo aqui.
-                </Typography>
-              </Stack>
-            </Stack>
-
-          ) : (
-            <Box sx={{ position: 'absolute', inset: 0, overflowY: 'auto', px: 2.5, pb: 3 }}>
-              <Stack spacing={1.4} sx={{ pt: 0.5 }}>
-                {favoriteNotes.map((note) => (
-                  <NoteCard key={note.id} note={note} onToggleFavorite={handleToggleFavorite} />
-                ))}
-              </Stack>
             </Box>
-          )}
-        </Box>
+            <Stack spacing={0.6} alignItems="center">
+              <Typography sx={{ color: '#1f2a44', fontWeight: 700, fontSize: '1.05rem', fontFamily: '"Playfair Display",Georgia,serif', fontStyle: 'italic' }}>
+                Nenhum favorito ainda
+              </Typography>
+              <Typography sx={{ color: '#9ca3af', fontSize: '0.88rem', textAlign: 'center', maxWidth: 250, lineHeight: 1.55 }}>
+                Toque no coração de um bilhete coletado para adicioná-lo aqui.
+              </Typography>
+            </Stack>
+          </Box>
+
+        ) : (
+          <Box sx={{ flex: 1, minHeight: 0, overflowY: 'auto', px: 2.5, pb: 3 }}>
+            <Stack spacing={1.4} sx={{ pt: 0.5 }}>
+              {favoriteNotes.map((note) => (
+                <NoteCard key={note.id} note={note} onToggleFavorite={handleToggleFavorite} />
+              ))}
+            </Stack>
+          </Box>
+        )}
       </Stack>
     </Box>
   )
