@@ -15,14 +15,10 @@ import {
 } from '@mui/material'
 import { useMemo, useState } from 'react'
 import { NoteCard } from '../components/NoteCard'
-import { useCollectionQuery, useToggleFavoriteMutation } from '../hooks/useNotes'
-import type { Note, Rarity } from '../types/note'
+import { useCollectionQuery, useToggleFavoriteMutation, useRaritiesQuery } from '../hooks/useNotes'
+import type { Note } from '../types/note'
 
 type SortOption = 'raridade' | 'nome' | 'recentes'
-
-const rarityOrder: Record<Rarity, number> = {
-  comum: 1, incomum: 2, raro: 3, lendario: 4, mitico: 5,
-}
 
 const FLOATING = [
   { size: 12, left: '6%',  delay: '0s',   dur: '10s', opacity: 0.13 },
@@ -34,10 +30,11 @@ const FLOATING = [
 export function CollectionPage() {
   const collectionQuery = useCollectionQuery()
   const toggleFavoriteMutation = useToggleFavoriteMutation()
+  const { data: rarities = [] } = useRaritiesQuery()
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<SortOption>('raridade')
   const [ownershipFilter, setOwnershipFilter] = useState<'todos' | 'coletados' | 'faltando'>('todos')
-  const [rarityFilter, setRarityFilter] = useState<'todas' | Rarity>('todas')
+  const [rarityFilter, setRarityFilter] = useState<'todas' | string>('todas')
 
   function handleToggleFavorite(note: Note) {
     toggleFavoriteMutation.mutate({ id: note.id, favorite: !note.favorite })
@@ -64,9 +61,10 @@ export function CollectionPage() {
         return (b.obtainedAt ? new Date(b.obtainedAt).getTime() : 0) -
                (a.obtainedAt ? new Date(a.obtainedAt).getTime() : 0)
       }
-      return rarityOrder[b.rarity] - rarityOrder[a.rarity]
+      const orderMap = Object.fromEntries(rarities.map((r) => [r.id, r.order]))
+      return (orderMap[b.rarity] ?? 99) - (orderMap[a.rarity] ?? 99)
     })
-  }, [collectionQuery.data?.items, searchTerm, sortBy, ownershipFilter, rarityFilter])
+  }, [collectionQuery.data?.items, searchTerm, sortBy, ownershipFilter, rarityFilter, rarities])
 
   return (
     <Box sx={{ height: '100%', position: 'relative', overflow: 'hidden',
@@ -163,14 +161,12 @@ export function CollectionPage() {
                 <FormControl fullWidth size="small">
                   <InputLabel>Raridade</InputLabel>
                   <Select value={rarityFilter} label="Raridade"
-                    onChange={(e) => setRarityFilter(e.target.value as 'todas' | Rarity)}
+                    onChange={(e) => setRarityFilter(e.target.value)}
                     sx={{ borderRadius: 2.5 }}>
                     <MenuItem value="todas">Todas</MenuItem>
-                    <MenuItem value="comum">Comum</MenuItem>
-                    <MenuItem value="incomum">Incomum</MenuItem>
-                    <MenuItem value="raro">Raro</MenuItem>
-                    <MenuItem value="lendario">Lendário</MenuItem>
-                    <MenuItem value="mitico">Mítico</MenuItem>
+                    {rarities.map((r) => (
+                      <MenuItem key={r.id} value={r.id}>{r.emoji} {r.label}</MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Stack>

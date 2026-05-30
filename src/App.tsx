@@ -1,15 +1,32 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { MobileLayout } from './components/MobileLayout'
+import { UserProvider, useUser } from './context/UserContext'
+import { CardConfigProvider } from './context/CardConfigContext'
 import { CollectionPage } from './pages/CollectionPage'
+import { ConfigPage } from './pages/ConfigPage'
 import { FavoritesPage } from './pages/FavoritesPage'
 import { HomePage } from './pages/HomePage'
+import { LoginPage } from './pages/LoginPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { PackPage } from './pages/PackPage'
 import { ProgressPage } from './pages/ProgressPage'
+import { RegisterPage } from './pages/RegisterPage'
 
-function App() {
+function AppRoutes() {
+  const { user } = useUser()
+
+  if (!user) {
+    return (
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    )
+  }
+
   return (
-    <BrowserRouter>
+    <CardConfigProvider>
       <Routes>
         <Route element={<MobileLayout />}>
           <Route index element={<HomePage />} />
@@ -17,10 +34,21 @@ function App() {
           <Route path="pacotinho" element={<PackPage />} />
           <Route path="favoritos" element={<FavoritesPage />} />
           <Route path="progresso" element={<ProgressPage />} />
+          <Route path="config" element={<ConfigPage />} />
           <Route path="inicio" element={<Navigate to="/" replace />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+    </CardConfigProvider>
+  )
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <UserProvider>
+        <AppRoutes />
+      </UserProvider>
     </BrowserRouter>
   )
 }

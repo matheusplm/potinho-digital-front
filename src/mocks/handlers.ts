@@ -115,7 +115,7 @@ export const handlers = [
     }
 
     note.favorite = payload.favorite
-    return HttpResponse.json({ ok: true, note })
+    return HttpResponse.json(note)
   }),
 
   http.get('/api/notes/:id', async ({ params }) => {
