@@ -162,28 +162,28 @@ export function HomePage() {
       ))}
 
       <Stack sx={{
-        alignItems: 'center', height: '100%', justifyContent: 'space-between',
-        px: 2.5, py: 2, position: 'relative', zIndex: 1, overflowY: 'auto',
+        alignItems: 'center', height: '100%', justifyContent: 'center',
+        px: 2.5, py: 2, gap: 2.5, position: 'relative', zIndex: 1, overflowY: 'auto',
       }}>
         <Stack spacing={0.3} alignItems="center">
           <Typography variant="h4" sx={{ color: '#1f2a44', textAlign: 'center', fontSize: '2rem', lineHeight: 1.1, letterSpacing: '-0.3px' }}>
             Potinho Digital
           </Typography>
-          <Typography variant="body2" sx={{ color: '#4a5568', textAlign: 'center', fontSize: '0.93rem', lineHeight: 1.55, maxWidth: 290 }}>
+          <Typography variant="body2" sx={{ color: '#4a5568', textAlign: 'center', fontSize: '0.93rem', lineHeight: 1.55 }}>
             {user?.name ? `Olá, ${user.name.split(' ')[0]} 💙` : 'Um potinho de bilhetinhos feito com amor.'}
           </Typography>
-          <Typography variant="caption" sx={{ color: '#a0aec0', fontSize: '0.74rem', fontStyle: 'italic', letterSpacing: 0.4 }}>
+          <Typography variant="caption" sx={{ color: '#a0aec0', fontSize: '0.74rem', fontStyle: 'italic' }}>
             feito por Matheus
           </Typography>
         </Stack>
 
-        <Box sx={{ position: 'relative', width: 320, height: 320, maxWidth: '96%', flexShrink: 0 }}>
+        <Box sx={{ position: 'relative', width: 280, height: 280, maxWidth: '86%', flexShrink: 0 }}>
           <MuiButton
             onClick={handleOpenDailyNote}
             disabled={!canOpenDaily || openDailyNoteMutation.isPending}
             sx={{
-              width: 240, height: 240, borderRadius: '50%', p: 0, minWidth: 0,
-              position: 'absolute', top: 40, left: 40, zIndex: 2,
+              width: 210, height: 210, borderRadius: '50%', p: 0, minWidth: 0,
+              position: 'absolute', top: 35, left: 35, zIndex: 2,
               bgcolor: 'transparent', color: 'inherit', boxShadow: 'none',
               '&::before': {
                 content: '""', position: 'absolute', inset: -13, borderRadius: '50%',
@@ -275,7 +275,7 @@ export function HomePage() {
           </MuiButton>
         </Box>
 
-        <Stack spacing={0.9} alignItems="center" sx={{ width: '100%', maxWidth: 340 }}>
+        <Stack spacing={0.8} alignItems="center" sx={{ width: '100%', maxWidth: 300 }}>
           <Chip
             icon={canOpenDaily ? <AutoAwesomeIcon sx={{ fontSize: '0.95rem !important', color: '#fff !important' }} /> : undefined}
             label={nextDailyLabel}
