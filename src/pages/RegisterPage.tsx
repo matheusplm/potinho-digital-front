@@ -1,12 +1,12 @@
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
-import { Alert, Box, Stack, Typography } from '@mui/material'
+import { Box, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { api } from '../services/api'
-import { Button, Input, SegmentedControl } from '../components/ui'
+import { Button, Input, SegmentedControl, toast } from '../components/ui'
 
 const fadeSlide = keyframes`
   from { opacity: 0; transform: translateY(28px); }
@@ -34,22 +34,21 @@ export function RegisterPage() {
   const [mode, setMode] = useState<Mode>('criar')
   const [form, setForm] = useState({ name: '', email: '', password: '', inviteCode: '' })
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
 
   const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [field]: e.target.value }))
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError('')
     setLoading(true)
     try {
       const inviteCode = mode === 'convite' ? form.inviteCode : undefined
       await api.register(form.name, form.email, form.password, inviteCode)
+      toast.success('Conta criada!', { description: 'Agora é só entrar.' })
       navigate('/login')
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erro ao criar conta.'
-      setError(msg === 'INVALID_INVITE_CODE' ? 'Código de convite inválido.' : msg)
+      toast.error(msg === 'INVALID_INVITE_CODE' ? 'Código de convite inválido.' : msg)
     } finally {
       setLoading(false)
     }
@@ -112,7 +111,6 @@ export function RegisterPage() {
 
           <Box component="form" onSubmit={handleSubmit}>
             <Stack spacing={2}>
-              {error && <Alert severity="error" sx={{ borderRadius: 2.5, fontSize: '0.82rem', py: 0.5 }}>{error}</Alert>}
               <Input label="Seu nome" value={form.name} onChange={set('name')} placeholder="Como te chamamos?" fullWidth required />
               <Input label="Email" type="email" value={form.email} onChange={set('email')} placeholder="seu@email.com" fullWidth required />
               <Input label="Senha" type="password" value={form.password} onChange={set('password')} placeholder="••••••••" fullWidth required />

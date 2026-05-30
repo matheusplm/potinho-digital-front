@@ -1,9 +1,9 @@
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import LocalMallIcon from '@mui/icons-material/LocalMall'
-import { Alert, Box, Chip, Snackbar, Stack, Typography } from '@mui/material'
+import { Box, Chip, Stack, Typography } from '@mui/material'
 import { useState } from 'react'
 import { PackOpenDialog } from '../components/PackOpenDialog'
-import { Button } from '../components/ui'
+import { Button, toast } from '../components/ui'
 import { useCardConfig } from '../context/CardConfigContext'
 import { useOpenPackMutation, usePackOddsQuery, usePackStatusQuery } from '../hooks/useNotes'
 import type { OpenPackResponse } from '../types/note'
@@ -24,7 +24,6 @@ export function PackPage() {
   const { rarities } = useCardConfig()
   const [dialogOpen, setDialogOpen] = useState(false)
   const [packResult, setPackResult] = useState<OpenPackResponse | null>(null)
-  const [error, setError] = useState<string | null>(null)
 
   const canOpen = packStatusQuery.data?.canOpen ?? true
   const remaining = packStatusQuery.data?.remainingOpensToday ?? 3
@@ -32,7 +31,7 @@ export function PackPage() {
   function handleOpenPack() {
     openPackMutation.mutate(undefined, {
       onSuccess: (response) => { setPackResult(response); setDialogOpen(true) },
-      onError: (err) => setError(err.message),
+      onError: () => toast.error('Não foi possível abrir o pacotinho', { description: 'Tente novamente em instantes.' }),
     })
   }
 
@@ -178,10 +177,6 @@ export function PackPage() {
       </Stack>
 
       <PackOpenDialog open={dialogOpen} result={packResult} onClose={() => setDialogOpen(false)} />
-
-      <Snackbar open={Boolean(error)} autoHideDuration={3000} onClose={() => setError(null)}>
-        <Alert severity="error" variant="filled" onClose={() => setError(null)}>{error}</Alert>
-      </Snackbar>
     </Box>
   )
 }

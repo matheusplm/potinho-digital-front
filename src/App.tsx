@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { Toaster } from 'sonner'
 import { MobileLayout } from './components/MobileLayout'
 import { UserProvider, useUser } from './context/UserContext'
 import { CardConfigProvider } from './context/CardConfigContext'
@@ -48,6 +49,11 @@ function App() {
     <BrowserRouter>
       <UserProvider>
         <AppRoutes />
+        <Toaster
+          position="top-center"
+          gap={8}
+          toastOptions={{ unstyled: true }}
+        />
       </UserProvider>
     </BrowserRouter>
   )

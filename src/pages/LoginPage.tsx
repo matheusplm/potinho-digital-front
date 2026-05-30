@@ -1,11 +1,11 @@
 import FavoriteIcon from '@mui/icons-material/Favorite'
-import { Alert, Box, Stack, Typography } from '@mui/material'
+import { Box, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { api } from '../services/api'
-import { Button, Input } from '../components/ui'
+import { Button, Input, toast } from '../components/ui'
 
 const fadeSlide = keyframes`
   from { opacity: 0; transform: translateY(28px); }
@@ -32,17 +32,14 @@ export function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError('')
     setLoading(true)
     try {
       const { token, user } = await api.login(email, password)
       setUser({ id: user.id, name: user.name, role: user.role as 'writer' | 'reader', token, coupleCode: user.coupleCode })
     } catch {
-      setError('Email ou senha incorretos.')
+      toast.error('Email ou senha incorretos.')
     } finally {
       setLoading(false)
     }
@@ -89,7 +86,6 @@ export function LoginPage() {
 
         <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%', maxWidth: 320 }}>
           <Stack spacing={2}>
-            {error && <Alert severity="error" sx={{ borderRadius: 2.5, fontSize: '0.82rem', py: 0.5 }}>{error}</Alert>}
             <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" fullWidth required />
             <Input label="Senha" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" fullWidth required />
             <Button variant="primary" type="submit" fullWidth loading={loading} sx={{ mt: 0.5 }}>
