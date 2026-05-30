@@ -117,12 +117,12 @@ export function CollectionPage() {
                 <CircularProgress variant="determinate" value={100} size={44} thickness={4}
                   sx={{ color: 'rgba(29,78,216,0.1)', position: 'absolute', top: 0, left: 0 }} />
                 <CircularProgress variant="determinate"
-                  value={Math.round((collectionQuery.data.owned / collectionQuery.data.total) * 100)}
+                  value={collectionQuery.data.total > 0 ? Math.round((collectionQuery.data.owned / collectionQuery.data.total) * 100) : 0}
                   size={44} thickness={4}
                   sx={{ color: '#f43f5e', position: 'absolute', top: 0, left: 0 }} />
                 <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Typography sx={{ fontSize: '0.6rem', fontWeight: 800, color: '#1f2a44', lineHeight: 1 }}>
-                    {Math.round((collectionQuery.data.owned / collectionQuery.data.total) * 100)}%
+                    {collectionQuery.data.total > 0 ? Math.round((collectionQuery.data.owned / collectionQuery.data.total) * 100) : 0}%
                   </Typography>
                 </Box>
               </Box>
@@ -131,10 +131,10 @@ export function CollectionPage() {
 
           {/* Filters */}
           <Box sx={{
-            p: 1.6, borderRadius: 3,
+            p: 1.6, borderRadius: '10px',
             background: 'rgba(255, 253, 251, 0.94)',
-            border: '1.5px solid rgba(30, 64, 175, 0.09)',
-            boxShadow: '0 4px 18px rgba(0,0,0,0.05)',
+            border: '1px solid rgba(30, 64, 175, 0.08)',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.05)',
           }}>
             <Stack spacing={1.3}>
               <TextField
@@ -143,7 +143,7 @@ export function CollectionPage() {
                 placeholder="Pesquisar bilhete..."
                 size="small"
                 fullWidth
-                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2.5, bgcolor: 'rgba(248,250,252,0.8)' } }}
+                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px', bgcolor: 'rgba(248,250,252,0.8)' } }}
               />
 
               <Stack direction="row" spacing={1}>
@@ -151,7 +151,7 @@ export function CollectionPage() {
                   <InputLabel>Ordenar</InputLabel>
                   <Select value={sortBy} label="Ordenar"
                     onChange={(e) => setSortBy(e.target.value as SortOption)}
-                    sx={{ borderRadius: 2.5 }}>
+                    sx={{ borderRadius: '8px' }}>
                     <MenuItem value="raridade">Raridade</MenuItem>
                     <MenuItem value="nome">Nome</MenuItem>
                     <MenuItem value="recentes">Mais recentes</MenuItem>
@@ -162,7 +162,7 @@ export function CollectionPage() {
                   <InputLabel>Raridade</InputLabel>
                   <Select value={rarityFilter} label="Raridade"
                     onChange={(e) => setRarityFilter(e.target.value)}
-                    sx={{ borderRadius: 2.5 }}>
+                    sx={{ borderRadius: '8px' }}>
                     <MenuItem value="todas">Todas</MenuItem>
                     {rarities.map((r) => (
                       <MenuItem key={r.id} value={r.id}>{r.emoji} {r.label}</MenuItem>

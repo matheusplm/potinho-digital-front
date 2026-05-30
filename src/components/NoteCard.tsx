@@ -29,7 +29,7 @@ export function NoteCard({ note, onToggleFavorite }: NoteCardProps) {
 
   if (!note.owned) {
     return (
-      <Card sx={{ background: 'rgba(241,245,249,0.75)', border: '1.5px solid rgba(148,163,184,0.18)', boxShadow: '0 2px 10px rgba(0,0,0,0.04)' }}>
+      <Card sx={{ background: 'rgba(241,245,249,0.75)', border: '1.5px solid rgba(148,163,184,0.18)', boxShadow: '0 2px 10px rgba(0,0,0,0.04)', borderRadius: '10px' }}>
         <CardContent sx={{ py: '12px !important' }}>
           <Stack spacing={0.9}>
             <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
@@ -55,6 +55,7 @@ export function NoteCard({ note, onToggleFavorite }: NoteCardProps) {
     <Card sx={{
       background: cfg.cardBg,
       border: `1.5px solid ${cfg.borderColor}`,
+      borderRadius: '10px',
       boxShadow: cfg.glowColor ? `${cfg.shadow}, 0 0 16px ${cfg.glowColor}` : cfg.shadow,
       transition: 'transform 0.18s ease',
       '&:hover': { transform: 'translateY(-2px)' },
