@@ -85,7 +85,7 @@ export function FavoritesPage() {
           </Box>
 
         ) : favoriteNotes.length === 0 ? (
-          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+          <Box sx={{ height: 'calc(100dvh - 56px - 96px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
             <Box sx={{ position: 'relative', width: 100, height: 100 }}>
               <Box sx={{
                 position: 'absolute', inset: 0, borderRadius: '50%',
