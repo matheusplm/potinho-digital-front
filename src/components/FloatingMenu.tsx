@@ -1,89 +1,126 @@
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import SettingsIcon from '@mui/icons-material/Settings'
 import LogoutIcon from '@mui/icons-material/Logout'
-import { Box, Stack, Typography, Backdrop, IconButton, Divider } from '@mui/material'
+import FavoriteIcon from '@mui/icons-material/Favorite'
+import { Box, Stack, Typography, Backdrop, IconButton } from '@mui/material'
+import { keyframes } from '@emotion/react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
+
+const menuIn = keyframes`
+  from { opacity: 0; transform: scale(0.94) translateY(-6px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+`
+
+const ACTIONS = [
+  { icon: SettingsIcon, label: 'Configurações', key: 'config', danger: false },
+  { icon: LogoutIcon,   label: 'Sair',           key: 'logout', danger: true  },
+]
 
 export function FloatingMenu() {
   const [open, setOpen] = useState(false)
   const { user, logout } = useUser()
   const navigate = useNavigate()
 
-  function handleSettings() { setOpen(false); navigate('/config') }
-  function handleLogout() { setOpen(false); logout() }
+  function handle(key: string) {
+    setOpen(false)
+    if (key === 'config') navigate('/config')
+    if (key === 'logout') logout()
+  }
 
   return (
     <>
-      <Backdrop open={open} onClick={() => setOpen(false)} sx={{ zIndex: 90, backdropFilter: 'blur(1px)', bgcolor: 'rgba(0,0,0,0.08)' }} />
+      <Backdrop
+        open={open}
+        onClick={() => setOpen(false)}
+        sx={{ zIndex: 90, bgcolor: 'transparent' }}
+      />
 
-      <Box sx={{ position: 'fixed', top: 14, right: 14, zIndex: 100 }}>
-        {open && (
-          <Box sx={{
-            position: 'absolute', top: 40, right: 0,
-            background: 'rgba(255,253,251,0.98)',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(0,0,0,0.1)',
-            borderRadius: '8px',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.14)',
-            overflow: 'hidden',
-            minWidth: 170,
-            animation: 'menu-in 0.14s ease-out',
-            '@keyframes menu-in': {
-              from: { opacity: 0, transform: 'translateY(-4px)' },
-              to:   { opacity: 1, transform: 'translateY(0)' },
-            },
-          }}>
-            <Box sx={{ px: 1.8, py: 1.2 }}>
-              <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#1e3a5f' }}>
-                {user?.name}
-              </Typography>
-            </Box>
-
-            <Divider />
-
-            {[
-              { icon: <SettingsIcon sx={{ fontSize: 15 }} />, label: 'Configurações', action: handleSettings, color: '#374151' },
-              { icon: <LogoutIcon sx={{ fontSize: 15 }} />, label: 'Sair', action: handleLogout, color: '#e11d48' },
-            ].map((item) => (
-              <Stack
-                key={item.label}
-                direction="row" spacing={1.2} alignItems="center"
-                onClick={item.action}
-                sx={{
-                  px: 1.8, py: 1, cursor: 'pointer',
-                  '&:hover': { bgcolor: 'rgba(0,0,0,0.04)' },
-                  transition: 'background 0.1s',
-                  color: item.color,
-                  '& svg': { color: item.color },
-                }}
-              >
-                {item.icon}
-                <Typography sx={{ fontSize: '0.82rem', fontWeight: 600, color: item.color }}>
-                  {item.label}
-                </Typography>
-              </Stack>
-            ))}
-          </Box>
-        )}
-
+      <Box sx={{ position: 'fixed', top: 16, right: 16, zIndex: 100 }}>
         <IconButton
           onClick={() => setOpen((v) => !v)}
           sx={{
-            width: 34, height: 34,
-            borderRadius: '8px',
-            bgcolor: open ? 'rgba(29,78,216,0.1)' : 'rgba(255,253,251,0.9)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(0,0,0,0.08)',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            color: open ? '#1d4ed8' : '#475569',
-            transition: 'all 0.15s',
-            '&:hover': { bgcolor: 'rgba(29,78,216,0.08)' },
+            width: 36, height: 36, borderRadius: '10px',
+            bgcolor: open ? '#1d4ed8' : 'rgba(255,255,255,0.88)',
+            backdropFilter: 'blur(12px)',
+            boxShadow: open
+              ? '0 4px 16px rgba(29,78,216,0.35)'
+              : '0 2px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8)',
+            border: '1px solid rgba(0,0,0,0.07)',
+            color: open ? '#fff' : '#334155',
+            transition: 'all 0.2s cubic-bezier(0.16,1,0.3,1)',
+            '&:hover': { bgcolor: open ? '#1e40af' : 'rgba(255,255,255,1)' },
           }}
         >
-          <MoreHorizIcon sx={{ fontSize: 18 }} />
+          <Stack spacing={0.4} alignItems="center" justifyContent="center">
+            {[0, 1, 2].map((i) => (
+              <Box key={i} sx={{
+                width: open ? (i === 1 ? 12 : 14) : 14,
+                height: 1.5, borderRadius: 1,
+                bgcolor: open ? '#fff' : '#334155',
+                transition: 'all 0.2s',
+                opacity: i === 1 ? 0.6 : 1,
+              }} />
+            ))}
+          </Stack>
         </IconButton>
+
+        {open && (
+          <Box sx={{
+            position: 'absolute', top: 44, right: 0,
+            width: 200,
+            background: 'rgba(255,255,255,0.92)',
+            backdropFilter: 'blur(24px)',
+            borderRadius: '12px',
+            boxShadow: '0 16px 48px rgba(0,0,0,0.16), 0 2px 8px rgba(0,0,0,0.08)',
+            border: '1px solid rgba(255,255,255,0.6)',
+            overflow: 'hidden',
+            animation: `${menuIn} 0.2s cubic-bezier(0.16,1,0.3,1)`,
+            transformOrigin: 'top right',
+          }}>
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ px: 1.8, pt: 1.6, pb: 1.4 }}>
+              <Box sx={{
+                width: 30, height: 30, borderRadius: '8px',
+                background: 'linear-gradient(135deg,#1d4ed8,#e11d48)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+              }}>
+                <FavoriteIcon sx={{ fontSize: 14, color: '#fff' }} />
+              </Box>
+              <Box>
+                <Typography sx={{ fontSize: '0.82rem', fontWeight: 700, color: '#0f172a', lineHeight: 1.2 }}>
+                  {user?.name?.split(' ')[0]}
+                </Typography>
+                <Typography sx={{ fontSize: '0.68rem', color: '#94a3b8', lineHeight: 1.2 }}>
+                  {user?.role === 'writer' ? 'escritor' : 'leitor'}
+                </Typography>
+              </Box>
+            </Stack>
+
+            <Box sx={{ height: '1px', bgcolor: 'rgba(0,0,0,0.06)', mx: 1.5 }} />
+
+            <Box sx={{ py: 0.8 }}>
+              {ACTIONS.map((item) => (
+                <Stack
+                  key={item.key}
+                  direction="row" spacing={1.4} alignItems="center"
+                  onClick={() => handle(item.key)}
+                  sx={{
+                    px: 1.8, py: 1,
+                    cursor: 'pointer',
+                    mx: 0.5, borderRadius: '8px',
+                    transition: 'background 0.12s',
+                    '&:hover': { bgcolor: item.danger ? 'rgba(225,29,72,0.07)' : 'rgba(0,0,0,0.04)' },
+                  }}
+                >
+                  <item.icon sx={{ fontSize: 16, color: item.danger ? '#e11d48' : '#475569' }} />
+                  <Typography sx={{ fontSize: '0.84rem', fontWeight: 600, color: item.danger ? '#e11d48' : '#1e293b' }}>
+                    {item.label}
+                  </Typography>
+                </Stack>
+              ))}
+            </Box>
+          </Box>
+        )}
       </Box>
     </>
   )
