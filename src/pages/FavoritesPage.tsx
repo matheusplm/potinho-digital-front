@@ -113,7 +113,7 @@ export function FavoritesPage() {
               </Box>
             </Box>
             <Stack spacing={0.6} alignItems="center">
-              <Typography sx={{ color: '#1f2a44', fontWeight: 700, fontSize: '1.05rem', fontFamily: '"Playfair Display",Georgia,serif', fontStyle: 'italic' }}>
+              <Typography sx={{ color: '#1f2a44', fontWeight: 700, fontSize: '1.05rem', fontFamily: '"Playfair Display",Georgia,serif', fontStyle: 'italic', textAlign: 'center' }}>
                 Nenhum favorito ainda
               </Typography>
               <Typography sx={{ color: '#9ca3af', fontSize: '0.88rem', textAlign: 'center', maxWidth: 250, lineHeight: 1.55 }}>
