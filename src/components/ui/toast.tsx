@@ -1,6 +1,6 @@
 import FavoriteIcon from '@mui/icons-material/Favorite'
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
+import CheckCircleOutlineIcon from '@mui/icons-material/TaskAlt'
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlined'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import { Box, Stack, Typography } from '@mui/material'
 import { toast as sonnerToast } from 'sonner'

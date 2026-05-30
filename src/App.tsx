@@ -40,6 +40,7 @@ function AppRoutes() {
           <Route path="config" element={<ConfigPage />} />
           <Route path="inicio" element={<Navigate to="/" replace />} />
         </Route>
+        <Route path="test" element={<TestPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </CardConfigProvider>
