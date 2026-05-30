@@ -2,7 +2,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { api } from '../services/api'
 import { Button, Input, toast } from '../components/ui'
@@ -29,15 +29,19 @@ const HEARTS = [
 
 export function LoginPage() {
   const { setUser } = useUser()
+  const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     try {
       const { token, user } = await api.login(email, password)
       setUser({ id: user.id, name: user.name, role: user.role as 'writer' | 'reader', token, coupleCode: user.coupleCode })
+      toast.success(`Bem-vindo, ${user.name.split(' ')[0]}! 💙`)
+      navigate('/home')
     } catch {
       toast.error('Email ou senha incorretos.')
     } finally {
