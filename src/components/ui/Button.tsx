@@ -1,6 +1,6 @@
 import { Button as MuiButton, CircularProgress, type ButtonProps } from '@mui/material'
 
-type AppVariant = 'primary' | 'rose' | 'ghost'
+type AppVariant = 'primary' | 'rose' | 'purple' | 'ghost'
 
 interface AppButtonProps extends Omit<ButtonProps, 'variant'> {
   variant?: AppVariant
@@ -20,6 +20,13 @@ const STYLES: Record<AppVariant, object> = {
     boxShadow: '0 6px 20px rgba(225,29,72,0.32)',
     color: '#fff',
     '&:hover': { boxShadow: '0 8px 24px rgba(225,29,72,0.44)', background: 'linear-gradient(135deg, #e11d48 0%, #fb7185 100%)' },
+    '&:disabled': { background: 'rgba(0,0,0,0.1)', boxShadow: 'none', color: 'rgba(0,0,0,0.3)' },
+  },
+  purple: {
+    background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+    boxShadow: '0 6px 20px rgba(79,70,229,0.32)',
+    color: '#fff',
+    '&:hover': { boxShadow: '0 8px 24px rgba(79,70,229,0.44)', background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)' },
     '&:disabled': { background: 'rgba(0,0,0,0.1)', boxShadow: 'none', color: 'rgba(0,0,0,0.3)' },
   },
   ghost: {

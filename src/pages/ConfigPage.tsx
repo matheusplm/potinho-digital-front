@@ -4,8 +4,9 @@ import CheckIcon from '@mui/icons-material/Check'
 import {
   Box, Stack, Typography, Tabs, Tab, Card, CardContent, Chip,
   Dialog, DialogTitle, DialogContent, DialogActions,
-  Button, TextField, CircularProgress, IconButton, Tooltip,
+  IconButton, Tooltip,
 } from '@mui/material'
+import { Button, Input } from '../components/ui'
 import { keyframes } from '@emotion/react'
 import { useRaritiesQuery, useTypesQuery, useUpdateRarityMutation, useUpdateTypeMutation } from '../hooks/useNotes'
 import { useUser } from '../context/UserContext'
@@ -27,10 +28,10 @@ function ColorRow({ label, field, value, onChange }: { label: string; field: str
           />
         </Box>
       )}
-      <TextField
+      <Input
         value={value} onChange={(e) => onChange(field, e.target.value)}
-        size="small" fullWidth
-        sx={{ '& .MuiOutlinedInput-root': { borderRadius: 1.5, fontSize: '0.78rem' }, '& input': { py: 0.7 } }}
+        fullWidth
+        sx={{ '& .MuiOutlinedInput-root': { fontSize: '0.78rem' }, '& input': { py: 0.7 } }}
       />
     </Stack>
   )
@@ -55,9 +56,9 @@ function RarityEditor({ rarity, onClose }: { rarity: RarityConfig; onClose: () =
       <DialogContent>
         <Stack spacing={2} sx={{ pt: 1 }}>
           <Stack direction="row" spacing={1.5}>
-            <TextField label="Label" value={form.label} onChange={(e) => set('label', e.target.value)} size="small" sx={{ flex: 1, '& .MuiOutlinedInput-root': { borderRadius: 2 } }} />
-            <TextField label="Emoji" value={form.emoji} onChange={(e) => set('emoji', e.target.value)} size="small" sx={{ width: 80, '& .MuiOutlinedInput-root': { borderRadius: 2 } }} />
-            <TextField label="Odds %" type="number" value={form.odds} onChange={(e) => set('odds', Number(e.target.value))} size="small" sx={{ width: 90, '& .MuiOutlinedInput-root': { borderRadius: 2 } }} />
+            <Input label="Label" value={form.label} onChange={(e) => set('label', e.target.value)} sx={{ flex: 1 }} />
+            <Input label="Emoji" value={form.emoji} onChange={(e) => set('emoji', e.target.value)} sx={{ width: 80 }} />
+            <Input label="Odds %" type="number" value={form.odds} onChange={(e) => set('odds', Number(e.target.value))} sx={{ width: 90 }} />
           </Stack>
           <ColorRow label="Fundo do card" field="cardBg" value={form.cardBg} onChange={set} />
           <ColorRow label="Cor do texto" field="textColor" value={form.textColor} onChange={set} />
@@ -77,10 +78,8 @@ function RarityEditor({ rarity, onClose }: { rarity: RarityConfig; onClose: () =
         </Stack>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button onClick={onClose} sx={{ borderRadius: 2, textTransform: 'none' }}>Cancelar</Button>
-        <Button onClick={save} variant="contained" disabled={isPending} sx={{ borderRadius: 2, textTransform: 'none', background: 'linear-gradient(135deg,#1d4ed8,#3b82f6)' }}>
-          {isPending ? <CircularProgress size={16} sx={{ color: '#fff' }} /> : 'Salvar'}
-        </Button>
+        <Button variant="ghost" onClick={onClose} sx={{ py: 0.8 }}>Cancelar</Button>
+        <Button variant="primary" onClick={save} loading={isPending} sx={{ py: 0.8 }}>Salvar</Button>
       </DialogActions>
     </>
   )
@@ -105,8 +104,8 @@ function TypeEditor({ type, onClose }: { type: NoteTypeConfig; onClose: () => vo
       <DialogContent>
         <Stack spacing={2} sx={{ pt: 1 }}>
           <Stack direction="row" spacing={1.5}>
-            <TextField label="Label" value={form.label} onChange={(e) => set('label', e.target.value)} size="small" sx={{ flex: 1, '& .MuiOutlinedInput-root': { borderRadius: 2 } }} />
-            <TextField label="Emoji" value={form.emoji} onChange={(e) => set('emoji', e.target.value)} size="small" sx={{ width: 80, '& .MuiOutlinedInput-root': { borderRadius: 2 } }} />
+            <Input label="Label" value={form.label} onChange={(e) => set('label', e.target.value)} sx={{ flex: 1 }} />
+            <Input label="Emoji" value={form.emoji} onChange={(e) => set('emoji', e.target.value)} sx={{ width: 80 }} />
           </Stack>
           <ColorRow label="Cor de destaque" field="accentColor" value={form.accentColor} onChange={set} />
           <ColorRow label="Fundo da tag" field="tagBg" value={form.tagBg} onChange={set} />
@@ -118,10 +117,8 @@ function TypeEditor({ type, onClose }: { type: NoteTypeConfig; onClose: () => vo
         </Stack>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button onClick={onClose} sx={{ borderRadius: 2, textTransform: 'none' }}>Cancelar</Button>
-        <Button onClick={save} variant="contained" disabled={isPending} sx={{ borderRadius: 2, textTransform: 'none', background: 'linear-gradient(135deg,#e11d48,#fb7185)' }}>
-          {isPending ? <CircularProgress size={16} sx={{ color: '#fff' }} /> : 'Salvar'}
-        </Button>
+        <Button variant="ghost" onClick={onClose} sx={{ py: 0.8 }}>Cancelar</Button>
+        <Button variant="rose" onClick={save} loading={isPending} sx={{ py: 0.8 }}>Salvar</Button>
       </DialogActions>
     </>
   )

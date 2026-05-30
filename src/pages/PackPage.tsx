@@ -1,19 +1,12 @@
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import LocalMallIcon from '@mui/icons-material/LocalMall'
-import { Alert, Box, Button, Chip, Snackbar, Stack, Typography } from '@mui/material'
+import { Alert, Box, Chip, Snackbar, Stack, Typography } from '@mui/material'
 import { useState } from 'react'
 import { PackOpenDialog } from '../components/PackOpenDialog'
+import { Button } from '../components/ui'
+import { useCardConfig } from '../context/CardConfigContext'
 import { useOpenPackMutation, usePackOddsQuery, usePackStatusQuery } from '../hooks/useNotes'
-import type { OpenPackResponse, Rarity } from '../types/note'
-
-// Estilo visual por raridade — responsabilidade da UI, não da API
-const rarityChipStyle: Record<Rarity, { chipBg: string; chipColor: string }> = {
-  comum:    { chipBg: '#f1f5f9',                                 chipColor: '#475569' },
-  incomum:  { chipBg: '#dbeafe',                                 chipColor: '#1e40af' },
-  raro:     { chipBg: '#1e3a8a',                                 chipColor: '#bfdbfe' },
-  mitico:   { chipBg: 'linear-gradient(135deg,#ec4899,#8b5cf6)', chipColor: '#fff'    },
-  lendario: { chipBg: 'linear-gradient(135deg,#fbbf24,#f59e0b)', chipColor: '#451a03' },
-}
+import type { OpenPackResponse } from '../types/note'
 
 const STARS = [
   { size: 18, left: '7%',  delay: '0s',   dur: '8s',  opacity: 0.22 },
@@ -27,11 +20,12 @@ const STARS = [
 export function PackPage() {
   const openPackMutation = useOpenPackMutation()
   const packStatusQuery = usePackStatusQuery()
+  const packOddsQuery = usePackOddsQuery()
+  const { rarities } = useCardConfig()
   const [dialogOpen, setDialogOpen] = useState(false)
   const [packResult, setPackResult] = useState<OpenPackResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const packOddsQuery = usePackOddsQuery()
   const canOpen = packStatusQuery.data?.canOpen ?? true
   const remaining = packStatusQuery.data?.remainingOpensToday ?? 3
 
@@ -47,8 +41,6 @@ export function PackPage() {
       height: '100%', position: 'relative', overflow: 'hidden',
       background: 'linear-gradient(145deg, #f4f8ff 0%, #eef4ff 40%, #f0eeff 100%)',
     }}>
-
-      {/* Background icon */}
       <LocalMallIcon sx={{
         position: 'absolute', top: -100, right: -100,
         fontSize: 560, color: '#4f46e5', opacity: 0.05,
@@ -60,7 +52,6 @@ export function PackPage() {
         },
       }} />
 
-      {/* Floating stars */}
       {STARS.map((s, i) => (
         <AutoAwesomeIcon key={i} sx={{
           position: 'absolute', bottom: '-4px', left: s.left,
@@ -69,7 +60,7 @@ export function PackPage() {
           transition: 'color 1s ease',
           animation: `star-float-${i} ${s.dur} ${s.delay} ease-in infinite`,
           [`@keyframes star-float-${i}`]: {
-            '0%':   { transform: 'translateY(0) rotate(0deg)',   opacity: 0 },
+            '0%':   { transform: 'translateY(0) rotate(0deg)', opacity: 0 },
             '8%':   { opacity: s.opacity },
             '92%':  { opacity: s.opacity * 0.5 },
             '100%': { transform: 'translateY(-105vh) rotate(180deg)', opacity: 0 },
@@ -77,29 +68,18 @@ export function PackPage() {
         }} />
       ))}
 
-      {/* Main content */}
-      <Stack sx={{
-        height: '100%', alignItems: 'center', justifyContent: 'space-evenly',
-        px: 2.5, py: 2.5, position: 'relative', zIndex: 1,
-      }}>
-
-        {/* ── Header ── */}
+      <Stack sx={{ height: '100%', alignItems: 'center', justifyContent: 'space-evenly', px: 2.5, py: 2.5, position: 'relative', zIndex: 1 }}>
         <Stack spacing={0.5} alignItems="center">
-          <Typography variant="h5" sx={{ color: '#1f2a44', textAlign: 'center' }}>
-            Pacotinho
-          </Typography>
+          <Typography variant="h5" sx={{ color: '#1f2a44', textAlign: 'center' }}>Pacotinho</Typography>
           <Typography variant="body2" sx={{ color: '#4a5568', textAlign: 'center', maxWidth: 270, lineHeight: 1.55 }}>
             Cada abertura traz 3 bilhetinhos com chance de raridade especial.
           </Typography>
         </Stack>
 
-        {/* ── Pack card ── */}
         <Box
           onClick={canOpen && !openPackMutation.isPending ? handleOpenPack : undefined}
           sx={{
-            position: 'relative',
-            width: 140, height: 196,
-            borderRadius: '16px',
+            position: 'relative', width: 140, height: 196, borderRadius: '16px',
             background: canOpen
               ? 'linear-gradient(145deg, #e0e7ff 0%, #ddd6fe 50%, #c7d2fe 100%)'
               : 'linear-gradient(145deg, #f1f5f9 0%, #e2e8f0 100%)',
@@ -107,8 +87,7 @@ export function PackPage() {
             boxShadow: canOpen
               ? '0 20px 60px rgba(99,102,241,0.25), 0 4px 16px rgba(0,0,0,0.07)'
               : '0 8px 28px rgba(0,0,0,0.07)',
-            display: 'flex', flexDirection: 'column', alignItems: 'center',
-            justifyContent: 'center', gap: 1.4,
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 1.4,
             transition: 'all 0.5s ease',
             cursor: canOpen && !openPackMutation.isPending ? 'pointer' : 'default',
             animation: canOpen ? 'pack-float 3.2s ease-in-out infinite' : 'none',
@@ -116,10 +95,8 @@ export function PackPage() {
               '0%, 100%': { transform: 'translateY(0) rotate(-0.5deg)' },
               '50%':      { transform: 'translateY(-10px) rotate(0.5deg)' },
             },
-            /* Shimmer overlay */
             '&::before': canOpen ? {
-              content: '""',
-              position: 'absolute', inset: 0, borderRadius: 'inherit',
+              content: '""', position: 'absolute', inset: 0, borderRadius: 'inherit',
               background: 'linear-gradient(120deg, transparent 25%, rgba(255,255,255,0.45) 50%, transparent 75%)',
               backgroundSize: '250% 100%',
               animation: 'pack-shimmer 2.4s linear infinite',
@@ -128,43 +105,24 @@ export function PackPage() {
                 '100%': { backgroundPosition: '-200% 0' },
               },
             } : {},
-            /* Hover glow */
-            '&:hover': canOpen ? {
-              boxShadow: '0 24px 72px rgba(99,102,241,0.35), 0 4px 16px rgba(0,0,0,0.08)',
-              transform: 'translateY(-2px)',
-            } : {},
+            '&:hover': canOpen ? { boxShadow: '0 24px 72px rgba(99,102,241,0.35), 0 4px 16px rgba(0,0,0,0.08)', transform: 'translateY(-2px)' } : {},
           }}
         >
-          {/* Corner accents */}
-          {canOpen && <>
-            <Box sx={{ position: 'absolute', top: 10, left: 10, width: 18, height: 18,
-              borderTop: '2px solid rgba(99,102,241,0.4)', borderLeft: '2px solid rgba(99,102,241,0.4)',
-              borderRadius: '3px 0 0 0' }} />
-            <Box sx={{ position: 'absolute', top: 10, right: 10, width: 18, height: 18,
-              borderTop: '2px solid rgba(99,102,241,0.4)', borderRight: '2px solid rgba(99,102,241,0.4)',
-              borderRadius: '0 3px 0 0' }} />
-            <Box sx={{ position: 'absolute', bottom: 10, left: 10, width: 18, height: 18,
-              borderBottom: '2px solid rgba(99,102,241,0.4)', borderLeft: '2px solid rgba(99,102,241,0.4)',
-              borderRadius: '0 0 0 3px' }} />
-            <Box sx={{ position: 'absolute', bottom: 10, right: 10, width: 18, height: 18,
-              borderBottom: '2px solid rgba(99,102,241,0.4)', borderRight: '2px solid rgba(99,102,241,0.4)',
-              borderRadius: '0 0 3px 0' }} />
-          </>}
+          {canOpen && (
+            <>
+              <Box sx={{ position: 'absolute', top: 10, left: 10, width: 18, height: 18, borderTop: '2px solid rgba(99,102,241,0.4)', borderLeft: '2px solid rgba(99,102,241,0.4)', borderRadius: '3px 0 0 0' }} />
+              <Box sx={{ position: 'absolute', top: 10, right: 10, width: 18, height: 18, borderTop: '2px solid rgba(99,102,241,0.4)', borderRight: '2px solid rgba(99,102,241,0.4)', borderRadius: '0 3px 0 0' }} />
+              <Box sx={{ position: 'absolute', bottom: 10, left: 10, width: 18, height: 18, borderBottom: '2px solid rgba(99,102,241,0.4)', borderLeft: '2px solid rgba(99,102,241,0.4)', borderRadius: '0 0 0 3px' }} />
+              <Box sx={{ position: 'absolute', bottom: 10, right: 10, width: 18, height: 18, borderBottom: '2px solid rgba(99,102,241,0.4)', borderRight: '2px solid rgba(99,102,241,0.4)', borderRadius: '0 0 3px 0' }} />
+            </>
+          )}
 
-          <LocalMallIcon sx={{
-            fontSize: 52, color: canOpen ? '#4f46e5' : '#94a3b8',
-            opacity: 0.88, transition: 'color 0.5s ease',
-          }} />
+          <LocalMallIcon sx={{ fontSize: 52, color: canOpen ? '#4f46e5' : '#94a3b8', opacity: 0.88, transition: 'color 0.5s ease' }} />
 
-          <Typography sx={{
-            fontSize: '0.7rem', fontWeight: 800, letterSpacing: 1.5,
-            textTransform: 'uppercase', color: canOpen ? '#4f46e5' : '#94a3b8',
-            transition: 'color 0.5s ease',
-          }}>
+          <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, letterSpacing: 1.5, textTransform: 'uppercase', color: canOpen ? '#4f46e5' : '#94a3b8', transition: 'color 0.5s ease' }}>
             3 bilhetes
           </Typography>
 
-          {/* Remaining dots */}
           <Stack direction="row" spacing={0.6}>
             {[0, 1, 2].map((i) => (
               <Box key={i} sx={{
@@ -177,25 +135,16 @@ export function PackPage() {
           </Stack>
         </Box>
 
-        {/* ── CTA ── */}
         <Stack spacing={0.8} alignItems="center" sx={{ width: '100%', maxWidth: 280 }}>
           <Button
-            variant="contained"
+            variant="purple"
             onClick={handleOpenPack}
             disabled={(!packStatusQuery.isPending && !canOpen) || openPackMutation.isPending}
-            startIcon={<AutoAwesomeIcon />}
             fullWidth
-            sx={{
-              py: 1.4, fontSize: '1.02rem', fontWeight: 700,
-              borderRadius: 3.5, textTransform: 'none',
-              background: canOpen
-                ? 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)'
-                : undefined,
-              boxShadow: canOpen ? '0 6px 24px rgba(79,70,229,0.35)' : undefined,
-              transition: 'all 0.4s ease',
-            }}
+            loading={openPackMutation.isPending}
+            sx={{ borderRadius: 3.5, fontSize: '1.02rem', opacity: canOpen ? 1 : undefined }}
           >
-            {openPackMutation.isPending ? 'Abrindo...' : canOpen ? 'Abrir pacotinho' : 'Sem aberturas hoje'}
+            {!openPackMutation.isPending && (canOpen ? '✨ Abrir pacotinho' : 'Sem aberturas hoje')}
           </Button>
           <Typography variant="caption" sx={{ color: '#94a3b8', textAlign: 'center', fontSize: '0.78rem' }}>
             {remaining > 0
@@ -204,29 +153,20 @@ export function PackPage() {
           </Typography>
         </Stack>
 
-        {/* ── Odds ── */}
-        <Box sx={{
-          width: '100%', maxWidth: 300, p: 1.6, borderRadius: 3,
-          background: 'rgba(255,253,251,0.92)',
-          border: '1.5px solid rgba(99,102,241,0.1)',
-          boxShadow: '0 4px 18px rgba(0,0,0,0.05)',
-        }}>
-          <Typography variant="caption" sx={{
-            color: '#94a3b8', fontWeight: 700, letterSpacing: 0.7,
-            display: 'block', mb: 1, fontSize: '0.68rem',
-          }}>
+        <Box sx={{ width: '100%', maxWidth: 300, p: 1.6, borderRadius: 3, background: 'rgba(255,253,251,0.92)', border: '1.5px solid rgba(99,102,241,0.1)', boxShadow: '0 4px 18px rgba(0,0,0,0.05)' }}>
+          <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, letterSpacing: 0.7, display: 'block', mb: 1, fontSize: '0.68rem' }}>
             CHANCES DE RARIDADE
           </Typography>
           <Stack spacing={0.65}>
             {(packOddsQuery.data ?? []).map((item) => {
-              const style = rarityChipStyle[item.rarity]
+              const cfg = rarities[item.rarity]
               return (
                 <Stack key={item.rarity} direction="row" justifyContent="space-between" alignItems="center">
-                  <Chip label={item.label} size="small" sx={{
-                    height: 18, fontSize: '0.64rem', fontWeight: 700,
-                    background: style.chipBg, color: style.chipColor,
-                    '& .MuiChip-label': { px: 0.8 },
-                  }} />
+                  <Chip
+                    label={cfg ? `${cfg.emoji} ${cfg.label}` : item.label}
+                    size="small"
+                    sx={{ height: 18, fontSize: '0.64rem', fontWeight: 700, background: cfg?.chipBg ?? '#f1f5f9', color: cfg?.chipColor ?? '#475569', '& .MuiChip-label': { px: 0.8 } }}
+                  />
                   <Typography sx={{ fontSize: '0.8rem', color: '#4a5568', fontWeight: 700 }}>
                     {item.percent}%
                   </Typography>
