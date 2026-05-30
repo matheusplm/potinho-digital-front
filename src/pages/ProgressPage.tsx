@@ -2,7 +2,7 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import QueryStatsIcon from '@mui/icons-material/QueryStats'
 import { Box, CircularProgress, LinearProgress, Stack, Typography } from '@mui/material'
 import { useStatsQuery, useRaritiesQuery } from '../hooks/useNotes'
-import { Card } from '../components/ui'
+import { Card, PageTitle } from '../components/ui'
 
 const STARS = [
   { size: 14, left: '9%',  delay: '0s',   dur: '9s',  opacity: 0.15 },
@@ -45,10 +45,7 @@ export function ProgressPage() {
           px: 2.5, pt: 2.4, pb: 1.4, flexShrink: 0,
           background: 'linear-gradient(to bottom,rgba(244,248,255,0.98) 80%,rgba(244,248,255,0))',
         }}>
-          <Stack spacing={0.25}>
-            <Typography variant="h5" sx={{ color: '#1f2a44', lineHeight: 1.1, letterSpacing: '-0.3px' }}>Progresso</Typography>
-            <Typography variant="body2" sx={{ color: '#4a5568' }}>Sua jornada de coleção</Typography>
-          </Stack>
+          <PageTitle title="Progresso" subtitle="Sua jornada de coleção" />
         </Box>
 
         <Box sx={{ flex: 1, overflowY: 'auto', px: 2.5, pb: 3 }}>
@@ -86,7 +83,7 @@ export function ProgressPage() {
                     <AutoAwesomeIcon sx={{ fontSize: 16, color: '#f43f5e' }} />
                   </Stack>
                 )}
-              </Box>
+              </Card>
 
               {rarities.map((rarity) => {
                 const s = statsQuery.data.byRarity[rarity.id]
@@ -133,7 +130,7 @@ export function ProgressPage() {
                         {isComplete ? 'Completo! 🎉' : `${pct}% coletado${pct !== 1 ? 's' : ''}`}
                       </Typography>
                     </Stack>
-                  </Box>
+                  </Card>
                 )
               })}
             </Stack>

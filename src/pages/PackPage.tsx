@@ -163,25 +163,17 @@ export function PackPage() {
               const trackColor = cfg?.chipBg ?? '#e0e7ff'
               return (
                 <Stack key={item.rarity} spacing={0.5}>
-                  <Stack direction="row" justifyContent="space-between" alignItems="center">
-                    <Stack direction="row" spacing={0.6} alignItems="center">
-                      {cfg?.emoji && <Typography sx={{ fontSize: '0.78rem', lineHeight: 1 }}>{cfg.emoji}</Typography>}
-                      <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, color: '#1e3a5f' }}>
-                        {cfg?.label ?? item.label}
-                      </Typography>
-                    </Stack>
-                    <Typography sx={{ fontSize: '0.75rem', fontWeight: 800, color: barColor }}>
+                  <Stack direction="row" alignItems="center" spacing={0.8}>
+                    {cfg?.emoji && <Typography sx={{ fontSize: '0.8rem', lineHeight: 1, flexShrink: 0 }}>{cfg.emoji}</Typography>}
+                    <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, color: '#1e3a5f', flex: 1 }}>
+                      {cfg?.label ?? item.label}
+                    </Typography>
+                    <Typography sx={{ fontSize: '0.75rem', fontWeight: 800, color: barColor, flexShrink: 0 }}>
                       {item.percent}%
                     </Typography>
                   </Stack>
                   <Box sx={{ height: 5, borderRadius: '4px', bgcolor: trackColor, overflow: 'hidden' }}>
-                    <Box sx={{
-                      height: '100%',
-                      width: `${item.percent}%`,
-                      borderRadius: '4px',
-                      bgcolor: barColor,
-                      transition: 'width 0.6s ease',
-                    }} />
+                    <Box sx={{ height: '100%', width: `${item.percent}%`, borderRadius: '4px', bgcolor: barColor, transition: 'width 0.6s ease' }} />
                   </Box>
                 </Stack>
               )

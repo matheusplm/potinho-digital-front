@@ -2,6 +2,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import { Box, CircularProgress, Stack, Typography } from '@mui/material'
 import { NoteCard } from '../components/NoteCard'
+import { PageTitle } from '../components/ui'
 import { useCollectionQuery, useToggleFavoriteMutation } from '../hooks/useNotes'
 import type { Note } from '../types/note'
 
@@ -68,16 +69,10 @@ export function FavoritesPage() {
             }}>
               <FavoriteIcon sx={{ fontSize: 22, color: '#f43f5e' }} />
             </Box>
-            <Stack spacing={0.15}>
-              <Typography variant="h5" sx={{ color: '#1f2a44', lineHeight: 1.1, letterSpacing: '-0.3px' }}>Favoritos</Typography>
-              <Typography variant="body2" sx={{ color: '#6b7280' }}>
-                {collectionQuery.isPending
-                  ? 'Carregando...'
-                  : favoriteNotes.length > 0
-                  ? `${favoriteNotes.length} bilhete${favoriteNotes.length !== 1 ? 's' : ''} favoritado${favoriteNotes.length !== 1 ? 's' : ''}`
-                  : 'Nenhum favorito ainda'}
-              </Typography>
-            </Stack>
+            <PageTitle
+              title="Favoritos"
+              subtitle={collectionQuery.isPending ? 'Carregando...' : favoriteNotes.length > 0 ? `${favoriteNotes.length} bilhete${favoriteNotes.length !== 1 ? 's' : ''} favoritado${favoriteNotes.length !== 1 ? 's' : ''}` : 'Nenhum favorito ainda'}
+            />
           </Stack>
         </Box>
 
@@ -113,7 +108,7 @@ export function FavoritesPage() {
               </Box>
             </Box>
             <Stack spacing={0.6} alignItems="center">
-              <Typography sx={{ color: '#1f2a44', fontWeight: 700, fontSize: '1.05rem', fontFamily: '"Playfair Display",Georgia,serif', fontStyle: 'italic', textAlign: 'center' }}>
+              <Typography sx={{ color: '#1f2a44', fontWeight: 700, fontSize: '1.05rem', textAlign: 'center' }}>
                 Nenhum favorito ainda
               </Typography>
               <Typography sx={{ color: '#9ca3af', fontSize: '0.88rem', textAlign: 'center', maxWidth: 250, lineHeight: 1.55 }}>

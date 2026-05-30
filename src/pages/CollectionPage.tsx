@@ -15,7 +15,7 @@ import {
 } from '@mui/material'
 import { useMemo, useState } from 'react'
 import { NoteCard } from '../components/NoteCard'
-import { Card } from '../components/ui'
+import { Card, PageTitle } from '../components/ui'
 import { useCollectionQuery, useToggleFavoriteMutation, useRaritiesQuery } from '../hooks/useNotes'
 import type { Note } from '../types/note'
 
@@ -102,16 +102,10 @@ export function CollectionPage() {
           background: 'linear-gradient(to bottom, rgba(244,248,255,0.98) 80%, rgba(244,248,255,0))',
         }}>
           <Stack direction="row" justifyContent="space-between" alignItems="flex-end" sx={{ mb: 1.8 }}>
-            <Stack spacing={0.2}>
-              <Typography variant="h5" sx={{ color: '#1f2a44', lineHeight: 1.1, letterSpacing: '-0.3px' }}>
-                Coleção
-              </Typography>
-              <Typography variant="body2" sx={{ color: '#4a5568' }}>
-                {collectionQuery.data
-                  ? `${collectionQuery.data.owned} de ${collectionQuery.data.total} bilhetes`
-                  : 'Carregando...'}
-              </Typography>
-            </Stack>
+            <PageTitle
+              title="Coleção"
+              subtitle={collectionQuery.data ? `${collectionQuery.data.owned} de ${collectionQuery.data.total} bilhetes` : 'Carregando...'}
+            />
 
             {collectionQuery.data && (
               <Box sx={{ position: 'relative', width: 44, height: 44 }}>
