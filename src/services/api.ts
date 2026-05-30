@@ -47,10 +47,10 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     }),
-  register: (name: string, email: string, password: string, role: string) =>
-    request<{ id: string; name: string; role: string }>('/auth/register', {
+  register: (name: string, email: string, password: string, inviteCode?: string) =>
+    request<{ id: string; name: string; role: string; coupleCode?: string }>('/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ name, email, password, role }),
+      body: JSON.stringify({ name, email, password, ...(inviteCode ? { inviteCode } : {}) }),
     }),
   me: () => request<{ id: string; name: string; role: string }>('/auth/me'),
 

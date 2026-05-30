@@ -1,11 +1,14 @@
 import { useState } from 'react'
+import ContentCopyIcon from '@mui/icons-material/ContentCopy'
+import CheckIcon from '@mui/icons-material/Check'
 import {
   Box, Stack, Typography, Tabs, Tab, Card, CardContent, Chip,
   Dialog, DialogTitle, DialogContent, DialogActions,
-  Button, TextField, CircularProgress,
+  Button, TextField, CircularProgress, IconButton, Tooltip,
 } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useRaritiesQuery, useTypesQuery, useUpdateRarityMutation, useUpdateTypeMutation } from '../hooks/useNotes'
+import { useUser } from '../context/UserContext'
 import type { RarityConfig, NoteTypeConfig } from '../types/note'
 
 const fadeIn = keyframes`from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}`
@@ -128,8 +131,17 @@ export function ConfigPage() {
   const [tab, setTab] = useState(0)
   const [editingRarity, setEditingRarity] = useState<RarityConfig | null>(null)
   const [editingType, setEditingType] = useState<NoteTypeConfig | null>(null)
+  const [copied, setCopied] = useState(false)
   const { data: rarities = [] } = useRaritiesQuery()
   const { data: types = [] } = useTypesQuery()
+  const { user } = useUser()
+
+  const handleCopyCode = () => {
+    if (!user?.coupleCode) return
+    navigator.clipboard.writeText(user.coupleCode)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden', bgcolor: '#f8fafc' }}>
@@ -138,6 +150,27 @@ export function ConfigPage() {
           Configurações
         </Typography>
         <Typography variant="caption" sx={{ color: '#64748b' }}>Personalize raridades e tipos</Typography>
+
+        {user?.coupleCode && (
+          <Box sx={{ mt: 2, mb: 0.5, p: 2, borderRadius: 2.5, background: 'linear-gradient(135deg,rgba(29,78,216,0.06),rgba(190,24,93,0.06))', border: '1.5px solid rgba(29,78,216,0.15)' }}>
+            <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: '#64748b', letterSpacing: 0.8, mb: 1 }}>
+              CÓDIGO DE CONVITE
+            </Typography>
+            <Stack direction="row" alignItems="center" justifyContent="space-between">
+              <Typography sx={{ fontFamily: '"Playfair Display",serif', fontWeight: 700, fontSize: '1.6rem', color: '#1e3a5f', letterSpacing: '0.18em' }}>
+                {user.coupleCode}
+              </Typography>
+              <Tooltip title={copied ? 'Copiado!' : 'Copiar código'}>
+                <IconButton onClick={handleCopyCode} size="small" sx={{ color: copied ? '#15803d' : '#1d4ed8' }}>
+                  {copied ? <CheckIcon sx={{ fontSize: 20 }} /> : <ContentCopyIcon sx={{ fontSize: 20 }} />}
+                </IconButton>
+              </Tooltip>
+            </Stack>
+            <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8', mt: 0.5, fontStyle: 'italic' }}>
+              Compartilhe com quem você ama 💙
+            </Typography>
+          </Box>
+        )}
         <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mt: 1, '& .MuiTab-root': { textTransform: 'none', fontWeight: 600, fontSize: '0.85rem' }, '& .Mui-selected': { color: '#1d4ed8' }, '& .MuiTabs-indicator': { bgcolor: '#1d4ed8' } }}>
           <Tab label="Raridades" />
           <Tab label="Tipos" />
