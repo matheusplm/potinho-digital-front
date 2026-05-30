@@ -179,7 +179,7 @@ export function PackPage() {
               )
             })}
           </Stack>
-        </Box>
+        </Card>
       </Stack>
 
       <PackOpenDialog open={dialogOpen} result={packResult} onClose={() => setDialogOpen(false)} />
