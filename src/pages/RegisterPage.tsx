@@ -14,17 +14,17 @@ const fadeSlide = keyframes`
 `
 
 const floatHeart = (i: number) => keyframes`
-  0%   { transform: translateY(0) rotate(${i % 2 === 0 ? -8 : 6}deg) scale(1); opacity: 0; }
-  8%   { opacity: ${0.18 + (i % 3) * 0.05}; }
-  90%  { opacity: ${0.08 + (i % 3) * 0.03}; }
-  100% { transform: translateY(-100vh) rotate(${i % 2 === 0 ? 14 : -12}deg) scale(0.8); opacity: 0; }
+  0%   { transform: translateY(0) rotate(${i % 2 === 0 ? -6 : 5}deg); opacity: 0; }
+  10%  { opacity: ${0.06 + (i % 3) * 0.02}; }
+  85%  { opacity: ${0.04 + (i % 3) * 0.01}; }
+  100% { transform: translateY(-100vh) rotate(${i % 2 === 0 ? 10 : -8}deg); opacity: 0; }
 `
 
 const HEARTS = [
-  { size: 12, left: '11%', delay: '0s',   dur: '10s' },
-  { size: 16, left: '33%', delay: '3.2s', dur: '8.5s' },
-  { size: 10, left: '67%', delay: '1.5s', dur: '9.5s' },
-  { size: 14, left: '85%', delay: '5s',   dur: '11s' },
+  { size: 18, left: '11%', delay: '0s',   dur: '13s' },
+  { size: 22, left: '33%', delay: '4s',   dur: '11s' },
+  { size: 15, left: '67%', delay: '2s',   dur: '14s' },
+  { size: 20, left: '85%', delay: '6.5s', dur: '12s' },
 ]
 
 type Mode = 'criar' | 'convite'
@@ -72,9 +72,10 @@ export function RegisterPage() {
 
       {HEARTS.map((h, i) => (
         <FavoriteIcon key={i} sx={{
-          position: 'absolute', bottom: 0, left: h.left,
-          fontSize: h.size,
+          position: 'absolute', bottom: -8, left: h.left,
+          fontSize: h.size, zIndex: 0,
           color: i % 2 === 0 ? (mode === 'criar' ? '#1d4ed8' : '#e11d48') : '#7c3aed',
+          filter: 'blur(0.5px)',
           animation: `${floatHeart(i)} ${h.dur} ${h.delay} ease-in infinite`,
           pointerEvents: 'none',
         }} />
@@ -98,25 +99,26 @@ export function RegisterPage() {
         <Box sx={{ width: 40, height: 3, borderRadius: 2, background: mode === 'criar' ? 'linear-gradient(90deg, #1d4ed8, #e11d48)' : 'linear-gradient(90deg, #e11d48, #7c3aed)', mb: 4, transition: 'background 0.4s ease' }} />
 
         <Box sx={{ width: '100%', maxWidth: 320 }}>
-          <Stack direction="row" spacing={1.5} sx={{ mb: 3 }}>
+          <Box sx={{ display: 'flex', p: 0.5, mb: 3, borderRadius: 1.5, bgcolor: 'rgba(0,0,0,0.06)' }}>
             {([
-              { id: 'criar' as const, icon: <AutoAwesomeIcon sx={{ fontSize: 20 }} />, title: 'Criar potinho', sub: 'sou quem escreve', color: '#1d4ed8', bg: 'rgba(29,78,216,0.07)' },
-              { id: 'convite' as const, icon: <FavoriteBorderIcon sx={{ fontSize: 20 }} />, title: 'Tenho convite', sub: 'fui convidado', color: '#e11d48', bg: 'rgba(225,29,72,0.07)' },
+              { id: 'criar' as const, icon: <AutoAwesomeIcon sx={{ fontSize: 16 }} />, label: 'Criar potinho', color: '#1d4ed8' },
+              { id: 'convite' as const, icon: <FavoriteBorderIcon sx={{ fontSize: 16 }} />, label: 'Tenho convite', color: '#e11d48' },
             ]).map((opt) => (
               <Box key={opt.id} onClick={() => setMode(opt.id)} sx={{
-                flex: 1, py: 1.4, px: 1.2, borderRadius: 3, cursor: 'pointer', textAlign: 'center',
-                border: mode === opt.id ? `2px solid ${opt.color}` : '1.5px solid rgba(0,0,0,0.1)',
-                bgcolor: mode === opt.id ? opt.bg : 'rgba(255,255,255,0.7)',
-                backdropFilter: 'blur(8px)',
+                flex: 1, py: 1, px: 1.2, borderRadius: 1, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.7,
+                bgcolor: mode === opt.id ? '#fff' : 'transparent',
+                boxShadow: mode === opt.id ? '0 1px 6px rgba(0,0,0,0.1)' : 'none',
                 transition: 'all 0.2s',
                 '& svg': { color: mode === opt.id ? opt.color : '#94a3b8', transition: 'color 0.2s' },
               }}>
                 {opt.icon}
-                <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: mode === opt.id ? opt.color : '#64748b', lineHeight: 1.3, mt: 0.5 }}>{opt.title}</Typography>
-                <Typography sx={{ fontSize: '0.64rem', color: '#94a3b8', lineHeight: 1.2 }}>{opt.sub}</Typography>
+                <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, color: mode === opt.id ? opt.color : '#64748b', transition: 'color 0.2s', whiteSpace: 'nowrap' }}>
+                  {opt.label}
+                </Typography>
               </Box>
             ))}
-          </Stack>
+          </Box>
 
           <Box component="form" onSubmit={handleSubmit}>
             <Stack spacing={2}>

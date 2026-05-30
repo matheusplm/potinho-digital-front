@@ -13,18 +13,18 @@ const fadeSlide = keyframes`
 `
 
 const floatHeart = (i: number) => keyframes`
-  0%   { transform: translateY(0) rotate(${i % 2 === 0 ? -8 : 6}deg) scale(1); opacity: 0; }
-  8%   { opacity: ${0.18 + (i % 3) * 0.05}; }
-  90%  { opacity: ${0.08 + (i % 3) * 0.03}; }
-  100% { transform: translateY(-100vh) rotate(${i % 2 === 0 ? 14 : -12}deg) scale(0.8); opacity: 0; }
+  0%   { transform: translateY(0) rotate(${i % 2 === 0 ? -6 : 5}deg); opacity: 0; }
+  10%  { opacity: ${0.06 + (i % 3) * 0.02}; }
+  85%  { opacity: ${0.04 + (i % 3) * 0.01}; }
+  100% { transform: translateY(-100vh) rotate(${i % 2 === 0 ? 10 : -8}deg); opacity: 0; }
 `
 
 const HEARTS = [
-  { size: 13, left: '9%',  delay: '0s',   dur: '9s'  },
-  { size: 9,  left: '24%', delay: '2.8s', dur: '11s' },
-  { size: 16, left: '58%', delay: '1.2s', dur: '8.5s' },
-  { size: 11, left: '78%', delay: '4.5s', dur: '10s' },
-  { size: 8,  left: '43%', delay: '6.5s', dur: '7.5s' },
+  { size: 20, left: '7%',  delay: '0s',    dur: '12s' },
+  { size: 14, left: '23%', delay: '3.5s',  dur: '15s' },
+  { size: 24, left: '57%', delay: '1.5s',  dur: '11s' },
+  { size: 16, left: '77%', delay: '5.5s',  dur: '13s' },
+  { size: 12, left: '42%', delay: '8s',    dur: '14s' },
 ]
 
 export function LoginPage() {
@@ -62,9 +62,10 @@ export function LoginPage() {
 
       {HEARTS.map((h, i) => (
         <FavoriteIcon key={i} sx={{
-          position: 'absolute', bottom: 0, left: h.left,
-          fontSize: h.size,
+          position: 'absolute', bottom: -8, left: h.left,
+          fontSize: h.size, zIndex: 0,
           color: i % 2 === 0 ? '#1d4ed8' : '#e11d48',
+          filter: 'blur(0.5px)',
           animation: `${floatHeart(i)} ${h.dur} ${h.delay} ease-in infinite`,
           pointerEvents: 'none',
         }} />
