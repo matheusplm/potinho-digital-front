@@ -25,8 +25,7 @@ export function FavoritesPage() {
 
   return (
     <Box sx={{
-      height: '100%', display: 'flex', flexDirection: 'column',
-      position: 'relative', overflow: 'hidden',
+      position: 'relative', height: '100%', overflow: 'hidden',
       background: 'linear-gradient(155deg, #fff5f7 0%, #ffe4ed 35%, #f5eeff 100%)',
     }}>
       <FavoriteIcon sx={{
@@ -53,7 +52,10 @@ export function FavoritesPage() {
         }} />
       ))}
 
-      <Stack sx={{ flex: 1, minHeight: 0, position: 'relative', zIndex: 1 }}>
+      <Box sx={{
+        position: 'absolute', inset: 0, zIndex: 1,
+        display: 'flex', flexDirection: 'column',
+      }}>
         <Box sx={{
           px: 2.5, pt: 2.4, pb: 1.6, flexShrink: 0,
           background: 'linear-gradient(to bottom, rgba(255,245,247,0.98) 80%, rgba(255,245,247,0))',
@@ -79,50 +81,50 @@ export function FavoritesPage() {
           </Stack>
         </Box>
 
-        {collectionQuery.isPending ? (
+        {collectionQuery.isPending && (
           <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <CircularProgress size={32} sx={{ color: '#f43f5e' }} />
           </Box>
+        )}
 
-        ) : favoriteNotes.length === 0 ? (
-          <>
-            <Stack alignItems="center" spacing={2} sx={{ my: 'auto', px: 2.5 }}>
-              <Box sx={{ position: 'relative', width: 100, height: 100 }}>
-                <Box sx={{
-                  position: 'absolute', inset: 0, borderRadius: '50%',
-                  border: '2px dashed rgba(244,63,94,0.2)',
-                  animation: 'empty-ring-1 3s ease-in-out infinite',
-                  '@keyframes empty-ring-1': {
-                    '0%,100%': { transform: 'scale(1)', opacity: 0.5 },
-                    '50%':     { transform: 'scale(1.1)', opacity: 0.2 },
-                  },
-                }} />
-                <Box sx={{
-                  position: 'absolute', inset: 14, borderRadius: '50%',
-                  border: '1.5px dashed rgba(244,63,94,0.3)',
-                  animation: 'empty-ring-2 3s ease-in-out infinite reverse',
-                  '@keyframes empty-ring-2': {
-                    '0%,100%': { transform: 'scale(1)', opacity: 0.6 },
-                    '50%':     { transform: 'scale(1.08)', opacity: 0.3 },
-                  },
-                }} />
-                <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <FavoriteBorderIcon sx={{ fontSize: 38, color: '#f43f5e', opacity: 0.4 }} />
-                </Box>
+        {!collectionQuery.isPending && favoriteNotes.length === 0 && (
+          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+            <Box sx={{ position: 'relative', width: 100, height: 100 }}>
+              <Box sx={{
+                position: 'absolute', inset: 0, borderRadius: '50%',
+                border: '2px dashed rgba(244,63,94,0.2)',
+                animation: 'empty-ring-1 3s ease-in-out infinite',
+                '@keyframes empty-ring-1': {
+                  '0%,100%': { transform: 'scale(1)', opacity: 0.5 },
+                  '50%':     { transform: 'scale(1.1)', opacity: 0.2 },
+                },
+              }} />
+              <Box sx={{
+                position: 'absolute', inset: 14, borderRadius: '50%',
+                border: '1.5px dashed rgba(244,63,94,0.3)',
+                animation: 'empty-ring-2 3s ease-in-out infinite reverse',
+                '@keyframes empty-ring-2': {
+                  '0%,100%': { transform: 'scale(1)', opacity: 0.6 },
+                  '50%':     { transform: 'scale(1.08)', opacity: 0.3 },
+                },
+              }} />
+              <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <FavoriteBorderIcon sx={{ fontSize: 38, color: '#f43f5e', opacity: 0.4 }} />
               </Box>
-              <Stack spacing={0.6} alignItems="center">
-                <Typography sx={{ color: '#1f2a44', fontWeight: 700, fontSize: '1.05rem', fontFamily: '"Playfair Display",Georgia,serif', fontStyle: 'italic' }}>
-                  Nenhum favorito ainda
-                </Typography>
-                <Typography sx={{ color: '#9ca3af', fontSize: '0.88rem', textAlign: 'center', maxWidth: 250, lineHeight: 1.55 }}>
-                  Toque no coração de um bilhete coletado para adicioná-lo aqui.
-                </Typography>
-              </Stack>
+            </Box>
+            <Stack spacing={0.6} alignItems="center">
+              <Typography sx={{ color: '#1f2a44', fontWeight: 700, fontSize: '1.05rem', fontFamily: '"Playfair Display",Georgia,serif', fontStyle: 'italic' }}>
+                Nenhum favorito ainda
+              </Typography>
+              <Typography sx={{ color: '#9ca3af', fontSize: '0.88rem', textAlign: 'center', maxWidth: 250, lineHeight: 1.55 }}>
+                Toque no coração de um bilhete coletado para adicioná-lo aqui.
+              </Typography>
             </Stack>
-          </>
+          </Box>
+        )}
 
-        ) : (
-          <Box sx={{ flex: 1, minHeight: 0, overflowY: 'auto', px: 2.5, pb: 3 }}>
+        {!collectionQuery.isPending && favoriteNotes.length > 0 && (
+          <Box sx={{ flex: 1, overflowY: 'auto', px: 2.5, pb: 3 }}>
             <Stack spacing={1.4} sx={{ pt: 0.5 }}>
               {favoriteNotes.map((note) => (
                 <NoteCard key={note.id} note={note} onToggleFavorite={handleToggleFavorite} />
@@ -130,7 +132,7 @@ export function FavoritesPage() {
             </Stack>
           </Box>
         )}
-      </Stack>
+      </Box>
     </Box>
   )
 }
