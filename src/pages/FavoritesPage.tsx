@@ -78,14 +78,14 @@ export function FavoritesPage() {
           </Stack>
         </Box>
 
-        <Box sx={{ flex: 1, overflowY: 'auto', px: 2.5, pb: 3, display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
           {collectionQuery.isPending ? (
-            <Stack alignItems="center" justifyContent="center" sx={{ flex: 1 }}>
+            <Stack alignItems="center" justifyContent="center" sx={{ position: 'absolute', inset: 0 }}>
               <CircularProgress size={32} sx={{ color: '#f43f5e' }} />
             </Stack>
 
           ) : favoriteNotes.length === 0 ? (
-            <Stack alignItems="center" justifyContent="center" spacing={2} sx={{ flex: 1 }}>
+            <Stack alignItems="center" justifyContent="center" spacing={2} sx={{ position: 'absolute', inset: 0 }}>
               <Box sx={{ position: 'relative', width: 100, height: 100 }}>
                 <Box sx={{
                   position: 'absolute', inset: 0, borderRadius: '50%',
@@ -120,11 +120,13 @@ export function FavoritesPage() {
             </Stack>
 
           ) : (
-            <Stack spacing={1.4} sx={{ pt: 0.5 }}>
-              {favoriteNotes.map((note) => (
-                <NoteCard key={note.id} note={note} onToggleFavorite={handleToggleFavorite} />
-              ))}
-            </Stack>
+            <Box sx={{ position: 'absolute', inset: 0, overflowY: 'auto', px: 2.5, pb: 3 }}>
+              <Stack spacing={1.4} sx={{ pt: 0.5 }}>
+                {favoriteNotes.map((note) => (
+                  <NoteCard key={note.id} note={note} onToggleFavorite={handleToggleFavorite} />
+                ))}
+              </Stack>
+            </Box>
           )}
         </Box>
       </Stack>
