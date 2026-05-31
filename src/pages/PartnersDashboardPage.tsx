@@ -1,5 +1,5 @@
 import FavoriteIcon from '@mui/icons-material/Favorite'
-import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline'
+import GroupIcon from '@mui/icons-material/Group'
 import { Box, CircularProgress, LinearProgress, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { Card, PageTitle } from '../components/ui'
@@ -69,7 +69,7 @@ export function PartnersDashboardPage() {
 
         {!isLoading && partners.length === 0 && (
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textAlign: 'center' }}>
-            <PeopleOutlineIcon sx={{ fontSize: 52, color: colors.primary.light, opacity: 0.45 }} />
+            <GroupIcon sx={{ fontSize: 52, color: colors.primary.light, opacity: 0.45 }} />
             <Stack spacing={0.5}>
               <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.1rem', color: colors.text.primary }}>
                 Nenhum leitor ainda

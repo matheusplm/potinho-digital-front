@@ -3,7 +3,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import SettingsIcon from '@mui/icons-material/Settings'
 import Inventory2Icon from '@mui/icons-material/Inventory2'
 import LockIcon from '@mui/icons-material/Lock'
-import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline'
+import GroupIcon from '@mui/icons-material/Group'
 import EditNoteIcon from '@mui/icons-material/EditNote'
 import { Box, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
@@ -171,7 +171,7 @@ export function WriterHomePage() {
           />
 
           <QuickAction
-            icon={<PeopleOutlineIcon sx={{ fontSize: 20, color: '#fff' }} />}
+            icon={<GroupIcon sx={{ fontSize: 20, color: '#fff' }} />}
             bg={gradients.rose}
             title="Parceiros"
             subtitle="Ver leitores e coleção de cada um"
