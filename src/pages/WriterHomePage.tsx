@@ -3,6 +3,8 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import SettingsIcon from '@mui/icons-material/Settings'
 import Inventory2Icon from '@mui/icons-material/Inventory2'
 import LockIcon from '@mui/icons-material/Lock'
+import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline'
+import EditNoteIcon from '@mui/icons-material/EditNote'
 import { Box, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useState } from 'react'
@@ -10,6 +12,7 @@ import { useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { useCollectionQuery, useRaritiesQuery, useTypesQuery } from '../hooks/useNotes'
 import { Card, Button, Input, toast } from '../components/ui'
+import { colors, font, gradients } from '../design-system'
 import { api } from '../services/api'
 
 const fadeIn = keyframes`
@@ -23,6 +26,38 @@ const FLOATING = [
   { size: 18, left: '70%', delay: '1.5s', dur: '11s', opacity: 0.11 },
   { size: 11, left: '86%', delay: '5s',   dur: '12s', opacity: 0.08 },
 ]
+
+interface QuickActionProps {
+  icon: React.ReactNode
+  bg: string
+  title: string
+  subtitle: string
+  onClick: () => void
+}
+
+function QuickAction({ icon, bg, title, subtitle, onClick }: QuickActionProps) {
+  return (
+    <Card sx={{ p: 2, cursor: 'pointer' }} onClick={onClick}>
+      <Stack direction="row" spacing={1.5} alignItems="center">
+        <Box sx={{
+          width: 40, height: 40, borderRadius: '10px',
+          background: bg, flexShrink: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          {icon}
+        </Box>
+        <Stack spacing={0.2}>
+          <Typography sx={{ fontSize: '0.88rem', fontWeight: 700, color: colors.text.primary }}>
+            {title}
+          </Typography>
+          <Typography sx={{ fontSize: '0.75rem', color: colors.text.muted }}>
+            {subtitle}
+          </Typography>
+        </Stack>
+      </Stack>
+    </Card>
+  )
+}
 
 export function WriterHomePage() {
   const { user, setUser } = useUser()
@@ -55,7 +90,7 @@ export function WriterHomePage() {
   return (
     <Box sx={{
       height: '100%', position: 'relative', overflow: 'hidden',
-      background: 'linear-gradient(160deg, #dbeafe 0%, #ede9fe 50%, #fce7f3 100%)',
+      background: gradients.brand,
     }}>
       <FavoriteIcon sx={{
         position: 'absolute', bottom: -80, right: -80,
@@ -66,7 +101,7 @@ export function WriterHomePage() {
       {FLOATING.map((h, i) => (
         <FavoriteIcon key={i} sx={{
           position: 'absolute', bottom: '-4px', left: h.left,
-          fontSize: h.size, color: '#1d4ed8', opacity: h.opacity, pointerEvents: 'none',
+          fontSize: h.size, color: colors.primary.main, opacity: h.opacity, pointerEvents: 'none',
           animation: `float-w-${i} ${h.dur} ${h.delay} ease-in infinite`,
           [`@keyframes float-w-${i}`]: {
             '0%':   { transform: 'translateY(0) rotate(-6deg)', opacity: 0 },
@@ -84,37 +119,37 @@ export function WriterHomePage() {
         animation: `${fadeIn} 0.4s ease`,
       }}>
         <Stack spacing={0.3} sx={{ mb: 3.5 }}>
-          <Typography sx={{ fontSize: '0.82rem', color: '#64748b', fontWeight: 500 }}>
+          <Typography sx={{ fontSize: '0.82rem', color: colors.text.secondary, fontWeight: 500 }}>
             {greeting},
           </Typography>
           <Typography sx={{
-            fontFamily: '"Playfair Display",serif',
+            fontFamily: font.serif,
             fontWeight: 700, fontSize: '2rem',
-            color: '#1e3a5f', lineHeight: 1.1, letterSpacing: '-0.5px',
+            color: colors.text.primary, lineHeight: 1.1, letterSpacing: '-0.5px',
           }}>
             {firstName} 💙
           </Typography>
-          <Typography sx={{ fontSize: '0.85rem', color: '#64748b', fontStyle: 'italic', mt: 0.5 }}>
+          <Typography sx={{ fontSize: '0.85rem', color: colors.text.secondary, fontStyle: 'italic', mt: 0.5 }}>
             o potinho está esperando por você
           </Typography>
         </Stack>
 
         <Stack spacing={1.5} sx={{ mb: 3 }}>
-          <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1.2, color: '#94a3b8', textTransform: 'uppercase' }}>
+          <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1.2, color: colors.text.muted, textTransform: 'uppercase' }}>
             Seu potinho
           </Typography>
           <Stack direction="row" spacing={1.5}>
             {[
-              { label: 'Bilhetes', value: totalNotes, icon: <AutoAwesomeIcon sx={{ fontSize: 18, color: '#1d4ed8' }} />, color: '#1d4ed8' },
-              { label: 'Raridades', value: rarities.length, icon: <FavoriteIcon sx={{ fontSize: 18, color: '#e11d48' }} />, color: '#e11d48' },
-              { label: 'Tipos', value: types.length, icon: <Inventory2Icon sx={{ fontSize: 18, color: '#7c3aed' }} />, color: '#7c3aed' },
+              { label: 'Bilhetes', value: totalNotes, icon: <AutoAwesomeIcon sx={{ fontSize: 18, color: colors.primary.main }} />, color: colors.primary.main },
+              { label: 'Raridades', value: rarities.length, icon: <FavoriteIcon sx={{ fontSize: 18, color: colors.rose.main }} />, color: colors.rose.main },
+              { label: 'Tipos', value: types.length, icon: <Inventory2Icon sx={{ fontSize: 18, color: colors.purple.light }} />, color: colors.purple.light },
             ].map((stat) => (
               <Card key={stat.label} sx={{ flex: 1, p: 1.5, textAlign: 'center' }}>
                 <Box sx={{ mb: 0.8 }}>{stat.icon}</Box>
-                <Typography sx={{ fontSize: '1.6rem', fontWeight: 800, color: stat.color, lineHeight: 1, fontFamily: '"Playfair Display",serif' }}>
+                <Typography sx={{ fontSize: '1.6rem', fontWeight: 800, color: stat.color, lineHeight: 1, fontFamily: font.serif }}>
                   {stat.value}
                 </Typography>
-                <Typography sx={{ fontSize: '0.68rem', color: '#94a3b8', fontWeight: 600, mt: 0.3 }}>
+                <Typography sx={{ fontSize: '0.68rem', color: colors.text.muted, fontWeight: 600, mt: 0.3 }}>
                   {stat.label}
                 </Typography>
               </Card>
@@ -123,62 +158,63 @@ export function WriterHomePage() {
         </Stack>
 
         <Stack spacing={1.5}>
-          <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1.2, color: '#94a3b8', textTransform: 'uppercase' }}>
+          <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1.2, color: colors.text.muted, textTransform: 'uppercase' }}>
             Ações rápidas
           </Typography>
-          <Card sx={{ p: 2 }} onClick={() => navigate('/config')} style={{ cursor: 'pointer' }}>
-            <Stack direction="row" spacing={1.5} alignItems="center">
-              <Box sx={{
-                width: 40, height: 40, borderRadius: '10px',
-                background: 'linear-gradient(135deg,#1d4ed8,#3b82f6)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-              }}>
-                <SettingsIcon sx={{ fontSize: 20, color: '#fff' }} />
-              </Box>
-              <Stack spacing={0.2}>
-                <Typography sx={{ fontSize: '0.88rem', fontWeight: 700, color: '#1e3a5f' }}>Configurações</Typography>
-                <Typography sx={{ fontSize: '0.75rem', color: '#94a3b8' }}>Raridades, tipos e código de convite</Typography>
-              </Stack>
-            </Stack>
-          </Card>
 
-          <Card sx={{ p: 2 }} onClick={() => navigate('/colecao')} style={{ cursor: 'pointer' }}>
-            <Stack direction="row" spacing={1.5} alignItems="center">
-              <Box sx={{
-                width: 40, height: 40, borderRadius: '10px',
-                background: 'linear-gradient(135deg,#e11d48,#fb7185)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-              }}>
-                <Inventory2Icon sx={{ fontSize: 20, color: '#fff' }} />
-              </Box>
-              <Stack spacing={0.2}>
-                <Typography sx={{ fontSize: '0.88rem', fontWeight: 700, color: '#1e3a5f' }}>Ver coleção</Typography>
-                <Typography sx={{ fontSize: '0.75rem', color: '#94a3b8' }}>Todos os bilhetes do potinho</Typography>
-              </Stack>
-            </Stack>
-          </Card>
+          <QuickAction
+            icon={<EditNoteIcon sx={{ fontSize: 20, color: '#fff' }} />}
+            bg={gradients.primary}
+            title="Gerenciar bilhetes"
+            subtitle="Criar, editar e remover bilhetes"
+            onClick={() => navigate('/bilhetes')}
+          />
+
+          <QuickAction
+            icon={<PeopleOutlineIcon sx={{ fontSize: 20, color: '#fff' }} />}
+            bg={gradients.rose}
+            title="Parceiros"
+            subtitle="Ver leitores e coleção de cada um"
+            onClick={() => navigate('/parceiros')}
+          />
+
+          <QuickAction
+            icon={<SettingsIcon sx={{ fontSize: 20, color: '#fff' }} />}
+            bg={gradients.purple}
+            title="Configurações"
+            subtitle="Raridades, tipos e convite"
+            onClick={() => navigate('/config')}
+          />
+
+          <QuickAction
+            icon={<Inventory2Icon sx={{ fontSize: 20, color: '#fff' }} />}
+            bg="linear-gradient(135deg,#0f172a,#1e293b)"
+            title="Ver coleção"
+            subtitle="Todos os bilhetes do potinho"
+            onClick={() => navigate('/colecao')}
+          />
 
           {user?.coupleCode && (
-            <Card sx={{ p: 2, background: 'linear-gradient(135deg,rgba(29,78,216,0.05),rgba(225,29,72,0.05))' }}>
+            <Card sx={{ p: 2, background: `linear-gradient(135deg,${colors.primary.main}08,${colors.rose.main}08)` }}>
               <Stack spacing={1.5}>
                 <Stack spacing={0.5}>
-                  <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1, color: '#94a3b8', textTransform: 'uppercase' }}>
+                  <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1, color: colors.text.muted, textTransform: 'uppercase' }}>
                     Código de convite
                   </Typography>
-                  <Typography sx={{ fontFamily: '"Playfair Display",serif', fontWeight: 700, fontSize: '1.8rem', color: '#1e3a5f', letterSpacing: '0.2em' }}>
+                  <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.8rem', color: colors.text.primary, letterSpacing: '0.2em' }}>
                     {user.coupleCode}
                   </Typography>
-                  <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8', fontStyle: 'italic' }}>
+                  <Typography sx={{ fontSize: '0.72rem', color: colors.text.muted, fontStyle: 'italic' }}>
                     Compartilhe com quem você ama 💙
                   </Typography>
                 </Stack>
 
-                <Box sx={{ height: '1px', bgcolor: 'rgba(0,0,0,0.06)' }} />
+                <Box sx={{ height: '1px', bgcolor: colors.border.subtle }} />
 
                 <Stack spacing={0.8}>
                   <Stack direction="row" spacing={0.6} alignItems="center">
-                    <LockIcon sx={{ fontSize: 13, color: '#64748b' }} />
-                    <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: 0.8, color: '#64748b', textTransform: 'uppercase' }}>
+                    <LockIcon sx={{ fontSize: 13, color: colors.text.secondary }} />
+                    <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: 0.8, color: colors.text.secondary, textTransform: 'uppercase' }}>
                       Email autorizado
                     </Typography>
                   </Stack>
@@ -200,7 +236,7 @@ export function WriterHomePage() {
                     </Button>
                   </Stack>
                   {user.inviteEmail && (
-                    <Typography sx={{ fontSize: '0.72rem', color: '#15803d' }}>
+                    <Typography sx={{ fontSize: '0.72rem', color: colors.success.main }}>
                       ✓ {user.inviteEmail}
                     </Typography>
                   )}

@@ -1,6 +1,34 @@
 export type Rarity = string
 export type NoteType = string
 
+export interface NoteRecord {
+  id: string
+  title: string
+  message: string
+  rarity: string
+  typeId: string
+  createdAt: string
+}
+
+export interface NoteFormData {
+  title: string
+  message: string
+  rarity: string
+  typeId: string
+}
+
+export interface PartnerReader {
+  id: string
+  name: string
+  email: string
+  createdAt: string
+  collection: {
+    total: number
+    owned: number
+    completion: number
+  }
+}
+
 export interface Note {
   id: string
   title: string

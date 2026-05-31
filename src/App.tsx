@@ -8,6 +8,8 @@ import { ConfigPage } from './pages/ConfigPage'
 import { FavoritesPage } from './pages/FavoritesPage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
+import { NotesManagePage } from './pages/NotesManagePage'
+import { PartnersDashboardPage } from './pages/PartnersDashboardPage'
 import { TestPage } from './pages/TestPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { PackPage } from './pages/PackPage'
@@ -39,6 +41,8 @@ function AppRoutes() {
           <Route path="favoritos" element={<FavoritesPage />} />
           <Route path="progresso" element={<ProgressPage />} />
           <Route path="config" element={<ConfigPage />} />
+          <Route path="bilhetes" element={<NotesManagePage />} />
+          <Route path="parceiros" element={<PartnersDashboardPage />} />
         </Route>
         <Route path="test" element={<TestPage />} />
         <Route path="*" element={<NotFoundPage />} />

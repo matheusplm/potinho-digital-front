@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../services/api'
+import type { NoteFormData } from '../types/note'
 
 export function useCollectionQuery() {
   return useQuery({ queryKey: ['collection'], queryFn: api.getCollection })
@@ -77,4 +78,37 @@ export function useUpdateTypeMutation() {
       api.updateType(id, data),
     onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['types'] }) },
   })
+}
+
+export function useNotesQuery() {
+  return useQuery({ queryKey: ['notes'], queryFn: api.getNotes })
+}
+
+export function useCreateNoteMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: NoteFormData) => api.createNote(data),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['notes'] }) },
+  })
+}
+
+export function useUpdateNoteMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<NoteFormData> }) =>
+      api.updateNote(id, data),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['notes'] }) },
+  })
+}
+
+export function useDeleteNoteMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => api.deleteNote(id),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['notes'] }) },
+  })
+}
+
+export function usePartnersQuery() {
+  return useQuery({ queryKey: ['partners'], queryFn: api.getPartners })
 }

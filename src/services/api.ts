@@ -3,9 +3,12 @@ import type {
   DailyNoteOpenResponse,
   DailyNoteStatusResponse,
   Note,
+  NoteFormData,
+  NoteRecord,
   OpenPackResponse,
   PackOddsResponse,
   PackStatusResponse,
+  PartnerReader,
   RarityConfig,
   NoteTypeConfig,
   StatsResponse,
@@ -58,6 +61,16 @@ export const api = {
       method: 'PUT',
       body: JSON.stringify({ email }),
     }),
+
+  getNotes: () => request<NoteRecord[]>('/api/notes'),
+  createNote: (data: NoteFormData) =>
+    request<NoteRecord>('/api/notes', { method: 'POST', body: JSON.stringify(data) }),
+  updateNote: (id: string, data: Partial<NoteFormData>) =>
+    request<NoteRecord>(`/api/notes/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteNote: (id: string) =>
+    request<{ deleted: boolean }>(`/api/notes/${id}`, { method: 'DELETE' }),
+
+  getPartners: () => request<PartnerReader[]>('/api/partner'),
 
   getCollection: () => request<CollectionResponse>('/api/collection'),
   getStats: () => request<StatsResponse>('/api/stats'),
