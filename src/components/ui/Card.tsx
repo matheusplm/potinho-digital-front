@@ -1,4 +1,5 @@
 import { Box, type BoxProps } from '@mui/material'
+import { colors, radius, shadow } from '../../design-system'
 
 interface CardProps extends BoxProps {
   accent?: string
@@ -9,12 +10,10 @@ export function Card({ accent, sx, children, ...props }: CardProps) {
     <Box
       {...props}
       sx={{
-        background: 'rgba(255,253,251,0.95)',
-        border: `1px solid ${accent ? `${accent}22` : 'rgba(0,0,0,0.07)'}`,
-        borderRadius: '12px',
-        boxShadow: accent
-          ? `0 4px 20px ${accent}12`
-          : '0 4px 20px rgba(0,0,0,0.06)',
+        background: colors.surface.base,
+        border: `1px solid ${accent ? `${accent}22` : colors.border.subtle}`,
+        borderRadius: radius.lg,
+        boxShadow: accent ? `0 4px 20px ${accent}12` : shadow.md,
         ...sx,
       }}
     >
