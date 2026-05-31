@@ -1,5 +1,5 @@
 import AddIcon from '@mui/icons-material/Add'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, TextField, Typography } from '@mui/material'
@@ -370,7 +370,7 @@ export function NotesManagePage() {
                           <EditOutlinedIcon sx={{ fontSize: 17 }} />
                         </IconButton>
                         <IconButton size="small" onClick={() => setDeletingNote(note)} sx={{ color: colors.rose.main, p: 0.7 }}>
-                          <DeleteOutlineIcon sx={{ fontSize: 17 }} />
+                          <DeleteForeverOutlinedIcon sx={{ fontSize: 17 }} />
                         </IconButton>
                       </Stack>
                     </Stack>
