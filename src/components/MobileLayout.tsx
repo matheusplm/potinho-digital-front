@@ -7,6 +7,7 @@ import { BottomNavigation, BottomNavigationAction, Box, Paper } from '@mui/mater
 import { useMemo } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { FloatingMenu } from './FloatingMenu'
+import { ScrollHint } from './ui'
 
 type NavPath = '/home' | '/colecao' | '/pacotinho' | '/favoritos' | '/progresso'
 
@@ -30,6 +31,8 @@ export function MobileLayout() {
       <Box component="main" sx={{ height: 'calc(100% - 56px - env(safe-area-inset-bottom, 0px))' }}>
         <Outlet />
       </Box>
+
+      <ScrollHint />
 
       <Paper
         elevation={0}
