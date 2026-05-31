@@ -52,7 +52,12 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ name, email, password, ...(inviteCode ? { inviteCode } : {}) }),
     }),
-  me: () => request<{ id: string; name: string; role: string }>('/auth/me'),
+  me: () => request<{ id: string; name: string; role: string; coupleCode?: string; inviteEmail?: string }>('/auth/me'),
+  setInviteEmail: (email: string) =>
+    request<{ inviteEmail: string }>('/auth/invite-email', {
+      method: 'PUT',
+      body: JSON.stringify({ email }),
+    }),
 
   getCollection: () => request<CollectionResponse>('/api/collection'),
   getStats: () => request<StatsResponse>('/api/stats'),

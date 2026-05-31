@@ -9,6 +9,7 @@ export interface AuthUser {
   role: UserRole
   token: string
   coupleCode?: string
+  inviteEmail?: string
 }
 
 interface UserContextValue {

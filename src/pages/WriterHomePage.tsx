@@ -2,12 +2,15 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import SettingsIcon from '@mui/icons-material/Settings'
 import Inventory2Icon from '@mui/icons-material/Inventory2'
-import { Box, CircularProgress, Stack, Typography } from '@mui/material'
+import LockIcon from '@mui/icons-material/Lock'
+import { Box, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { useCollectionQuery, useRaritiesQuery, useTypesQuery } from '../hooks/useNotes'
-import { Card, Button } from '../components/ui'
+import { Card, Button, Input, toast } from '../components/ui'
+import { api } from '../services/api'
 
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(16px); }
@@ -22,11 +25,27 @@ const FLOATING = [
 ]
 
 export function WriterHomePage() {
-  const { user } = useUser()
+  const { user, setUser } = useUser()
   const navigate = useNavigate()
   const { data: collection } = useCollectionQuery()
   const { data: rarities = [] } = useRaritiesQuery()
   const { data: types = [] } = useTypesQuery()
+  const [inviteEmailInput, setInviteEmailInput] = useState(user?.inviteEmail ?? '')
+  const [savingEmail, setSavingEmail] = useState(false)
+
+  async function handleSaveInviteEmail() {
+    if (!inviteEmailInput.trim()) return
+    setSavingEmail(true)
+    try {
+      await api.setInviteEmail(inviteEmailInput.trim())
+      setUser({ ...user!, inviteEmail: inviteEmailInput.trim().toLowerCase() })
+      toast.success('Email de convite atualizado!')
+    } catch {
+      toast.error('Erro ao salvar email.')
+    } finally {
+      setSavingEmail(false)
+    }
+  }
 
   const firstName = user?.name?.split(' ')[0] ?? ''
   const totalNotes = collection?.total ?? 0
@@ -141,20 +160,51 @@ export function WriterHomePage() {
 
           {user?.coupleCode && (
             <Card sx={{ p: 2, background: 'linear-gradient(135deg,rgba(29,78,216,0.05),rgba(225,29,72,0.05))' }}>
-              <Stack spacing={0.5}>
-                <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1, color: '#94a3b8', textTransform: 'uppercase' }}>
-                  Código de convite
-                </Typography>
-                <Typography sx={{
-                  fontFamily: '"Playfair Display",serif',
-                  fontWeight: 700, fontSize: '1.8rem',
-                  color: '#1e3a5f', letterSpacing: '0.2em',
-                }}>
-                  {user.coupleCode}
-                </Typography>
-                <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8', fontStyle: 'italic' }}>
-                  Compartilhe com quem você ama 💙
-                </Typography>
+              <Stack spacing={1.5}>
+                <Stack spacing={0.5}>
+                  <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1, color: '#94a3b8', textTransform: 'uppercase' }}>
+                    Código de convite
+                  </Typography>
+                  <Typography sx={{ fontFamily: '"Playfair Display",serif', fontWeight: 700, fontSize: '1.8rem', color: '#1e3a5f', letterSpacing: '0.2em' }}>
+                    {user.coupleCode}
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8', fontStyle: 'italic' }}>
+                    Compartilhe com quem você ama 💙
+                  </Typography>
+                </Stack>
+
+                <Box sx={{ height: '1px', bgcolor: 'rgba(0,0,0,0.06)' }} />
+
+                <Stack spacing={0.8}>
+                  <Stack direction="row" spacing={0.6} alignItems="center">
+                    <LockIcon sx={{ fontSize: 13, color: '#64748b' }} />
+                    <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: 0.8, color: '#64748b', textTransform: 'uppercase' }}>
+                      Email autorizado
+                    </Typography>
+                  </Stack>
+                  <Stack direction="row" spacing={1} alignItems="flex-end">
+                    <Input
+                      type="email"
+                      placeholder="email@exemplo.com"
+                      value={inviteEmailInput}
+                      onChange={(e) => setInviteEmailInput(e.target.value)}
+                      sx={{ flex: 1, '& .MuiOutlinedInput-root': { fontSize: '0.82rem' }, '& input': { py: 0.7 } }}
+                    />
+                    <Button
+                      variant="primary"
+                      loading={savingEmail}
+                      onClick={handleSaveInviteEmail}
+                      sx={{ py: 0.85, px: 1.5, fontSize: '0.78rem', whiteSpace: 'nowrap' }}
+                    >
+                      Salvar
+                    </Button>
+                  </Stack>
+                  {user.inviteEmail && (
+                    <Typography sx={{ fontSize: '0.72rem', color: '#15803d' }}>
+                      ✓ {user.inviteEmail}
+                    </Typography>
+                  )}
+                </Stack>
               </Stack>
             </Card>
           )}
