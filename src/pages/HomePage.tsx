@@ -8,7 +8,8 @@ import { usePackNotifications } from '../hooks/usePackNotifications'
 import { useDailyNoteStatusQuery, useOpenDailyNoteMutation } from '../hooks/useNotes'
 import { useUser } from '../context/UserContext'
 import { useCardConfig } from '../context/CardConfigContext'
-import { toast } from '../components/ui'
+import { Button, toast } from '../components/ui'
+import { radius } from '../design-system'
 import type { DailyNoteOpenResponse } from '../types/note'
 
 function formatDateTime(isoDate: string): string {
@@ -352,20 +353,16 @@ export function HomePage() {
           )}
 
           <Tooltip title={notificationsEnabled ? 'Notificações já estão ativas' : 'Avisa quando o pacotinho diário liberar'} placement="top">
-            <span style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-              <MuiButton
-                variant={notificationsEnabled ? 'contained' : 'outlined'}
-                size="small"
+            <span style={{ display: 'flex', justifyContent: 'center' }}>
+              <Button
+                variant="ghost"
                 startIcon={<NotificationsActiveIcon sx={{ fontSize: '1rem !important' }} />}
                 onClick={handleEnableNotifications}
                 disabled={notificationsEnabled}
-                sx={{
-                  fontSize: '0.78rem', fontWeight: 600, px: 2.2, py: 0.55,
-                  borderRadius: 6, opacity: notificationsEnabled ? 0.65 : 1, textTransform: 'none',
-                }}
+                sx={{ fontSize: '0.78rem', px: 2.2, py: 0.7, borderRadius: radius.full, opacity: notificationsEnabled ? 0.6 : 1 }}
               >
                 {notificationsEnabled ? 'Notificações ativas' : 'Ativar notificações'}
-              </MuiButton>
+              </Button>
             </span>
           </Tooltip>
         </Stack>

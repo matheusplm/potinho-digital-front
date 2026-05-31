@@ -1,7 +1,8 @@
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
-import { Box, Button, Chip, Dialog, DialogContent, Stack, Typography } from '@mui/material'
+import { Box, Chip, Dialog, DialogContent, Stack, Typography } from '@mui/material'
 import type { OpenPackResponse } from '../types/note'
 import { useCardConfig } from '../context/CardConfigContext'
+import { Button } from './ui'
 
 interface PackOpenDialogProps {
   open: boolean
@@ -121,14 +122,7 @@ export function PackOpenDialog({ open, result, onClose }: PackOpenDialogProps) {
                 </Box>{' '}
                 pacotinho{result.remainingOpensToday !== 1 ? 's' : ''} hoje.
               </Typography>
-              <Button
-                onClick={onClose} variant="contained" fullWidth
-                sx={{
-                  borderRadius: 3, fontWeight: 700, textTransform: 'none', fontSize: '1rem', py: 1.2,
-                  background: 'linear-gradient(135deg,#1d4ed8 0%,#2563eb 100%)',
-                  boxShadow: '0 4px 16px rgba(29,78,216,0.3)',
-                }}
-              >
+              <Button onClick={onClose} fullWidth>
                 Ótimo!
               </Button>
             </Stack>

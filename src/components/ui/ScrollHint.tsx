@@ -3,21 +3,24 @@ import { Box, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useState, useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
-import { radius } from '../../design-system'
+import { colors, radius } from '../../design-system'
 
-const bounce = keyframes`
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(5px); }
+const hop = keyframes`
+  0%, 50%, 100% { transform: translateX(-50%) translateY(0); }
+  62%  { transform: translateX(-50%) translateY(-11px); }
+  74%  { transform: translateX(-50%) translateY(0); }
+  83%  { transform: translateX(-50%) translateY(-5px); }
+  92%  { transform: translateX(-50%) translateY(0); }
+`
+
+const chevronBounce = keyframes`
+  0%, 100% { transform: translateY(-1px); }
+  50%       { transform: translateY(3px); }
 `
 
 const appear = keyframes`
-  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
-`
-
-const vanish = keyframes`
-  from { opacity: 1; transform: translateX(-50%) translateY(0); }
-  to   { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  from { opacity: 0; transform: translateX(-50%) translateY(14px) scale(0.85); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
 `
 
 function findScrollable(el: Element, depth = 0): boolean {
@@ -56,31 +59,39 @@ export function ScrollHint() {
   return (
     <Box sx={{
       position: 'fixed',
-      bottom: 66,
+      bottom: 70,
       left: '50%',
       zIndex: 200,
       pointerEvents: 'none',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: 0.3,
-      px: 1.8, py: 1,
-      borderRadius: radius.full,
-      background: 'rgba(30,58,95,0.62)',
-      backdropFilter: 'blur(14px)',
-      border: '1px solid rgba(255,255,255,0.16)',
-      boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
-      animation: `${appear} 0.3s ease forwards, ${vanish} 0.35s ease 2.8s forwards`,
+      animation: `${appear} 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards, ${hop} 1.9s ease-in-out 0.4s infinite`,
     }}>
-      <Box sx={{ animation: `${bounce} 1.1s ease-in-out infinite`, display: 'flex' }}>
-        <KeyboardArrowDownIcon sx={{ fontSize: 18, color: 'rgba(255,255,255,0.9)' }} />
-      </Box>
-      <Typography sx={{
-        fontSize: '0.65rem', fontWeight: 700,
-        color: 'rgba(255,255,255,0.85)', whiteSpace: 'nowrap', lineHeight: 1,
+      <Box sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 0.4,
+        px: 1.6, pt: 1, pb: 0.9,
+        borderRadius: radius.full,
+        background: `linear-gradient(160deg, ${colors.primary.main}f0, ${colors.purple.main}f0)`,
+        backdropFilter: 'blur(14px)',
+        border: '1.5px solid rgba(255,255,255,0.22)',
+        boxShadow: `0 6px 22px ${colors.primary.glow}, inset 0 1px 0 rgba(255,255,255,0.25)`,
       }}>
-        Deslize para baixo
-      </Typography>
+        <Box sx={{
+          width: 26, height: 26, borderRadius: '50%',
+          background: 'rgba(255,255,255,0.18)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          animation: `${chevronBounce} 1.1s ease-in-out infinite`,
+        }}>
+          <KeyboardArrowDownIcon sx={{ fontSize: 19, color: '#fff' }} />
+        </Box>
+        <Typography sx={{
+          fontSize: '0.64rem', fontWeight: 800, letterSpacing: 0.3,
+          color: 'rgba(255,255,255,0.95)', whiteSpace: 'nowrap', lineHeight: 1,
+        }}>
+          Deslize para baixo
+        </Typography>
+      </Box>
     </Box>
   )
 }

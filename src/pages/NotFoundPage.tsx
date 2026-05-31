@@ -1,6 +1,7 @@
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
-import { Box, Button, Stack, Typography } from '@mui/material'
+import { Box, Stack, Typography } from '@mui/material'
 import { Link as RouterLink } from 'react-router-dom'
+import { Button } from '../components/ui'
 
 export function NotFoundPage() {
   return (
@@ -38,21 +39,7 @@ export function NotFoundPage() {
           </Typography>
         </Stack>
 
-        <Button
-          component={RouterLink}
-          to="/"
-          variant="contained"
-          sx={{
-            borderRadius: 3,
-            fontWeight: 700,
-            textTransform: 'none',
-            px: 3.5,
-            py: 1.1,
-            background: 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)',
-            boxShadow: '0 4px 16px rgba(29, 78, 216, 0.3)',
-            fontSize: '0.95rem',
-          }}
-        >
+        <Button component={RouterLink} to="/" sx={{ px: 3.5 }}>
           Voltar para o início
         </Button>
       </Stack>
