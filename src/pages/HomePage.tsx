@@ -42,8 +42,12 @@ const CLOCK_HEARTS = [
   { top: '48%', left: '72%', size: 11, rotate:  15, opacity: 0.70 },
 ]
 
+import { WriterHomePage } from './WriterHomePage'
+
 export function HomePage() {
   const { user } = useUser()
+  if (user?.role === 'writer') return <WriterHomePage />
+
   const { rarities } = useCardConfig()
   const dailyStatusQuery = useDailyNoteStatusQuery()
   const openDailyNoteMutation = useOpenDailyNoteMutation()
@@ -133,10 +137,12 @@ export function HomePage() {
   return (
     <Box sx={{
       height: '100%', position: 'relative', overflow: 'hidden',
-      background: canOpenDaily
+      background: dailyStatusQuery.isPending
+        ? 'linear-gradient(145deg, #f4f8ff 0%, #eef4ff 45%, #f7efff 100%)'
+        : canOpenDaily
         ? 'linear-gradient(160deg, #fff1f2 0%, #ffe4e6 40%, #fdf2ff 100%)'
         : 'linear-gradient(145deg, #f4f8ff 0%, #eef4ff 45%, #f7efff 100%)',
-      transition: 'background 1.8s ease',
+      transition: 'background 1.2s ease',
     }}>
       <SettingsIcon sx={{
         position: 'absolute', top: -560, right: -530,
