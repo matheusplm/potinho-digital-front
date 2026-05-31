@@ -3,26 +3,52 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import HomeIcon from '@mui/icons-material/Home'
 import Inventory2Icon from '@mui/icons-material/Inventory2'
 import QueryStatsIcon from '@mui/icons-material/QueryStats'
+import EditNoteIcon from '@mui/icons-material/EditNote'
+import GroupIcon from '@mui/icons-material/Group'
+import SettingsIcon from '@mui/icons-material/Settings'
 import { BottomNavigation, BottomNavigationAction, Box, Paper } from '@mui/material'
 import { useMemo } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { FloatingMenu } from './FloatingMenu'
 import { ScrollHint } from './ui'
+import { useUser } from '../context/UserContext'
+import { useBackground } from '../context/BackgroundContext'
+import { colors } from '../design-system'
 
-type NavPath = '/home' | '/colecao' | '/pacotinho' | '/favoritos' | '/progresso'
-
-function resolveNavValue(pathname: string): NavPath {
-  if (pathname.startsWith('/colecao')) return '/colecao'
-  if (pathname.startsWith('/pacotinho')) return '/pacotinho'
-  if (pathname.startsWith('/favoritos')) return '/favoritos'
-  if (pathname.startsWith('/progresso')) return '/progresso'
-  return '/home'
+interface NavItem {
+  label: string
+  path: string
+  icon: React.ReactNode
 }
+
+const READER_NAV: NavItem[] = [
+  { label: 'Início',    path: '/home',      icon: <HomeIcon /> },
+  { label: 'Coleção',   path: '/colecao',   icon: <Inventory2Icon /> },
+  { label: 'Pacote',    path: '/pacotinho', icon: <AutoAwesomeIcon /> },
+  { label: 'Favoritos', path: '/favoritos', icon: <FavoriteIcon /> },
+  { label: 'Progresso', path: '/progresso', icon: <QueryStatsIcon /> },
+]
+
+const WRITER_NAV: NavItem[] = [
+  { label: 'Início',    path: '/home',      icon: <HomeIcon /> },
+  { label: 'Bilhetes',  path: '/bilhetes',  icon: <EditNoteIcon /> },
+  { label: 'Parceiros', path: '/parceiros', icon: <GroupIcon /> },
+  { label: 'Coleção',   path: '/colecao',   icon: <Inventory2Icon /> },
+  { label: 'Config',    path: '/config',    icon: <SettingsIcon /> },
+]
 
 export function MobileLayout() {
   const location = useLocation()
   const navigate = useNavigate()
-  const navValue = useMemo(() => resolveNavValue(location.pathname), [location.pathname])
+  const { user } = useUser()
+  const { theme } = useBackground()
+
+  const items = user?.role === 'writer' ? WRITER_NAV : READER_NAV
+
+  const navValue = useMemo(() => {
+    const match = items.find((item) => location.pathname.startsWith(item.path))
+    return match?.path ?? '/home'
+  }, [location.pathname, items])
 
   return (
     <Box sx={{ width: '100%', maxWidth: 480, height: '100dvh', mx: 'auto', bgcolor: 'background.default', overflow: 'hidden' }}>
@@ -46,19 +72,18 @@ export function MobileLayout() {
       >
         <BottomNavigation
           showLabels value={navValue}
-          onChange={(_, path: NavPath) => navigate(path)}
+          onChange={(_, path: string) => navigate(path)}
           sx={{
             bgcolor: 'transparent',
-            '& .MuiBottomNavigationAction-root': { minWidth: 0, transition: 'color 0.2s ease' },
+            '& .MuiBottomNavigationAction-root': { minWidth: 0, transition: 'color 0.2s ease', color: colors.text.muted },
             '& .MuiBottomNavigationAction-label': { fontSize: '0.72rem', fontWeight: 600 },
-            '& .Mui-selected': { color: '#1d4ed8' },
+            '& .Mui-selected': { color: theme.accent },
+            '& .Mui-selected .MuiBottomNavigationAction-label': { color: theme.accent },
           }}
         >
-          <BottomNavigationAction label="Início"    value="/home"      icon={<HomeIcon />} />
-          <BottomNavigationAction label="Coleção"   value="/colecao"   icon={<Inventory2Icon />} />
-          <BottomNavigationAction label="Pacote"    value="/pacotinho" icon={<AutoAwesomeIcon />} />
-          <BottomNavigationAction label="Favoritos" value="/favoritos" icon={<FavoriteIcon />} />
-          <BottomNavigationAction label="Progresso" value="/progresso" icon={<QueryStatsIcon />} />
+          {items.map((item) => (
+            <BottomNavigationAction key={item.path} label={item.label} value={item.path} icon={item.icon} />
+          ))}
         </BottomNavigation>
       </Paper>
     </Box>

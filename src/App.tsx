@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { MobileLayout } from './components/MobileLayout'
 import { UserProvider, useUser } from './context/UserContext'
+import { BackgroundProvider } from './context/BackgroundContext'
 import { CardConfigProvider } from './context/CardConfigContext'
 import { CollectionPage } from './pages/CollectionPage'
 import { ConfigPage } from './pages/ConfigPage'
@@ -55,12 +56,14 @@ function App() {
   return (
     <BrowserRouter>
       <UserProvider>
-        <AppRoutes />
-        <Toaster
-          position="top-center"
-          gap={8}
-          toastOptions={{ unstyled: true }}
-        />
+        <BackgroundProvider>
+          <AppRoutes />
+          <Toaster
+            position="top-center"
+            gap={8}
+            toastOptions={{ unstyled: true }}
+          />
+        </BackgroundProvider>
       </UserProvider>
     </BrowserRouter>
   )

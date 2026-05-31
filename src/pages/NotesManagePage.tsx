@@ -7,7 +7,8 @@ import { keyframes } from '@emotion/react'
 import { useState } from 'react'
 import { Button, Card, Input, PageTitle, toast } from '../components/ui'
 import { useCreateNoteMutation, useDeleteNoteMutation, useNotesQuery, useRaritiesQuery, useTypesQuery, useUpdateNoteMutation } from '../hooks/useNotes'
-import { colors, font, gradients, radius } from '../design-system'
+import { colors, font, radius } from '../design-system'
+import { useBackground } from '../context/BackgroundContext'
 import type { NoteFormData, NoteRecord } from '../types/note'
 import type { RarityConfig, NoteTypeConfig } from '../types/note'
 
@@ -265,6 +266,7 @@ function DeleteDialog({ note, onClose }: DeleteDialogProps) {
 }
 
 export function NotesManagePage() {
+  const { theme } = useBackground()
   const { data: notes = [], isLoading } = useNotesQuery()
   const { data: rarities = [] } = useRaritiesQuery()
   const { data: types = [] } = useTypesQuery()
@@ -291,7 +293,7 @@ export function NotesManagePage() {
   return (
     <Box sx={{
       height: '100%', position: 'relative',
-      background: gradients.brand,
+      background: theme.gradient,
     }}>
       <FavoriteIcon sx={{
         position: 'absolute', bottom: -60, right: -60,

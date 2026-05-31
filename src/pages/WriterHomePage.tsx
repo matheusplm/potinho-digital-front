@@ -13,6 +13,7 @@ import { useUser } from '../context/UserContext'
 import { useCollectionQuery, useRaritiesQuery, useTypesQuery } from '../hooks/useNotes'
 import { Card, Button, Input, toast } from '../components/ui'
 import { colors, font, gradients } from '../design-system'
+import { useBackground } from '../context/BackgroundContext'
 import { api } from '../services/api'
 
 const fadeIn = keyframes`
@@ -62,6 +63,7 @@ function QuickAction({ icon, bg, title, subtitle, onClick }: QuickActionProps) {
 export function WriterHomePage() {
   const { user, setUser } = useUser()
   const navigate = useNavigate()
+  const { theme } = useBackground()
   const { data: collection } = useCollectionQuery()
   const { data: rarities = [] } = useRaritiesQuery()
   const { data: types = [] } = useTypesQuery()
@@ -90,7 +92,7 @@ export function WriterHomePage() {
   return (
     <Box sx={{
       height: '100%', position: 'relative', overflow: 'hidden',
-      background: gradients.brand,
+      background: theme.gradient,
     }}>
       <FavoriteIcon sx={{
         position: 'absolute', bottom: -80, right: -80,

@@ -5,6 +5,7 @@ import { keyframes } from '@emotion/react'
 import { Card, PageTitle } from '../components/ui'
 import { usePartnersQuery } from '../hooks/useNotes'
 import { colors, font, gradients, radius } from '../design-system'
+import { useBackground } from '../context/BackgroundContext'
 
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(12px); }
@@ -36,12 +37,13 @@ function formatDate(iso: string) {
 }
 
 export function PartnersDashboardPage() {
+  const { theme } = useBackground()
   const { data: partners = [], isLoading } = usePartnersQuery()
 
   return (
     <Box sx={{
       height: '100%', position: 'relative',
-      background: gradients.brand,
+      background: theme.gradient,
     }}>
       <FavoriteIcon sx={{
         position: 'absolute', bottom: -60, right: -60,
