@@ -38,6 +38,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }, [user])
 
   const setUser = (u: AuthUser | null) => {
+    setAuthToken(u?.token ?? '')
     if (u) localStorage.setItem(STORAGE_KEY, JSON.stringify(u))
     else localStorage.removeItem(STORAGE_KEY)
     setUserState(u)
