@@ -4,7 +4,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import { Box, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Card, Input, PageTitle, ScrollablePage, toast } from '../components/ui'
 import { useCollectionsQuery, useCreateCollectionMutation } from '../hooks/useNotes'
@@ -26,19 +26,22 @@ function CreateDialog({ open, onClose }: { open: boolean; onClose: () => void })
   const [form, setForm] = useState<CollectionFormData>(DEFAULT_FORM)
   const createMutation = useCreateCollectionMutation()
 
-  const titleError = form.name.trim().length === 0 ? '' : form.name.length > 50 ? 'Máximo 50 caracteres' : ''
+  useEffect(() => {
+    if (open) setForm(DEFAULT_FORM)
+  }, [open])
 
   async function handleSubmit() {
     if (!form.name.trim()) return
     try {
       await createMutation.mutateAsync(form)
       toast.success('Coleção criada!')
-      setForm(DEFAULT_FORM)
       onClose()
     } catch {
       toast.error('Erro ao criar coleção.')
     }
   }
+
+  const selectedBg = backgroundThemes.find((bg) => bg.key === form.theme) ?? backgroundThemes[0]
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth PaperProps={{
@@ -49,13 +52,22 @@ function CreateDialog({ open, onClose }: { open: boolean; onClose: () => void })
       </DialogTitle>
       <DialogContent sx={{ pt: 0 }}>
         <Stack spacing={2.5} sx={{ mt: 1 }}>
+          <Box sx={{
+            height: 52, borderRadius: radius.lg, mb: -1,
+            background: selectedBg.gradient,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: '1.6rem', transition: 'background 0.3s ease',
+          }}>
+            {form.emoji || '💙'}
+          </Box>
+
           <Box>
-            <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.secondary, mb: 0.8 }}>Emoji</Typography>
-            <Box sx={{ display: 'flex', gap: 0.8, flexWrap: 'wrap' }}>
+            <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.text.secondary, mb: 0.8 }}>Emoji</Typography>
+            <Box sx={{ display: 'flex', gap: 0.7, flexWrap: 'wrap' }}>
               {EMOJIS.map((e) => (
                 <Box key={e} onClick={() => setForm((f) => ({ ...f, emoji: e }))} sx={{
-                  width: 38, height: 38, borderRadius: radius.md, cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.3rem',
+                  width: 36, height: 36, borderRadius: radius.md, cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem',
                   border: `2px solid ${form.emoji === e ? colors.primary.main : 'transparent'}`,
                   background: form.emoji === e ? `${colors.primary.main}12` : 'rgba(0,0,0,0.04)',
                   transition: 'all 0.15s',
@@ -68,38 +80,49 @@ function CreateDialog({ open, onClose }: { open: boolean; onClose: () => void })
 
           <Box>
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.5 }}>
-              <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.secondary }}>Nome</Typography>
-              <Typography sx={{ fontSize: '0.68rem', color: form.name.length > 50 ? colors.error.main : colors.text.muted }}>
+              <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.text.secondary }}>Nome</Typography>
+              <Typography sx={{ fontSize: '0.65rem', color: form.name.length > 50 ? colors.error.main : colors.text.muted }}>
                 {form.name.length}/50
               </Typography>
             </Stack>
-            <Input placeholder="Nosso potinho 💙" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} error={!!titleError} />
+            <Input placeholder="Nosso potinho 💙" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value.slice(0, 50) }))} />
           </Box>
 
           <Box>
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.5 }}>
-              <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.secondary }}>Descrição</Typography>
-              <Typography sx={{ fontSize: '0.68rem', color: colors.text.muted }}>{form.description.length}/200</Typography>
+              <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.text.secondary }}>Descrição</Typography>
+              <Typography sx={{ fontSize: '0.65rem', color: colors.text.muted }}>{form.description.length}/200</Typography>
             </Stack>
             <TextField multiline rows={2} fullWidth placeholder="Um potinho cheio de amor..." value={form.description}
               onChange={(e) => setForm((f) => ({ ...f, description: e.target.value.slice(0, 200) }))}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: radius.md, fontSize: '0.88rem', background: colors.surface.overlay, '& fieldset': { borderColor: colors.border.medium } } }}
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: radius.md, fontSize: '0.86rem', background: colors.surface.overlay, '& fieldset': { borderColor: colors.border.medium } } }}
             />
           </Box>
 
           <Box>
-            <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.secondary, mb: 1 }}>Tema de fundo</Typography>
-            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-              {backgroundThemes.map((bg) => (
-                <Box key={bg.key} onClick={() => setForm((f) => ({ ...f, theme: bg.key }))} sx={{
-                  width: 36, height: 36, borderRadius: '50%', cursor: 'pointer',
-                  background: bg.gradient, flexShrink: 0,
-                  border: `2.5px solid ${form.theme === bg.key ? bg.accent : 'transparent'}`,
-                  boxShadow: form.theme === bg.key ? `0 2px 10px ${bg.accent}66` : 'none',
-                  transition: 'all 0.15s', '&:hover': { transform: 'scale(1.1)' },
-                }} title={bg.label} />
+            <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.text.secondary, mb: 1 }}>
+              Cor da coleção
+            </Typography>
+            <Stack spacing={0.8}>
+              {([false, true] as const).map((dark) => (
+                <Box key={String(dark)}>
+                  <Typography sx={{ fontSize: '0.58rem', fontWeight: 700, letterSpacing: 0.5, color: colors.text.muted, textTransform: 'uppercase', mb: 0.6 }}>
+                    {dark ? 'Escuros' : 'Claros'}
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 0.8, flexWrap: 'wrap' }}>
+                    {backgroundThemes.filter((bg) => bg.isDark === dark).map((bg) => (
+                      <Box key={bg.key} onClick={() => setForm((f) => ({ ...f, theme: bg.key }))} title={bg.label} sx={{
+                        width: 30, height: 30, borderRadius: '50%', cursor: 'pointer',
+                        background: bg.gradient, flexShrink: 0,
+                        border: `2.5px solid ${form.theme === bg.key ? bg.accent : 'transparent'}`,
+                        boxShadow: form.theme === bg.key ? `0 2px 10px ${bg.accent}66` : 'none',
+                        transition: 'all 0.15s', '&:hover': { transform: 'scale(1.12)' },
+                      }} />
+                    ))}
+                  </Box>
+                </Box>
               ))}
-            </Box>
+            </Stack>
           </Box>
         </Stack>
       </DialogContent>
