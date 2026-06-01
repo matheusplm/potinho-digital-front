@@ -6,6 +6,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { api } from '../services/api'
 import { Button, Input, toast } from '../components/ui'
+import { ScrollHint } from '../components/ui/ScrollHint'
 
 const fadeSlide = keyframes`
   from { opacity: 0; transform: translateY(28px); }
@@ -57,6 +58,8 @@ export function LoginPage() {
       position: 'relative',
       overflow: 'hidden',
       background: 'linear-gradient(160deg, #dbeafe 0%, #fce7f3 55%, #ede9fe 100%)',
+      overflowX: 'hidden',
+      overflowY: 'auto',
     }}>
       <Box sx={{ position: 'absolute', top: -120, right: -120, width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(29,78,216,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
       <Box sx={{ position: 'absolute', bottom: -80, left: -80, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(225,29,72,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
@@ -103,6 +106,7 @@ export function LoginPage() {
           <Link to="/register" style={{ color: '#1d4ed8', fontWeight: 700, textDecoration: 'none' }}>Criar conta</Link>
         </Typography>
       </Stack>
+      <ScrollHint />
     </Box>
   )
 }

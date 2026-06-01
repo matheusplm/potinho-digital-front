@@ -7,6 +7,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { api } from '../services/api'
 import { Button, Input, SegmentedControl, toast } from '../components/ui'
+import { ScrollHint } from '../components/ui/ScrollHint'
 
 const fadeSlide = keyframes`
   from { opacity: 0; transform: translateY(28px); }
@@ -60,7 +61,8 @@ export function RegisterPage() {
       display: 'flex',
       flexDirection: 'column',
       position: 'relative',
-      overflow: 'hidden',
+      overflowX: 'hidden',
+      overflowY: 'auto',
       background: mode === 'criar'
         ? 'linear-gradient(160deg, #dbeafe 0%, #fce7f3 55%, #ede9fe 100%)'
         : 'linear-gradient(160deg, #fce7f3 0%, #ede9fe 55%, #dbeafe 100%)',
@@ -139,6 +141,7 @@ export function RegisterPage() {
           <Link to="/login" style={{ color: '#1d4ed8', fontWeight: 700, textDecoration: 'none' }}>Entrar</Link>
         </Typography>
       </Stack>
+      <ScrollHint />
     </Box>
   )
 }
