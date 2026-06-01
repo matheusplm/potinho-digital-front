@@ -6,11 +6,6 @@ import { useState, useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import { colors } from '../../design-system'
 
-const overlayIn = keyframes`
-  from { opacity: 0; }
-  to   { opacity: 1; }
-`
-
 const dropFade = keyframes`
   0%   { opacity: 0; transform: translateY(0);    }
   16%  { opacity: 1; transform: translateY(0);    }
@@ -68,26 +63,7 @@ export function ScrollHint() {
   if (!visible) return null
 
   return (
-    <>
-      <Box sx={{
-        position: 'fixed',
-        top: '25%',
-        bottom: 0,
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: '100%',
-        maxWidth: 480,
-        zIndex: 190,
-        pointerEvents: 'none',
-        backdropFilter: 'blur(1px)',
-        WebkitBackdropFilter: 'blur(1px)',
-        background: 'linear-gradient(to bottom, transparent 0%, rgba(255,228,236,0.08) 55%, rgba(255,228,236,0.22) 100%)',
-        WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 22%)',
-        maskImage: 'linear-gradient(to bottom, transparent 0%, black 22%)',
-        animation: `${overlayIn} 0.5s ease forwards`,
-      }} />
-
-      <Box sx={{
+    <Box sx={{
         position: 'fixed',
         top: '43%',
         left: '50%',
@@ -146,6 +122,6 @@ export function ScrollHint() {
           </Box>
         </Box>
       </Box>
-    </>
+    </Box>
   )
 }
