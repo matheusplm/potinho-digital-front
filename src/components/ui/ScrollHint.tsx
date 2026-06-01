@@ -29,10 +29,16 @@ const chevronPulse = keyframes`
   50%     { opacity: 1;   transform: translateY(4px); }
 `
 
-function findScrollable(el: Element, depth = 0): boolean {
-  if (depth > 6) return false
-  if (el.scrollHeight > el.clientHeight + 20) return true
-  return Array.from(el.children).some((child) => findScrollable(child, depth + 1))
+function hasScrollableContent(): boolean {
+  const main = document.querySelector('main')
+  if (!main) return false
+  for (const el of main.querySelectorAll('*')) {
+    const { overflowY } = window.getComputedStyle(el)
+    if ((overflowY === 'auto' || overflowY === 'scroll') && el.scrollHeight > el.clientHeight + 10) {
+      return true
+    }
+  }
+  return false
 }
 
 export function ScrollHint() {
@@ -44,8 +50,7 @@ export function ScrollHint() {
     setVisible(false)
     clearTimeout(timerRef.current)
     timerRef.current = setTimeout(() => {
-      const main = document.querySelector('main')
-      if (main && findScrollable(main)) setVisible(true)
+      if (hasScrollableContent()) setVisible(true)
     }, 550)
     return () => clearTimeout(timerRef.current)
   }, [location.pathname])
