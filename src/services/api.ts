@@ -40,7 +40,7 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
     ...init,
   })
 
-  if (response.status === 401) {
+  if (response.status === 401 && !url.startsWith('/auth/')) {
     handleUnauthorized()
     throw new Error('Sessão expirada. Faça login novamente.')
   }
