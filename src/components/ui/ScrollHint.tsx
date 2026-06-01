@@ -122,6 +122,5 @@ export function ScrollHint() {
           </Box>
         </Box>
       </Box>
-    </Box>
   )
 }
