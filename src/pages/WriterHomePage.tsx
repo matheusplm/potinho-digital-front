@@ -1,18 +1,14 @@
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import FavoriteIcon from '@mui/icons-material/Favorite'
-import SettingsIcon from '@mui/icons-material/Settings'
 import Inventory2Icon from '@mui/icons-material/Inventory2'
 import LockIcon from '@mui/icons-material/Lock'
-import GroupIcon from '@mui/icons-material/Group'
-import EditNoteIcon from '@mui/icons-material/EditNote'
 import { Box, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { useCollectionQuery, useRaritiesQuery, useTypesQuery } from '../hooks/useNotes'
 import { Card, Button, Input, ScrollablePage, toast } from '../components/ui'
-import { colors, font, gradients } from '../design-system'
+import { colors, font } from '../design-system'
 import { useBackground } from '../context/BackgroundContext'
 import { api } from '../services/api'
 
@@ -28,41 +24,8 @@ const FLOATING = [
   { size: 11, left: '86%', delay: '5s',   dur: '12s', opacity: 0.08 },
 ]
 
-interface QuickActionProps {
-  icon: React.ReactNode
-  bg: string
-  title: string
-  subtitle: string
-  onClick: () => void
-}
-
-function QuickAction({ icon, bg, title, subtitle, onClick }: QuickActionProps) {
-  return (
-    <Card sx={{ p: 2, cursor: 'pointer' }} onClick={onClick}>
-      <Stack direction="row" spacing={1.5} alignItems="center">
-        <Box sx={{
-          width: 40, height: 40, borderRadius: '10px',
-          background: bg, flexShrink: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
-          {icon}
-        </Box>
-        <Stack spacing={0.2}>
-          <Typography sx={{ fontSize: '0.88rem', fontWeight: 700, color: colors.text.primary }}>
-            {title}
-          </Typography>
-          <Typography sx={{ fontSize: '0.75rem', color: colors.text.muted }}>
-            {subtitle}
-          </Typography>
-        </Stack>
-      </Stack>
-    </Card>
-  )
-}
-
 export function WriterHomePage() {
   const { user, setUser } = useUser()
-  const navigate = useNavigate()
   const { theme } = useBackground()
   const { data: collection } = useCollectionQuery()
   const { data: rarities = [] } = useRaritiesQuery()
@@ -90,14 +53,10 @@ export function WriterHomePage() {
   const greeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite'
 
   return (
-    <Box sx={{
-      height: '100%', position: 'relative', overflow: 'hidden',
-      background: theme.gradient,
-    }}>
+    <Box sx={{ height: '100%', position: 'relative', overflow: 'hidden', background: theme.gradient }}>
       <FavoriteIcon sx={{
         position: 'absolute', bottom: -80, right: -80,
-        fontSize: 500, color: 'rgba(29,78,216,0.05)',
-        pointerEvents: 'none',
+        fontSize: 500, color: 'rgba(29,78,216,0.05)', pointerEvents: 'none',
       }} />
 
       {FLOATING.map((h, i) => (
@@ -114,14 +73,13 @@ export function WriterHomePage() {
         }} />
       ))}
 
-      <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.4s ease` }}>
-        <Stack spacing={0.3} sx={{ mb: 3.5 }}>
+      <ScrollablePage sx={{ px: 2.5, py: 2.5, gap: 3, animation: `${fadeIn} 0.4s ease` }}>
+        <Stack spacing={0.3}>
           <Typography sx={{ fontSize: '0.82rem', color: colors.text.secondary, fontWeight: 500 }}>
             {greeting},
           </Typography>
           <Typography sx={{
-            fontFamily: font.serif,
-            fontWeight: 700, fontSize: '2rem',
+            fontFamily: font.serif, fontWeight: 700, fontSize: '2rem',
             color: colors.text.primary, lineHeight: 1.1, letterSpacing: '-0.5px',
           }}>
             {firstName} 💙
@@ -131,15 +89,15 @@ export function WriterHomePage() {
           </Typography>
         </Stack>
 
-        <Stack spacing={1.5} sx={{ mb: 3 }}>
+        <Stack spacing={1.5}>
           <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1.2, color: colors.text.muted, textTransform: 'uppercase' }}>
             Seu potinho
           </Typography>
           <Stack direction="row" spacing={1.5}>
             {[
-              { label: 'Bilhetes', value: totalNotes, icon: <AutoAwesomeIcon sx={{ fontSize: 18, color: colors.primary.main }} />, color: colors.primary.main },
-              { label: 'Raridades', value: rarities.length, icon: <FavoriteIcon sx={{ fontSize: 18, color: colors.rose.main }} />, color: colors.rose.main },
-              { label: 'Tipos', value: types.length, icon: <Inventory2Icon sx={{ fontSize: 18, color: colors.purple.light }} />, color: colors.purple.light },
+              { label: 'Bilhetes',  value: totalNotes,       icon: <AutoAwesomeIcon sx={{ fontSize: 18, color: colors.primary.main }} />, color: colors.primary.main },
+              { label: 'Raridades', value: rarities.length,  icon: <FavoriteIcon    sx={{ fontSize: 18, color: colors.rose.main }} />,    color: colors.rose.main },
+              { label: 'Tipos',     value: types.length,     icon: <Inventory2Icon  sx={{ fontSize: 18, color: colors.purple.light }} />, color: colors.purple.light },
             ].map((stat) => (
               <Card key={stat.label} sx={{ flex: 1, p: 1.5, textAlign: 'center' }}>
                 <Box sx={{ mb: 0.8 }}>{stat.icon}</Box>
@@ -154,94 +112,56 @@ export function WriterHomePage() {
           </Stack>
         </Stack>
 
-        <Stack spacing={1.5}>
-          <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1.2, color: colors.text.muted, textTransform: 'uppercase' }}>
-            Ações rápidas
-          </Typography>
-
-          <QuickAction
-            icon={<EditNoteIcon sx={{ fontSize: 20, color: '#fff' }} />}
-            bg={gradients.primary}
-            title="Gerenciar bilhetes"
-            subtitle="Criar, editar e remover bilhetes"
-            onClick={() => navigate('/bilhetes')}
-          />
-
-          <QuickAction
-            icon={<GroupIcon sx={{ fontSize: 20, color: '#fff' }} />}
-            bg={gradients.rose}
-            title="Parceiros"
-            subtitle="Ver leitores e coleção de cada um"
-            onClick={() => navigate('/parceiros')}
-          />
-
-          <QuickAction
-            icon={<SettingsIcon sx={{ fontSize: 20, color: '#fff' }} />}
-            bg={gradients.purple}
-            title="Configurações"
-            subtitle="Raridades, tipos e convite"
-            onClick={() => navigate('/config')}
-          />
-
-          <QuickAction
-            icon={<Inventory2Icon sx={{ fontSize: 20, color: '#fff' }} />}
-            bg="linear-gradient(135deg,#0f172a,#1e293b)"
-            title="Ver coleção"
-            subtitle="Todos os bilhetes do potinho"
-            onClick={() => navigate('/colecao')}
-          />
-
-          {user?.coupleCode && (
-            <Card sx={{ p: 2, background: `linear-gradient(135deg,${colors.primary.main}08,${colors.rose.main}08)` }}>
-              <Stack spacing={1.5}>
-                <Stack spacing={0.5}>
-                  <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1, color: colors.text.muted, textTransform: 'uppercase' }}>
-                    Código de convite
-                  </Typography>
-                  <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.8rem', color: colors.text.primary, letterSpacing: '0.2em' }}>
-                    {user.coupleCode}
-                  </Typography>
-                  <Typography sx={{ fontSize: '0.72rem', color: colors.text.muted, fontStyle: 'italic' }}>
-                    Compartilhe com quem você ama 💙
-                  </Typography>
-                </Stack>
-
-                <Box sx={{ height: '1px', bgcolor: colors.border.subtle }} />
-
-                <Stack spacing={0.8}>
-                  <Stack direction="row" spacing={0.6} alignItems="center">
-                    <LockIcon sx={{ fontSize: 13, color: colors.text.secondary }} />
-                    <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: 0.8, color: colors.text.secondary, textTransform: 'uppercase' }}>
-                      Email autorizado
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" spacing={1} alignItems="flex-end">
-                    <Input
-                      type="email"
-                      placeholder="email@exemplo.com"
-                      value={inviteEmailInput}
-                      onChange={(e) => setInviteEmailInput(e.target.value)}
-                      sx={{ flex: 1, '& .MuiOutlinedInput-root': { fontSize: '0.82rem' }, '& input': { py: 0.7 } }}
-                    />
-                    <Button
-                      variant="primary"
-                      loading={savingEmail}
-                      onClick={handleSaveInviteEmail}
-                      sx={{ py: 0.85, px: 1.5, fontSize: '0.78rem', whiteSpace: 'nowrap' }}
-                    >
-                      Salvar
-                    </Button>
-                  </Stack>
-                  {user.inviteEmail && (
-                    <Typography sx={{ fontSize: '0.72rem', color: colors.success.main }}>
-                      ✓ {user.inviteEmail}
-                    </Typography>
-                  )}
-                </Stack>
+        {user?.coupleCode && (
+          <Card sx={{ p: 2, background: `linear-gradient(135deg,${colors.primary.main}08,${colors.rose.main}08)` }}>
+            <Stack spacing={1.5}>
+              <Stack spacing={0.5}>
+                <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1, color: colors.text.muted, textTransform: 'uppercase' }}>
+                  Código de convite
+                </Typography>
+                <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.8rem', color: colors.text.primary, letterSpacing: '0.2em' }}>
+                  {user.coupleCode}
+                </Typography>
+                <Typography sx={{ fontSize: '0.72rem', color: colors.text.muted, fontStyle: 'italic' }}>
+                  Compartilhe com quem você ama 💙
+                </Typography>
               </Stack>
-            </Card>
-          )}
-        </Stack>
+
+              <Box sx={{ height: '1px', bgcolor: colors.border.subtle }} />
+
+              <Stack spacing={0.8}>
+                <Stack direction="row" spacing={0.6} alignItems="center">
+                  <LockIcon sx={{ fontSize: 13, color: colors.text.secondary }} />
+                  <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: 0.8, color: colors.text.secondary, textTransform: 'uppercase' }}>
+                    Email autorizado
+                  </Typography>
+                </Stack>
+                <Stack direction="row" spacing={1} alignItems="flex-end">
+                  <Input
+                    type="email"
+                    placeholder="email@exemplo.com"
+                    value={inviteEmailInput}
+                    onChange={(e) => setInviteEmailInput(e.target.value)}
+                    sx={{ flex: 1, '& .MuiOutlinedInput-root': { fontSize: '0.82rem' }, '& input': { py: 0.7 } }}
+                  />
+                  <Button
+                    variant="primary"
+                    loading={savingEmail}
+                    onClick={handleSaveInviteEmail}
+                    sx={{ py: 0.85, px: 1.5, fontSize: '0.78rem', whiteSpace: 'nowrap' }}
+                  >
+                    Salvar
+                  </Button>
+                </Stack>
+                {user.inviteEmail && (
+                  <Typography sx={{ fontSize: '0.72rem', color: colors.success.main }}>
+                    ✓ {user.inviteEmail}
+                  </Typography>
+                )}
+              </Stack>
+            </Stack>
+          </Card>
+        )}
       </ScrollablePage>
     </Box>
   )
