@@ -24,6 +24,12 @@ export function setAuthToken(token: string) {
   authToken = token
 }
 
+function handleUnauthorized() {
+  authToken = ''
+  localStorage.removeItem('potinho-auth')
+  window.location.href = '/login'
+}
+
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${BASE_URL}${url}`, {
     headers: {
@@ -33,6 +39,11 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
     },
     ...init,
   })
+
+  if (response.status === 401) {
+    handleUnauthorized()
+    throw new Error('Sessão expirada. Faça login novamente.')
+  }
 
   if (!response.ok) {
     const payload = (await response.json()) as { message?: string; error?: string }

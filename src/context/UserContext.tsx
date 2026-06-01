@@ -25,7 +25,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUserState] = useState<AuthUser | null>(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY)
-      return raw ? (JSON.parse(raw) as AuthUser) : null
+      const parsed = raw ? (JSON.parse(raw) as AuthUser) : null
+      if (parsed?.token) setAuthToken(parsed.token)
+      return parsed
     } catch {
       return null
     }

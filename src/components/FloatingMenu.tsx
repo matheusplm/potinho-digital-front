@@ -37,7 +37,7 @@ export function FloatingMenu() {
             '&:hover': { bgcolor: open ? theme.accent : 'rgba(255,255,255,1)' },
           }}
         >
-          <Stack spacing={0.4} alignItems="center" justifyContent="center">
+          <Stack spacing={0.4} sx={{ alignItems: 'center', justifyContent: 'center' }}>
             {[0, 1, 2].map((i) => (
               <Box key={i} sx={{
                 width: open ? (i === 1 ? 12 : 14) : 14,
@@ -61,7 +61,7 @@ export function FloatingMenu() {
             transformOrigin: 'top right',
           }}>
             {/* user info */}
-            <Stack direction="row" spacing={1.2} alignItems="center" sx={{ px: 1.8, pt: 1.8, pb: 1.5 }}>
+            <Stack direction="row" spacing={1.2} sx={{ alignItems: 'center', px: 1.8, pt: 1.8, pb: 1.5 }}>
               <Box sx={{
                 width: 38, height: 38, borderRadius: radius.md, flexShrink: 0,
                 background: `linear-gradient(135deg, ${colors.primary.main}, ${theme.accent})`,
@@ -83,7 +83,7 @@ export function FloatingMenu() {
 
             {/* theme picker */}
             <Box sx={{ px: 1.8, py: 1.4 }}>
-              <Stack direction="row" spacing={0.6} alignItems="center" sx={{ mb: 1.2 }}>
+              <Stack direction="row" spacing={0.6} sx={{ alignItems: 'center', mb: 1.2 }}>
                 <PaletteOutlinedIcon sx={{ fontSize: 14, color: colors.text.secondary }} />
                 <Typography sx={{ fontSize: '0.66rem', fontWeight: 800, letterSpacing: 0.6, color: colors.text.secondary, textTransform: 'uppercase' }}>
                   Tema de fundo
@@ -123,9 +123,9 @@ export function FloatingMenu() {
             {/* logout */}
             <Box sx={{ p: 1 }}>
               <Stack
-                direction="row" spacing={1.4} alignItems="center"
+                direction="row" spacing={1.4}
                 onClick={() => { setOpen(false); logout() }}
-                sx={{
+                sx={{ alignItems: 'center',
                   px: 1.4, py: 1, cursor: 'pointer', borderRadius: radius.md,
                   transition: 'background 0.12s',
                   '&:hover': { bgcolor: `${colors.rose.main}12` },
