@@ -6,14 +6,14 @@ import QueryStatsIcon from '@mui/icons-material/QueryStats'
 import EditNoteIcon from '@mui/icons-material/EditNote'
 import GroupIcon from '@mui/icons-material/Group'
 import SettingsIcon from '@mui/icons-material/Settings'
-import { BottomNavigation, BottomNavigationAction, Box, Paper } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import { useMemo } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { FloatingMenu } from './FloatingMenu'
 import { ScrollHint } from './ui'
 import { useUser } from '../context/UserContext'
 import { useBackground } from '../context/BackgroundContext'
-import { colors } from '../design-system'
+import { colors, radius } from '../design-system'
 
 interface NavItem {
   label: string
@@ -54,38 +54,62 @@ export function MobileLayout() {
     <Box sx={{ width: '100%', maxWidth: 480, height: '100dvh', mx: 'auto', bgcolor: 'background.default', overflow: 'hidden' }}>
       <FloatingMenu />
 
-      <Box component="main" sx={{ height: 'calc(100% - 56px - env(safe-area-inset-bottom, 0px))' }}>
+      <Box component="main" sx={{ height: 'calc(100% - 64px - env(safe-area-inset-bottom, 0px))' }}>
         <Outlet />
       </Box>
 
       <ScrollHint />
 
-      <Paper
-        elevation={0}
-        sx={{
-          position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)',
-          width: '100%', maxWidth: 480, borderRadius: 0, overflow: 'hidden',
-          pb: 'env(safe-area-inset-bottom,0px)',
-          background: 'rgba(255,253,251,0.96)', backdropFilter: 'blur(16px)',
-          borderTop: '1px solid rgba(0,0,0,0.06)',
-        }}
-      >
-        <BottomNavigation
-          showLabels value={navValue}
-          onChange={(_, path: string) => navigate(path)}
-          sx={{
-            bgcolor: 'transparent',
-            '& .MuiBottomNavigationAction-root': { minWidth: 0, transition: 'color 0.2s ease', color: colors.text.muted },
-            '& .MuiBottomNavigationAction-label': { fontSize: '0.72rem', fontWeight: 600 },
-            '& .Mui-selected': { color: theme.accent },
-            '& .Mui-selected .MuiBottomNavigationAction-label': { color: theme.accent },
-          }}
-        >
-          {items.map((item) => (
-            <BottomNavigationAction key={item.path} label={item.label} value={item.path} icon={item.icon} />
-          ))}
-        </BottomNavigation>
-      </Paper>
+      <Box sx={{
+        position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)',
+        width: '100%', maxWidth: 480, zIndex: 100,
+        background: 'rgba(255,253,251,0.96)', backdropFilter: 'blur(20px)',
+        borderTop: '1px solid rgba(0,0,0,0.055)',
+        pb: 'env(safe-area-inset-bottom, 0px)',
+      }}>
+        <Box sx={{ display: 'flex', height: 64 }}>
+          {items.map((item) => {
+            const active = navValue === item.path
+            return (
+              <Box
+                key={item.path}
+                onClick={() => navigate(item.path)}
+                sx={{
+                  flex: 1, display: 'flex', flexDirection: 'column',
+                  alignItems: 'center', justifyContent: 'center',
+                  gap: 0.45, cursor: 'pointer',
+                  WebkitTapHighlightColor: 'transparent',
+                  '&:active': { opacity: 0.65 },
+                }}
+              >
+                <Box sx={{
+                  px: 1.8, py: 0.5, borderRadius: radius.full,
+                  background: active ? `${theme.accent}18` : 'transparent',
+                  transition: 'background 0.22s cubic-bezier(0.16,1,0.3,1)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  '& svg': {
+                    fontSize: '1.25rem',
+                    color: active ? theme.accent : colors.text.muted,
+                    transition: 'color 0.18s, transform 0.22s cubic-bezier(0.16,1,0.3,1)',
+                    transform: active ? 'scale(1.15)' : 'scale(1)',
+                  },
+                }}>
+                  {item.icon}
+                </Box>
+                <Typography sx={{
+                  fontSize: '0.62rem',
+                  fontWeight: active ? 700 : 500,
+                  color: active ? theme.accent : colors.text.muted,
+                  lineHeight: 1, letterSpacing: 0.1,
+                  transition: 'color 0.18s',
+                }}>
+                  {item.label}
+                </Typography>
+              </Box>
+            )
+          })}
+        </Box>
+      </Box>
     </Box>
   )
 }

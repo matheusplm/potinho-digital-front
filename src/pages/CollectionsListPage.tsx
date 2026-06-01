@@ -382,24 +382,24 @@ function CollectionCardView({ col, i, onClick }: { col: Collection; i: number; o
         '&:active': { transform: 'scale(0.985)' },
       }}
     >
-      <Box sx={{ height: 72, background: bg.gradient, position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Box sx={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
-        <Typography sx={{ fontSize: '2rem', lineHeight: 1, zIndex: 1, filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.18))' }}>
+      <Box sx={{ height: 84, background: bg.gradient, position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Box sx={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.18) 0%, transparent 68%)', pointerEvents: 'none' }} />
+        <Typography sx={{ fontSize: '2.2rem', lineHeight: 1, zIndex: 1, filter: 'drop-shadow(0 3px 10px rgba(0,0,0,0.2))' }}>
           {col.emoji}
         </Typography>
         {isOwner && (
-          <Box sx={{ position: 'absolute', top: 7, right: 7, zIndex: 2 }}>
+          <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 2 }}>
             <CollectionActionsMenu col={col} />
           </Box>
         )}
       </Box>
-      <Box sx={{ p: 1.6 }}>
-        <Stack direction="row" sx={{ alignItems: 'flex-start', justifyContent: 'space-between', mb: col.description ? 0.4 : 0 }}>
+      <Box sx={{ px: 1.6, pt: 1.4, pb: 1.5 }}>
+        <Stack direction="row" sx={{ alignItems: 'flex-start', justifyContent: 'space-between', mb: col.description ? 0.5 : 0 }}>
           <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1rem', color: colors.text.primary, lineHeight: 1.25, flex: 1, mr: 1 }}>
             {col.name}
           </Typography>
           <Box sx={{
-            px: 0.9, py: 0.25, borderRadius: radius.full, flexShrink: 0, mt: 0.15,
+            px: 0.9, py: 0.3, borderRadius: radius.full, flexShrink: 0, mt: 0.1,
             background: isOwner ? `${colors.primary.main}15` : `${colors.rose.main}15`,
             border: `1px solid ${isOwner ? colors.primary.main : colors.rose.main}30`,
             fontSize: '0.58rem', fontWeight: 800, letterSpacing: 0.5,
@@ -414,7 +414,7 @@ function CollectionCardView({ col, i, onClick }: { col: Collection; i: number; o
             {col.description}
           </Typography>
         )}
-        <Box sx={{ height: '3px', borderRadius: 2, background: bg.gradient, mt: 1.2, opacity: 0.55 }} />
+        <Box sx={{ height: '2.5px', borderRadius: 2, background: bg.gradient, mt: 1.3, opacity: 0.5 }} />
       </Box>
     </Card>
   )
@@ -448,7 +448,7 @@ function CollectionGridItem({ col, i, onClick }: { col: Collection; i: number; o
           </Box>
         )}
       </Box>
-      <Box sx={{ px: 1.2, py: 1, display: 'flex', flexDirection: 'column', gap: 0.3 }}>
+      <Box sx={{ px: 1.3, py: 1.1, display: 'flex', flexDirection: 'column', gap: 0.35 }}>
         <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.88rem', color: colors.text.primary, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {col.name}
         </Typography>
@@ -474,8 +474,8 @@ function CollectionListItem({ col, i, onClick }: { col: Collection; i: number; o
       onClick={onClick}
       sx={{
         display: 'flex', alignItems: 'center', gap: 1.4,
-        px: 1.4, py: 1.1,
-        borderRadius: radius.lg, cursor: 'pointer',
+        px: 1.5, py: 1.3,
+        borderRadius: radius.xl, cursor: 'pointer',
         background: 'rgba(255,255,255,0.75)', backdropFilter: 'blur(12px)',
         border: '1px solid rgba(255,255,255,0.5)',
         boxShadow: '0 1px 6px rgba(0,0,0,0.07)',
@@ -486,9 +486,9 @@ function CollectionListItem({ col, i, onClick }: { col: Collection; i: number; o
       }}
     >
       <Box sx={{
-        width: 40, height: 40, borderRadius: radius.md, flexShrink: 0,
+        width: 44, height: 44, borderRadius: radius.lg, flexShrink: 0,
         background: bg.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: '1.3rem', boxShadow: `0 2px 8px ${bg.accent}33`,
+        fontSize: '1.4rem', boxShadow: `0 3px 10px ${bg.accent}40`,
       }}>
         {col.emoji}
       </Box>
@@ -582,7 +582,7 @@ function AddGhostCard({ view, onClick, accent }: { view: ViewMode; onClick: () =
   return (
     <Box onClick={onClick} sx={{ ...base, borderRadius: radius.xl, overflow: 'hidden', background: `${accent}06` }}>
       <Box sx={{
-        height: 72, position: 'relative', overflow: 'hidden',
+        height: 84, position: 'relative', overflow: 'hidden',
         background: `linear-gradient(135deg, ${accent}18, ${accent}32)`,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
