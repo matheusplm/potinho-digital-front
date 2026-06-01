@@ -4,12 +4,21 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import ViewListIcon from '@mui/icons-material/ViewList'
 import GridViewIcon from '@mui/icons-material/GridView'
 import ViewAgendaIcon from '@mui/icons-material/ViewAgenda'
-import { Box, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField, Typography } from '@mui/material'
+import MoreVertIcon from '@mui/icons-material/MoreVert'
+import EditIcon from '@mui/icons-material/Edit'
+import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
+import {
+  Box, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle,
+  Menu, MenuItem, Stack, TextField, Typography,
+} from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useState, useEffect, type ElementType } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Card, Input, PageTitle, ScrollablePage, toast } from '../components/ui'
-import { useCollectionsQuery, useCreateCollectionMutation } from '../hooks/useNotes'
+import {
+  useCollectionsQuery, useCreateCollectionMutation,
+  useUpdateCollectionMutation, useDeleteCollectionMutation,
+} from '../hooks/useNotes'
 import { useBackground } from '../context/BackgroundContext'
 import { useUser } from '../context/UserContext'
 import { backgroundThemes, colors, font, radius } from '../design-system'
@@ -19,12 +28,10 @@ const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
 `
-
 const cardIn = (i: number) => keyframes`
   from { opacity: 0; transform: translateY(${14 + i * 4}px); }
   to   { opacity: 1; transform: translateY(0); }
 `
-
 const ghostPulse = keyframes`
   0%, 100% { transform: scale(1);   box-shadow: 0 0 0 0 rgba(0,0,0,0.12); }
   50%       { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(0,0,0,0); }
@@ -36,33 +43,35 @@ const VIEW_KEY = 'potinho-collections-view'
 const EMOJIS = ['💙', '💗', '✨', '🌸', '🌙', '🌊', '🌿', '🔥', '⭐', '🎁', '🦋', '🍀']
 const DEFAULT_FORM: CollectionFormData = { name: '', emoji: '💙', description: '', theme: 'romance' }
 
-function CreateDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+function CollectionFormDialog({
+  open, onClose, initial, onSubmit, isPending,
+}: {
+  open: boolean
+  onClose: () => void
+  initial?: Collection
+  onSubmit: (data: CollectionFormData) => Promise<void>
+  isPending: boolean
+}) {
   const [form, setForm] = useState<CollectionFormData>(DEFAULT_FORM)
-  const createMutation = useCreateCollectionMutation()
 
   useEffect(() => {
-    if (open) setForm(DEFAULT_FORM)
+    if (open) {
+      setForm(initial
+        ? { name: initial.name, emoji: initial.emoji, description: initial.description ?? '', theme: initial.theme }
+        : DEFAULT_FORM
+      )
+    }
   }, [open])
 
-  async function handleSubmit() {
-    if (!form.name.trim()) return
-    try {
-      await createMutation.mutateAsync(form)
-      toast.success('Coleção criada!')
-      onClose()
-    } catch {
-      toast.error('Erro ao criar coleção.')
-    }
-  }
-
   const selectedBg = backgroundThemes.find((bg) => bg.key === form.theme) ?? backgroundThemes[0]
+  const isEdit = Boolean(initial)
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth PaperProps={{
       sx: { borderRadius: radius.xl, mx: 2, background: 'rgba(255,253,251,0.98)', backdropFilter: 'blur(24px)' }
     }}>
       <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 700, color: colors.text.primary, pb: 1 }}>
-        Nova coleção
+        {isEdit ? 'Editar coleção' : 'Nova coleção'}
       </DialogTitle>
       <DialogContent sx={{ pt: 0 }}>
         <Stack spacing={2.5} sx={{ mt: 1 }}>
@@ -141,15 +150,111 @@ function CreateDialog({ open, onClose }: { open: boolean; onClose: () => void })
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
         <Button variant="ghost" onClick={onClose} sx={{ flex: 1 }}>Cancelar</Button>
-        <Button variant="primary" loading={createMutation.isPending} onClick={handleSubmit} disabled={!form.name.trim()} sx={{ flex: 1 }}>
-          Criar
+        <Button variant="primary" loading={isPending} onClick={() => onSubmit(form)} disabled={!form.name.trim()} sx={{ flex: 1 }}>
+          {isEdit ? 'Salvar' : 'Criar'}
         </Button>
       </DialogActions>
     </Dialog>
   )
 }
 
-function CollectionCardView({ col, i, onClick }: { col: Collection; i: number; onClick: () => void }) {
+function CollectionActionsMenu({ col }: { col: Collection }) {
+  const [anchor, setAnchor] = useState<null | HTMLElement>(null)
+  const [editOpen, setEditOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const updateMutation = useUpdateCollectionMutation()
+  const deleteMutation = useDeleteCollectionMutation()
+
+  function open(e: React.MouseEvent) {
+    e.stopPropagation()
+    setAnchor(e.currentTarget as HTMLElement)
+  }
+
+  return (
+    <>
+      <Box
+        onClick={open}
+        sx={{
+          width: 26, height: 26, borderRadius: '50%', flexShrink: 0,
+          background: 'rgba(0,0,0,0.18)', backdropFilter: 'blur(4px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          cursor: 'pointer', transition: 'background 0.15s',
+          '&:hover': { background: 'rgba(0,0,0,0.32)' },
+        }}
+      >
+        <MoreVertIcon sx={{ fontSize: 14, color: 'rgba(255,255,255,0.92)' }} />
+      </Box>
+
+      <Menu
+        anchorEl={anchor}
+        open={Boolean(anchor)}
+        onClose={(e) => { (e as Event).stopPropagation?.(); setAnchor(null) }}
+        onClick={(e) => e.stopPropagation()}
+        PaperProps={{
+          sx: {
+            borderRadius: radius.lg, minWidth: 160,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.14)',
+            border: '1px solid rgba(255,255,255,0.5)',
+            background: 'rgba(255,253,251,0.97)', backdropFilter: 'blur(20px)',
+            p: 0.5,
+          }
+        }}
+      >
+        <MenuItem onClick={() => { setAnchor(null); setEditOpen(true) }} sx={{
+          gap: 1.2, fontSize: '0.86rem', fontWeight: 600, color: colors.text.primary,
+          borderRadius: radius.md, py: 1,
+        }}>
+          <EditIcon sx={{ fontSize: 16, color: colors.primary.main }} />
+          Editar
+        </MenuItem>
+        <MenuItem onClick={() => { setAnchor(null); setDeleteOpen(true) }} sx={{
+          gap: 1.2, fontSize: '0.86rem', fontWeight: 600, color: colors.rose.main,
+          borderRadius: radius.md, py: 1,
+        }}>
+          <DeleteForeverOutlinedIcon sx={{ fontSize: 16, color: colors.rose.main }} />
+          Excluir
+        </MenuItem>
+      </Menu>
+
+      <CollectionFormDialog
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        initial={col}
+        isPending={updateMutation.isPending}
+        onSubmit={async (data) => {
+          await updateMutation.mutateAsync({ id: col.id, data })
+          toast.success('Coleção atualizada!')
+          setEditOpen(false)
+        }}
+      />
+
+      <Dialog open={deleteOpen} onClose={() => setDeleteOpen(false)} PaperProps={{
+        sx: { borderRadius: radius.xl, mx: 2, background: 'rgba(255,253,251,0.98)', backdropFilter: 'blur(24px)' }
+      }}>
+        <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 700, color: colors.text.primary, pb: 1 }}>
+          Excluir coleção
+        </DialogTitle>
+        <DialogContent>
+          <Typography sx={{ fontSize: '0.88rem', color: colors.text.secondary, lineHeight: 1.55 }}>
+            Tem certeza que deseja excluir <strong style={{ color: colors.text.primary }}>{col.name}</strong>? Todos os bilhetes, raridades e tipos serão removidos.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
+          <Button variant="ghost" onClick={() => setDeleteOpen(false)} sx={{ flex: 1 }}>Cancelar</Button>
+          <Button variant="rose" loading={deleteMutation.isPending} onClick={async () => {
+            await deleteMutation.mutateAsync(col.id)
+            toast.success('Coleção excluída.')
+            setDeleteOpen(false)
+          }} sx={{ flex: 1 }}>
+            Excluir
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  )
+}
+
+function CollectionCardView({ col, i, isOwner: _isOwner, onClick }: { col: Collection; i: number; isOwner: boolean; onClick: () => void }) {
   const bg = backgroundThemes.find((t) => t.key === col.theme) ?? backgroundThemes[0]
   const isOwner = col.access === 'owner'
   return (
@@ -163,14 +268,16 @@ function CollectionCardView({ col, i, onClick }: { col: Collection; i: number; o
         '&:active': { transform: 'scale(0.985)' },
       }}
     >
-      <Box sx={{
-        height: 72, background: bg.gradient, position: 'relative', overflow: 'hidden',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-      }}>
+      <Box sx={{ height: 72, background: bg.gradient, position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Box sx={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
         <Typography sx={{ fontSize: '2rem', lineHeight: 1, zIndex: 1, filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.18))' }}>
           {col.emoji}
         </Typography>
+        {isOwner && (
+          <Box sx={{ position: 'absolute', top: 7, right: 7, zIndex: 2 }}>
+            <CollectionActionsMenu col={col} />
+          </Box>
+        )}
       </Box>
       <Box sx={{ p: 1.6 }}>
         <Stack direction="row" sx={{ alignItems: 'flex-start', justifyContent: 'space-between', mb: col.description ? 0.4 : 0 }}>
@@ -216,14 +323,16 @@ function CollectionGridItem({ col, i, onClick }: { col: Collection; i: number; o
         '&:active': { transform: 'scale(0.96)' },
       }}
     >
-      <Box sx={{
-        aspectRatio: '4/3', background: bg.gradient, position: 'relative', overflow: 'hidden',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-      }}>
+      <Box sx={{ aspectRatio: '4/3', background: bg.gradient, position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Box sx={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 40% 35%, rgba(255,255,255,0.22) 0%, transparent 65%)', pointerEvents: 'none' }} />
         <Typography sx={{ fontSize: '2.2rem', lineHeight: 1, filter: 'drop-shadow(0 3px 10px rgba(0,0,0,0.22))' }}>
           {col.emoji}
         </Typography>
+        {isOwner && (
+          <Box sx={{ position: 'absolute', top: 6, right: 6, zIndex: 2 }}>
+            <CollectionActionsMenu col={col} />
+          </Box>
+        )}
       </Box>
       <Box sx={{ px: 1.2, py: 1, display: 'flex', flexDirection: 'column', gap: 0.3 }}>
         <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.88rem', color: colors.text.primary, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -288,6 +397,7 @@ function CollectionListItem({ col, i, onClick }: { col: Collection; i: number; o
       }}>
         {isOwner ? 'minha' : 'convidada'}
       </Box>
+      {isOwner && <CollectionActionsMenu col={col} />}
     </Box>
   )
 }
@@ -316,8 +426,7 @@ function AddGhostCard({ view, onClick, accent }: { view: ViewMode; onClick: () =
   if (view === 'list') {
     return (
       <Box onClick={onClick} sx={{
-        ...base,
-        display: 'flex', alignItems: 'center', gap: 1.4,
+        ...base, display: 'flex', alignItems: 'center', gap: 1.4,
         px: 1.4, py: 1.1, borderRadius: radius.lg,
         background: `linear-gradient(135deg, ${accent}08, ${accent}04)`,
         backdropFilter: 'blur(8px)',
@@ -338,11 +447,7 @@ function AddGhostCard({ view, onClick, accent }: { view: ViewMode; onClick: () =
   if (view === 'grid') {
     return (
       <Box onClick={onClick} sx={{ ...base, borderRadius: radius.xl, overflow: 'hidden', background: `${accent}06` }}>
-        <Box sx={{
-          aspectRatio: '4/3',
-          background: `linear-gradient(135deg, ${accent}18, ${accent}30)`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
+        <Box sx={{ aspectRatio: '4/3', background: `linear-gradient(135deg, ${accent}18, ${accent}30)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <PlusCircle size={42} />
         </Box>
         <Box sx={{ px: 1.2, py: 1 }}>
@@ -394,6 +499,7 @@ export function CollectionsListPage() {
   const navigate = useNavigate()
   const { data: collections = [], isLoading } = useCollectionsQuery()
   const [createOpen, setCreateOpen] = useState(false)
+  const createMutation = useCreateCollectionMutation()
   const [view, setView] = useState<ViewMode>(() => (localStorage.getItem(VIEW_KEY) as ViewMode) ?? 'cards')
 
   const isWriter = user?.role === 'writer'
@@ -424,19 +530,15 @@ export function CollectionsListPage() {
             border: '1px solid rgba(255,255,255,0.4)',
           }}>
             {VIEW_ICONS.map(({ mode, Icon }) => (
-              <Box
-                key={mode}
-                onClick={() => changeView(mode)}
-                sx={{
-                  width: 32, height: 32, borderRadius: radius.md,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  cursor: 'pointer', transition: 'all 0.15s',
-                  background: view === mode ? 'rgba(255,255,255,0.85)' : 'transparent',
-                  boxShadow: view === mode ? '0 1px 4px rgba(0,0,0,0.12)' : 'none',
-                  color: view === mode ? theme.accent : theme.textOnBgMuted,
-                  '&:hover': { background: 'rgba(255,255,255,0.6)' },
-                }}
-              >
+              <Box key={mode} onClick={() => changeView(mode)} sx={{
+                width: 32, height: 32, borderRadius: radius.md,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', transition: 'all 0.15s',
+                background: view === mode ? 'rgba(255,255,255,0.85)' : 'transparent',
+                boxShadow: view === mode ? '0 1px 4px rgba(0,0,0,0.12)' : 'none',
+                color: view === mode ? theme.accent : theme.textOnBgMuted,
+                '&:hover': { background: 'rgba(255,255,255,0.6)' },
+              }}>
                 <Icon sx={{ fontSize: 17 }} />
               </Box>
             ))}
@@ -466,9 +568,7 @@ export function CollectionsListPage() {
                 {isWriter ? 'Crie sua primeira coleção de bilhetes' : 'Peça o código de convite para acessar uma coleção'}
               </Typography>
             </Stack>
-            {isWriter && (
-              <AddGhostCard view="cards" onClick={() => setCreateOpen(true)} accent={theme.accent} />
-            )}
+            {isWriter && <AddGhostCard view="cards" onClick={() => setCreateOpen(true)} accent={theme.accent} />}
           </Box>
         )}
 
@@ -477,12 +577,11 @@ export function CollectionsListPage() {
             {view === 'cards' && (
               <Stack spacing={1.4}>
                 {collections.map((col, i) => (
-                  <CollectionCardView key={col.id} col={col} i={i} onClick={() => navigate(`/colecoes/${col.id}`)} />
+                  <CollectionCardView key={col.id} col={col} i={i} isOwner={col.access === 'owner'} onClick={() => navigate(`/colecoes/${col.id}`)} />
                 ))}
                 {isWriter && <AddGhostCard view="cards" onClick={() => setCreateOpen(true)} accent={theme.accent} />}
               </Stack>
             )}
-
             {view === 'grid' && (
               <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1.4 }}>
                 {collections.map((col, i) => (
@@ -491,7 +590,6 @@ export function CollectionsListPage() {
                 {isWriter && <AddGhostCard view="grid" onClick={() => setCreateOpen(true)} accent={theme.accent} />}
               </Box>
             )}
-
             {view === 'list' && (
               <Stack spacing={0.8}>
                 {collections.map((col, i) => (
@@ -504,7 +602,16 @@ export function CollectionsListPage() {
         )}
       </ScrollablePage>
 
-      <CreateDialog open={createOpen} onClose={() => setCreateOpen(false)} />
+      <CollectionFormDialog
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        isPending={createMutation.isPending}
+        onSubmit={async (data) => {
+          await createMutation.mutateAsync(data)
+          toast.success('Coleção criada!')
+          setCreateOpen(false)
+        }}
+      />
     </Box>
   )
 }
