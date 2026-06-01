@@ -7,12 +7,13 @@ import ViewAgendaIcon from '@mui/icons-material/ViewAgenda'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
+import SwapVertIcon from '@mui/icons-material/SwapVert'
 import {
   Box, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle,
   Menu, MenuItem, Stack, TextField, Typography,
 } from '@mui/material'
 import { keyframes } from '@emotion/react'
-import { useState, useEffect, type ElementType } from 'react'
+import { useState, useEffect, useMemo, type ElementType } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Card, Input, PageTitle, ScrollablePage, toast } from '../components/ui'
 import {
@@ -38,7 +39,77 @@ const ghostPulse = keyframes`
 `
 
 type ViewMode = 'cards' | 'grid' | 'list'
+type FilterType = 'all' | 'owner' | 'reader'
+type SortType = 'name-asc' | 'name-desc'
+
 const VIEW_KEY = 'potinho-collections-view'
+
+const FILTER_LABELS: { key: FilterType; label: string }[] = [
+  { key: 'all',    label: 'Todas' },
+  { key: 'owner',  label: 'Minhas' },
+  { key: 'reader', label: 'Convidadas' },
+]
+
+function CollectionsFilterBar({
+  filter, setFilter, sort, setSort, accent, textOnBgMuted,
+}: {
+  filter: FilterType
+  setFilter: (f: FilterType) => void
+  sort: SortType
+  setSort: (s: SortType) => void
+  accent: string
+  textOnBgMuted: string
+}) {
+  return (
+    <Stack direction="row" sx={{ alignItems: 'center', gap: 1, mb: 2.5 }}>
+      <Box sx={{
+        display: 'flex', gap: 0.7, flex: 1,
+        overflowX: 'auto', scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' },
+      }}>
+        {FILTER_LABELS.map(({ key, label }) => {
+          const active = filter === key
+          return (
+            <Box
+              key={key}
+              onClick={() => setFilter(key)}
+              sx={{
+                px: 1.4, py: 0.55, borderRadius: radius.full, flexShrink: 0,
+                cursor: 'pointer', transition: 'all 0.16s',
+                background: active ? `${accent}1a` : 'rgba(255,255,255,0.38)',
+                border: `1.5px solid ${active ? accent : 'rgba(255,255,255,0.55)'}`,
+                fontSize: '0.78rem', fontWeight: active ? 800 : 500,
+                color: active ? accent : textOnBgMuted,
+                backdropFilter: 'blur(8px)',
+                boxShadow: active ? `0 2px 8px ${accent}22` : 'none',
+              }}
+            >
+              {label}
+            </Box>
+          )
+        })}
+      </Box>
+
+      <Box
+        onClick={() => setSort(sort === 'name-asc' ? 'name-desc' : 'name-asc')}
+        sx={{
+          display: 'flex', alignItems: 'center', gap: 0.4,
+          px: 1.1, py: 0.55, borderRadius: radius.full, flexShrink: 0,
+          cursor: 'pointer', transition: 'all 0.16s',
+          background: sort !== 'name-asc' ? `${accent}1a` : 'rgba(255,255,255,0.38)',
+          border: `1.5px solid ${sort !== 'name-asc' ? accent : 'rgba(255,255,255,0.55)'}`,
+          color: sort !== 'name-asc' ? accent : textOnBgMuted,
+          backdropFilter: 'blur(8px)',
+          '&:hover': { background: 'rgba(255,255,255,0.6)' },
+        }}
+      >
+        <SwapVertIcon sx={{ fontSize: 14 }} />
+        <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: 0.2 }}>
+          {sort === 'name-asc' ? 'A-Z' : 'Z-A'}
+        </Typography>
+      </Box>
+    </Stack>
+  )
+}
 
 const EMOJIS = ['💙', '💗', '✨', '🌸', '🌙', '🌊', '🌿', '🔥', '⭐', '🎁', '🦋', '🍀']
 const DEFAULT_FORM: CollectionFormData = { name: '', emoji: '💙', description: '', theme: 'romance' }
@@ -513,8 +584,21 @@ export function CollectionsListPage() {
   const [createOpen, setCreateOpen] = useState(false)
   const createMutation = useCreateCollectionMutation()
   const [view, setView] = useState<ViewMode>(() => (localStorage.getItem(VIEW_KEY) as ViewMode) ?? 'cards')
+  const [filter, setFilter] = useState<FilterType>('all')
+  const [sort, setSort] = useState<SortType>('name-asc')
 
   const isWriter = user?.role === 'writer'
+
+  const displayedCollections = useMemo(() => {
+    let result = collections
+    if (filter === 'owner')  result = result.filter((c) => c.access === 'owner')
+    if (filter === 'reader') result = result.filter((c) => c.access === 'reader')
+    return [...result].sort((a, b) =>
+      sort === 'name-asc'
+        ? a.name.localeCompare(b.name, 'pt-BR')
+        : b.name.localeCompare(a.name, 'pt-BR')
+    )
+  }, [collections, filter, sort])
 
   function changeView(v: ViewMode) {
     setView(v)
@@ -543,7 +627,7 @@ export function CollectionsListPage() {
           }}>
             {VIEW_ICONS.map(({ mode, Icon }) => (
               <Box key={mode} onClick={() => changeView(mode)} sx={{
-                width: 38, height: 38, borderRadius: radius.md,
+                width: 38, height: 38, borderRadius: '50%',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 cursor: 'pointer', transition: 'all 0.15s',
                 background: view === mode ? 'rgba(255,255,255,0.85)' : 'transparent',
@@ -557,13 +641,21 @@ export function CollectionsListPage() {
           </Box>
         </Stack>
 
+        {!isLoading && collections.length > 0 && (
+          <CollectionsFilterBar
+            filter={filter} setFilter={setFilter}
+            sort={sort} setSort={setSort}
+            accent={theme.accent} textOnBgMuted={theme.textOnBgMuted}
+          />
+        )}
+
         {isLoading && (
           <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', py: 8 }}>
             <CircularProgress size={28} sx={{ color: theme.accent }} />
           </Box>
         )}
 
-        {!isLoading && collections.length === 0 && (
+        {!isLoading && collections.length === 0 && filter === 'all' && (
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textAlign: 'center', py: 8 }}>
             <Box sx={{
               width: 72, height: 72, borderRadius: '50%',
@@ -584,30 +676,41 @@ export function CollectionsListPage() {
           </Box>
         )}
 
-        {!isLoading && collections.length > 0 && (
+        {!isLoading && collections.length > 0 && displayedCollections.length === 0 && (
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 6, gap: 1 }}>
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1rem', color: theme.textOnBg }}>
+              Nenhuma coleção aqui
+            </Typography>
+            <Typography sx={{ fontSize: '0.8rem', color: theme.textOnBgMuted }}>
+              Tente outro filtro
+            </Typography>
+          </Box>
+        )}
+
+        {!isLoading && displayedCollections.length > 0 && (
           <>
             {view === 'cards' && (
               <Stack spacing={1.4}>
-                {collections.map((col, i) => (
+                {displayedCollections.map((col, i) => (
                   <CollectionCardView key={col.id} col={col} i={i} onClick={() => navigate(`/colecoes/${col.id}`)} />
                 ))}
-                {isWriter && <AddGhostCard view="cards" onClick={() => setCreateOpen(true)} accent={theme.accent} />}
+                {isWriter && filter === 'all' && <AddGhostCard view="cards" onClick={() => setCreateOpen(true)} accent={theme.accent} />}
               </Stack>
             )}
             {view === 'grid' && (
               <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1.4 }}>
-                {collections.map((col, i) => (
+                {displayedCollections.map((col, i) => (
                   <CollectionGridItem key={col.id} col={col} i={i} onClick={() => navigate(`/colecoes/${col.id}`)} />
                 ))}
-                {isWriter && <AddGhostCard view="grid" onClick={() => setCreateOpen(true)} accent={theme.accent} />}
+                {isWriter && filter === 'all' && <AddGhostCard view="grid" onClick={() => setCreateOpen(true)} accent={theme.accent} />}
               </Box>
             )}
             {view === 'list' && (
               <Stack spacing={0.8}>
-                {collections.map((col, i) => (
+                {displayedCollections.map((col, i) => (
                   <CollectionListItem key={col.id} col={col} i={i} onClick={() => navigate(`/colecoes/${col.id}`)} />
                 ))}
-                {isWriter && <AddGhostCard view="list" onClick={() => setCreateOpen(true)} accent={theme.accent} />}
+                {isWriter && filter === 'all' && <AddGhostCard view="list" onClick={() => setCreateOpen(true)} accent={theme.accent} />}
               </Stack>
             )}
           </>
