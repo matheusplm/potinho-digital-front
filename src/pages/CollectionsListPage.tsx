@@ -12,7 +12,7 @@ import SearchIcon from '@mui/icons-material/Search'
 import CloseIcon from '@mui/icons-material/Close'
 import {
   Box, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle,
-  Menu, MenuItem, Stack, TextField, Typography,
+  Popover, Stack, TextField, Typography,
 } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useState, useEffect, useMemo, type ElementType } from 'react'
@@ -288,36 +288,44 @@ function CollectionActionsMenu({ col, variant = 'overlay' }: { col: Collection; 
         <MoreVertIcon sx={{ fontSize: variant === 'overlay' ? 15 : 18, color: iconColor }} />
       </Box>
 
-      <Menu
+      <Popover
         anchorEl={anchor}
         open={Boolean(anchor)}
         onClose={() => setAnchor(null)}
         onClick={(e) => e.stopPropagation()}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         PaperProps={{
           sx: {
-            borderRadius: radius.lg, minWidth: 160,
+            borderRadius: '20px',
             boxShadow: '0 8px 32px rgba(0,0,0,0.14)',
-            border: '1px solid rgba(255,255,255,0.5)',
+            border: '1px solid rgba(255,255,255,0.55)',
             background: 'rgba(255,253,251,0.97)', backdropFilter: 'blur(20px)',
-            p: 0.5,
+            p: 0.8, display: 'flex', gap: 0.8,
           }
         }}
       >
-        <MenuItem onClick={() => { setAnchor(null); setEditOpen(true) }} sx={{
-          gap: 1.2, fontSize: '0.86rem', fontWeight: 600, color: colors.text.primary,
-          borderRadius: radius.md, py: 1,
+        <Box onClick={() => { setAnchor(null); setEditOpen(true) }} sx={{
+          width: 44, height: 44, borderRadius: '50%', cursor: 'pointer',
+          background: `${colors.primary.main}12`,
+          border: `1.5px solid ${colors.primary.main}22`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          transition: 'all 0.15s',
+          '&:hover': { background: `${colors.primary.main}22`, transform: 'scale(1.06)' },
         }}>
-          <EditIcon sx={{ fontSize: 16, color: colors.primary.main }} />
-          Editar
-        </MenuItem>
-        <MenuItem onClick={() => { setAnchor(null); setDeleteOpen(true) }} sx={{
-          gap: 1.2, fontSize: '0.86rem', fontWeight: 600, color: colors.rose.main,
-          borderRadius: radius.md, py: 1,
+          <EditIcon sx={{ fontSize: 18, color: colors.primary.main }} />
+        </Box>
+        <Box onClick={() => { setAnchor(null); setDeleteOpen(true) }} sx={{
+          width: 44, height: 44, borderRadius: '50%', cursor: 'pointer',
+          background: `${colors.rose.main}12`,
+          border: `1.5px solid ${colors.rose.main}22`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          transition: 'all 0.15s',
+          '&:hover': { background: `${colors.rose.main}22`, transform: 'scale(1.06)' },
         }}>
-          <DeleteForeverOutlinedIcon sx={{ fontSize: 16, color: colors.rose.main }} />
-          Excluir
-        </MenuItem>
-      </Menu>
+          <DeleteForeverOutlinedIcon sx={{ fontSize: 18, color: colors.rose.main }} />
+        </Box>
+      </Popover>
 
       <CollectionFormDialog
         open={editOpen}
