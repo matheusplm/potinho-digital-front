@@ -5,17 +5,22 @@ import { useState, useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import { colors } from '../../design-system'
 
+const overlayIn = keyframes`
+  from { opacity: 0; }
+  to   { opacity: 1; }
+`
+
 const floatFade = keyframes`
-  0%   { opacity: 0; transform: translateX(-50%) translateY(-4px); }
-  22%  { opacity: 1; transform: translateX(-50%) translateY(2px); }
-  55%  { opacity: 0.95; transform: translateX(-50%) translateY(8px); }
-  100% { opacity: 0; transform: translateX(-50%) translateY(18px); }
+  0%   { opacity: 0; transform: translateX(-50%) translateY(-6px); }
+  18%  { opacity: 1; transform: translateX(-50%) translateY(0px); }
+  60%  { opacity: 1; transform: translateX(-50%) translateY(6px); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(16px); }
 `
 
 const chevronDrift = keyframes`
-  0%   { opacity: 0.4; transform: translateY(-2px); }
-  50%  { opacity: 1; transform: translateY(2px); }
-  100% { opacity: 0.4; transform: translateY(-2px); }
+  0%   { transform: translateY(-3px); opacity: 0.6; }
+  50%  { transform: translateY(3px);  opacity: 1; }
+  100% { transform: translateY(-3px); opacity: 0.6; }
 `
 
 function findScrollable(el: Element, depth = 0): boolean {
@@ -52,33 +57,54 @@ export function ScrollHint() {
   if (!visible) return null
 
   return (
-    <Box sx={{
-      position: 'fixed',
-      bottom: 72,
-      left: '50%',
-      zIndex: 200,
-      pointerEvents: 'none',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: 0.5,
-      animation: `${floatFade} 2.6s ease-in-out infinite`,
-    }}>
+    <>
       <Box sx={{
-        width: 30, height: 30, borderRadius: '50%',
-        background: `linear-gradient(160deg, ${colors.primary.main}, ${colors.purple.main})`,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        boxShadow: `0 4px 16px ${colors.primary.glow}`,
-        animation: `${chevronDrift} 1.3s ease-in-out infinite`,
+        position: 'fixed',
+        top: '40%',
+        bottom: 0,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: '100%',
+        maxWidth: 480,
+        zIndex: 190,
+        pointerEvents: 'none',
+        background: 'linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.22) 35%, rgba(255,255,255,0.52) 70%, rgba(255,255,255,0.72) 100%)',
+        backdropFilter: 'blur(6px)',
+        WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 40%)',
+        maskImage: 'linear-gradient(to bottom, transparent 0%, black 40%)',
+        animation: `${overlayIn} 0.4s ease forwards`,
+      }} />
+
+      <Box sx={{
+        position: 'fixed',
+        bottom: 76,
+        left: '50%',
+        zIndex: 200,
+        pointerEvents: 'none',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 0.6,
+        animation: `${floatFade} 2.8s ease-in-out infinite`,
       }}>
-        <KeyboardArrowDownIcon sx={{ fontSize: 20, color: '#fff' }} />
+        <Box sx={{
+          width: 38, height: 38, borderRadius: '50%',
+          background: `linear-gradient(160deg, ${colors.primary.main}, ${colors.purple.main})`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: `0 6px 24px ${colors.primary.glow}, 0 2px 8px rgba(0,0,0,0.15)`,
+          animation: `${chevronDrift} 1.4s ease-in-out infinite`,
+        }}>
+          <KeyboardArrowDownIcon sx={{ fontSize: 22, color: '#fff' }} />
+        </Box>
+        <Typography sx={{
+          fontSize: '0.68rem', fontWeight: 800, letterSpacing: 0.5,
+          color: colors.text.primary,
+          whiteSpace: 'nowrap', lineHeight: 1,
+          textShadow: '0 1px 8px rgba(255,255,255,0.9)',
+        }}>
+          Deslize para baixo
+        </Typography>
       </Box>
-      <Typography sx={{
-        fontSize: '0.62rem', fontWeight: 800, letterSpacing: 0.4,
-        color: colors.text.secondary, whiteSpace: 'nowrap', lineHeight: 1,
-      }}>
-        Deslize para baixo
-      </Typography>
-    </Box>
+    </>
   )
 }
