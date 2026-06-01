@@ -158,37 +158,46 @@ function CollectionFormDialog({
   )
 }
 
-function CollectionActionsMenu({ col }: { col: Collection }) {
+function CollectionActionsMenu({ col, variant = 'overlay' }: { col: Collection; variant?: 'overlay' | 'inline' }) {
   const [anchor, setAnchor] = useState<null | HTMLElement>(null)
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const updateMutation = useUpdateCollectionMutation()
   const deleteMutation = useDeleteCollectionMutation()
 
-  function open(e: React.MouseEvent) {
+  function openMenu(e: React.MouseEvent) {
     e.stopPropagation()
     setAnchor(e.currentTarget as HTMLElement)
   }
 
+  const btnSx = variant === 'overlay'
+    ? {
+        width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+        background: 'rgba(0,0,0,0.22)', backdropFilter: 'blur(4px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        cursor: 'pointer', transition: 'background 0.15s',
+        '&:hover': { background: 'rgba(0,0,0,0.38)' },
+      }
+    : {
+        width: 36, height: 36, borderRadius: radius.md, flexShrink: 0,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        cursor: 'pointer', transition: 'background 0.15s',
+        color: colors.text.muted,
+        '&:hover': { background: 'rgba(0,0,0,0.06)', color: colors.text.secondary },
+      }
+
+  const iconColor = variant === 'overlay' ? 'rgba(255,255,255,0.92)' : 'inherit'
+
   return (
     <>
-      <Box
-        onClick={open}
-        sx={{
-          width: 26, height: 26, borderRadius: '50%', flexShrink: 0,
-          background: 'rgba(0,0,0,0.18)', backdropFilter: 'blur(4px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          cursor: 'pointer', transition: 'background 0.15s',
-          '&:hover': { background: 'rgba(0,0,0,0.32)' },
-        }}
-      >
-        <MoreVertIcon sx={{ fontSize: 14, color: 'rgba(255,255,255,0.92)' }} />
+      <Box onClick={openMenu} sx={btnSx}>
+        <MoreVertIcon sx={{ fontSize: variant === 'overlay' ? 15 : 18, color: iconColor }} />
       </Box>
 
       <Menu
         anchorEl={anchor}
         open={Boolean(anchor)}
-        onClose={(e) => { (e as Event).stopPropagation?.(); setAnchor(null) }}
+        onClose={() => setAnchor(null)}
         onClick={(e) => e.stopPropagation()}
         PaperProps={{
           sx: {
@@ -254,7 +263,7 @@ function CollectionActionsMenu({ col }: { col: Collection }) {
   )
 }
 
-function CollectionCardView({ col, i, isOwner: _isOwner, onClick }: { col: Collection; i: number; isOwner: boolean; onClick: () => void }) {
+function CollectionCardView({ col, i, onClick }: { col: Collection; i: number; onClick: () => void }) {
   const bg = backgroundThemes.find((t) => t.key === col.theme) ?? backgroundThemes[0]
   const isOwner = col.access === 'owner'
   return (
@@ -388,16 +397,19 @@ function CollectionListItem({ col, i, onClick }: { col: Collection; i: number; o
           </Typography>
         )}
       </Box>
-      <Box sx={{
-        px: 0.8, py: 0.2, borderRadius: radius.full, flexShrink: 0,
-        background: isOwner ? `${colors.primary.main}15` : `${colors.rose.main}15`,
-        fontSize: '0.57rem', fontWeight: 800, letterSpacing: 0.4,
-        color: isOwner ? colors.primary.main : colors.rose.main,
-        textTransform: 'uppercase',
-      }}>
-        {isOwner ? 'minha' : 'convidada'}
-      </Box>
-      {isOwner && <CollectionActionsMenu col={col} />}
+      {isOwner
+        ? <CollectionActionsMenu col={col} variant="inline" />
+        : (
+          <Box sx={{
+            px: 0.8, py: 0.2, borderRadius: radius.full, flexShrink: 0,
+            background: `${colors.rose.main}15`,
+            fontSize: '0.57rem', fontWeight: 800, letterSpacing: 0.4,
+            color: colors.rose.main, textTransform: 'uppercase',
+          }}>
+            convidada
+          </Box>
+        )
+      }
     </Box>
   )
 }
@@ -531,7 +543,7 @@ export function CollectionsListPage() {
           }}>
             {VIEW_ICONS.map(({ mode, Icon }) => (
               <Box key={mode} onClick={() => changeView(mode)} sx={{
-                width: 32, height: 32, borderRadius: radius.md,
+                width: 38, height: 38, borderRadius: radius.md,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 cursor: 'pointer', transition: 'all 0.15s',
                 background: view === mode ? 'rgba(255,255,255,0.85)' : 'transparent',
@@ -577,7 +589,7 @@ export function CollectionsListPage() {
             {view === 'cards' && (
               <Stack spacing={1.4}>
                 {collections.map((col, i) => (
-                  <CollectionCardView key={col.id} col={col} i={i} isOwner={col.access === 'owner'} onClick={() => navigate(`/colecoes/${col.id}`)} />
+                  <CollectionCardView key={col.id} col={col} i={i} onClick={() => navigate(`/colecoes/${col.id}`)} />
                 ))}
                 {isWriter && <AddGhostCard view="cards" onClick={() => setCreateOpen(true)} accent={theme.accent} />}
               </Stack>
