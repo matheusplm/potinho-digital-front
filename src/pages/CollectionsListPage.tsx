@@ -297,33 +297,30 @@ function CollectionActionsMenu({ col, variant = 'overlay' }: { col: Collection; 
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         PaperProps={{
           sx: {
-            borderRadius: '20px',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.14)',
-            border: '1px solid rgba(255,255,255,0.55)',
-            background: 'rgba(255,253,251,0.97)', backdropFilter: 'blur(20px)',
-            p: 0.8, display: 'flex', gap: 0.8,
+            background: 'transparent', boxShadow: 'none',
+            border: 'none', p: 0, display: 'flex', gap: 0.8,
           }
         }}
       >
         <Box onClick={() => { setAnchor(null); setEditOpen(true) }} sx={{
-          width: 44, height: 44, borderRadius: '50%', cursor: 'pointer',
-          background: `${colors.primary.main}12`,
-          border: `1.5px solid ${colors.primary.main}22`,
+          width: 36, height: 36, borderRadius: '50%', cursor: 'pointer',
+          background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)',
+          boxShadow: `0 4px 14px rgba(0,0,0,0.18)`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           transition: 'all 0.15s',
-          '&:hover': { background: `${colors.primary.main}22`, transform: 'scale(1.06)' },
+          '&:hover': { transform: 'scale(1.1)', boxShadow: '0 6px 20px rgba(0,0,0,0.22)' },
         }}>
-          <EditIcon sx={{ fontSize: 18, color: colors.primary.main }} />
+          <EditIcon sx={{ fontSize: 16, color: colors.primary.main }} />
         </Box>
         <Box onClick={() => { setAnchor(null); setDeleteOpen(true) }} sx={{
-          width: 44, height: 44, borderRadius: '50%', cursor: 'pointer',
-          background: `${colors.rose.main}12`,
-          border: `1.5px solid ${colors.rose.main}22`,
+          width: 36, height: 36, borderRadius: '50%', cursor: 'pointer',
+          background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)',
+          boxShadow: `0 4px 14px rgba(0,0,0,0.18)`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           transition: 'all 0.15s',
-          '&:hover': { background: `${colors.rose.main}22`, transform: 'scale(1.06)' },
+          '&:hover': { transform: 'scale(1.1)', boxShadow: '0 6px 20px rgba(0,0,0,0.22)' },
         }}>
-          <DeleteForeverOutlinedIcon sx={{ fontSize: 18, color: colors.rose.main }} />
+          <DeleteForeverOutlinedIcon sx={{ fontSize: 16, color: colors.rose.main }} />
         </Box>
       </Popover>
 
