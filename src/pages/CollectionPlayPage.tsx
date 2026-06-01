@@ -6,7 +6,7 @@ import { Box, Chip, CircularProgress, IconButton, LinearProgress, Stack, Typogra
 import { keyframes } from '@emotion/react'
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Button, Card, toast } from '../components/ui'
+import { Button, Card, ScrollablePage, toast } from '../components/ui'
 import { useCollectionPlayQuery, useOpenCollectionDailyMutation, useCollectionRaritiesQuery, useCollectionTypesQuery } from '../hooks/useNotes'
 import { useBackground } from '../context/BackgroundContext'
 import { useUser } from '../context/UserContext'
@@ -124,10 +124,7 @@ export function CollectionPlayPage() {
     <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>
       <FavoriteIcon sx={{ position: 'absolute', bottom: -60, right: -60, fontSize: 400, color: 'rgba(225,29,72,0.04)', pointerEvents: 'none' }} />
 
-      <Box sx={{
-        position: 'absolute', inset: 0, zIndex: 1, display: 'flex', flexDirection: 'column',
-        px: 2.5, py: 2.5, overflowY: 'auto', animation: `${fadeIn} 0.35s ease`,
-      }}>
+      <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
         <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
           <IconButton size="small" onClick={() => navigate('/colecoes')} sx={{ color: colors.text.secondary, mr: 0.5 }}>
             <ArrowBackIcon sx={{ fontSize: 20 }} />
@@ -285,7 +282,7 @@ export function CollectionPlayPage() {
             )}
           </Stack>
         )}
-      </Box>
+      </ScrollablePage>
     </Box>
   )
 }

@@ -5,7 +5,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, TextField, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useState } from 'react'
-import { Button, Card, Input, PageTitle, toast } from '../components/ui'
+import { Button, Card, Input, PageTitle, ScrollablePage, toast } from '../components/ui'
 import { useCreateNoteMutation, useDeleteNoteMutation, useNotesQuery, useRaritiesQuery, useTypesQuery, useUpdateNoteMutation } from '../hooks/useNotes'
 import { colors, font, radius } from '../design-system'
 import { useBackground } from '../context/BackgroundContext'
@@ -300,12 +300,7 @@ export function NotesManagePage() {
         fontSize: 400, color: 'rgba(225,29,72,0.04)', pointerEvents: 'none',
       }} />
 
-      <Box sx={{
-        position: 'absolute', inset: 0, zIndex: 1,
-        display: 'flex', flexDirection: 'column',
-        px: 2.5, py: 2.5, overflowY: 'auto',
-        animation: `${fadeIn} 0.35s ease`,
-      }}>
+      <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
         <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 3 }}>
           <PageTitle title="Bilhetes" subtitle={`${notes.length} bilhete${notes.length !== 1 ? 's' : ''} no potinho`} />
           <Button variant="primary" onClick={openCreate} sx={{ py: 0.9, px: 1.6, fontSize: '0.8rem', flexShrink: 0 }}>
@@ -382,7 +377,7 @@ export function NotesManagePage() {
             })}
           </Stack>
         )}
-      </Box>
+      </ScrollablePage>
 
       <NoteFormDialog
         open={formOpen}

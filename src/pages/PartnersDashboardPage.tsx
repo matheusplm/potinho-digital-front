@@ -2,7 +2,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import GroupIcon from '@mui/icons-material/Group'
 import { Box, CircularProgress, LinearProgress, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
-import { Card, PageTitle } from '../components/ui'
+import { Card, PageTitle, ScrollablePage } from '../components/ui'
 import { usePartnersQuery } from '../hooks/useNotes'
 import { colors, font, gradients, radius } from '../design-system'
 import { useBackground } from '../context/BackgroundContext'
@@ -50,12 +50,7 @@ export function PartnersDashboardPage() {
         fontSize: 400, color: 'rgba(29,78,216,0.04)', pointerEvents: 'none',
       }} />
 
-      <Box sx={{
-        position: 'absolute', inset: 0, zIndex: 1,
-        display: 'flex', flexDirection: 'column',
-        px: 2.5, py: 2.5, overflowY: 'auto',
-        animation: `${fadeIn} 0.35s ease`,
-      }}>
+      <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
         <Box sx={{ mb: 3 }}>
           <PageTitle
             title="Parceiros"
@@ -142,7 +137,7 @@ export function PartnersDashboardPage() {
             ))}
           </Stack>
         )}
-      </Box>
+      </ScrollablePage>
     </Box>
   )
 }

@@ -9,7 +9,7 @@ import { Box, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitl
 import { keyframes } from '@emotion/react'
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Button, Card, Input, PageTitle, SegmentedControl, toast } from '../components/ui'
+import { Button, Card, Input, PageTitle, ScrollablePage, SegmentedControl, toast } from '../components/ui'
 import {
   useCollectionNotesQuery, useCreateCollectionNoteMutation, useUpdateCollectionNoteMutation, useDeleteCollectionNoteMutation,
   useCollectionRaritiesQuery, useCollectionTypesQuery,
@@ -167,10 +167,7 @@ export function CollectionManagePage() {
     <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>
       <FavoriteIcon sx={{ position: 'absolute', bottom: -60, right: -60, fontSize: 400, color: 'rgba(225,29,72,0.04)', pointerEvents: 'none' }} />
 
-      <Box sx={{
-        position: 'absolute', inset: 0, zIndex: 1, display: 'flex', flexDirection: 'column',
-        px: 2.5, py: 2.5, overflowY: 'auto', animation: `${fadeIn} 0.35s ease`,
-      }}>
+      <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
         <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2.5 }}>
           <IconButton size="small" onClick={() => navigate(`/colecoes/${cid}`)} sx={{ color: colors.text.secondary }}>
             <ArrowBackIcon sx={{ fontSize: 20 }} />
@@ -292,7 +289,7 @@ export function CollectionManagePage() {
             ))}
           </Stack>
         )}
-      </Box>
+      </ScrollablePage>
 
       {cid && (
         <NoteDialog open={noteDialog} editing={editingNote} rarities={rarities} types={types} cid={cid} onClose={() => { setNoteDialog(false); setEditingNote(null) }} />

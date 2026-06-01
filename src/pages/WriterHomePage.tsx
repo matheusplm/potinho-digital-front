@@ -11,7 +11,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { useCollectionQuery, useRaritiesQuery, useTypesQuery } from '../hooks/useNotes'
-import { Card, Button, Input, toast } from '../components/ui'
+import { Card, Button, Input, ScrollablePage, toast } from '../components/ui'
 import { colors, font, gradients } from '../design-system'
 import { useBackground } from '../context/BackgroundContext'
 import { api } from '../services/api'
@@ -114,12 +114,7 @@ export function WriterHomePage() {
         }} />
       ))}
 
-      <Box sx={{
-        position: 'absolute', inset: 0, zIndex: 1,
-        display: 'flex', flexDirection: 'column',
-        px: 2.5, py: 2.5, overflowY: 'auto',
-        animation: `${fadeIn} 0.4s ease`,
-      }}>
+      <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.4s ease` }}>
         <Stack spacing={0.3} sx={{ mb: 3.5 }}>
           <Typography sx={{ fontSize: '0.82rem', color: colors.text.secondary, fontWeight: 500 }}>
             {greeting},
@@ -247,7 +242,7 @@ export function WriterHomePage() {
             </Card>
           )}
         </Stack>
-      </Box>
+      </ScrollablePage>
     </Box>
   )
 }

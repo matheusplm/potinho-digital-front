@@ -6,7 +6,7 @@ import { Box, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitl
 import { keyframes } from '@emotion/react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button, Card, Input, PageTitle, toast } from '../components/ui'
+import { Button, Card, Input, PageTitle, ScrollablePage, toast } from '../components/ui'
 import { useCollectionsQuery, useCreateCollectionMutation } from '../hooks/useNotes'
 import { useBackground } from '../context/BackgroundContext'
 import { useUser } from '../context/UserContext'
@@ -126,10 +126,7 @@ export function CollectionsListPage() {
     <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>
       <FavoriteIcon sx={{ position: 'absolute', bottom: -60, right: -60, fontSize: 400, color: 'rgba(225,29,72,0.04)', pointerEvents: 'none' }} />
 
-      <Box sx={{
-        position: 'absolute', inset: 0, zIndex: 1, display: 'flex', flexDirection: 'column',
-        px: 2.5, py: 2.5, overflowY: 'auto', animation: `${fadeIn} 0.35s ease`,
-      }}>
+      <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
         <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 3 }}>
           <PageTitle title="Coleções" subtitle={isLoading ? 'Carregando...' : `${collections.length} coleção${collections.length !== 1 ? 'ões' : ''}`} />
           {isWriter && (
@@ -204,7 +201,7 @@ export function CollectionsListPage() {
             })}
           </Stack>
         )}
-      </Box>
+      </ScrollablePage>
 
       <CreateDialog open={createOpen} onClose={() => setCreateOpen(false)} />
     </Box>

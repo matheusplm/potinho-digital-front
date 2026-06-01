@@ -1,6 +1,6 @@
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
-import { Box } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useState, useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
@@ -98,6 +98,12 @@ export function ScrollHint() {
           animation: `${dropFade} 3.2s cubic-bezier(0.4, 0, 0.6, 1) infinite`,
         }}>
           <Box sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 0.7,
+          }}>
+          <Box sx={{
             width: 48, height: 48,
             borderRadius: '50%',
             background: `linear-gradient(160deg, ${colors.rose.main}, ${colors.purple.main})`,
@@ -121,6 +127,17 @@ export function ScrollHint() {
               animation: `${chevronPulse} 1.4s ease-in-out infinite`,
               mt: '-2px',
             }} />
+          </Box>
+          <Typography sx={{
+            fontSize: '0.62rem',
+            fontWeight: 700,
+            letterSpacing: 0.6,
+            color: 'rgba(0,0,0,0.35)',
+            textTransform: 'uppercase',
+            whiteSpace: 'nowrap',
+          }}>
+            deslize para baixo
+          </Typography>
           </Box>
         </Box>
       </Box>
