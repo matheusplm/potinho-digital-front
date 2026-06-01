@@ -10,17 +10,16 @@ const overlayIn = keyframes`
   to   { opacity: 1; }
 `
 
-const floatFade = keyframes`
-  0%   { opacity: 0; transform: translateX(-50%) translateY(-6px); }
-  18%  { opacity: 1; transform: translateX(-50%) translateY(0px); }
-  60%  { opacity: 1; transform: translateX(-50%) translateY(6px); }
-  100% { opacity: 0; transform: translateX(-50%) translateY(16px); }
+const dropFade = keyframes`
+  0%   { opacity: 0;    transform: translateX(-50%) translateY(-16px); }
+  22%  { opacity: 1;    transform: translateX(-50%) translateY(0px);   }
+  72%  { opacity: 0;    transform: translateX(-50%) translateY(72px);  }
+  100% { opacity: 0;    transform: translateX(-50%) translateY(-16px); }
 `
 
 const chevronDrift = keyframes`
-  0%   { transform: translateY(-3px); opacity: 0.6; }
-  50%  { transform: translateY(3px);  opacity: 1; }
-  100% { transform: translateY(-3px); opacity: 0.6; }
+  0%,100% { transform: translateY(-2px); }
+  50%     { transform: translateY(3px);  }
 `
 
 function findScrollable(el: Element, depth = 0): boolean {
@@ -60,7 +59,7 @@ export function ScrollHint() {
     <>
       <Box sx={{
         position: 'fixed',
-        top: '40%',
+        top: '25%',
         bottom: 0,
         left: '50%',
         transform: 'translateX(-50%)',
@@ -68,39 +67,39 @@ export function ScrollHint() {
         maxWidth: 480,
         zIndex: 190,
         pointerEvents: 'none',
-        background: 'linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.22) 35%, rgba(255,255,255,0.52) 70%, rgba(255,255,255,0.72) 100%)',
-        backdropFilter: 'blur(6px)',
-        WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 40%)',
-        maskImage: 'linear-gradient(to bottom, transparent 0%, black 40%)',
-        animation: `${overlayIn} 0.4s ease forwards`,
+        backdropFilter: 'blur(2px)',
+        WebkitBackdropFilter: 'blur(2px)',
+        background: 'linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.08) 40%, rgba(255,255,255,0.28) 100%)',
+        WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 30%)',
+        maskImage: 'linear-gradient(to bottom, transparent 0%, black 30%)',
+        animation: `${overlayIn} 0.5s ease forwards`,
       }} />
 
       <Box sx={{
         position: 'fixed',
-        bottom: 76,
+        top: '44%',
         left: '50%',
         zIndex: 200,
         pointerEvents: 'none',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: 0.6,
-        animation: `${floatFade} 2.8s ease-in-out infinite`,
+        gap: 0.5,
+        animation: `${dropFade} 2.8s cubic-bezier(0.4,0,0.2,1) infinite`,
       }}>
         <Box sx={{
-          width: 38, height: 38, borderRadius: '50%',
+          width: 40, height: 40, borderRadius: '50%',
           background: `linear-gradient(160deg, ${colors.primary.main}, ${colors.purple.main})`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: `0 6px 24px ${colors.primary.glow}, 0 2px 8px rgba(0,0,0,0.15)`,
+          boxShadow: `0 6px 24px ${colors.primary.glow}, 0 2px 8px rgba(0,0,0,0.14)`,
           animation: `${chevronDrift} 1.4s ease-in-out infinite`,
         }}>
-          <KeyboardArrowDownIcon sx={{ fontSize: 22, color: '#fff' }} />
+          <KeyboardArrowDownIcon sx={{ fontSize: 24, color: '#fff' }} />
         </Box>
         <Typography sx={{
-          fontSize: '0.68rem', fontWeight: 800, letterSpacing: 0.5,
-          color: colors.text.primary,
-          whiteSpace: 'nowrap', lineHeight: 1,
-          textShadow: '0 1px 8px rgba(255,255,255,0.9)',
+          fontSize: '0.7rem', fontWeight: 800, letterSpacing: 0.5,
+          color: colors.text.primary, whiteSpace: 'nowrap', lineHeight: 1,
+          textShadow: '0 1px 10px rgba(255,255,255,1)',
         }}>
           Deslize para baixo
         </Typography>
