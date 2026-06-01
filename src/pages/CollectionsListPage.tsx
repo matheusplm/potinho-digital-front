@@ -25,6 +25,11 @@ const cardIn = (i: number) => keyframes`
   to   { opacity: 1; transform: translateY(0); }
 `
 
+const ghostPulse = keyframes`
+  0%, 100% { transform: scale(1);   box-shadow: 0 0 0 0 rgba(0,0,0,0.12); }
+  50%       { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(0,0,0,0); }
+`
+
 type ViewMode = 'cards' | 'grid' | 'list'
 const VIEW_KEY = 'potinho-collections-view'
 
@@ -288,50 +293,64 @@ function CollectionListItem({ col, i, onClick }: { col: Collection; i: number; o
 }
 
 function AddGhostCard({ view, onClick, accent }: { view: ViewMode; onClick: () => void; accent: string }) {
-  const baseStyle = {
+  const PlusCircle = ({ size = 44 }: { size?: number }) => (
+    <Box sx={{
+      width: size, height: size, borderRadius: '50%', flexShrink: 0,
+      background: `linear-gradient(135deg, ${accent}, ${accent}bb)`,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      boxShadow: `0 4px 16px ${accent}55`,
+      animation: `${ghostPulse} 2.4s ease-in-out infinite`,
+    }}>
+      <AddIcon sx={{ fontSize: size * 0.5, color: '#fff' }} />
+    </Box>
+  )
+
+  const base = {
     cursor: 'pointer',
-    border: `2px dashed ${accent}44`,
-    background: `${accent}06`,
-    transition: 'all 0.18s ease',
-    '&:hover': { border: `2px dashed ${accent}88`, background: `${accent}0e`, transform: 'translateY(-1px)' },
-    '&:active': { transform: 'scale(0.98)' },
+    border: `1.5px dashed ${accent}55`,
+    transition: 'all 0.2s ease',
+    '&:hover': { border: `1.5px dashed ${accent}cc`, transform: 'translateY(-2px)', boxShadow: `0 6px 24px ${accent}22` },
+    '&:active': { transform: 'scale(0.985)' },
   }
 
   if (view === 'list') {
     return (
-      <Box onClick={onClick} sx={{ ...baseStyle, display: 'flex', alignItems: 'center', gap: 1.4, px: 1.4, py: 1.1, borderRadius: radius.lg }}>
-        <Box sx={{
-          width: 40, height: 40, borderRadius: radius.md, flexShrink: 0,
-          background: `linear-gradient(135deg, ${accent}22, ${accent}44)`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
-          <AddIcon sx={{ fontSize: 20, color: accent }} />
+      <Box onClick={onClick} sx={{
+        ...base,
+        display: 'flex', alignItems: 'center', gap: 1.4,
+        px: 1.4, py: 1.1, borderRadius: radius.lg,
+        background: `linear-gradient(135deg, ${accent}08, ${accent}04)`,
+        backdropFilter: 'blur(8px)',
+      }}>
+        <PlusCircle size={40} />
+        <Box>
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.92rem', color: accent, lineHeight: 1.2 }}>
+            Nova coleção
+          </Typography>
+          <Typography sx={{ fontSize: '0.7rem', color: accent, opacity: 0.55, mt: 0.15 }}>
+            Toque para criar
+          </Typography>
         </Box>
-        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.92rem', color: accent, opacity: 0.8 }}>
-          Nova coleção
-        </Typography>
       </Box>
     )
   }
 
   if (view === 'grid') {
     return (
-      <Box onClick={onClick} sx={{ ...baseStyle, borderRadius: radius.xl, overflow: 'hidden' }}>
+      <Box onClick={onClick} sx={{ ...base, borderRadius: radius.xl, overflow: 'hidden', background: `${accent}06` }}>
         <Box sx={{
-          aspectRatio: '4/3', background: `linear-gradient(135deg, ${accent}14, ${accent}28)`,
+          aspectRatio: '4/3',
+          background: `linear-gradient(135deg, ${accent}18, ${accent}30)`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          <Box sx={{
-            width: 40, height: 40, borderRadius: '50%',
-            background: `linear-gradient(135deg, ${accent}44, ${accent}66)`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <AddIcon sx={{ fontSize: 22, color: accent }} />
-          </Box>
+          <PlusCircle size={42} />
         </Box>
         <Box sx={{ px: 1.2, py: 1 }}>
-          <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.82rem', color: accent, opacity: 0.8 }}>
-            Nova
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.86rem', color: accent, lineHeight: 1.2 }}>
+            Nova coleção
+          </Typography>
+          <Typography sx={{ fontSize: '0.6rem', color: accent, opacity: 0.5, mt: 0.2 }}>
+            Toque para criar
           </Typography>
         </Box>
       </Box>
@@ -339,23 +358,35 @@ function AddGhostCard({ view, onClick, accent }: { view: ViewMode; onClick: () =
   }
 
   return (
-    <Box onClick={onClick} sx={{ ...baseStyle, borderRadius: radius.xl, overflow: 'hidden' }}>
+    <Box onClick={onClick} sx={{ ...base, borderRadius: radius.xl, overflow: 'hidden', background: `${accent}06` }}>
       <Box sx={{
-        height: 72, background: `linear-gradient(135deg, ${accent}14, ${accent}28)`,
+        height: 72, position: 'relative', overflow: 'hidden',
+        background: `linear-gradient(135deg, ${accent}18, ${accent}32)`,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
-        <Box sx={{
-          width: 44, height: 44, borderRadius: '50%',
-          background: `linear-gradient(135deg, ${accent}44, ${accent}66)`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
-          <AddIcon sx={{ fontSize: 24, color: accent }} />
-        </Box>
+        <Box sx={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.18) 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <PlusCircle size={46} />
       </Box>
-      <Box sx={{ p: 1.6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.92rem', color: accent, opacity: 0.8 }}>
-          Nova coleção
-        </Typography>
+      <Box sx={{ p: 1.6 }}>
+        <Stack direction="row" sx={{ alignItems: 'flex-start', justifyContent: 'space-between' }}>
+          <Box>
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1rem', color: accent, lineHeight: 1.25 }}>
+              Nova coleção
+            </Typography>
+            <Typography sx={{ fontSize: '0.74rem', color: accent, opacity: 0.55, mt: 0.2 }}>
+              Toque para criar
+            </Typography>
+          </Box>
+          <Box sx={{
+            px: 0.9, py: 0.25, borderRadius: radius.full, mt: 0.15,
+            border: `1px solid ${accent}44`,
+            fontSize: '0.58rem', fontWeight: 800, letterSpacing: 0.5,
+            color: accent, opacity: 0.7, textTransform: 'uppercase',
+          }}>
+            + criar
+          </Box>
+        </Stack>
+        <Box sx={{ height: '3px', borderRadius: 2, background: `linear-gradient(90deg, ${accent}66, ${accent}22)`, mt: 1.2 }} />
       </Box>
     </Box>
   )
