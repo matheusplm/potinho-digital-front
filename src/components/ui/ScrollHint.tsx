@@ -1,3 +1,4 @@
+import FavoriteIcon from '@mui/icons-material/Favorite'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import { Box, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
@@ -11,15 +12,21 @@ const overlayIn = keyframes`
 `
 
 const dropFade = keyframes`
-  0%   { opacity: 0; transform: translateY(0); }
-  18%  { opacity: 1; transform: translateY(0); }
-  82%  { opacity: 0; transform: translateY(42vh); }
-  100% { opacity: 0; transform: translateY(0); }
+  0%   { opacity: 0; transform: translateY(0);    }
+  16%  { opacity: 1; transform: translateY(0);    }
+  80%  { opacity: 0; transform: translateY(54vh); }
+  100% { opacity: 0; transform: translateY(0);    }
 `
 
-const chevronDrift = keyframes`
-  0%,100% { transform: translateY(-3px); }
-  50%     { transform: translateY(4px);  }
+const heartBeat = keyframes`
+  0%,100% { transform: scale(1);    }
+  30%     { transform: scale(1.22); }
+  60%     { transform: scale(0.94); }
+`
+
+const chevronPulse = keyframes`
+  0%,100% { opacity: 0.5; transform: translateY(0);   }
+  50%     { opacity: 1;   transform: translateY(4px); }
 `
 
 function findScrollable(el: Element, depth = 0): boolean {
@@ -69,15 +76,15 @@ export function ScrollHint() {
         pointerEvents: 'none',
         backdropFilter: 'blur(1px)',
         WebkitBackdropFilter: 'blur(1px)',
-        background: 'linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.06) 60%, rgba(255,255,255,0.18) 100%)',
-        WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 25%)',
-        maskImage: 'linear-gradient(to bottom, transparent 0%, black 25%)',
+        background: 'linear-gradient(to bottom, transparent 0%, rgba(255,228,236,0.08) 55%, rgba(255,228,236,0.22) 100%)',
+        WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 22%)',
+        maskImage: 'linear-gradient(to bottom, transparent 0%, black 22%)',
         animation: `${overlayIn} 0.5s ease forwards`,
       }} />
 
       <Box sx={{
         position: 'fixed',
-        top: '44%',
+        top: '43%',
         left: '50%',
         transform: 'translateX(-50%)',
         zIndex: 200,
@@ -87,25 +94,59 @@ export function ScrollHint() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: 0.5,
-          animation: `${dropFade} 3s ease-in-out infinite`,
+          gap: 0.6,
+          animation: `${dropFade} 3.2s cubic-bezier(0.4, 0, 0.6, 1) infinite`,
         }}>
           <Box sx={{
-            width: 40, height: 40, borderRadius: '50%',
-            background: `linear-gradient(160deg, ${colors.primary.main}, ${colors.purple.main})`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: `0 6px 24px ${colors.primary.glow}, 0 2px 8px rgba(0,0,0,0.14)`,
-            animation: `${chevronDrift} 1.4s ease-in-out infinite`,
+            px: 1.6, pt: 1.1, pb: 1,
+            borderRadius: '20px',
+            background: `linear-gradient(160deg, ${colors.rose.main}ee, ${colors.purple.main}ee)`,
+            backdropFilter: 'blur(12px)',
+            border: '1.5px solid rgba(255,255,255,0.25)',
+            boxShadow: `0 8px 28px ${colors.rose.glow}, 0 2px 8px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.2)`,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 0.5,
           }}>
-            <KeyboardArrowDownIcon sx={{ fontSize: 24, color: '#fff' }} />
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <FavoriteIcon sx={{
+                fontSize: 13,
+                color: 'rgba(255,255,255,0.85)',
+                animation: `${heartBeat} 1.6s ease-in-out infinite`,
+              }} />
+              <Typography sx={{
+                fontSize: '0.68rem',
+                fontWeight: 800,
+                letterSpacing: 0.4,
+                color: 'rgba(255,255,255,0.95)',
+                whiteSpace: 'nowrap',
+                lineHeight: 1,
+              }}>
+                deslize para baixo
+              </Typography>
+              <FavoriteIcon sx={{
+                fontSize: 13,
+                color: 'rgba(255,255,255,0.85)',
+                animation: `${heartBeat} 1.6s ease-in-out 0.8s infinite`,
+              }} />
+            </Box>
+
+            <Box sx={{
+              display: 'flex',
+              gap: 0.3,
+              animation: `${chevronPulse} 1.4s ease-in-out infinite`,
+            }}>
+              {[0, 1, 2].map((i) => (
+                <KeyboardArrowDownIcon key={i} sx={{
+                  fontSize: 14,
+                  color: 'rgba(255,255,255,0.9)',
+                  opacity: 1 - i * 0.25,
+                  mt: `-${i * 2}px`,
+                }} />
+              ))}
+            </Box>
           </Box>
-          <Typography sx={{
-            fontSize: '0.7rem', fontWeight: 800, letterSpacing: 0.5,
-            color: colors.text.primary, whiteSpace: 'nowrap', lineHeight: 1,
-            textShadow: '0 1px 10px rgba(255,255,255,1)',
-          }}>
-            Deslize para baixo
-          </Typography>
         </Box>
       </Box>
     </>
