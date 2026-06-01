@@ -20,11 +20,16 @@ const BASE_URL = import.meta.env.VITE_API_URL ?? ''
 const API_SECRET = import.meta.env.VITE_API_SECRET ?? ''
 
 let authToken = ''
+let redirectingToLogin = false
+
 export function setAuthToken(token: string) {
   authToken = token
+  redirectingToLogin = false
 }
 
 function handleUnauthorized() {
+  if (redirectingToLogin) return
+  redirectingToLogin = true
   authToken = ''
   localStorage.removeItem('potinho-auth')
   window.location.href = '/login'
