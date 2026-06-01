@@ -62,7 +62,7 @@ export function WriterHomePage() {
       {FLOATING.map((h, i) => (
         <FavoriteIcon key={i} sx={{
           position: 'absolute', bottom: '-4px', left: h.left,
-          fontSize: h.size, color: colors.primary.main, opacity: h.opacity, pointerEvents: 'none',
+          fontSize: h.size, color: theme.accent, opacity: h.opacity, pointerEvents: 'none',
           animation: `float-w-${i} ${h.dur} ${h.delay} ease-in infinite`,
           [`@keyframes float-w-${i}`]: {
             '0%':   { transform: 'translateY(0) rotate(-6deg)', opacity: 0 },
@@ -75,22 +75,22 @@ export function WriterHomePage() {
 
       <ScrollablePage sx={{ px: 2.5, py: 2.5, gap: 3, animation: `${fadeIn} 0.4s ease` }}>
         <Stack spacing={0.3}>
-          <Typography sx={{ fontSize: '0.82rem', color: colors.text.secondary, fontWeight: 500 }}>
+          <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBgMuted, fontWeight: 500 }}>
             {greeting},
           </Typography>
           <Typography sx={{
             fontFamily: font.serif, fontWeight: 700, fontSize: '2rem',
-            color: colors.text.primary, lineHeight: 1.1, letterSpacing: '-0.5px',
+            color: theme.textOnBg, lineHeight: 1.1, letterSpacing: '-0.5px',
           }}>
             {firstName} 💙
           </Typography>
-          <Typography sx={{ fontSize: '0.85rem', color: colors.text.secondary, fontStyle: 'italic', mt: 0.5 }}>
+          <Typography sx={{ fontSize: '0.85rem', color: theme.textOnBgMuted, fontStyle: 'italic', mt: 0.5 }}>
             o potinho está esperando por você
           </Typography>
         </Stack>
 
         <Stack spacing={1.5}>
-          <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1.2, color: colors.text.muted, textTransform: 'uppercase' }}>
+          <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1.2, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
             Seu potinho
           </Typography>
           <Stack direction="row" spacing={1.5}>

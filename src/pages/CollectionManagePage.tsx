@@ -169,7 +169,7 @@ export function CollectionManagePage() {
 
       <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
         <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2.5 }}>
-          <IconButton size="small" onClick={() => navigate(`/colecoes/${cid}`)} sx={{ color: colors.text.secondary }}>
+          <IconButton size="small" onClick={() => navigate(`/colecoes/${cid}`)} sx={{ color: theme.textOnBgMuted }}>
             <ArrowBackIcon sx={{ fontSize: 20 }} />
           </IconButton>
           <Box sx={{ flex: 1 }}>
@@ -184,7 +184,7 @@ export function CollectionManagePage() {
         {tab === 'bilhetes' && (
           <Stack spacing={1.5}>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
-              <Typography sx={{ fontSize: '0.72rem', color: colors.text.muted, fontWeight: 600 }}>
+              <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted, fontWeight: 600 }}>
                 {notes.length} bilhete{notes.length !== 1 ? 's' : ''}
               </Typography>
               <Button variant="primary" onClick={openCreate} sx={{ py: 0.7, px: 1.4, fontSize: '0.78rem' }}>
@@ -196,10 +196,10 @@ export function CollectionManagePage() {
 
             {!notesLoading && notes.length === 0 && (
               <Box sx={{ textAlign: 'center', py: 4 }}>
-                <Typography sx={{ fontFamily: font.serif, fontSize: '1rem', fontWeight: 700, color: colors.text.primary, mb: 0.5 }}>
+                <Typography sx={{ fontFamily: font.serif, fontSize: '1rem', fontWeight: 700, color: theme.textOnBg, mb: 0.5 }}>
                   Nenhum bilhete ainda
                 </Typography>
-                <Typography sx={{ fontSize: '0.8rem', color: colors.text.secondary }}>
+                <Typography sx={{ fontSize: '0.8rem', color: theme.textOnBgMuted }}>
                   Crie o primeiro bilhete desta coleção
                 </Typography>
               </Box>
@@ -265,7 +265,7 @@ export function CollectionManagePage() {
             {accessLoading && <CircularProgress size={24} sx={{ color: colors.primary.main, mx: 'auto' }} />}
 
             {!accessLoading && accesses.length === 0 && (
-              <Typography sx={{ fontSize: '0.82rem', color: colors.text.muted, textAlign: 'center', py: 2 }}>
+              <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBgMuted, textAlign: 'center', py: 2 }}>
                 Nenhum acesso concedido ainda
               </Typography>
             )}

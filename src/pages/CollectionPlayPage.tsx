@@ -126,20 +126,20 @@ export function CollectionPlayPage() {
 
       <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
         <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
-          <IconButton size="small" onClick={() => navigate('/colecoes')} sx={{ color: colors.text.secondary, mr: 0.5 }}>
+          <IconButton size="small" onClick={() => navigate('/colecoes')} sx={{ color: theme.textOnBgMuted, mr: 0.5 }}>
             <ArrowBackIcon sx={{ fontSize: 20 }} />
           </IconButton>
           <Box sx={{ flex: 1 }}>
             {isLoading ? (
-              <CircularProgress size={16} sx={{ color: colors.text.muted }} />
+              <CircularProgress size={16} sx={{ color: theme.textOnBgMuted }} />
             ) : (
-              <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.15rem', color: colors.text.primary }}>
+              <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.15rem', color: theme.textOnBg }}>
                 {play ? 'Coleção' : '—'}
               </Typography>
             )}
           </Box>
           {isWriter && cid && (
-            <IconButton size="small" onClick={() => navigate(`/colecoes/${cid}/gerenciar`)} sx={{ color: colors.text.secondary }}>
+            <IconButton size="small" onClick={() => navigate(`/colecoes/${cid}/gerenciar`)} sx={{ color: theme.textOnBgMuted }}>
               <SettingsIcon sx={{ fontSize: 20 }} />
             </IconButton>
           )}
@@ -197,19 +197,19 @@ export function CollectionPlayPage() {
 
               {canOpen ? (
                 <Stack spacing={0.3} alignItems="center">
-                  <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1rem', color: colors.text.primary }}>
+                  <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1rem', color: theme.textOnBg }}>
                     Seu bilhete está pronto!
                   </Typography>
-                  <Typography sx={{ fontSize: '0.8rem', color: colors.text.secondary }}>
+                  <Typography sx={{ fontSize: '0.8rem', color: theme.textOnBgMuted }}>
                     Toque no coração para abrir ✨
                   </Typography>
                 </Stack>
               ) : (
                 <Stack spacing={0.3} alignItems="center">
-                  <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1rem', color: colors.text.primary }}>
+                  <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1rem', color: theme.textOnBg }}>
                     Próximo bilhete
                   </Typography>
-                  <Typography sx={{ fontSize: '0.82rem', color: colors.text.secondary }}>
+                  <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBgMuted }}>
                     às {formatTime(play.daily.availableAt)} · <Countdown availableAt={play.daily.availableAt} />
                   </Typography>
                 </Stack>
@@ -222,7 +222,7 @@ export function CollectionPlayPage() {
 
             {play.items.filter((n) => n.owned).length > 0 && (
               <Stack spacing={1}>
-                <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1.2, color: colors.text.muted, textTransform: 'uppercase' }}>
+                <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1.2, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
                   Bilhetes coletados
                 </Typography>
                 {play.items.filter((n) => n.owned).map((note) => {
@@ -261,7 +261,7 @@ export function CollectionPlayPage() {
 
             {play.total > 0 && play.items.filter((n) => !n.owned).length > 0 && (
               <Stack spacing={1}>
-                <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1.2, color: colors.text.muted, textTransform: 'uppercase' }}>
+                <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1.2, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
                   Ainda por descobrir — {play.items.filter((n) => !n.owned).length}
                 </Typography>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
@@ -270,8 +270,8 @@ export function CollectionPlayPage() {
                     return (
                       <Box key={note.id} sx={{
                         px: 1, py: 0.5, borderRadius: radius.full,
-                        background: 'rgba(0,0,0,0.06)', fontSize: '0.68rem', fontWeight: 700,
-                        color: colors.text.muted, display: 'flex', alignItems: 'center', gap: 0.4,
+                        background: 'rgba(255,255,255,0.08)', fontSize: '0.68rem', fontWeight: 700,
+                        color: theme.textOnBgMuted, display: 'flex', alignItems: 'center', gap: 0.4,
                       }}>
                         {r?.emoji ?? '📝'} ???
                       </Box>

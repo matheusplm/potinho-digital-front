@@ -318,10 +318,10 @@ export function NotesManagePage() {
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textAlign: 'center' }}>
             <FavoriteIcon sx={{ fontSize: 48, color: colors.rose.light, opacity: 0.5 }} />
             <Stack spacing={0.5}>
-              <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.1rem', color: colors.text.primary }}>
+              <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.1rem', color: theme.textOnBg }}>
                 Nenhum bilhete ainda
               </Typography>
-              <Typography sx={{ fontSize: '0.82rem', color: colors.text.secondary }}>
+              <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBgMuted }}>
                 Crie o primeiro bilhete para o potinho
               </Typography>
             </Stack>

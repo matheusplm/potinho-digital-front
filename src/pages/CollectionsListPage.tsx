@@ -146,10 +146,10 @@ export function CollectionsListPage() {
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textAlign: 'center' }}>
             <AutoAwesomeIcon sx={{ fontSize: 48, color: colors.primary.light, opacity: 0.4 }} />
             <Stack spacing={0.5}>
-              <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.1rem', color: colors.text.primary }}>
+              <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.1rem', color: theme.textOnBg }}>
                 {isWriter ? 'Nenhuma coleção ainda' : 'Você não tem coleções'}
               </Typography>
-              <Typography sx={{ fontSize: '0.82rem', color: colors.text.secondary }}>
+              <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBgMuted }}>
                 {isWriter ? 'Crie sua primeira coleção de bilhetes' : 'Peça o código de convite para acessar uma coleção'}
               </Typography>
             </Stack>
