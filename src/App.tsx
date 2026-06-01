@@ -9,6 +9,9 @@ import { ConfigPage } from './pages/ConfigPage'
 import { FavoritesPage } from './pages/FavoritesPage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
+import { CollectionsListPage } from './pages/CollectionsListPage'
+import { CollectionPlayPage } from './pages/CollectionPlayPage'
+import { CollectionManagePage } from './pages/CollectionManagePage'
 import { NotesManagePage } from './pages/NotesManagePage'
 import { PartnersDashboardPage } from './pages/PartnersDashboardPage'
 import { TestPage } from './pages/TestPage'
@@ -44,6 +47,9 @@ function AppRoutes() {
           <Route path="config" element={<ConfigPage />} />
           <Route path="bilhetes" element={<NotesManagePage />} />
           <Route path="parceiros" element={<PartnersDashboardPage />} />
+          <Route path="colecoes" element={<CollectionsListPage />} />
+          <Route path="colecoes/:cid" element={<CollectionPlayPage />} />
+          <Route path="colecoes/:cid/gerenciar" element={<CollectionManagePage />} />
         </Route>
         <Route path="test" element={<TestPage />} />
         <Route path="*" element={<NotFoundPage />} />

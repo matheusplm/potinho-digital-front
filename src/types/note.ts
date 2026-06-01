@@ -119,3 +119,54 @@ export interface PackOddsItem {
 }
 
 export type PackOddsResponse = PackOddsItem[]
+
+export interface Collection {
+  id: string
+  ownerId: string
+  name: string
+  emoji: string
+  description: string
+  theme: string
+  access: 'owner' | 'reader'
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CollectionFormData {
+  name: string
+  emoji: string
+  description: string
+  theme: string
+}
+
+export interface CollectionAccess {
+  collectionId: string
+  email: string
+  createdAt: string
+}
+
+export interface CollectionDailyStatus {
+  canOpen: boolean
+  availableAt: string
+  serverTime: string
+}
+
+export interface CollectionNoteView extends Note {
+  message: string
+}
+
+export interface CollectionPlayView {
+  total: number
+  owned: number
+  items: CollectionNoteView[]
+  daily: CollectionDailyStatus
+}
+
+export interface CollectionDailyReward {
+  id: string
+  title: string
+  message: string
+  rarity: string
+  typeId: string
+  isNew: boolean
+}

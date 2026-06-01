@@ -1,4 +1,6 @@
 import type {
+  Collection, CollectionAccess, CollectionDailyReward, CollectionDailyStatus,
+  CollectionFormData, CollectionPlayView,
   CollectionResponse,
   DailyNoteOpenResponse,
   DailyNoteStatusResponse,
@@ -71,6 +73,53 @@ export const api = {
     request<{ deleted: boolean }>(`/api/notes/${id}`, { method: 'DELETE' }),
 
   getPartners: () => request<PartnerReader[]>('/api/partner'),
+
+  listCollections: () => request<Collection[]>('/api/collections'),
+  createCollection: (data: CollectionFormData) =>
+    request<Collection>('/api/collections', { method: 'POST', body: JSON.stringify(data) }),
+  updateCollection: (id: string, data: Partial<CollectionFormData>) =>
+    request<Collection>(`/api/collections/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteCollection: (id: string) =>
+    request<{ deleted: boolean }>(`/api/collections/${id}`, { method: 'DELETE' }),
+
+  listCollectionAccess: (cid: string) =>
+    request<CollectionAccess[]>(`/api/collections/${cid}/access`),
+  grantAccess: (cid: string, email: string) =>
+    request<CollectionAccess>(`/api/collections/${cid}/access`, { method: 'POST', body: JSON.stringify({ email }) }),
+  revokeAccess: (cid: string, email: string) =>
+    request<{ revoked: boolean }>(`/api/collections/${cid}/access/${encodeURIComponent(email)}`, { method: 'DELETE' }),
+
+  getCollectionNotes: (cid: string) => request<NoteRecord[]>(`/api/collections/${cid}/notes`),
+  createCollectionNote: (cid: string, data: NoteFormData) =>
+    request<NoteRecord>(`/api/collections/${cid}/notes`, { method: 'POST', body: JSON.stringify(data) }),
+  updateCollectionNote: (cid: string, id: string, data: Partial<NoteFormData>) =>
+    request<NoteRecord>(`/api/collections/${cid}/notes/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteCollectionNote: (cid: string, id: string) =>
+    request<{ deleted: boolean }>(`/api/collections/${cid}/notes/${id}`, { method: 'DELETE' }),
+
+  getCollectionRarities: (cid: string) => request<RarityConfig[]>(`/api/collections/${cid}/rarities`),
+  createCollectionRarity: (cid: string, data: Omit<RarityConfig, 'createdAt' | 'updatedAt'>) =>
+    request<RarityConfig>(`/api/collections/${cid}/rarities`, { method: 'POST', body: JSON.stringify(data) }),
+  updateCollectionRarity: (cid: string, id: string, data: Partial<RarityConfig>) =>
+    request<RarityConfig>(`/api/collections/${cid}/rarities/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteCollectionRarity: (cid: string, id: string) =>
+    request<{ deleted: boolean }>(`/api/collections/${cid}/rarities/${id}`, { method: 'DELETE' }),
+
+  getCollectionTypes: (cid: string) => request<NoteTypeConfig[]>(`/api/collections/${cid}/types`),
+  createCollectionType: (cid: string, data: Omit<NoteTypeConfig, 'createdAt' | 'updatedAt'>) =>
+    request<NoteTypeConfig>(`/api/collections/${cid}/types`, { method: 'POST', body: JSON.stringify(data) }),
+  updateCollectionType: (cid: string, id: string, data: Partial<NoteTypeConfig>) =>
+    request<NoteTypeConfig>(`/api/collections/${cid}/types/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteCollectionType: (cid: string, id: string) =>
+    request<{ deleted: boolean }>(`/api/collections/${cid}/types/${id}`, { method: 'DELETE' }),
+
+  getCollectionPlay: (cid: string) => request<CollectionPlayView>(`/api/collections/${cid}/play`),
+  getCollectionDailyStatus: (cid: string) =>
+    request<CollectionDailyStatus>(`/api/collections/${cid}/daily/status`),
+  openCollectionDaily: (cid: string) =>
+    request<{ reward: CollectionDailyReward; status: CollectionDailyStatus }>(
+      `/api/collections/${cid}/daily/open`, { method: 'POST', body: JSON.stringify({}) }
+    ),
 
   getCollection: () => request<CollectionResponse>('/api/collection'),
   getStats: () => request<StatsResponse>('/api/stats'),

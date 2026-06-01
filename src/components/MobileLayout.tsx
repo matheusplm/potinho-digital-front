@@ -23,7 +23,7 @@ interface NavItem {
 
 const READER_NAV: NavItem[] = [
   { label: 'Início',    path: '/home',      icon: <HomeIcon /> },
-  { label: 'Coleção',   path: '/colecao',   icon: <Inventory2Icon /> },
+  { label: 'Coleções',  path: '/colecoes',  icon: <Inventory2Icon /> },
   { label: 'Pacote',    path: '/pacotinho', icon: <AutoAwesomeIcon /> },
   { label: 'Favoritos', path: '/favoritos', icon: <FavoriteIcon /> },
   { label: 'Progresso', path: '/progresso', icon: <QueryStatsIcon /> },
@@ -31,9 +31,9 @@ const READER_NAV: NavItem[] = [
 
 const WRITER_NAV: NavItem[] = [
   { label: 'Início',    path: '/home',      icon: <HomeIcon /> },
+  { label: 'Coleções',  path: '/colecoes',  icon: <Inventory2Icon /> },
   { label: 'Bilhetes',  path: '/bilhetes',  icon: <EditNoteIcon /> },
   { label: 'Parceiros', path: '/parceiros', icon: <GroupIcon /> },
-  { label: 'Coleção',   path: '/colecao',   icon: <Inventory2Icon /> },
   { label: 'Config',    path: '/config',    icon: <SettingsIcon /> },
 ]
 
