@@ -92,16 +92,22 @@ export function FloatingMenu() {
                   Tema de fundo
                 </Typography>
               </Stack>
-              <Box sx={{ display: 'flex', gap: 0.9, flexWrap: 'wrap' }}>
-                {backgroundThemes.map((bg) => {
-                  const active = bg.key === themeKey
-                  return (
-                    <Box
-                      key={bg.key}
-                      onClick={() => setThemeKey(bg.key)}
-                      title={bg.label}
-                      sx={{
-                        width: 30, height: 30, borderRadius: '50%',
+              <Stack spacing={1}>
+                {[false, true].map((dark) => (
+                  <Box key={String(dark)}>
+                    <Typography sx={{ fontSize: '0.58rem', fontWeight: 700, letterSpacing: 0.5, color: colors.text.muted, textTransform: 'uppercase', mb: 0.6 }}>
+                      {dark ? 'Escuros' : 'Claros'}
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 0.8 }}>
+                      {backgroundThemes.filter((bg) => bg.isDark === dark).map((bg) => {
+                        const active = bg.key === themeKey
+                        return (
+                          <Box
+                            key={bg.key}
+                            onClick={() => setThemeKey(bg.key)}
+                            title={bg.label}
+                            sx={{
+                              width: 28, height: 28, borderRadius: '50%',
                         background: bg.gradient,
                         cursor: 'pointer', flexShrink: 0,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -111,12 +117,14 @@ export function FloatingMenu() {
                         '&:hover': { transform: 'scale(1.12)' },
                       }}
                     >
-                      {active && <CheckIcon sx={{ fontSize: 15, color: bg.accent }} />}
+                              {active && <CheckIcon sx={{ fontSize: 14, color: bg.accent }} />}
+                            </Box>
+                          )
+                        })}
                     </Box>
-                  )
-                })}
-              </Box>
-            </Box>
+                  </Box>
+                ))}
+              </Stack>
 
             <Box sx={{ height: '1px', bgcolor: colors.border.subtle, mx: 1.5 }} />
 
