@@ -107,28 +107,28 @@ function CollectionsFilterBar({
         )}
       </Box>
 
-      <Stack direction="row" sx={{ alignItems: 'center', gap: 0.8 }}>
-        <Box sx={{ display: 'flex', gap: 0.7, flex: 1, overflowX: 'auto', scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
-          {FILTER_LABELS.map(({ key, label }) => {
-            const active = filter === key
-            return (
-              <Box key={key} onClick={() => setFilter(key)} sx={{
-                ...chipBase,
-                background: active ? `${accent}1a` : 'rgba(255,255,255,0.38)',
-                border: `1.5px solid ${active ? accent : 'rgba(255,255,255,0.55)'}`,
-                fontSize: '0.76rem', fontWeight: active ? 800 : 500,
-                color: active ? accent : textOnBgMuted,
-                boxShadow: active ? `0 2px 8px ${accent}22` : 'none',
-              }}>
-                {label}
-              </Box>
-            )
-          })}
-        </Box>
+      <Box sx={{ display: 'flex', gap: 0.7, mb: 1, overflowX: 'auto', scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
+        {FILTER_LABELS.map(({ key, label }) => {
+          const active = filter === key
+          return (
+            <Box key={key} onClick={() => setFilter(key)} sx={{
+              ...chipBase,
+              background: active ? `${accent}1a` : 'rgba(255,255,255,0.38)',
+              border: `1.5px solid ${active ? accent : 'rgba(255,255,255,0.55)'}`,
+              fontSize: '0.76rem', fontWeight: active ? 800 : 500,
+              color: active ? accent : textOnBgMuted,
+              boxShadow: active ? `0 2px 8px ${accent}22` : 'none',
+            }}>
+              {label}
+            </Box>
+          )
+        })}
+      </Box>
 
+      <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
         <Box onClick={() => setSort(sort === 'name-asc' ? 'name-desc' : 'name-asc')} sx={{
           ...chipBase, display: 'flex', alignItems: 'center', gap: 0.3,
-          px: 1, py: 0.5,
+          px: 1.1, py: 0.5,
           background: sort !== 'name-asc' ? `${accent}1a` : 'rgba(255,255,255,0.38)',
           border: `1.5px solid ${sort !== 'name-asc' ? accent : 'rgba(255,255,255,0.55)'}`,
           color: sort !== 'name-asc' ? accent : textOnBgMuted,
@@ -139,16 +139,17 @@ function CollectionsFilterBar({
           </Typography>
         </Box>
 
-        <Box sx={{ display: 'flex', gap: 0.25, background: 'rgba(255,255,255,0.3)', backdropFilter: 'blur(8px)', borderRadius: radius.lg, p: 0.3, border: '1px solid rgba(255,255,255,0.4)', flexShrink: 0 }}>
+        <Box sx={{ display: 'flex', gap: 0.8 }}>
           {VIEW_ICONS.map(({ mode, Icon }) => (
             <Box key={mode} onClick={() => changeView(mode)} sx={{
-              width: 30, height: 30, borderRadius: '50%',
+              width: 34, height: 34, borderRadius: '50%',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', transition: 'all 0.15s',
-              background: view === mode ? 'rgba(255,255,255,0.85)' : 'transparent',
-              boxShadow: view === mode ? '0 1px 4px rgba(0,0,0,0.12)' : 'none',
+              cursor: 'pointer', transition: 'all 0.15s', backdropFilter: 'blur(8px)',
+              background: view === mode ? 'rgba(255,255,255,0.88)' : 'rgba(255,255,255,0.38)',
+              border: `1.5px solid ${view === mode ? accent : 'rgba(255,255,255,0.55)'}`,
+              boxShadow: view === mode ? `0 2px 8px ${accent}22` : 'none',
               color: view === mode ? accent : textOnBgMuted,
-              '&:hover': { background: 'rgba(255,255,255,0.6)' },
+              '&:hover': { background: 'rgba(255,255,255,0.65)' },
             }}>
               <Icon sx={{ fontSize: 15 }} />
             </Box>
