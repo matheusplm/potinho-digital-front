@@ -12,10 +12,14 @@ import SearchIcon from '@mui/icons-material/Search'
 import CloseIcon from '@mui/icons-material/Close'
 import {
   Box, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle,
-  Popover, Stack, TextField, Typography,
+  Stack, TextField, Typography,
 } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useState, useEffect, useMemo, type ElementType } from 'react'
+import {
+  useFloating, useClick, useDismiss, useInteractions,
+  offset, flip, shift, autoUpdate, FloatingPortal,
+} from '@floating-ui/react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Card, Input, PageTitle, ScrollablePage, toast } from '../components/ui'
 import {
@@ -253,16 +257,23 @@ function CollectionFormDialog({
 }
 
 function CollectionActionsMenu({ col, variant = 'overlay' }: { col: Collection; variant?: 'overlay' | 'inline' }) {
-  const [anchor, setAnchor] = useState<null | HTMLElement>(null)
+  const [isOpen, setIsOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const updateMutation = useUpdateCollectionMutation()
   const deleteMutation = useDeleteCollectionMutation()
 
-  function openMenu(e: React.MouseEvent) {
-    e.stopPropagation()
-    setAnchor(e.currentTarget as HTMLElement)
-  }
+  const { refs, floatingStyles, context } = useFloating({
+    open: isOpen,
+    onOpenChange: setIsOpen,
+    placement: 'bottom-end',
+    middleware: [offset(6), flip(), shift({ padding: 8 })],
+    whileElementsMounted: autoUpdate,
+  })
+
+  const click = useClick(context)
+  const dismiss = useDismiss(context)
+  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss])
 
   const btnSx = variant === 'overlay'
     ? {
@@ -282,47 +293,42 @@ function CollectionActionsMenu({ col, variant = 'overlay' }: { col: Collection; 
 
   const iconColor = variant === 'overlay' ? 'rgba(255,255,255,0.92)' : 'inherit'
 
+  const circleBtn = {
+    width: 36, height: 36, borderRadius: '50%', cursor: 'pointer',
+    background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)',
+    boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    transition: 'all 0.15s',
+    '&:hover': { transform: 'scale(1.1)', boxShadow: '0 6px 22px rgba(0,0,0,0.26)' },
+  }
+
   return (
     <>
-      <Box onClick={openMenu} sx={btnSx}>
+      <Box
+        ref={refs.setReference}
+        sx={btnSx}
+        {...getReferenceProps({ onClick: (e: React.MouseEvent) => e.stopPropagation() })}
+      >
         <MoreVertIcon sx={{ fontSize: variant === 'overlay' ? 15 : 18, color: iconColor }} />
       </Box>
 
-      <Popover
-        anchorEl={anchor}
-        open={Boolean(anchor)}
-        onClose={() => setAnchor(null)}
-        onClick={(e) => e.stopPropagation()}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        PaperProps={{
-          sx: {
-            background: 'transparent', boxShadow: 'none',
-            border: 'none', p: 0, display: 'flex', gap: 0.8,
-          }
-        }}
-      >
-        <Box onClick={() => { setAnchor(null); setEditOpen(true) }} sx={{
-          width: 36, height: 36, borderRadius: '50%', cursor: 'pointer',
-          background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)',
-          boxShadow: `0 4px 14px rgba(0,0,0,0.18)`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          transition: 'all 0.15s',
-          '&:hover': { transform: 'scale(1.1)', boxShadow: '0 6px 20px rgba(0,0,0,0.22)' },
-        }}>
-          <EditIcon sx={{ fontSize: 16, color: colors.primary.main }} />
-        </Box>
-        <Box onClick={() => { setAnchor(null); setDeleteOpen(true) }} sx={{
-          width: 36, height: 36, borderRadius: '50%', cursor: 'pointer',
-          background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)',
-          boxShadow: `0 4px 14px rgba(0,0,0,0.18)`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          transition: 'all 0.15s',
-          '&:hover': { transform: 'scale(1.1)', boxShadow: '0 6px 20px rgba(0,0,0,0.22)' },
-        }}>
-          <DeleteForeverOutlinedIcon sx={{ fontSize: 16, color: colors.rose.main }} />
-        </Box>
-      </Popover>
+      {isOpen && (
+        <FloatingPortal>
+          <Box
+            ref={refs.setFloating}
+            style={floatingStyles}
+            {...getFloatingProps({ onClick: (e: React.MouseEvent) => e.stopPropagation() })}
+            sx={{ display: 'flex', gap: 0.8, zIndex: 9999 }}
+          >
+            <Box sx={circleBtn} onClick={(e) => { e.stopPropagation(); setIsOpen(false); setEditOpen(true) }}>
+              <EditIcon sx={{ fontSize: 16, color: colors.primary.main }} />
+            </Box>
+            <Box sx={circleBtn} onClick={(e) => { e.stopPropagation(); setIsOpen(false); setDeleteOpen(true) }}>
+              <DeleteForeverOutlinedIcon sx={{ fontSize: 16, color: colors.rose.main }} />
+            </Box>
+          </Box>
+        </FloatingPortal>
+      )}
 
       <CollectionFormDialog
         open={editOpen}
