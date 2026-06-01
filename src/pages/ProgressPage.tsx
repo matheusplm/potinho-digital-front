@@ -50,7 +50,7 @@ export function ProgressPage() {
 
         <Box sx={{ flex: 1, overflowY: 'auto', px: 2.5, pb: 3 }}>
           {statsQuery.isPending ? (
-            <Stack alignItems="center" sx={{ py: 8 }}>
+            <Stack sx={{ py: 8, alignItems: 'center' }}>
               <CircularProgress size={34} sx={{ color: '#f43f5e' }} />
             </Stack>
           ) : statsQuery.data ? (
@@ -75,7 +75,7 @@ export function ProgressPage() {
                   </Box>
                 </Box>
                 {statsQuery.data.completion === 100 && (
-                  <Stack direction="row" spacing={0.5} alignItems="center">
+                  <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
                     <AutoAwesomeIcon sx={{ fontSize: 16, color: '#f43f5e' }} />
                     <Typography sx={{ fontSize: '0.88rem', fontWeight: 700, color: '#f43f5e', fontFamily: '"Playfair Display",Georgia,serif', fontStyle: 'italic' }}>
                       Coleção completa!
@@ -106,8 +106,8 @@ export function ProgressPage() {
                       }} />
                     )}
                     <Stack spacing={1}>
-                      <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        <Stack direction="row" spacing={0.8} alignItems="center">
+                      <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Stack direction="row" spacing={0.8} sx={{ alignItems: 'center' }}>
                           <Typography sx={{ fontSize: '1rem', lineHeight: 1 }}>{rarity.emoji}</Typography>
                           <Typography sx={{ fontWeight: 700, fontSize: '0.9rem', color: rarity.textColor }}>
                             {rarity.label}

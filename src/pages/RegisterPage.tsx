@@ -121,7 +121,7 @@ export function RegisterPage() {
                   onChange={(e) => setForm((f) => ({ ...f, inviteCode: e.target.value.toUpperCase() }))}
                   placeholder="Ex: AMOR01"
                   fullWidth required
-                  inputProps={{ style: { letterSpacing: '0.2em', fontWeight: 700 } }}
+                  sx={{ '& input': { letterSpacing: '0.2em', fontWeight: 700 } }}
                 />
               )}
               <Button

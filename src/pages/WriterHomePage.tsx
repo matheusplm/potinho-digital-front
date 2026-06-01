@@ -130,13 +130,13 @@ export function WriterHomePage() {
               <Box sx={{ height: '1px', bgcolor: colors.border.subtle }} />
 
               <Stack spacing={0.8}>
-                <Stack direction="row" spacing={0.6} alignItems="center">
+                <Stack direction="row" spacing={0.6} sx={{ alignItems: 'center' }}>
                   <LockIcon sx={{ fontSize: 13, color: colors.text.secondary }} />
                   <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: 0.8, color: colors.text.secondary, textTransform: 'uppercase' }}>
                     Email autorizado
                   </Typography>
                 </Stack>
-                <Stack direction="row" spacing={1} alignItems="flex-end">
+                <Stack direction="row" spacing={1} sx={{ alignItems: 'flex-end' }}>
                   <Input
                     type="email"
                     placeholder="email@exemplo.com"

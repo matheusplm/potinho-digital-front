@@ -73,7 +73,7 @@ export function TestPage() {
               label="Código de convite"
               placeholder="Ex: AMOR01"
               fullWidth
-              inputProps={{ style: { letterSpacing: '0.2em', fontWeight: 700 } }}
+              sx={{ '& input': { letterSpacing: '0.2em', fontWeight: 700 } }}
             />
           </Stack>
         </Section>
