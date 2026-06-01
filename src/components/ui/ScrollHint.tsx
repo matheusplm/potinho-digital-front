@@ -1,6 +1,6 @@
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
-import { Box, Typography } from '@mui/material'
+import { Box } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useState, useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
@@ -98,54 +98,29 @@ export function ScrollHint() {
           animation: `${dropFade} 3.2s cubic-bezier(0.4, 0, 0.6, 1) infinite`,
         }}>
           <Box sx={{
-            px: 1.6, pt: 1.1, pb: 1,
-            borderRadius: '20px',
-            background: `linear-gradient(160deg, ${colors.rose.main}ee, ${colors.purple.main}ee)`,
-            backdropFilter: 'blur(12px)',
-            border: '1.5px solid rgba(255,255,255,0.25)',
-            boxShadow: `0 8px 28px ${colors.rose.glow}, 0 2px 8px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.2)`,
+            width: 48, height: 48,
+            borderRadius: '50%',
+            background: `linear-gradient(160deg, ${colors.rose.main}, ${colors.purple.main})`,
+            border: '1.5px solid rgba(255,255,255,0.28)',
+            boxShadow: `0 8px 28px ${colors.rose.glow}, inset 0 1px 0 rgba(255,255,255,0.22)`,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: 0.5,
+            justifyContent: 'center',
+            gap: 0,
           }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <FavoriteIcon sx={{
-                fontSize: 13,
-                color: 'rgba(255,255,255,0.85)',
-                animation: `${heartBeat} 1.6s ease-in-out infinite`,
-              }} />
-              <Typography sx={{
-                fontSize: '0.68rem',
-                fontWeight: 800,
-                letterSpacing: 0.4,
-                color: 'rgba(255,255,255,0.95)',
-                whiteSpace: 'nowrap',
-                lineHeight: 1,
-              }}>
-                deslize para baixo
-              </Typography>
-              <FavoriteIcon sx={{
-                fontSize: 13,
-                color: 'rgba(255,255,255,0.85)',
-                animation: `${heartBeat} 1.6s ease-in-out 0.8s infinite`,
-              }} />
-            </Box>
-
-            <Box sx={{
-              display: 'flex',
-              gap: 0.3,
+            <FavoriteIcon sx={{
+              fontSize: 16,
+              color: '#fff',
+              animation: `${heartBeat} 1.6s ease-in-out infinite`,
+              lineHeight: 1,
+            }} />
+            <KeyboardArrowDownIcon sx={{
+              fontSize: 18,
+              color: 'rgba(255,255,255,0.9)',
               animation: `${chevronPulse} 1.4s ease-in-out infinite`,
-            }}>
-              {[0, 1, 2].map((i) => (
-                <KeyboardArrowDownIcon key={i} sx={{
-                  fontSize: 14,
-                  color: 'rgba(255,255,255,0.9)',
-                  opacity: 1 - i * 0.25,
-                  mt: `-${i * 2}px`,
-                }} />
-              ))}
-            </Box>
+              mt: '-2px',
+            }} />
           </Box>
         </Box>
       </Box>
