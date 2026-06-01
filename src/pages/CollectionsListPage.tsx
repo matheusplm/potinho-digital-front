@@ -8,6 +8,8 @@ import MoreVertIcon from '@mui/icons-material/MoreVert'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
 import SwapVertIcon from '@mui/icons-material/SwapVert'
+import SearchIcon from '@mui/icons-material/Search'
+import CloseIcon from '@mui/icons-material/Close'
 import {
   Box, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle,
   Menu, MenuItem, Stack, TextField, Typography,
@@ -50,64 +52,110 @@ const FILTER_LABELS: { key: FilterType; label: string }[] = [
   { key: 'reader', label: 'Convidadas' },
 ]
 
+const VIEW_ICONS: { mode: ViewMode; Icon: ElementType }[] = [
+  { mode: 'cards', Icon: ViewAgendaIcon },
+  { mode: 'grid',  Icon: GridViewIcon },
+  { mode: 'list',  Icon: ViewListIcon },
+]
+
 function CollectionsFilterBar({
-  filter, setFilter, sort, setSort, accent, textOnBgMuted,
+  filter, setFilter, sort, setSort, search, setSearch,
+  view, changeView, accent, textOnBg, textOnBgMuted,
 }: {
-  filter: FilterType
-  setFilter: (f: FilterType) => void
-  sort: SortType
-  setSort: (s: SortType) => void
-  accent: string
-  textOnBgMuted: string
+  filter: FilterType;    setFilter: (f: FilterType) => void
+  sort: SortType;        setSort: (s: SortType) => void
+  search: string;        setSearch: (s: string) => void
+  view: ViewMode;        changeView: (v: ViewMode) => void
+  accent: string;        textOnBg: string;  textOnBgMuted: string
 }) {
+  const chipBase = {
+    px: 1.3, py: 0.5, borderRadius: radius.full, flexShrink: 0,
+    cursor: 'pointer', transition: 'all 0.16s',
+    backdropFilter: 'blur(8px)',
+  }
+
   return (
-    <Stack direction="row" sx={{ alignItems: 'center', gap: 1, mb: 2.5 }}>
+    <Box sx={{ mb: 2.5 }}>
       <Box sx={{
-        display: 'flex', gap: 0.7, flex: 1,
-        overflowX: 'auto', scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' },
+        display: 'flex', alignItems: 'center', gap: 1,
+        px: 1.4, py: 0.85,
+        background: 'rgba(255,255,255,0.45)', backdropFilter: 'blur(12px)',
+        border: '1.5px solid rgba(255,255,255,0.6)',
+        borderRadius: radius.xl, mb: 1.2,
+        transition: 'border-color 0.15s, background 0.15s',
+        '&:focus-within': {
+          border: `1.5px solid ${accent}66`,
+          background: 'rgba(255,255,255,0.72)',
+        },
       }}>
-        {FILTER_LABELS.map(({ key, label }) => {
-          const active = filter === key
-          return (
-            <Box
-              key={key}
-              onClick={() => setFilter(key)}
-              sx={{
-                px: 1.4, py: 0.55, borderRadius: radius.full, flexShrink: 0,
-                cursor: 'pointer', transition: 'all 0.16s',
-                background: active ? `${accent}1a` : 'rgba(255,255,255,0.38)',
-                border: `1.5px solid ${active ? accent : 'rgba(255,255,255,0.55)'}`,
-                fontSize: '0.78rem', fontWeight: active ? 800 : 500,
-                color: active ? accent : textOnBgMuted,
-                backdropFilter: 'blur(8px)',
-                boxShadow: active ? `0 2px 8px ${accent}22` : 'none',
-              }}
-            >
-              {label}
-            </Box>
-          )
-        })}
+        <SearchIcon sx={{ fontSize: 17, color: textOnBgMuted, flexShrink: 0 }} />
+        <Box
+          component="input"
+          value={search}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
+          placeholder="Buscar coleção..."
+          sx={{
+            flex: 1, border: 'none', outline: 'none', background: 'transparent',
+            fontSize: '0.88rem', color: textOnBg, fontFamily: 'inherit',
+            '&::placeholder': { color: textOnBgMuted },
+          }}
+        />
+        {search && (
+          <Box onClick={() => setSearch('')} sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', color: textOnBgMuted, '&:hover': { color: textOnBg } }}>
+            <CloseIcon sx={{ fontSize: 15 }} />
+          </Box>
+        )}
       </Box>
 
-      <Box
-        onClick={() => setSort(sort === 'name-asc' ? 'name-desc' : 'name-asc')}
-        sx={{
-          display: 'flex', alignItems: 'center', gap: 0.4,
-          px: 1.1, py: 0.55, borderRadius: radius.full, flexShrink: 0,
-          cursor: 'pointer', transition: 'all 0.16s',
+      <Stack direction="row" sx={{ alignItems: 'center', gap: 0.8 }}>
+        <Box sx={{ display: 'flex', gap: 0.7, flex: 1, overflowX: 'auto', scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
+          {FILTER_LABELS.map(({ key, label }) => {
+            const active = filter === key
+            return (
+              <Box key={key} onClick={() => setFilter(key)} sx={{
+                ...chipBase,
+                background: active ? `${accent}1a` : 'rgba(255,255,255,0.38)',
+                border: `1.5px solid ${active ? accent : 'rgba(255,255,255,0.55)'}`,
+                fontSize: '0.76rem', fontWeight: active ? 800 : 500,
+                color: active ? accent : textOnBgMuted,
+                boxShadow: active ? `0 2px 8px ${accent}22` : 'none',
+              }}>
+                {label}
+              </Box>
+            )
+          })}
+        </Box>
+
+        <Box onClick={() => setSort(sort === 'name-asc' ? 'name-desc' : 'name-asc')} sx={{
+          ...chipBase, display: 'flex', alignItems: 'center', gap: 0.3,
+          px: 1, py: 0.5,
           background: sort !== 'name-asc' ? `${accent}1a` : 'rgba(255,255,255,0.38)',
           border: `1.5px solid ${sort !== 'name-asc' ? accent : 'rgba(255,255,255,0.55)'}`,
           color: sort !== 'name-asc' ? accent : textOnBgMuted,
-          backdropFilter: 'blur(8px)',
-          '&:hover': { background: 'rgba(255,255,255,0.6)' },
-        }}
-      >
-        <SwapVertIcon sx={{ fontSize: 14 }} />
-        <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: 0.2 }}>
-          {sort === 'name-asc' ? 'A-Z' : 'Z-A'}
-        </Typography>
-      </Box>
-    </Stack>
+        }}>
+          <SwapVertIcon sx={{ fontSize: 13 }} />
+          <Typography sx={{ fontSize: '0.7rem', fontWeight: 700 }}>
+            {sort === 'name-asc' ? 'A-Z' : 'Z-A'}
+          </Typography>
+        </Box>
+
+        <Box sx={{ display: 'flex', gap: 0.25, background: 'rgba(255,255,255,0.3)', backdropFilter: 'blur(8px)', borderRadius: radius.lg, p: 0.3, border: '1px solid rgba(255,255,255,0.4)', flexShrink: 0 }}>
+          {VIEW_ICONS.map(({ mode, Icon }) => (
+            <Box key={mode} onClick={() => changeView(mode)} sx={{
+              width: 30, height: 30, borderRadius: '50%',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', transition: 'all 0.15s',
+              background: view === mode ? 'rgba(255,255,255,0.85)' : 'transparent',
+              boxShadow: view === mode ? '0 1px 4px rgba(0,0,0,0.12)' : 'none',
+              color: view === mode ? accent : textOnBgMuted,
+              '&:hover': { background: 'rgba(255,255,255,0.6)' },
+            }}>
+              <Icon sx={{ fontSize: 15 }} />
+            </Box>
+          ))}
+        </Box>
+      </Stack>
+    </Box>
   )
 }
 
@@ -570,12 +618,6 @@ function AddGhostCard({ view, onClick, accent }: { view: ViewMode; onClick: () =
   )
 }
 
-const VIEW_ICONS: { mode: ViewMode; Icon: ElementType }[] = [
-  { mode: 'cards', Icon: ViewAgendaIcon },
-  { mode: 'grid',  Icon: GridViewIcon },
-  { mode: 'list',  Icon: ViewListIcon },
-]
-
 export function CollectionsListPage() {
   const { theme } = useBackground()
   const { user } = useUser()
@@ -586,6 +628,7 @@ export function CollectionsListPage() {
   const [view, setView] = useState<ViewMode>(() => (localStorage.getItem(VIEW_KEY) as ViewMode) ?? 'cards')
   const [filter, setFilter] = useState<FilterType>('all')
   const [sort, setSort] = useState<SortType>('name-asc')
+  const [search, setSearch] = useState('')
 
   const isWriter = user?.role === 'writer'
 
@@ -593,12 +636,18 @@ export function CollectionsListPage() {
     let result = collections
     if (filter === 'owner')  result = result.filter((c) => c.access === 'owner')
     if (filter === 'reader') result = result.filter((c) => c.access === 'reader')
+    if (search.trim()) {
+      const q = search.toLowerCase()
+      result = result.filter((c) =>
+        c.name.toLowerCase().includes(q) || c.description?.toLowerCase().includes(q)
+      )
+    }
     return [...result].sort((a, b) =>
       sort === 'name-asc'
         ? a.name.localeCompare(b.name, 'pt-BR')
         : b.name.localeCompare(a.name, 'pt-BR')
     )
-  }, [collections, filter, sort])
+  }, [collections, filter, sort, search])
 
   function changeView(v: ViewMode) {
     setView(v)
@@ -614,38 +663,20 @@ export function CollectionsListPage() {
       }} />
 
       <ScrollablePage sx={{ px: 2.5, pt: 2.5, pb: 4, animation: `${fadeIn} 0.35s ease` }}>
-        <Stack direction="row" sx={{ alignItems: 'flex-start', justifyContent: 'space-between', mb: 3 }}>
+        <Box sx={{ mb: 2.5 }}>
           <PageTitle
             title="Coleções"
             subtitle={isLoading ? 'Carregando...' : collections.length === 0 ? 'Nenhuma ainda' : `${collections.length} coleção${collections.length !== 1 ? 'ões' : ''}`}
           />
-          <Box sx={{
-            display: 'flex', gap: 0.3, mt: 0.5,
-            background: 'rgba(255,255,255,0.3)', backdropFilter: 'blur(8px)',
-            borderRadius: radius.lg, p: 0.4,
-            border: '1px solid rgba(255,255,255,0.4)',
-          }}>
-            {VIEW_ICONS.map(({ mode, Icon }) => (
-              <Box key={mode} onClick={() => changeView(mode)} sx={{
-                width: 38, height: 38, borderRadius: '50%',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', transition: 'all 0.15s',
-                background: view === mode ? 'rgba(255,255,255,0.85)' : 'transparent',
-                boxShadow: view === mode ? '0 1px 4px rgba(0,0,0,0.12)' : 'none',
-                color: view === mode ? theme.accent : theme.textOnBgMuted,
-                '&:hover': { background: 'rgba(255,255,255,0.6)' },
-              }}>
-                <Icon sx={{ fontSize: 17 }} />
-              </Box>
-            ))}
-          </Box>
-        </Stack>
+        </Box>
 
         {!isLoading && collections.length > 0 && (
           <CollectionsFilterBar
             filter={filter} setFilter={setFilter}
             sort={sort} setSort={setSort}
-            accent={theme.accent} textOnBgMuted={theme.textOnBgMuted}
+            search={search} setSearch={setSearch}
+            view={view} changeView={changeView}
+            accent={theme.accent} textOnBg={theme.textOnBg} textOnBgMuted={theme.textOnBgMuted}
           />
         )}
 
@@ -655,7 +686,7 @@ export function CollectionsListPage() {
           </Box>
         )}
 
-        {!isLoading && collections.length === 0 && filter === 'all' && (
+        {!isLoading && collections.length === 0 && filter === 'all' && !search && (
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textAlign: 'center', py: 8 }}>
             <Box sx={{
               width: 72, height: 72, borderRadius: '50%',
