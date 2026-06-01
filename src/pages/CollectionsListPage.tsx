@@ -41,16 +41,9 @@ const ghostPulse = keyframes`
 `
 
 type ViewMode = 'cards' | 'grid' | 'list'
-type FilterType = 'all' | 'owner' | 'reader'
 type SortType = 'name-asc' | 'name-desc'
 
 const VIEW_KEY = 'potinho-collections-view'
-
-const FILTER_LABELS: { key: FilterType; label: string }[] = [
-  { key: 'all',    label: 'Todas' },
-  { key: 'owner',  label: 'Minhas' },
-  { key: 'reader', label: 'Convidadas' },
-]
 
 const VIEW_ICONS: { mode: ViewMode; Icon: ElementType }[] = [
   { mode: 'cards', Icon: ViewAgendaIcon },
@@ -59,17 +52,16 @@ const VIEW_ICONS: { mode: ViewMode; Icon: ElementType }[] = [
 ]
 
 function CollectionsFilterBar({
-  filter, setFilter, sort, setSort, search, setSearch,
+  sort, setSort, search, setSearch,
   view, changeView, accent, textOnBg, textOnBgMuted,
 }: {
-  filter: FilterType;    setFilter: (f: FilterType) => void
   sort: SortType;        setSort: (s: SortType) => void
   search: string;        setSearch: (s: string) => void
   view: ViewMode;        changeView: (v: ViewMode) => void
   accent: string;        textOnBg: string;  textOnBgMuted: string
 }) {
   const chipBase = {
-    px: 1.3, py: 0.5, borderRadius: radius.full, flexShrink: 0,
+    px: 1.1, py: 0.5, borderRadius: radius.full, flexShrink: 0,
     cursor: 'pointer', transition: 'all 0.16s',
     backdropFilter: 'blur(8px)',
   }
@@ -105,24 +97,6 @@ function CollectionsFilterBar({
             <CloseIcon sx={{ fontSize: 15 }} />
           </Box>
         )}
-      </Box>
-
-      <Box sx={{ display: 'flex', gap: 0.7, mb: 1, overflowX: 'auto', scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
-        {FILTER_LABELS.map(({ key, label }) => {
-          const active = filter === key
-          return (
-            <Box key={key} onClick={() => setFilter(key)} sx={{
-              ...chipBase,
-              background: active ? `${accent}1a` : 'rgba(255,255,255,0.38)',
-              border: `1.5px solid ${active ? accent : 'rgba(255,255,255,0.55)'}`,
-              fontSize: '0.76rem', fontWeight: active ? 800 : 500,
-              color: active ? accent : textOnBgMuted,
-              boxShadow: active ? `0 2px 8px ${accent}22` : 'none',
-            }}>
-              {label}
-            </Box>
-          )
-        })}
       </Box>
 
       <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
@@ -627,7 +601,6 @@ export function CollectionsListPage() {
   const [createOpen, setCreateOpen] = useState(false)
   const createMutation = useCreateCollectionMutation()
   const [view, setView] = useState<ViewMode>(() => (localStorage.getItem(VIEW_KEY) as ViewMode) ?? 'cards')
-  const [filter, setFilter] = useState<FilterType>('all')
   const [sort, setSort] = useState<SortType>('name-asc')
   const [search, setSearch] = useState('')
 
@@ -635,8 +608,6 @@ export function CollectionsListPage() {
 
   const displayedCollections = useMemo(() => {
     let result = collections
-    if (filter === 'owner')  result = result.filter((c) => c.access === 'owner')
-    if (filter === 'reader') result = result.filter((c) => c.access === 'reader')
     if (search.trim()) {
       const q = search.toLowerCase()
       result = result.filter((c) =>
@@ -648,7 +619,7 @@ export function CollectionsListPage() {
         ? a.name.localeCompare(b.name, 'pt-BR')
         : b.name.localeCompare(a.name, 'pt-BR')
     )
-  }, [collections, filter, sort, search])
+  }, [collections, sort, search])
 
   function changeView(v: ViewMode) {
     setView(v)
@@ -673,7 +644,6 @@ export function CollectionsListPage() {
 
         {!isLoading && collections.length > 0 && (
           <CollectionsFilterBar
-            filter={filter} setFilter={setFilter}
             sort={sort} setSort={setSort}
             search={search} setSearch={setSearch}
             view={view} changeView={changeView}
@@ -687,7 +657,7 @@ export function CollectionsListPage() {
           </Box>
         )}
 
-        {!isLoading && collections.length === 0 && filter === 'all' && !search && (
+        {!isLoading && collections.length === 0 && !search && (
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textAlign: 'center', py: 8 }}>
             <Box sx={{
               width: 72, height: 72, borderRadius: '50%',
@@ -726,7 +696,7 @@ export function CollectionsListPage() {
                 {displayedCollections.map((col, i) => (
                   <CollectionCardView key={col.id} col={col} i={i} onClick={() => navigate(`/colecoes/${col.id}`)} />
                 ))}
-                {isWriter && filter === 'all' && <AddGhostCard view="cards" onClick={() => setCreateOpen(true)} accent={theme.accent} />}
+                {isWriter && <AddGhostCard view="cards" onClick={() => setCreateOpen(true)} accent={theme.accent} />}
               </Stack>
             )}
             {view === 'grid' && (
@@ -734,7 +704,7 @@ export function CollectionsListPage() {
                 {displayedCollections.map((col, i) => (
                   <CollectionGridItem key={col.id} col={col} i={i} onClick={() => navigate(`/colecoes/${col.id}`)} />
                 ))}
-                {isWriter && filter === 'all' && <AddGhostCard view="grid" onClick={() => setCreateOpen(true)} accent={theme.accent} />}
+                {isWriter && <AddGhostCard view="grid" onClick={() => setCreateOpen(true)} accent={theme.accent} />}
               </Box>
             )}
             {view === 'list' && (
@@ -742,7 +712,7 @@ export function CollectionsListPage() {
                 {displayedCollections.map((col, i) => (
                   <CollectionListItem key={col.id} col={col} i={i} onClick={() => navigate(`/colecoes/${col.id}`)} />
                 ))}
-                {isWriter && filter === 'all' && <AddGhostCard view="list" onClick={() => setCreateOpen(true)} accent={theme.accent} />}
+                {isWriter && <AddGhostCard view="list" onClick={() => setCreateOpen(true)} accent={theme.accent} />}
               </Stack>
             )}
           </>
