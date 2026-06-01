@@ -34,17 +34,20 @@ export function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError('')
     setLoading(true)
     try {
       const { token, user } = await api.login(email, password)
       setUser({ id: user.id, name: user.name, role: user.role as 'writer' | 'reader', token, coupleCode: user.coupleCode })
       toast.success(`Bem-vindo, ${user.name.split(' ')[0]}! 💙`)
       navigate('/home')
-    } catch {
-      toast.error('Email ou senha incorretos.')
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Erro ao fazer login.'
+      setError(msg)
     } finally {
       setLoading(false)
     }
@@ -98,6 +101,13 @@ export function LoginPage() {
             <Button variant="primary" type="submit" fullWidth loading={loading} sx={{ mt: 0.5 }}>
               Entrar
             </Button>
+            {error && (
+              <Box sx={{ mt: 0.5, px: 1.5, py: 1, borderRadius: '10px', background: 'rgba(225,29,72,0.08)', border: '1px solid rgba(225,29,72,0.2)' }}>
+                <Typography sx={{ fontSize: '0.8rem', color: '#e11d48', fontWeight: 600 }}>
+                  {error}
+                </Typography>
+              </Box>
+            )}
           </Stack>
         </Box>
 
