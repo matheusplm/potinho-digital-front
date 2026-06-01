@@ -368,24 +368,14 @@ function AddGhostCard({ view, onClick, accent }: { view: ViewMode; onClick: () =
         <PlusCircle size={46} />
       </Box>
       <Box sx={{ p: 1.6 }}>
-        <Stack direction="row" sx={{ alignItems: 'flex-start', justifyContent: 'space-between' }}>
-          <Box>
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1rem', color: accent, lineHeight: 1.25 }}>
-              Nova coleção
-            </Typography>
-            <Typography sx={{ fontSize: '0.74rem', color: accent, opacity: 0.55, mt: 0.2 }}>
-              Toque para criar
-            </Typography>
-          </Box>
-          <Box sx={{
-            px: 0.9, py: 0.25, borderRadius: radius.full, mt: 0.15,
-            border: `1px solid ${accent}44`,
-            fontSize: '0.58rem', fontWeight: 800, letterSpacing: 0.5,
-            color: accent, opacity: 0.7, textTransform: 'uppercase',
-          }}>
-            + criar
-          </Box>
-        </Stack>
+        <Box>
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1rem', color: accent, lineHeight: 1.25 }}>
+            Nova coleção
+          </Typography>
+          <Typography sx={{ fontSize: '0.74rem', color: accent, opacity: 0.55, mt: 0.2 }}>
+            Toque para criar
+          </Typography>
+        </Box>
         <Box sx={{ height: '3px', borderRadius: 2, background: `linear-gradient(90deg, ${accent}66, ${accent}22)`, mt: 1.2 }} />
       </Box>
     </Box>
