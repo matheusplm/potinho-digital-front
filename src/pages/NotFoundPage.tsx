@@ -1,9 +1,10 @@
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import { Box, Stack, Typography } from '@mui/material'
-import { Link as RouterLink } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui'
 
 export function NotFoundPage() {
+  const navigate = useNavigate()
   return (
     <Box
       sx={{
@@ -39,7 +40,7 @@ export function NotFoundPage() {
           </Typography>
         </Stack>
 
-        <Button component={RouterLink} to="/" sx={{ px: 3.5 }}>
+        <Button onClick={() => navigate('/')} sx={{ px: 3.5 }}>
           Voltar para o início
         </Button>
       </Stack>

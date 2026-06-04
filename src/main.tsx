@@ -9,7 +9,6 @@ import { appTheme } from './theme.ts'
 const queryClient = new QueryClient()
 
 async function enableMocking() {
-  // Quando VITE_API_URL está definido, usa o back real — sem MSW
   if (import.meta.env.VITE_API_URL) {
     return
   }

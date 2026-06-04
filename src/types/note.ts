@@ -70,6 +70,35 @@ export interface NoteTypeConfig {
   updatedAt?: string
 }
 
+export type CollectionPackCategory = 'daily' | 'bonus' | 'guaranteed' | 'thematic'
+export type CollectionPackDistribution = 'all_with_access' | 'manual_bonus' | 'selected_readers'
+export type CollectionPackStatus = 'active' | 'draft' | 'disabled'
+
+export interface CollectionPack {
+  id: string
+  collectionId: string
+  name: string
+  emoji: string
+  description: string
+  category: CollectionPackCategory
+  status: CollectionPackStatus
+  distribution: CollectionPackDistribution
+  cardsPerOpen: number
+  cooldownHours: number | null
+  maxOpensPerUser: number | null
+  allowedTypeIds: string[]
+  allowedRarityIds: string[]
+  guaranteedRarityId: string | null
+  gradient: string
+  accent: string
+  createdAt?: string
+  updatedAt?: string
+}
+
+export type CollectionPackFormData = Omit<CollectionPack, 'id' | 'collectionId' | 'createdAt' | 'updatedAt'> & {
+  id?: string
+}
+
 export interface CollectionResponse {
   total: number
   owned: number

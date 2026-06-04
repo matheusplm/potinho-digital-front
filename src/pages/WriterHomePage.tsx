@@ -1,12 +1,14 @@
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import Inventory2Icon from '@mui/icons-material/Inventory2'
 import LockIcon from '@mui/icons-material/Lock'
-import { Box, Stack, Typography } from '@mui/material'
+import ChevronRightIcon from '@mui/icons-material/ChevronRight'
+import ContentCopyIcon from '@mui/icons-material/ContentCopy'
+import { Box, IconButton, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
-import { useCollectionQuery, useRaritiesQuery, useTypesQuery } from '../hooks/useNotes'
+import { useCollectionsQuery } from '../hooks/useNotes'
 import { Card, Button, Input, ScrollablePage, toast } from '../components/ui'
 import { colors, font } from '../design-system'
 import { useBackground } from '../context/BackgroundContext'
@@ -27,9 +29,8 @@ const FLOATING = [
 export function WriterHomePage() {
   const { user, setUser } = useUser()
   const { theme } = useBackground()
-  const { data: collection } = useCollectionQuery()
-  const { data: rarities = [] } = useRaritiesQuery()
-  const { data: types = [] } = useTypesQuery()
+  const navigate = useNavigate()
+  const { data: collections = [] } = useCollectionsQuery()
   const [inviteEmailInput, setInviteEmailInput] = useState(user?.inviteEmail ?? '')
   const [savingEmail, setSavingEmail] = useState(false)
 
@@ -47,8 +48,18 @@ export function WriterHomePage() {
     }
   }
 
+  async function handleCopyInviteCode() {
+    if (!user?.coupleCode) return
+    try {
+      await navigator.clipboard.writeText(user.coupleCode)
+      toast.success('Código copiado!')
+    } catch {
+      toast.error('Não foi possível copiar o código.')
+    }
+  }
+
   const firstName = user?.name?.split(' ')[0] ?? ''
-  const totalNotes = collection?.total ?? 0
+  const ownedCount = collections.filter((c) => c.access === 'owner').length
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite'
 
@@ -85,32 +96,26 @@ export function WriterHomePage() {
             {firstName} 💙
           </Typography>
           <Typography sx={{ fontSize: '0.85rem', color: theme.textOnBgMuted, fontStyle: 'italic', mt: 0.5 }}>
-            o potinho está esperando por você
+            suas coleções estão esperando por você
           </Typography>
         </Stack>
 
-        <Stack spacing={1.5}>
-          <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1.2, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
-            Seu potinho
-          </Typography>
-          <Stack direction="row" spacing={1.5}>
-            {[
-              { label: 'Bilhetes',  value: totalNotes,       icon: <AutoAwesomeIcon sx={{ fontSize: 18, color: colors.primary.main }} />, color: colors.primary.main },
-              { label: 'Raridades', value: rarities.length,  icon: <FavoriteIcon    sx={{ fontSize: 18, color: colors.rose.main }} />,    color: colors.rose.main },
-              { label: 'Tipos',     value: types.length,     icon: <Inventory2Icon  sx={{ fontSize: 18, color: colors.purple.light }} />, color: colors.purple.light },
-            ].map((stat) => (
-              <Card key={stat.label} sx={{ flex: 1, p: 1.5, textAlign: 'center' }}>
-                <Box sx={{ mb: 0.8 }}>{stat.icon}</Box>
-                <Typography sx={{ fontSize: '1.6rem', fontWeight: 800, color: stat.color, lineHeight: 1, fontFamily: font.serif }}>
-                  {stat.value}
-                </Typography>
-                <Typography sx={{ fontSize: '0.68rem', color: colors.text.muted, fontWeight: 600, mt: 0.3 }}>
-                  {stat.label}
-                </Typography>
-              </Card>
-            ))}
+        <Card onClick={() => navigate('/colecoes')} sx={{ p: 2, cursor: 'pointer', transition: 'transform 0.18s, box-shadow 0.18s', '&:hover': { transform: 'translateY(-2px)' } }}>
+          <Stack direction="row" alignItems="center" spacing={1.5}>
+            <Box sx={{ width: 46, height: 46, borderRadius: 2.5, background: `linear-gradient(135deg,${colors.primary.main},${colors.purple.main})`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Inventory2Icon sx={{ fontSize: 24, color: '#fff' }} />
+            </Box>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.05rem', color: colors.text.primary, lineHeight: 1.2 }}>
+                Minhas coleções
+              </Typography>
+              <Typography sx={{ fontSize: '0.78rem', color: colors.text.secondary }}>
+                {ownedCount > 0 ? `${ownedCount} coleção${ownedCount !== 1 ? 'ões' : ''} criada${ownedCount !== 1 ? 's' : ''}` : 'Crie sua primeira coleção'}
+              </Typography>
+            </Box>
+            <ChevronRightIcon sx={{ color: colors.text.muted, flexShrink: 0 }} />
           </Stack>
-        </Stack>
+        </Card>
 
         {user?.coupleCode && (
           <Card sx={{ p: 2, background: `linear-gradient(135deg,${colors.primary.main}08,${colors.rose.main}08)` }}>
@@ -119,9 +124,30 @@ export function WriterHomePage() {
                 <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1, color: colors.text.muted, textTransform: 'uppercase' }}>
                   Código de convite
                 </Typography>
-                <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.8rem', color: colors.text.primary, letterSpacing: '0.2em' }}>
-                  {user.coupleCode}
-                </Typography>
+                <Stack direction="row" alignItems="center" spacing={0.8}>
+                  <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.8rem', color: colors.text.primary, letterSpacing: '0.2em', minWidth: 0 }}>
+                    {user.coupleCode}
+                  </Typography>
+                  <IconButton
+                    size="small"
+                    aria-label="copiar código de convite"
+                    onClick={handleCopyInviteCode}
+                    sx={{
+                      width: 34,
+                      height: 34,
+                      flexShrink: 0,
+                      color: colors.primary.main,
+                      background: `${colors.primary.main}12`,
+                      border: `1px solid ${colors.primary.main}22`,
+                      '&:hover': {
+                        background: `${colors.primary.main}1f`,
+                        transform: 'translateY(-1px)',
+                      },
+                    }}
+                  >
+                    <ContentCopyIcon sx={{ fontSize: 16 }} />
+                  </IconButton>
+                </Stack>
                 <Typography sx={{ fontSize: '0.72rem', color: colors.text.muted, fontStyle: 'italic' }}>
                   Compartilhe com quem você ama 💙
                 </Typography>

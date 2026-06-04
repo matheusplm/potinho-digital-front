@@ -1,19 +1,17 @@
 import type {
-  Collection, CollectionAccess, CollectionDailyReward, CollectionDailyStatus,
-  CollectionFormData, CollectionPlayView,
-  CollectionResponse,
-  DailyNoteOpenResponse,
-  DailyNoteStatusResponse,
-  Note,
+  Collection,
+  CollectionAccess,
+  CollectionDailyReward,
+  CollectionDailyStatus,
+  CollectionFormData,
+  CollectionNoteView,
+  CollectionPack,
+  CollectionPackFormData,
+  CollectionPlayView,
   NoteFormData,
   NoteRecord,
-  OpenPackResponse,
-  PackOddsResponse,
-  PackStatusResponse,
-  PartnerReader,
-  RarityConfig,
   NoteTypeConfig,
-  StatsResponse,
+  RarityConfig,
 } from '../types/note'
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? ''
@@ -36,12 +34,14 @@ function handleUnauthorized() {
 }
 
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
+  const headers: Record<string, string> = {
+    ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+    ...(API_SECRET ? { 'x-api-key': API_SECRET } : {}),
+  }
+  if (init?.body) headers['Content-Type'] = 'application/json'
+
   const response = await fetch(`${BASE_URL}${url}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
-      ...(API_SECRET ? { 'x-api-key': API_SECRET } : {}),
-    },
+    headers,
     ...init,
   })
 
@@ -51,8 +51,18 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
   }
 
   if (!response.ok) {
-    const payload = (await response.json()) as { message?: string; error?: string }
-    throw new Error(payload.message ?? payload.error ?? 'Erro inesperado na API.')
+    const payload = (await response.json()) as { message?: string; error?: string; details?: unknown }
+    const code = payload.error
+    if (code === 'ODDS_MUST_SUM_100') {
+      throw new Error('A soma das chances das raridades não pode passar de 100%.')
+    }
+    if (code === 'RARITY_ALREADY_EXISTS') {
+      throw new Error('Já existe uma raridade com esse identificador.')
+    }
+    if (code === 'VALIDATION_ERROR') {
+      throw new Error('Dados inválidos. Verifique os campos e tente novamente.')
+    }
+    throw new Error(payload.message ?? code ?? 'Erro inesperado na API.')
   }
 
   const json = await response.json()
@@ -64,7 +74,7 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
 
 export const api = {
   login: (email: string, password: string) =>
-    request<{ token: string; user: { id: string; name: string; role: string } }>('/auth/login', {
+    request<{ token: string; user: { id: string; name: string; role: string; coupleCode?: string } }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     }),
@@ -79,16 +89,6 @@ export const api = {
       method: 'PUT',
       body: JSON.stringify({ email }),
     }),
-
-  getNotes: () => request<NoteRecord[]>('/api/notes'),
-  createNote: (data: NoteFormData) =>
-    request<NoteRecord>('/api/notes', { method: 'POST', body: JSON.stringify(data) }),
-  updateNote: (id: string, data: Partial<NoteFormData>) =>
-    request<NoteRecord>(`/api/notes/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-  deleteNote: (id: string) =>
-    request<{ deleted: boolean }>(`/api/notes/${id}`, { method: 'DELETE' }),
-
-  getPartners: () => request<PartnerReader[]>('/api/partner'),
 
   listCollections: () => request<Collection[]>('/api/collections'),
   createCollection: (data: CollectionFormData) =>
@@ -129,43 +129,22 @@ export const api = {
   deleteCollectionType: (cid: string, id: string) =>
     request<{ deleted: boolean }>(`/api/collections/${cid}/types/${id}`, { method: 'DELETE' }),
 
+  getCollectionPacks: (cid: string) => request<CollectionPack[]>(`/api/collections/${cid}/packs`),
+  createCollectionPack: (cid: string, data: CollectionPackFormData) =>
+    request<CollectionPack>(`/api/collections/${cid}/packs`, { method: 'POST', body: JSON.stringify(data) }),
+  updateCollectionPack: (cid: string, id: string, data: Partial<CollectionPackFormData>) =>
+    request<CollectionPack>(`/api/collections/${cid}/packs/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteCollectionPack: (cid: string, id: string) =>
+    request<{ deleted: boolean }>(`/api/collections/${cid}/packs/${id}`, { method: 'DELETE' }),
+
   getCollectionPlay: (cid: string) => request<CollectionPlayView>(`/api/collections/${cid}/play`),
-  getCollectionDailyStatus: (cid: string) =>
-    request<CollectionDailyStatus>(`/api/collections/${cid}/daily/status`),
   openCollectionDaily: (cid: string) =>
-    request<{ reward: CollectionDailyReward; status: CollectionDailyStatus }>(
+    request<{ rewards: CollectionDailyReward[]; status: CollectionDailyStatus }>(
       `/api/collections/${cid}/daily/open`, { method: 'POST', body: JSON.stringify({}) }
     ),
-
-  getCollection: () => request<CollectionResponse>('/api/collection'),
-  getStats: () => request<StatsResponse>('/api/stats'),
-  getPackStatus: () => request<PackStatusResponse>('/api/packs/status'),
-  getPackOdds: () => request<PackOddsResponse>('/api/packs/odds'),
-  getDailyNoteStatus: () => request<DailyNoteStatusResponse>('/api/daily-note/status'),
-  getNoteById: (id: string) => request<Note>(`/api/notes/${id}`),
-  openPack: () =>
-    request<OpenPackResponse>('/api/packs/open', { method: 'POST', body: JSON.stringify({}) }),
-  openDailyNote: () =>
-    request<DailyNoteOpenResponse>('/api/daily-note/open', { method: 'POST', body: JSON.stringify({}) }),
-  setFavorite: (id: string, favorite: boolean) =>
-    request<Note>(`/api/notes/${id}/favorite`, {
+  setCollectionFavorite: (cid: string, id: string, favorite: boolean) =>
+    request<CollectionNoteView>(`/api/collections/${cid}/notes/${id}/favorite`, {
       method: 'PATCH',
       body: JSON.stringify({ favorite }),
     }),
-
-  getRarities: () => request<RarityConfig[]>('/api/rarities'),
-  createRarity: (data: Omit<RarityConfig, 'createdAt' | 'updatedAt'>) =>
-    request<RarityConfig>('/api/rarities', { method: 'POST', body: JSON.stringify(data) }),
-  updateRarity: (id: string, data: Partial<RarityConfig>) =>
-    request<RarityConfig>(`/api/rarities/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-  deleteRarity: (id: string) =>
-    request<{ deleted: boolean }>(`/api/rarities/${id}`, { method: 'DELETE' }),
-
-  getTypes: () => request<NoteTypeConfig[]>('/api/types'),
-  createType: (data: Omit<NoteTypeConfig, 'createdAt' | 'updatedAt'>) =>
-    request<NoteTypeConfig>('/api/types', { method: 'POST', body: JSON.stringify(data) }),
-  updateType: (id: string, data: Partial<NoteTypeConfig>) =>
-    request<NoteTypeConfig>(`/api/types/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-  deleteType: (id: string) =>
-    request<{ deleted: boolean }>(`/api/types/${id}`, { method: 'DELETE' }),
 }

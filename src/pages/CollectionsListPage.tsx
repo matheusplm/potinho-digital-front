@@ -4,31 +4,28 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import ViewListIcon from '@mui/icons-material/ViewList'
 import GridViewIcon from '@mui/icons-material/GridView'
 import ViewAgendaIcon from '@mui/icons-material/ViewAgenda'
-import MoreVertIcon from '@mui/icons-material/MoreVert'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
 import SwapVertIcon from '@mui/icons-material/SwapVert'
 import SearchIcon from '@mui/icons-material/Search'
 import CloseIcon from '@mui/icons-material/Close'
 import {
-  Box, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle,
-  Stack, TextField, Typography,
+  Box, Dialog, DialogActions, DialogContent, DialogTitle,
+  IconButton, Stack, TextField, Typography,
 } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useState, useEffect, useMemo, type ElementType } from 'react'
-import {
-  useFloating, useClick, useDismiss, useInteractions,
-  offset, flip, shift, autoUpdate, FloatingPortal,
-} from '@floating-ui/react'
 import { useNavigate } from 'react-router-dom'
-import { Button, Card, Input, PageTitle, ScrollablePage, toast } from '../components/ui'
+import { Button, Card, Input, LoadingState, PageTitle, ScrollablePage, toast } from '../components/ui'
 import {
   useCollectionsQuery, useCreateCollectionMutation,
   useUpdateCollectionMutation, useDeleteCollectionMutation,
 } from '../hooks/useNotes'
 import { useBackground } from '../context/BackgroundContext'
+import { useSimulation } from '../context/SimulationContext'
 import { useUser } from '../context/UserContext'
 import { backgroundThemes, colors, font, radius } from '../design-system'
+import { slugify } from '../utils/slug'
 import type { Collection, CollectionFormData } from '../types/note'
 
 const fadeIn = keyframes`
@@ -159,14 +156,14 @@ function CollectionFormDialog({
         : DEFAULT_FORM
       )
     }
-  }, [open])
+  }, [open, initial])
 
   const selectedBg = backgroundThemes.find((bg) => bg.key === form.theme) ?? backgroundThemes[0]
   const isEdit = Boolean(initial)
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth PaperProps={{
-      sx: { borderRadius: radius.xl, mx: 2, background: 'rgba(255,253,251,0.98)', backdropFilter: 'blur(24px)' }
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth slotProps={{
+      paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'rgba(255,253,251,0.98)', backdropFilter: 'blur(24px)' } }
     }}>
       <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 700, color: colors.text.primary, pb: 1 }}>
         {isEdit ? 'Editar coleção' : 'Nova coleção'}
@@ -256,119 +253,60 @@ function CollectionFormDialog({
   )
 }
 
-function CollectionActionsMenu({ col, variant = 'overlay' }: { col: Collection; variant?: 'overlay' | 'inline' }) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [editOpen, setEditOpen] = useState(false)
-  const [deleteOpen, setDeleteOpen] = useState(false)
-  const updateMutation = useUpdateCollectionMutation()
-  const deleteMutation = useDeleteCollectionMutation()
+const overlayBtn = {
+  width: 32, height: 32, borderRadius: '50%', cursor: 'pointer',
+  background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)',
+  boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+  display: 'flex', alignItems: 'center', justifyContent: 'center',
+  transition: 'transform 0.15s, box-shadow 0.15s',
+  '&:hover': { transform: 'scale(1.1)', boxShadow: '0 4px 16px rgba(0,0,0,0.26)' },
+}
 
-  const { refs, floatingStyles, context } = useFloating({
-    open: isOpen,
-    onOpenChange: setIsOpen,
-    placement: 'bottom-end',
-    middleware: [offset(6), flip(), shift({ padding: 8 })],
-    whileElementsMounted: autoUpdate,
-  })
+function CardActions({ col, variant, onEdit, onDelete }: {
+  col: Collection
+  variant: 'overlay' | 'inline'
+  onEdit: (col: Collection) => void
+  onDelete: (col: Collection) => void
+}) {
+  const handle = (fn: (col: Collection) => void) => (e: React.MouseEvent) => {
+    e.stopPropagation()
+    fn(col)
+  }
 
-  const click = useClick(context)
-  const dismiss = useDismiss(context)
-  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss])
-
-  const btnSx = variant === 'overlay'
-    ? {
-        width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
-        background: 'rgba(0,0,0,0.22)', backdropFilter: 'blur(4px)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        cursor: 'pointer', transition: 'background 0.15s',
-        '&:hover': { background: 'rgba(0,0,0,0.38)' },
-      }
-    : {
-        width: 36, height: 36, borderRadius: radius.md, flexShrink: 0,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        cursor: 'pointer', transition: 'background 0.15s',
-        color: colors.text.muted,
-        '&:hover': { background: 'rgba(0,0,0,0.06)', color: colors.text.secondary },
-      }
-
-  const iconColor = variant === 'overlay' ? 'rgba(255,255,255,0.92)' : 'inherit'
-
-  const circleBtn = {
-    width: 36, height: 36, borderRadius: '50%', cursor: 'pointer',
-    background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)',
-    boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    transition: 'all 0.15s',
-    '&:hover': { transform: 'scale(1.1)', boxShadow: '0 6px 22px rgba(0,0,0,0.26)' },
+  if (variant === 'inline') {
+    return (
+      <Stack direction="row" spacing={0.2} sx={{ flexShrink: 0 }}>
+        <IconButton size="small" aria-label="editar coleção" onClick={handle(onEdit)} sx={{ color: colors.primary.main, p: 0.7 }}>
+          <EditIcon sx={{ fontSize: 17 }} />
+        </IconButton>
+        <IconButton size="small" aria-label="excluir coleção" onClick={handle(onDelete)} sx={{ color: colors.rose.main, p: 0.7 }}>
+          <DeleteForeverOutlinedIcon sx={{ fontSize: 17 }} />
+        </IconButton>
+      </Stack>
+    )
   }
 
   return (
-    <>
-      <Box
-        ref={refs.setReference}
-        sx={btnSx}
-        {...getReferenceProps({ onClick: (e: React.MouseEvent) => e.stopPropagation() })}
-      >
-        <MoreVertIcon sx={{ fontSize: variant === 'overlay' ? 15 : 18, color: iconColor }} />
+    <Stack direction="row" spacing={0.7}>
+      <Box onClick={handle(onEdit)} aria-label="editar coleção" sx={overlayBtn}>
+        <EditIcon sx={{ fontSize: 15, color: colors.primary.main }} />
       </Box>
-
-      {isOpen && (
-        <FloatingPortal>
-          <Box
-            ref={refs.setFloating}
-            style={floatingStyles}
-            {...getFloatingProps({ onClick: (e: React.MouseEvent) => e.stopPropagation() })}
-            sx={{ display: 'flex', gap: 0.8, zIndex: 9999 }}
-          >
-            <Box sx={circleBtn} onClick={(e) => { e.stopPropagation(); setIsOpen(false); setEditOpen(true) }}>
-              <EditIcon sx={{ fontSize: 16, color: colors.primary.main }} />
-            </Box>
-            <Box sx={circleBtn} onClick={(e) => { e.stopPropagation(); setIsOpen(false); setDeleteOpen(true) }}>
-              <DeleteForeverOutlinedIcon sx={{ fontSize: 16, color: colors.rose.main }} />
-            </Box>
-          </Box>
-        </FloatingPortal>
-      )}
-
-      <CollectionFormDialog
-        open={editOpen}
-        onClose={() => setEditOpen(false)}
-        initial={col}
-        isPending={updateMutation.isPending}
-        onSubmit={async (data) => {
-          await updateMutation.mutateAsync({ id: col.id, data })
-          toast.success('Coleção atualizada!')
-          setEditOpen(false)
-        }}
-      />
-
-      <Dialog open={deleteOpen} onClose={() => setDeleteOpen(false)} PaperProps={{
-        sx: { borderRadius: radius.xl, mx: 2, background: 'rgba(255,253,251,0.98)', backdropFilter: 'blur(24px)' }
-      }}>
-        <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 700, color: colors.text.primary, pb: 1 }}>
-          Excluir coleção
-        </DialogTitle>
-        <DialogContent>
-          <Typography sx={{ fontSize: '0.88rem', color: colors.text.secondary, lineHeight: 1.55 }}>
-            Tem certeza que deseja excluir <strong style={{ color: colors.text.primary }}>{col.name}</strong>? Todos os bilhetes, raridades e tipos serão removidos.
-          </Typography>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
-          <Button variant="ghost" onClick={() => setDeleteOpen(false)} sx={{ flex: 1 }}>Cancelar</Button>
-          <Button variant="rose" loading={deleteMutation.isPending} onClick={async () => {
-            await deleteMutation.mutateAsync(col.id)
-            toast.success('Coleção excluída.')
-            setDeleteOpen(false)
-          }} sx={{ flex: 1 }}>
-            Excluir
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </>
+      <Box onClick={handle(onDelete)} aria-label="excluir coleção" sx={overlayBtn}>
+        <DeleteForeverOutlinedIcon sx={{ fontSize: 15, color: colors.rose.main }} />
+      </Box>
+    </Stack>
   )
 }
 
-function CollectionCardView({ col, i, onClick }: { col: Collection; i: number; onClick: () => void }) {
+interface CardProps {
+  col: Collection
+  i: number
+  onClick: () => void
+  onEdit: (col: Collection) => void
+  onDelete: (col: Collection) => void
+}
+
+function CollectionCardView({ col, i, onClick, onEdit, onDelete }: CardProps) {
   const bg = backgroundThemes.find((t) => t.key === col.theme) ?? backgroundThemes[0]
   const isOwner = col.access === 'owner'
   return (
@@ -389,13 +327,13 @@ function CollectionCardView({ col, i, onClick }: { col: Collection; i: number; o
         </Typography>
         {isOwner && (
           <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 2 }}>
-            <CollectionActionsMenu col={col} />
+            <CardActions col={col} variant="overlay" onEdit={onEdit} onDelete={onDelete} />
           </Box>
         )}
       </Box>
       <Box sx={{ px: 1.6, pt: 1.4, pb: 1.5 }}>
         <Stack direction="row" sx={{ alignItems: 'flex-start', justifyContent: 'space-between', mb: col.description ? 0.5 : 0 }}>
-          <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1rem', color: colors.text.primary, lineHeight: 1.25, flex: 1, mr: 1 }}>
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1rem', color: colors.text.primary, lineHeight: 1.25, flex: 1, minWidth: 0, mr: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {col.name}
           </Typography>
           <Box sx={{
@@ -420,7 +358,7 @@ function CollectionCardView({ col, i, onClick }: { col: Collection; i: number; o
   )
 }
 
-function CollectionGridItem({ col, i, onClick }: { col: Collection; i: number; onClick: () => void }) {
+function CollectionGridItem({ col, i, onClick, onEdit, onDelete }: CardProps) {
   const bg = backgroundThemes.find((t) => t.key === col.theme) ?? backgroundThemes[0]
   const isOwner = col.access === 'owner'
   return (
@@ -444,12 +382,12 @@ function CollectionGridItem({ col, i, onClick }: { col: Collection; i: number; o
         </Typography>
         {isOwner && (
           <Box sx={{ position: 'absolute', top: 6, right: 6, zIndex: 2 }}>
-            <CollectionActionsMenu col={col} />
+            <CardActions col={col} variant="overlay" onEdit={onEdit} onDelete={onDelete} />
           </Box>
         )}
       </Box>
       <Box sx={{ px: 1.3, py: 1.1, display: 'flex', flexDirection: 'column', gap: 0.35 }}>
-        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.88rem', color: colors.text.primary, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.88rem', color: colors.text.primary, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
           {col.name}
         </Typography>
         <Box sx={{
@@ -466,7 +404,7 @@ function CollectionGridItem({ col, i, onClick }: { col: Collection; i: number; o
   )
 }
 
-function CollectionListItem({ col, i, onClick }: { col: Collection; i: number; onClick: () => void }) {
+function CollectionListItem({ col, i, onClick, onEdit, onDelete }: CardProps) {
   const bg = backgroundThemes.find((t) => t.key === col.theme) ?? backgroundThemes[0]
   const isOwner = col.access === 'owner'
   return (
@@ -493,7 +431,7 @@ function CollectionListItem({ col, i, onClick }: { col: Collection; i: number; o
         {col.emoji}
       </Box>
       <Box sx={{ flex: 1, minWidth: 0 }}>
-        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.92rem', color: colors.text.primary, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.92rem', color: colors.text.primary, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
           {col.name}
         </Typography>
         {col.description && (
@@ -503,7 +441,7 @@ function CollectionListItem({ col, i, onClick }: { col: Collection; i: number; o
         )}
       </Box>
       {isOwner
-        ? <CollectionActionsMenu col={col} variant="inline" />
+        ? <CardActions col={col} variant="inline" onEdit={onEdit} onDelete={onDelete} />
         : (
           <Box sx={{
             px: 0.8, py: 0.2, borderRadius: radius.full, flexShrink: 0,
@@ -607,15 +545,26 @@ function AddGhostCard({ view, onClick, accent }: { view: ViewMode; onClick: () =
 export function CollectionsListPage() {
   const { theme } = useBackground()
   const { user } = useUser()
+  const { isActive, session, startSimulation } = useSimulation()
   const navigate = useNavigate()
   const { data: collections = [], isLoading } = useCollectionsQuery()
-  const [createOpen, setCreateOpen] = useState(false)
   const createMutation = useCreateCollectionMutation()
+  const updateMutation = useUpdateCollectionMutation()
+  const deleteMutation = useDeleteCollectionMutation()
+
+  const [createOpen, setCreateOpen] = useState(false)
+  const [editing, setEditing] = useState<Collection | null>(null)
+  const [deleting, setDeleting] = useState<Collection | null>(null)
   const [view, setView] = useState<ViewMode>(() => (localStorage.getItem(VIEW_KEY) as ViewMode) ?? 'cards')
   const [sort, setSort] = useState<SortType>('name-asc')
   const [search, setSearch] = useState('')
 
   const isWriter = user?.role === 'writer'
+
+  useEffect(() => {
+    if (!isActive || !session) return
+    navigate(`/colecoes/${session.collectionSlug}`, { replace: true })
+  }, [isActive, navigate, session])
 
   const displayedCollections = useMemo(() => {
     let result = collections
@@ -635,6 +584,56 @@ export function CollectionsListPage() {
   function changeView(v: ViewMode) {
     setView(v)
     localStorage.setItem(VIEW_KEY, v)
+  }
+
+  function openCollection(col: Collection) {
+    const slug = slugify(col.name)
+    if (isActive) {
+      startSimulation({
+        collectionId: col.id,
+        collectionSlug: slug,
+        collectionName: col.name,
+        collectionEmoji: col.emoji,
+        preset: session?.preset ?? 'new_reader',
+      })
+      navigate(`/colecoes/${slug}`)
+      return
+    }
+    navigate(col.access === 'owner' ? `/colecoes/${slug}/gerenciar` : `/colecoes/${slug}`)
+  }
+
+  if (isActive && session) {
+    return (
+      <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>
+        <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
+          <LoadingState label="Voltando para a coleção" accent={theme.accent} textColor={theme.textOnBg} mutedColor={theme.textOnBgMuted} sx={{ minHeight: 360 }} />
+        </ScrollablePage>
+      </Box>
+    )
+  }
+
+  async function handleCreate(data: CollectionFormData) {
+    await createMutation.mutateAsync(data)
+    toast.success('Coleção criada!')
+    setCreateOpen(false)
+  }
+
+  async function handleUpdate(data: CollectionFormData) {
+    if (!editing) return
+    await updateMutation.mutateAsync({ id: editing.id, data })
+    toast.success('Coleção atualizada!')
+    setEditing(null)
+  }
+
+  async function handleDelete() {
+    if (!deleting) return
+    try {
+      await deleteMutation.mutateAsync(deleting.id)
+      toast.success('Coleção excluída.')
+      setDeleting(null)
+    } catch (error) {
+      toast.error((error as Error).message || 'Erro ao excluir coleção.')
+    }
   }
 
   return (
@@ -663,9 +662,7 @@ export function CollectionsListPage() {
         )}
 
         {isLoading && (
-          <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', py: 8 }}>
-            <CircularProgress size={28} sx={{ color: theme.accent }} />
-          </Box>
+          <LoadingState label="Carregando coleções" accent={theme.accent} textColor={theme.textOnBg} mutedColor={theme.textOnBgMuted} sx={{ minHeight: 320 }} />
         )}
 
         {!isLoading && collections.length === 0 && !search && (
@@ -705,7 +702,7 @@ export function CollectionsListPage() {
             {view === 'cards' && (
               <Stack spacing={1.4}>
                 {displayedCollections.map((col, i) => (
-                  <CollectionCardView key={col.id} col={col} i={i} onClick={() => navigate(`/colecoes/${col.id}`)} />
+                  <CollectionCardView key={col.id} col={col} i={i} onClick={() => openCollection(col)} onEdit={setEditing} onDelete={setDeleting} />
                 ))}
                 {isWriter && <AddGhostCard view="cards" onClick={() => setCreateOpen(true)} accent={theme.accent} />}
               </Stack>
@@ -713,7 +710,7 @@ export function CollectionsListPage() {
             {view === 'grid' && (
               <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1.4 }}>
                 {displayedCollections.map((col, i) => (
-                  <CollectionGridItem key={col.id} col={col} i={i} onClick={() => navigate(`/colecoes/${col.id}`)} />
+                  <CollectionGridItem key={col.id} col={col} i={i} onClick={() => openCollection(col)} onEdit={setEditing} onDelete={setDeleting} />
                 ))}
                 {isWriter && <AddGhostCard view="grid" onClick={() => setCreateOpen(true)} accent={theme.accent} />}
               </Box>
@@ -721,7 +718,7 @@ export function CollectionsListPage() {
             {view === 'list' && (
               <Stack spacing={0.8}>
                 {displayedCollections.map((col, i) => (
-                  <CollectionListItem key={col.id} col={col} i={i} onClick={() => navigate(`/colecoes/${col.id}`)} />
+                  <CollectionListItem key={col.id} col={col} i={i} onClick={() => openCollection(col)} onEdit={setEditing} onDelete={setDeleting} />
                 ))}
                 {isWriter && <AddGhostCard view="list" onClick={() => setCreateOpen(true)} accent={theme.accent} />}
               </Stack>
@@ -734,12 +731,35 @@ export function CollectionsListPage() {
         open={createOpen}
         onClose={() => setCreateOpen(false)}
         isPending={createMutation.isPending}
-        onSubmit={async (data) => {
-          await createMutation.mutateAsync(data)
-          toast.success('Coleção criada!')
-          setCreateOpen(false)
-        }}
+        onSubmit={handleCreate}
       />
+
+      <CollectionFormDialog
+        open={!!editing}
+        initial={editing ?? undefined}
+        onClose={() => setEditing(null)}
+        isPending={updateMutation.isPending}
+        onSubmit={handleUpdate}
+      />
+
+      <Dialog open={!!deleting} onClose={() => setDeleting(null)} slotProps={{
+        paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'rgba(255,253,251,0.98)', backdropFilter: 'blur(24px)' } }
+      }}>
+        <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 700, color: colors.text.primary, pb: 1 }}>
+          Excluir coleção
+        </DialogTitle>
+        <DialogContent>
+          <Typography sx={{ fontSize: '0.88rem', color: colors.text.secondary, lineHeight: 1.55 }}>
+            Tem certeza que deseja excluir <strong style={{ color: colors.text.primary }}>{deleting?.name}</strong>? Todos os bilhetes, raridades e tipos serão removidos.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
+          <Button variant="ghost" onClick={() => setDeleting(null)} sx={{ flex: 1 }}>Cancelar</Button>
+          <Button variant="rose" loading={deleteMutation.isPending} onClick={handleDelete} sx={{ flex: 1 }}>
+            Excluir
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   )
 }

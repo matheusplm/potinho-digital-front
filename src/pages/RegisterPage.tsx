@@ -28,11 +28,11 @@ const HEARTS = [
   { size: 20, left: '85%', delay: '6.5s', dur: '12s' },
 ]
 
-type Mode = 'criar' | 'convite'
+type Mode = 'create' | 'invite'
 
 export function RegisterPage() {
   const navigate = useNavigate()
-  const [mode, setMode] = useState<Mode>('criar')
+  const [mode, setMode] = useState<Mode>('create')
   const [form, setForm] = useState({ name: '', email: '', password: '', inviteCode: '' })
   const [loading, setLoading] = useState(false)
 
@@ -43,7 +43,7 @@ export function RegisterPage() {
     e.preventDefault()
     setLoading(true)
     try {
-      const inviteCode = mode === 'convite' ? form.inviteCode : undefined
+      const inviteCode = mode === 'invite' ? form.inviteCode : undefined
       await api.register(form.name, form.email, form.password, inviteCode)
       toast.success('Conta criada!', { description: 'Agora é só entrar.' })
       navigate('/login')
@@ -63,19 +63,19 @@ export function RegisterPage() {
       position: 'relative',
       overflowX: 'hidden',
       overflowY: 'auto',
-      background: mode === 'criar'
+      background: mode === 'create'
         ? 'linear-gradient(160deg, #dbeafe 0%, #fce7f3 55%, #ede9fe 100%)'
         : 'linear-gradient(160deg, #fce7f3 0%, #ede9fe 55%, #dbeafe 100%)',
       transition: 'background 0.5s ease',
     }}>
-      <Box sx={{ position: 'absolute', top: -120, right: -120, width: 400, height: 400, borderRadius: '50%', background: mode === 'criar' ? 'radial-gradient(circle, rgba(29,78,216,0.12) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(225,29,72,0.12) 0%, transparent 70%)', transition: 'background 0.5s ease', pointerEvents: 'none' }} />
+      <Box sx={{ position: 'absolute', top: -120, right: -120, width: 400, height: 400, borderRadius: '50%', background: mode === 'create' ? 'radial-gradient(circle, rgba(29,78,216,0.12) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(225,29,72,0.12) 0%, transparent 70%)', transition: 'background 0.5s ease', pointerEvents: 'none' }} />
       <Box sx={{ position: 'absolute', bottom: -80, left: -80, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
       {HEARTS.map((h, i) => (
         <FavoriteIcon key={i} sx={{
           position: 'absolute', bottom: -8, left: h.left,
           fontSize: h.size, zIndex: 0,
-          color: i % 2 === 0 ? (mode === 'criar' ? '#1d4ed8' : '#e11d48') : '#7c3aed',
+          color: i % 2 === 0 ? (mode === 'create' ? '#1d4ed8' : '#e11d48') : '#7c3aed',
           filter: 'blur(0.5px)',
           animation: `${floatHeart(i)} ${h.dur} ${h.delay} ease-in infinite`,
           pointerEvents: 'none',
@@ -85,19 +85,19 @@ export function RegisterPage() {
       <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 3, py: 5, animation: `${fadeSlide} 0.5s ease both` }} spacing={0}>
         <FavoriteIcon sx={{
           fontSize: 52,
-          color: mode === 'criar' ? '#1d4ed8' : '#e11d48',
-          filter: mode === 'criar' ? 'drop-shadow(0 4px 16px rgba(29,78,216,0.4))' : 'drop-shadow(0 4px 16px rgba(225,29,72,0.4))',
+          color: mode === 'create' ? '#1d4ed8' : '#e11d48',
+          filter: mode === 'create' ? 'drop-shadow(0 4px 16px rgba(29,78,216,0.4))' : 'drop-shadow(0 4px 16px rgba(225,29,72,0.4))',
           mb: 3, transition: 'all 0.4s ease',
         }} />
 
         <Typography sx={{ fontFamily: '"Playfair Display",serif', fontWeight: 700, fontSize: '2.8rem', lineHeight: 1, color: '#1e3a5f', textAlign: 'center', letterSpacing: '-0.5px' }}>
           Criar
         </Typography>
-        <Typography sx={{ fontFamily: '"Playfair Display",serif', fontWeight: 700, fontSize: '2.8rem', lineHeight: 1, color: mode === 'criar' ? '#1d4ed8' : '#e11d48', textAlign: 'center', letterSpacing: '-0.5px', mb: 1.5, transition: 'color 0.4s ease' }}>
+        <Typography sx={{ fontFamily: '"Playfair Display",serif', fontWeight: 700, fontSize: '2.8rem', lineHeight: 1, color: mode === 'create' ? '#1d4ed8' : '#e11d48', textAlign: 'center', letterSpacing: '-0.5px', mb: 1.5, transition: 'color 0.4s ease' }}>
           Conta
         </Typography>
 
-        <Box sx={{ width: 40, height: 3, borderRadius: 2, background: mode === 'criar' ? 'linear-gradient(90deg, #1d4ed8, #e11d48)' : 'linear-gradient(90deg, #e11d48, #7c3aed)', mb: 4, transition: 'background 0.4s ease' }} />
+        <Box sx={{ width: 40, height: 3, borderRadius: 2, background: mode === 'create' ? 'linear-gradient(90deg, #1d4ed8, #e11d48)' : 'linear-gradient(90deg, #e11d48, #7c3aed)', mb: 4, transition: 'background 0.4s ease' }} />
 
         <Box sx={{ width: '100%', maxWidth: 320 }}>
           <Box sx={{ mb: 3 }}>
@@ -105,8 +105,8 @@ export function RegisterPage() {
               value={mode}
               onChange={setMode}
               options={[
-                { id: 'criar', label: 'Criar potinho', icon: <AutoAwesomeIcon />, activeColor: '#1d4ed8' },
-                { id: 'convite', label: 'Tenho convite', icon: <FavoriteBorderIcon />, activeColor: '#e11d48' },
+                { id: 'create', label: 'Criar potinho', icon: <AutoAwesomeIcon />, activeColor: '#1d4ed8' },
+                { id: 'invite', label: 'Tenho convite', icon: <FavoriteBorderIcon />, activeColor: '#e11d48' },
               ]}
             />
           </Box>
@@ -116,7 +116,7 @@ export function RegisterPage() {
               <Input label="Seu nome" value={form.name} onChange={set('name')} placeholder="Como te chamamos?" fullWidth required />
               <Input label="Email" type="email" value={form.email} onChange={set('email')} placeholder="seu@email.com" fullWidth required />
               <Input label="Senha" type="password" value={form.password} onChange={set('password')} placeholder="••••••••" fullWidth required />
-              {mode === 'convite' && (
+              {mode === 'invite' && (
                 <Input
                   label="Código de convite"
                   value={form.inviteCode}
@@ -127,7 +127,7 @@ export function RegisterPage() {
                 />
               )}
               <Button
-                variant={mode === 'criar' ? 'primary' : 'rose'}
+                variant={mode === 'create' ? 'primary' : 'rose'}
                 type="submit" fullWidth loading={loading} sx={{ mt: 0.5 }}
               >
                 Criar conta

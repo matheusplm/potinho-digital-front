@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
-import { setAuthToken } from '../services/api'
+import { api, setAuthToken } from '../services/api'
 
 export type UserRole = 'writer' | 'reader'
 
@@ -33,10 +33,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   })
 
-  useEffect(() => {
-    setAuthToken(user?.token ?? '')
-  }, [user])
-
   const setUser = (u: AuthUser | null) => {
     setAuthToken(u?.token ?? '')
     if (u) localStorage.setItem(STORAGE_KEY, JSON.stringify(u))
@@ -45,6 +41,35 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }
 
   const logout = () => setUser(null)
+
+  useEffect(() => {
+    const token = user?.token
+    if (!token) return
+    let active = true
+    api
+      .me()
+      .then((profile) => {
+        if (!active) return
+        setUserState((current) => {
+          if (!current) return current
+          const merged: AuthUser = {
+            ...current,
+            name: profile.name,
+            role: profile.role as UserRole,
+            coupleCode: profile.coupleCode,
+            inviteEmail: profile.inviteEmail,
+            token: current.token,
+          }
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(merged))
+          return merged
+        })
+      })
+      .catch(() => {})
+    return () => {
+      active = false
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return <UserContext.Provider value={{ user, setUser, logout }}>{children}</UserContext.Provider>
 }

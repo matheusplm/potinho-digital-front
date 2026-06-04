@@ -1,117 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../services/api'
-import type { NoteFormData } from '../types/note'
-
-export function useCollectionQuery() {
-  return useQuery({ queryKey: ['collection'], queryFn: api.getCollection })
-}
-
-export function useStatsQuery() {
-  return useQuery({ queryKey: ['stats'], queryFn: api.getStats })
-}
-
-export function useToggleFavoriteMutation() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: ({ id, favorite }: { id: string; favorite: boolean }) => api.setFavorite(id, favorite),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['collection'] }) },
-  })
-}
-
-export function useOpenPackMutation() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: api.openPack,
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['collection'] })
-      void queryClient.invalidateQueries({ queryKey: ['stats'] })
-    },
-  })
-}
-
-export function usePackStatusQuery() {
-  return useQuery({ queryKey: ['pack-status'], queryFn: api.getPackStatus, refetchInterval: 30_000 })
-}
-
-export function usePackOddsQuery() {
-  return useQuery({ queryKey: ['pack-odds'], queryFn: api.getPackOdds, staleTime: Infinity })
-}
-
-export function useDailyNoteStatusQuery() {
-  return useQuery({ queryKey: ['daily-note-status'], queryFn: api.getDailyNoteStatus, refetchInterval: 30_000 })
-}
-
-export function useOpenDailyNoteMutation() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: api.openDailyNote,
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['collection'] })
-      void queryClient.invalidateQueries({ queryKey: ['stats'] })
-      void queryClient.invalidateQueries({ queryKey: ['daily-note-status'] })
-      void queryClient.invalidateQueries({ queryKey: ['pack-status'] })
-    },
-  })
-}
-
-export function useRaritiesQuery() {
-  return useQuery({ queryKey: ['rarities'], queryFn: api.getRarities, staleTime: Infinity })
-}
-
-export function useTypesQuery() {
-  return useQuery({ queryKey: ['types'], queryFn: api.getTypes, staleTime: Infinity })
-}
-
-export function useUpdateRarityMutation() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Record<string, unknown> }) =>
-      api.updateRarity(id, data),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['rarities'] }) },
-  })
-}
-
-export function useUpdateTypeMutation() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Record<string, unknown> }) =>
-      api.updateType(id, data),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['types'] }) },
-  })
-}
-
-export function useNotesQuery() {
-  return useQuery({ queryKey: ['notes'], queryFn: api.getNotes })
-}
-
-export function useCreateNoteMutation() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: (data: NoteFormData) => api.createNote(data),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['notes'] }) },
-  })
-}
-
-export function useUpdateNoteMutation() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<NoteFormData> }) =>
-      api.updateNote(id, data),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['notes'] }) },
-  })
-}
-
-export function useDeleteNoteMutation() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: (id: string) => api.deleteNote(id),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['notes'] }) },
-  })
-}
-
-export function usePartnersQuery() {
-  return useQuery({ queryKey: ['partners'], queryFn: api.getPartners })
-}
+import type { CollectionPackFormData, NoteFormData, RarityConfig, NoteTypeConfig } from '../types/note'
 
 export function useCollectionsQuery() {
   return useQuery({ queryKey: ['collections'], queryFn: api.listCollections })
@@ -142,14 +31,18 @@ export function useDeleteCollectionMutation() {
   })
 }
 
-export function useCollectionNotesQuery(cid: string) {
-  return useQuery({ queryKey: ['col-notes', cid], queryFn: () => api.getCollectionNotes(cid), enabled: !!cid })
+export function useCollectionNotesQuery(cid: string, options?: { enabled?: boolean }) {
+  return useQuery({
+    queryKey: ['col-notes', cid],
+    queryFn: () => api.getCollectionNotes(cid),
+    enabled: !!cid && (options?.enabled ?? true),
+  })
 }
 
 export function useCreateCollectionNoteMutation(cid: string) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: import('../types/note').NoteFormData) => api.createCollectionNote(cid, data),
+    mutationFn: (data: NoteFormData) => api.createCollectionNote(cid, data),
     onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['col-notes', cid] }) },
   })
 }
@@ -157,7 +50,7 @@ export function useCreateCollectionNoteMutation(cid: string) {
 export function useUpdateCollectionNoteMutation(cid: string) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<import('../types/note').NoteFormData> }) =>
+    mutationFn: ({ id, data }: { id: string; data: Partial<NoteFormData> }) =>
       api.updateCollectionNote(cid, id, data),
     onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['col-notes', cid] }) },
   })
@@ -175,8 +68,87 @@ export function useCollectionRaritiesQuery(cid: string) {
   return useQuery({ queryKey: ['col-rarities', cid], queryFn: () => api.getCollectionRarities(cid), enabled: !!cid })
 }
 
+export function useCreateCollectionRarityMutation(cid: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: Parameters<typeof api.createCollectionRarity>[1]) => api.createCollectionRarity(cid, data),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['col-rarities', cid] }) },
+  })
+}
+
+export function useUpdateCollectionRarityMutation(cid: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<RarityConfig> }) =>
+      api.updateCollectionRarity(cid, id, data),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['col-rarities', cid] }) },
+  })
+}
+
+export function useDeleteCollectionRarityMutation(cid: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => api.deleteCollectionRarity(cid, id),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['col-rarities', cid] }) },
+  })
+}
+
 export function useCollectionTypesQuery(cid: string) {
   return useQuery({ queryKey: ['col-types', cid], queryFn: () => api.getCollectionTypes(cid), enabled: !!cid })
+}
+
+export function useCreateCollectionTypeMutation(cid: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: Parameters<typeof api.createCollectionType>[1]) => api.createCollectionType(cid, data),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['col-types', cid] }) },
+  })
+}
+
+export function useUpdateCollectionTypeMutation(cid: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<NoteTypeConfig> }) =>
+      api.updateCollectionType(cid, id, data),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['col-types', cid] }) },
+  })
+}
+
+export function useDeleteCollectionTypeMutation(cid: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => api.deleteCollectionType(cid, id),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['col-types', cid] }) },
+  })
+}
+
+export function useCollectionPacksQuery(cid: string) {
+  return useQuery({ queryKey: ['col-packs', cid], queryFn: () => api.getCollectionPacks(cid), enabled: !!cid })
+}
+
+export function useCreateCollectionPackMutation(cid: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: CollectionPackFormData) => api.createCollectionPack(cid, data),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['col-packs', cid] }) },
+  })
+}
+
+export function useUpdateCollectionPackMutation(cid: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<CollectionPackFormData> }) =>
+      api.updateCollectionPack(cid, id, data),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['col-packs', cid] }) },
+  })
+}
+
+export function useDeleteCollectionPackMutation(cid: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => api.deleteCollectionPack(cid, id),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['col-packs', cid] }) },
+  })
 }
 
 export function useCollectionAccessQuery(cid: string) {
@@ -199,19 +171,26 @@ export function useRevokeAccessMutation(cid: string) {
   })
 }
 
-export function useCollectionPlayQuery(cid: string) {
+export function useCollectionPlayQuery(cid: string, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['col-play', cid],
     queryFn: () => api.getCollectionPlay(cid),
-    enabled: !!cid,
-    refetchInterval: 30_000,
+    enabled: !!cid && (options?.enabled ?? true),
+    refetchInterval: options?.enabled === false ? false : 30_000,
   })
 }
 
 export function useOpenCollectionDailyMutation(cid: string) {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: () => api.openCollectionDaily(cid),
+  })
+}
+
+export function useToggleCollectionFavoriteMutation(cid: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, favorite }: { id: string; favorite: boolean }) =>
+      api.setCollectionFavorite(cid, id, favorite),
     onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['col-play', cid] }) },
   })
 }

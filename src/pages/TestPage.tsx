@@ -19,7 +19,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export function TestPage() {
   const [seg, setSeg] = useState('a')
-  const [seg2, setSeg2] = useState('criar')
+  const [seg2, setSeg2] = useState('create')
   const [inputVal, setInputVal] = useState('')
   const [passVal, setPassVal] = useState('')
 
@@ -93,8 +93,8 @@ export function TestPage() {
               value={seg2}
               onChange={setSeg2}
               options={[
-                { id: 'criar', label: 'Criar potinho', icon: <AutoAwesomeIcon />, activeColor: '#1d4ed8' },
-                { id: 'convite', label: 'Tenho convite', icon: <FavoriteBorderIcon />, activeColor: '#e11d48' },
+                { id: 'create', label: 'Criar potinho', icon: <AutoAwesomeIcon />, activeColor: '#1d4ed8' },
+                { id: 'invite', label: 'Tenho convite', icon: <FavoriteBorderIcon />, activeColor: '#e11d48' },
               ]}
             />
           </Stack>
