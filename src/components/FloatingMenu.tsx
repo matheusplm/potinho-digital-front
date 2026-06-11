@@ -3,11 +3,14 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined'
 import CheckIcon from '@mui/icons-material/Check'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
+import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined'
 import { Box, Stack, Typography, Backdrop, IconButton } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useUser } from '../context/UserContext'
+import { useUser, type UserRole } from '../context/UserContext'
+import { isCollectionReader, personaCapabilities } from '../utils/collectionAccess'
 import { useBackground } from '../context/BackgroundContext'
 import { useReader } from '../context/ReaderContext'
 import { useSimulation } from '../context/SimulationContext'
@@ -21,22 +24,35 @@ const menuIn = keyframes`
 
 export function FloatingMenu() {
   const [open, setOpen] = useState(false)
-  const { user, logout } = useUser()
+  const { user, persona, setPersona, logout } = useUser()
   const { themeKey, setThemeKey, theme } = useBackground()
   const { activeCollectionId, setActiveCollectionId, unreadFor } = useReader()
   const { isActive: simulating } = useSimulation()
   const navigate = useNavigate()
 
-  const isReader = user?.role === 'reader' && !simulating
+  const isReader = persona === 'reader' && !simulating
   const { data: collections = [] } = useCollectionsQuery()
-  const readerCollections = useMemo(
-    () => isReader ? collections.filter((c) => c.access === 'reader') : [],
-    [collections, isReader],
+  const { canSwitch, canWriter, canReader } = useMemo(
+    () => personaCapabilities(collections, user?.id, user?.role ?? 'writer'),
+    [collections, user?.id, user?.role],
   )
-  const showSwitcher = readerCollections.length > 1
+  const readerCollections = useMemo(
+    () => (isReader ? collections.filter((c) => isCollectionReader(c, user?.id)) : []),
+    [collections, isReader, user?.id],
+  )
+  const showCollectionSwitcher = readerCollections.length > 1
 
   function switchTo(id: string) {
     setActiveCollectionId(id)
+    setOpen(false)
+    navigate('/home')
+  }
+
+  function switchPersona(next: UserRole) {
+    if (next === persona) return
+    if (next === 'writer' && !canWriter) return
+    if (next === 'reader' && !canReader) return
+    setPersona(next)
     setOpen(false)
     navigate('/home')
   }
@@ -82,7 +98,6 @@ export function FloatingMenu() {
             animation: `${menuIn} 0.2s cubic-bezier(0.16,1,0.3,1)`,
             transformOrigin: 'top right',
           }}>
-            {/* user info */}
             <Stack direction="row" spacing={1.2} sx={{ alignItems: 'center', px: 1.8, pt: 1.8, pb: 1.5 }}>
               <Box sx={{
                 width: 38, height: 38, borderRadius: radius.md, flexShrink: 0,
@@ -96,15 +111,54 @@ export function FloatingMenu() {
                   {user?.name?.split(' ')[0]}
                 </Typography>
                 <Typography sx={{ fontSize: '0.68rem', color: colors.text.muted, lineHeight: 1.2 }}>
-                  {user?.role === 'writer' ? 'escritor' : 'leitor'}
+                  {persona === 'writer' ? 'escritor' : 'leitor'}
                 </Typography>
               </Box>
             </Stack>
 
             <Box sx={{ height: '1px', bgcolor: colors.border.subtle, mx: 1.5 }} />
 
-            {/* collection switcher (reader multi-tenant) */}
-            {showSwitcher && (
+            {(canSwitch || canWriter || canReader) && (
+              <Box sx={{ px: 1.8, py: 1.4 }}>
+                <Typography sx={{ fontSize: '0.66rem', fontWeight: 800, letterSpacing: 0.6, color: colors.text.secondary, textTransform: 'uppercase', mb: 1 }}>
+                  Modo de uso
+                </Typography>
+                <Stack direction="row" spacing={0.6}>
+                  {([
+                    { role: 'reader' as const, label: 'Leitor', icon: <MenuBookOutlinedIcon sx={{ fontSize: 15 }} />, enabled: canReader },
+                    { role: 'writer' as const, label: 'Escritor', icon: <EditOutlinedIcon sx={{ fontSize: 15 }} />, enabled: canWriter },
+                  ]).map(({ role, label, icon, enabled }) => {
+                    const active = persona === role
+                    return (
+                      <Box
+                        key={role}
+                        onClick={() => enabled && switchPersona(role)}
+                        sx={{
+                          flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5,
+                          py: 0.85, borderRadius: radius.md, cursor: enabled ? 'pointer' : 'default',
+                          border: `1.5px solid ${active ? `${theme.accent}66` : colors.border.subtle}`,
+                          background: active ? `${theme.accent}12` : 'transparent',
+                          opacity: enabled ? 1 : 0.4,
+                          transition: 'background 0.12s, border-color 0.12s',
+                          '&:hover': enabled ? { background: active ? `${theme.accent}18` : 'rgba(0,0,0,0.03)' } : undefined,
+                        }}
+                      >
+                        {icon}
+                        <Typography sx={{ fontSize: '0.78rem', fontWeight: active ? 800 : 600, color: active ? theme.accent : colors.text.secondary }}>
+                          {label}
+                        </Typography>
+                      </Box>
+                    )
+                  })}
+                </Stack>
+              </Box>
+            )}
+
+            {(canSwitch || canWriter || canReader) && (
+              <Box sx={{ height: '1px', bgcolor: colors.border.subtle, mx: 1.5 }} />
+            )}
+
+            {showCollectionSwitcher && (
               <>
                 <Box sx={{ px: 1.8, py: 1.4 }}>
                   <Stack direction="row" spacing={0.6} sx={{ alignItems: 'center', mb: 1.1 }}>
@@ -162,7 +216,6 @@ export function FloatingMenu() {
               </>
             )}
 
-            {/* theme picker */}
             <Box sx={{ px: 1.8, py: 1.4 }}>
               <Stack direction="row" spacing={0.6} sx={{ alignItems: 'center', mb: 1.2 }}>
                 <PaletteOutlinedIcon sx={{ fontSize: 14, color: colors.text.secondary }} />
@@ -201,7 +254,6 @@ export function FloatingMenu() {
 
             <Box sx={{ height: '1px', bgcolor: colors.border.subtle, mx: 1.5 }} />
 
-            {/* logout */}
             <Box sx={{ p: 1 }}>
               <Stack
                 direction="row" spacing={1.4}

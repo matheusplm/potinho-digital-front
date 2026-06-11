@@ -12,7 +12,11 @@ export interface AuthUser {
 
 interface UserContextValue {
   user: AuthUser | null
+  persona: UserRole
+  personaReady: boolean
   setUser: (user: AuthUser | null) => void
+  setPersona: (role: UserRole) => void
+  markPersonaReady: () => void
   logout: () => void
 }
 
@@ -30,13 +34,34 @@ export function UserProvider({ children }: { children: ReactNode }) {
       return null
     }
   })
+  const [persona, setPersonaState] = useState<UserRole>('writer')
+  const [personaReady, setPersonaReady] = useState(false)
 
   const setUser = (u: AuthUser | null) => {
     setAuthToken(u?.token ?? '')
     if (u) localStorage.setItem(STORAGE_KEY, JSON.stringify(u))
     else localStorage.removeItem(STORAGE_KEY)
     setUserState(u)
+    if (!u) {
+      setPersonaState('writer')
+      setPersonaReady(false)
+    } else {
+      setPersonaReady(false)
+    }
   }
+
+  const setPersona = (role: UserRole) => {
+    setPersonaState(role)
+    if (user?.id) {
+      try {
+        localStorage.setItem(`potinho-persona-${user.id}`, role)
+      } catch {
+        void 0
+      }
+    }
+  }
+
+  const markPersonaReady = () => setPersonaReady(true)
 
   const logout = () => setUser(null)
 
@@ -67,7 +92,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return <UserContext.Provider value={{ user, setUser, logout }}>{children}</UserContext.Provider>
+  return (
+    <UserContext.Provider value={{ user, persona, personaReady, setUser, setPersona, markPersonaReady, logout }}>
+      {children}
+    </UserContext.Provider>
+  )
 }
 
 export function useUser() {

@@ -2,8 +2,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../services/api'
 import type { CollectionAchievementFormData, CollectionPackFormData, NoteFormData, RarityConfig, NoteTypeConfig } from '../types/note'
 
-export function useCollectionsQuery() {
-  return useQuery({ queryKey: ['collections'], queryFn: api.listCollections })
+export function useCollectionsQuery(options?: { enabled?: boolean }) {
+  return useQuery({
+    queryKey: ['collections'],
+    queryFn: api.listCollections,
+    enabled: options?.enabled ?? true,
+  })
 }
 
 export function useCreateCollectionMutation() {

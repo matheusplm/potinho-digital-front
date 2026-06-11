@@ -23,6 +23,7 @@ import { useReader } from '../context/ReaderContext'
 import { colors, font, radius } from '../design-system'
 import type { BackgroundTheme } from '../design-system'
 import { slugify } from '../utils/slug'
+import { isCollectionOwner } from '../utils/collectionAccess'
 import { CollectionPanel } from '../components/album/CollectionPanel'
 import { ShareCartinha } from '../components/album/ShareCartinha'
 import type { CollectionDailyReward, CollectionNoteView, NoteRecord, RarityConfig, NoteTypeConfig } from '../types/note'
@@ -929,7 +930,7 @@ function AlbumSection({
 export function CollectionPlayPage() {
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
-  const { user } = useUser()
+  const { user, persona } = useUser()
   const { theme } = useBackground()
   const reader = useReader()
 
@@ -963,7 +964,8 @@ export function CollectionPlayPage() {
   const { data: types = [] } = useCollectionTypesQuery(cid)
   const favoriteMutation = useToggleCollectionFavoriteMutation(cid)
 
-  const isReaderView = !isSimulating && user?.role === 'reader'
+  const isCollectionOwnerUser = isCollectionOwner(collection, user?.id)
+  const isReaderView = !isSimulating && (persona === 'reader' || !isCollectionOwnerUser)
 
   function handleSelectNote(note: ReadableNote) {
     if (isSimulating) {
@@ -974,7 +976,6 @@ export function CollectionPlayPage() {
     setSelectedNote(note)
   }
 
-  // Coleção visitada vira a ativa (multi-tenant) — a home segue a última aberta.
   useEffect(() => {
     if (isReaderView && cid) reader.setActiveCollectionId(cid)
   }, [isReaderView, cid, reader])
@@ -1021,7 +1022,7 @@ export function CollectionPlayPage() {
   }, [albumFilter, hasFavorites])
 
 
-  const isWriter = user?.role === 'writer' && !isSimulating
+  const isWriter = isCollectionOwnerUser && persona === 'writer' && !isSimulating
 
   return (
     <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>

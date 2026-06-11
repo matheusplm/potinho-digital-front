@@ -18,6 +18,7 @@ import { useReader } from '../context/ReaderContext'
 import { useBackground } from '../context/BackgroundContext'
 import { useCollectionsQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
 import { slugify } from '../utils/slug'
+import { isCollectionReader } from '../utils/collectionAccess'
 import { colors, radius } from '../design-system'
 
 interface NavItem {
@@ -36,23 +37,21 @@ const WRITER_NAV: NavItem[] = [
 export function MobileLayout() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { user } = useUser()
+  const { user, persona } = useUser()
   const { theme } = useBackground()
   const { isActive, session, endSimulation, hasUnreadNotes } = useSimulation()
   const { hasUnread: readerHasUnread, activeCollectionId } = useReader()
   const [simulateOpen, setSimulateOpen] = useState(false)
-  const isReader = user?.role === 'reader' && !isActive
+  const isReader = persona === 'reader' && !isActive
 
   const { data: collections = [] } = useCollectionsQuery()
   const readerActive = useMemo(() => {
     if (!isReader) return undefined
-    const readerCollections = collections.filter((c) => c.access === 'reader')
+    const readerCollections = collections.filter((c) => isCollectionReader(c, user?.id))
     return readerCollections.find((c) => c.id === activeCollectionId) ?? readerCollections[0]
-  }, [isReader, collections, activeCollectionId])
-  // Slug da coleção ativa do leitor — multi-tenant: o álbum é sempre o do mundo atual.
+  }, [isReader, collections, activeCollectionId, user?.id])
   const readerAlbumPath = readerActive ? `/colecoes/${slugify(readerActive.name)}` : '/home'
 
-  // Dono único do toast de conquista (server-authoritative): justUnlocked vem do servidor.
   const { data: readerAch } = useReaderAchievementsQuery(readerActive?.id ?? '', { enabled: isReader && !!readerActive })
   const justUnlockedKey = (readerAch?.justUnlocked ?? []).join(',')
   useEffect(() => {
@@ -74,8 +73,7 @@ export function MobileLayout() {
         { label: 'Favoritas', path: '/favoritas', icon: <FavoriteBorderIcon /> },
       ]
     }
-    if (user?.role !== 'writer') {
-      // leitor durante carregamento/estado de borda
+    if (persona !== 'writer') {
       return [{ label: 'Início', path: '/home', icon: <HomeIcon /> }]
     }
     if (isActive) {
@@ -86,7 +84,7 @@ export function MobileLayout() {
       ]
     }
     return WRITER_NAV
-  }, [isReader, readerAlbumPath, user?.role, isActive, session])
+  }, [isReader, readerAlbumPath, persona, isActive, session])
 
   const navValue = useMemo(() => {
     if (isActive && location.pathname.startsWith('/colecoes/') && !location.pathname.endsWith('/gerenciar')) {

@@ -26,6 +26,7 @@ import { useSimulation } from '../context/SimulationContext'
 import { useUser } from '../context/UserContext'
 import { backgroundThemes, colors, font, radius } from '../design-system'
 import { slugify } from '../utils/slug'
+import { isCollectionOwner } from '../utils/collectionAccess'
 import type { Collection, CollectionFormData } from '../types/note'
 
 const fadeIn = keyframes`
@@ -307,8 +308,9 @@ interface CardProps {
 }
 
 function CollectionCardView({ col, i, onClick, onEdit, onDelete }: CardProps) {
+  const { user } = useUser()
   const bg = backgroundThemes.find((t) => t.key === col.theme) ?? backgroundThemes[0]
-  const isOwner = col.access === 'owner'
+  const isOwner = isCollectionOwner(col, user?.id)
   return (
     <Card
       onClick={onClick}
@@ -359,8 +361,9 @@ function CollectionCardView({ col, i, onClick, onEdit, onDelete }: CardProps) {
 }
 
 function CollectionGridItem({ col, i, onClick, onEdit, onDelete }: CardProps) {
+  const { user } = useUser()
   const bg = backgroundThemes.find((t) => t.key === col.theme) ?? backgroundThemes[0]
-  const isOwner = col.access === 'owner'
+  const isOwner = isCollectionOwner(col, user?.id)
   return (
     <Box
       onClick={onClick}
@@ -405,8 +408,9 @@ function CollectionGridItem({ col, i, onClick, onEdit, onDelete }: CardProps) {
 }
 
 function CollectionListItem({ col, i, onClick, onEdit, onDelete }: CardProps) {
+  const { user } = useUser()
   const bg = backgroundThemes.find((t) => t.key === col.theme) ?? backgroundThemes[0]
-  const isOwner = col.access === 'owner'
+  const isOwner = isCollectionOwner(col, user?.id)
   return (
     <Box
       onClick={onClick}
@@ -544,7 +548,7 @@ function AddGhostCard({ view, onClick, accent }: { view: ViewMode; onClick: () =
 
 export function CollectionsListPage() {
   const { theme } = useBackground()
-  const { user } = useUser()
+  const { user, persona } = useUser()
   const { isActive, session, startSimulation } = useSimulation()
   const navigate = useNavigate()
   const { data: collections = [], isLoading } = useCollectionsQuery()
@@ -559,7 +563,7 @@ export function CollectionsListPage() {
   const [sort, setSort] = useState<SortType>('name-asc')
   const [search, setSearch] = useState('')
 
-  const isWriter = user?.role === 'writer'
+  const isWriter = persona === 'writer'
 
   useEffect(() => {
     if (!isActive || !session) return
@@ -599,7 +603,7 @@ export function CollectionsListPage() {
       navigate(`/colecoes/${slug}`)
       return
     }
-    navigate(col.access === 'owner' ? `/colecoes/${slug}/gerenciar` : `/colecoes/${slug}`)
+    navigate(isCollectionOwner(col, user?.id) ? `/colecoes/${slug}/gerenciar` : `/colecoes/${slug}`)
   }
 
   if (isActive && session) {

@@ -29,7 +29,9 @@ import {
 } from '../hooks/useNotes'
 import { AchievementEditor } from '../components/manage/AchievementEditor'
 import { useBackground } from '../context/BackgroundContext'
+import { useUser } from '../context/UserContext'
 import { colors, font, radius } from '../design-system'
+import { isCollectionOwner } from '../utils/collectionAccess'
 import { isHexColor, slugify, uniqueConfigId } from '../utils/slug'
 import type {
   AchievementConditionType,
@@ -76,6 +78,8 @@ const shineSweep = keyframes`from{transform:translate3d(-130%,0,0) rotate(16deg)
 const openingSceneFade = keyframes`from{opacity:0;transform:translate3d(0,8px,0) scale(0.98);}to{opacity:1;transform:translate3d(0,0,0) scale(1);}`
 
 type Tab = 'notes' | 'rarities' | 'types' | 'packs' | 'achievements' | 'access'
+type NoteSort = 'newest' | 'oldest' | 'az' | 'rarity' | 'type'
+type NoteView = 'cards' | 'list' | 'compact'
 type PackFilter = 'all' | 'active' | 'draft' | 'daily' | 'bonus' | 'guaranteed' | 'thematic'
 type PackView = 'cards' | 'list'
 type PackSimulation = { pack: CollectionPack; rewards: NoteRecord[]; eligibleCount: number; guaranteedApplied: boolean }
@@ -88,6 +92,22 @@ const TABS = [
   { id: 'achievements' as Tab, label: 'Conquistas' },
   { id: 'access' as Tab, label: 'Acesso' },
 ]
+
+const NOTE_SORT_OPTIONS: { id: NoteSort; label: string }[] = [
+  { id: 'newest', label: 'Mais recentes' },
+  { id: 'oldest', label: 'Mais antigos' },
+  { id: 'az', label: 'A-Z' },
+  { id: 'rarity', label: 'Raridade' },
+  { id: 'type', label: 'Tipo' },
+]
+
+const NOTE_VIEW_OPTIONS = [
+  { id: 'cards' as NoteView, label: 'Cards', icon: <ViewAgendaIcon /> },
+  { id: 'list' as NoteView, label: 'Lista', icon: <ViewListIcon /> },
+  { id: 'compact' as NoteView, label: 'Compacta', icon: <ViewListIcon /> },
+]
+
+const NOTE_PAGE_SIZE = 60
 
 const ACHIEVEMENT_PRESETS: { emoji: string; label: string; description: string; conditionType: AchievementConditionType; count: number | null }[] = [
   { emoji: '🌱', label: 'Primeiro bilhete', description: 'Coletou o primeiro bilhetinho.', conditionType: 'collect_count', count: 1 },
@@ -1396,14 +1416,28 @@ export function CollectionManagePage() {
   const { slug = '' } = useParams<{ slug: string }>()
   const navigate = useNavigate()
   const { theme } = useBackground()
+  const { user } = useUser()
   const [tab, setTab] = useState<Tab>('notes')
 
-  const { data: collections = [] } = useCollectionsQuery()
+  const { data: collections = [], isLoading: collectionsLoading } = useCollectionsQuery()
   const collection = collections.find((c) => slugify(c.name) === slug)
   const cid = collection?.id ?? ''
+  const canManage = collection ? isCollectionOwner(collection, user?.id) : false
+
+  useEffect(() => {
+    if (collectionsLoading || !user) return
+    if (!collection) return
+    if (!canManage) {
+      toast.info('Só o autor da coleção pode editá-la.')
+      navigate(`/colecoes/${slug}`, { replace: true })
+    }
+  }, [collectionsLoading, user, collection, canManage, slug, navigate])
 
   const [search, setSearch] = useState('')
   const [rarityFilter, setRarityFilter] = useState<string>('all')
+  const [noteSort, setNoteSort] = useState<NoteSort>('newest')
+  const [noteView, setNoteView] = useState<NoteView>('cards')
+  const [visibleNoteCount, setVisibleNoteCount] = useState(NOTE_PAGE_SIZE)
   const [packFilter, setPackFilter] = useState<PackFilter>('all')
   const [packView, setPackView] = useState<PackView>('cards')
   const [packDialogOpen, setPackDialogOpen] = useState(false)
@@ -1468,11 +1502,29 @@ export function CollectionManagePage() {
 
   const filteredNotes = useMemo(() => {
     const q = search.trim().toLowerCase()
-    return notes.filter((note) =>
+    const rarityOrder = new Map(rarities.map((rarity) => [rarity.id, rarity.order]))
+    const typeOrder = new Map(types.map((type) => [type.id, type.order]))
+    const filtered = notes.filter((note) =>
       (rarityFilter === 'all' || note.rarity === rarityFilter) &&
       (q === '' || note.title.toLowerCase().includes(q) || note.message.toLowerCase().includes(q)),
     )
-  }, [notes, search, rarityFilter])
+    return filtered.sort((a, b) => {
+      if (noteSort === 'oldest') return (a.createdAt ?? '').localeCompare(b.createdAt ?? '') || a.title.localeCompare(b.title, 'pt-BR')
+      if (noteSort === 'az') return a.title.localeCompare(b.title, 'pt-BR')
+      if (noteSort === 'rarity') return (rarityOrder.get(b.rarity) ?? 0) - (rarityOrder.get(a.rarity) ?? 0) || a.title.localeCompare(b.title, 'pt-BR')
+      if (noteSort === 'type') return (typeOrder.get(a.typeId) ?? 0) - (typeOrder.get(b.typeId) ?? 0) || a.title.localeCompare(b.title, 'pt-BR')
+      return (b.createdAt ?? '').localeCompare(a.createdAt ?? '') || a.title.localeCompare(b.title, 'pt-BR')
+    })
+  }, [noteSort, notes, rarities, rarityFilter, search, types])
+
+  const visibleNotes = useMemo(
+    () => filteredNotes.slice(0, visibleNoteCount),
+    [filteredNotes, visibleNoteCount],
+  )
+
+  useEffect(() => {
+    setVisibleNoteCount(NOTE_PAGE_SIZE)
+  }, [noteSort, noteView, rarityFilter, search])
 
   const filteredPacks = useMemo(() => {
     return packs.filter((pack) => {
@@ -1580,6 +1632,16 @@ export function CollectionManagePage() {
     }
   }
 
+  if (collectionsLoading || (collection && !canManage)) {
+    return (
+      <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>
+        <ScrollablePage sx={{ px: 2.5, py: 2.5 }}>
+          <LoadingState label="Carregando coleção" accent={theme.accent} textColor={theme.textOnBg} mutedColor={theme.textOnBgMuted} sx={{ minHeight: 360 }} />
+        </ScrollablePage>
+      </Box>
+    )
+  }
+
   return (
     <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>
       <FavoriteIcon sx={{ position: 'absolute', bottom: -60, right: -60, fontSize: 400, color: 'rgba(225,29,72,0.04)', pointerEvents: 'none' }} />
@@ -1622,15 +1684,18 @@ export function CollectionManagePage() {
 
         {tab === 'notes' && (
           <Stack spacing={1.5}>
-            <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Stack spacing={1}>
               <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted, fontWeight: 600 }}>
                 {notes.length} bilhete{notes.length !== 1 ? 's' : ''}
               </Typography>
-              <Stack direction="row" spacing={0.8}>
-                <Button variant="ghost" onClick={() => setImportDialogOpen(true)} sx={{ py: 0.7, px: 1.2, fontSize: '0.76rem', background: 'rgba(255,255,255,0.44)' }}>
+              <Stack direction="row" spacing={0.8} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.8 }}>
+                <Box sx={{ flex: '1 1 260px', minWidth: 230 }}>
+                  <SegmentedControl options={NOTE_VIEW_OPTIONS} value={noteView} onChange={setNoteView} />
+                </Box>
+                <Button variant="ghost" onClick={() => setImportDialogOpen(true)} sx={{ flex: '1 1 132px', py: 0.7, px: 1.2, fontSize: '0.76rem', background: 'rgba(255,255,255,0.44)' }}>
                   Importar JSON
                 </Button>
-                <Button variant="primary" onClick={() => { setEditingNote(null); setNoteDialog(true) }} sx={{ py: 0.7, px: 1.4, fontSize: '0.78rem' }}>
+                <Button variant="primary" onClick={() => { setEditingNote(null); setNoteDialog(true) }} sx={{ flex: '1 1 94px', py: 0.7, px: 1.4, fontSize: '0.78rem' }}>
                   <AddIcon sx={{ fontSize: 15, mr: 0.4 }} /> Novo
                 </Button>
               </Stack>
@@ -1670,6 +1735,38 @@ export function CollectionManagePage() {
                     ))}
                   </Box>
                 )}
+                <Box sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.7,
+                  flexWrap: 'wrap',
+                  px: 0.1,
+                }}>
+                  <Typography sx={{ fontSize: '0.68rem', fontWeight: 800, letterSpacing: 0.6, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
+                    Ordenar
+                  </Typography>
+                  {NOTE_SORT_OPTIONS.map((option) => (
+                    <Chip
+                      key={option.id}
+                      label={option.label}
+                      size="small"
+                      onClick={() => setNoteSort(option.id)}
+                      sx={{
+                        height: 26,
+                        fontSize: '0.72rem',
+                        fontWeight: 800,
+                        cursor: 'pointer',
+                        bgcolor: noteSort === option.id ? colors.purple.main : 'rgba(255,255,255,0.5)',
+                        color: noteSort === option.id ? '#fff' : colors.text.secondary,
+                        border: `1.5px solid ${noteSort === option.id ? colors.purple.main : 'rgba(255,255,255,0.35)'}`,
+                        '& .MuiChip-label': { px: 0.9 },
+                      }}
+                    />
+                  ))}
+                  <Typography sx={{ ml: 'auto', fontSize: '0.7rem', color: theme.textOnBgMuted, fontWeight: 700 }}>
+                    {Math.min(visibleNoteCount, filteredNotes.length)} de {filteredNotes.length} exibido{filteredNotes.length !== 1 ? 's' : ''}
+                  </Typography>
+                </Box>
               </Stack>
             )}
 
@@ -1690,9 +1787,141 @@ export function CollectionManagePage() {
               </Typography>
             )}
 
-            {filteredNotes.map((note) => {
+            {visibleNotes.map((note) => {
               const r = rarities.find((x) => x.id === note.rarity)
               const t = types.find((x) => x.id === note.typeId)
+              if (noteView === 'compact') {
+                return (
+                  <Card key={note.id} accent={r?.borderColor} onClick={() => setViewingNote(note)} sx={{
+                    p: 0,
+                    overflow: 'hidden',
+                    cursor: 'pointer',
+                    border: `1px solid ${r?.borderColor ?? colors.border.subtle}`,
+                    background: 'rgba(255,255,255,0.74)',
+                    boxShadow: '0 3px 10px rgba(15,23,42,0.05)',
+                    '&:hover': {
+                      background: 'rgba(255,255,255,0.9)',
+                      boxShadow: '0 5px 14px rgba(15,23,42,0.08)',
+                    },
+                  }}>
+                    <Stack direction="row" alignItems="center" spacing={0.8} sx={{ minHeight: 38, px: 1, py: 0.35 }}>
+                      <Box sx={{ width: 6, height: 22, borderRadius: radius.full, background: r?.borderColor ?? colors.border.subtle, flexShrink: 0 }} />
+                      <Typography sx={{
+                        flex: 1,
+                        minWidth: 0,
+                        fontFamily: font.serif,
+                        fontWeight: 800,
+                        fontSize: '0.82rem',
+                        color: r?.textColor ?? colors.text.primary,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}>
+                        {note.title}
+                      </Typography>
+                      <Stack direction="row" spacing={0.25} sx={{ flexShrink: 0, opacity: 0.72 }}>
+                        <IconButton
+                          size="small"
+                          aria-label="editar bilhete"
+                          onClick={(event) => { event.stopPropagation(); setEditingNote(note); setNoteDialog(true) }}
+                          sx={{ ...actionButtonSx('primary'), width: 28, height: 28 }}
+                        >
+                          <EditOutlinedIcon sx={{ fontSize: 14 }} />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          aria-label="excluir bilhete"
+                          onClick={(event) => { event.stopPropagation(); setDeletingNote(note) }}
+                          sx={{ ...actionButtonSx('danger'), width: 28, height: 28 }}
+                        >
+                          <DeleteForeverOutlinedIcon sx={{ fontSize: 14 }} />
+                        </IconButton>
+                      </Stack>
+                    </Stack>
+                  </Card>
+                )
+              }
+              if (noteView === 'list') {
+                return (
+                  <Card key={note.id} accent={r?.borderColor} onClick={() => setViewingNote(note)} sx={{
+                    p: 0,
+                    overflow: 'hidden',
+                    cursor: 'pointer',
+                    border: `1.5px solid ${r?.borderColor ?? colors.border.subtle}`,
+                    background: 'rgba(255,255,255,0.78)',
+                    boxShadow: '0 6px 18px rgba(15,23,42,0.07)',
+                    transition: 'transform 0.16s ease, box-shadow 0.16s ease',
+                    '&:hover': {
+                      transform: 'translateY(-1px)',
+                      boxShadow: `0 8px 24px ${r?.glowColor || 'rgba(15,23,42,0.1)'}`,
+                    },
+                  }}>
+                    <Stack direction="row" alignItems="stretch" sx={{ minHeight: 74 }}>
+                      <Box sx={{ width: 5, flexShrink: 0, background: r ? `linear-gradient(180deg,${r.borderColor},${r.glowColor || r.borderColor})` : colors.border.subtle }} />
+                      <Box sx={{ flex: 1, minWidth: 0, px: 1.25, py: 1 }}>
+                        <Stack direction="row" alignItems="center" spacing={1}>
+                          <Box sx={{ flex: 1, minWidth: 0 }}>
+                            <Stack direction="row" spacing={0.6} alignItems="center" sx={{ minWidth: 0 }}>
+                              <Typography sx={{
+                                fontFamily: font.serif,
+                                fontWeight: 800,
+                                fontSize: '0.92rem',
+                                color: r?.textColor ?? colors.text.primary,
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                              }}>
+                                {note.title}
+                              </Typography>
+                              {r && (
+                                <Box sx={{ px: 0.65, py: 0.15, borderRadius: radius.full, background: r.chipBg, color: r.chipColor, border: `1px solid ${r.borderColor}`, fontSize: '0.58rem', fontWeight: 850, flexShrink: 0 }}>
+                                  {r.emoji}
+                                </Box>
+                              )}
+                              {t && (
+                                <Box sx={{ px: 0.65, py: 0.15, borderRadius: radius.full, background: t.tagBg, color: t.tagColor, border: `1px solid ${t.accentColor}33`, fontSize: '0.58rem', fontWeight: 850, flexShrink: 0 }}>
+                                  {t.emoji}
+                                </Box>
+                              )}
+                            </Stack>
+                            <Typography sx={{
+                              mt: 0.25,
+                              fontSize: '0.74rem',
+                              color: r?.captionColor ?? colors.text.secondary,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                            }}>
+                              {note.message}
+                            </Typography>
+                            <Typography sx={{ mt: 0.35, fontSize: '0.62rem', color: colors.text.muted, fontWeight: 700 }}>
+                              {[r?.label, t?.label].filter(Boolean).join(' · ') || 'Sem categoria'}
+                            </Typography>
+                          </Box>
+                          <Stack direction="row" spacing={0.4} sx={{ flexShrink: 0 }}>
+                            <IconButton
+                              size="small"
+                              aria-label="editar bilhete"
+                              onClick={(event) => { event.stopPropagation(); setEditingNote(note); setNoteDialog(true) }}
+                              sx={actionButtonSx('primary')}
+                            >
+                              <EditOutlinedIcon sx={{ fontSize: 16 }} />
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              aria-label="excluir bilhete"
+                              onClick={(event) => { event.stopPropagation(); setDeletingNote(note) }}
+                              sx={actionButtonSx('danger')}
+                            >
+                              <DeleteForeverOutlinedIcon sx={{ fontSize: 16 }} />
+                            </IconButton>
+                          </Stack>
+                        </Stack>
+                      </Box>
+                    </Stack>
+                  </Card>
+                )
+              }
               return (
                 <Card key={note.id} accent={r?.borderColor} onClick={() => setViewingNote(note)} sx={{
                   p: 0,
@@ -1792,6 +2021,23 @@ export function CollectionManagePage() {
                 </Card>
               )
             })}
+
+            {!notesLoading && filteredNotes.length > visibleNotes.length && (
+              <Button
+                variant="ghost"
+                onClick={() => setVisibleNoteCount((count) => count + NOTE_PAGE_SIZE)}
+                sx={{
+                  alignSelf: 'center',
+                  mt: 0.5,
+                  px: 1.6,
+                  py: 0.8,
+                  fontSize: '0.78rem',
+                  background: 'rgba(255,255,255,0.5)',
+                }}
+              >
+                Mostrar mais {Math.min(NOTE_PAGE_SIZE, filteredNotes.length - visibleNotes.length)} bilhetes
+              </Button>
+            )}
           </Stack>
         )}
 

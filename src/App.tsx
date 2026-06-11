@@ -2,6 +2,7 @@ import type { ReactElement } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { MobileLayout } from './components/MobileLayout'
+import { PersonaBootstrap } from './components/PersonaBootstrap'
 import { UserProvider, useUser, type UserRole } from './context/UserContext'
 import { BackgroundProvider } from './context/BackgroundContext'
 import { SimulationProvider, useSimulation } from './context/SimulationContext'
@@ -17,22 +18,32 @@ import { ConquistasPage } from './pages/ConquistasPage'
 import { FavoritasPage } from './pages/FavoritasPage'
 import { TestPage } from './pages/TestPage'
 import { NotFoundPage } from './pages/NotFoundPage'
+import { LoadingState } from './components/ui'
+import { Box } from '@mui/material'
 
 function HomeRoute() {
-  const { user } = useUser()
+  const { persona } = useUser()
   const simulation = useSimulation()
   if (simulation.isActive) return <SimulatedReaderHomePage />
-  return user?.role === 'writer' ? <WriterHomePage /> : <SimulatedReaderHomePage />
+  return persona === 'writer' ? <WriterHomePage /> : <SimulatedReaderHomePage />
 }
 
 function RequireRole({ role, children }: { role: UserRole; children: ReactElement }) {
-  const { user } = useUser()
-  if (user?.role !== role) return <Navigate to="/home" replace />
+  const { persona } = useUser()
+  if (persona !== role) return <Navigate to="/home" replace />
   return children
 }
 
 function AppRoutes() {
-  const { user } = useUser()
+  const { user, personaReady } = useUser()
+
+  if (user && !personaReady) {
+    return (
+      <Box sx={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <LoadingState label="Preparando seu potinho" />
+      </Box>
+    )
+  }
 
   if (!user) {
     return (
@@ -66,6 +77,7 @@ function App() {
   return (
     <BrowserRouter>
       <UserProvider>
+        <PersonaBootstrap />
         <BackgroundProvider>
           <ReaderProvider>
             <SimulationProvider>

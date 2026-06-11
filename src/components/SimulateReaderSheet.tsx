@@ -7,6 +7,8 @@ import { useSimulation, type SimulationPreset } from '../context/SimulationConte
 import { useCollectionsQuery } from '../hooks/useNotes'
 import { colors, font, radius } from '../design-system'
 import { slugify } from '../utils/slug'
+import { useUser } from '../context/UserContext'
+import { isCollectionOwner } from '../utils/collectionAccess'
 import type { Collection } from '../types/note'
 
 const PRESETS: { id: SimulationPreset; label: string; description: string; emoji: string }[] = [
@@ -31,11 +33,12 @@ interface SimulateReaderSheetProps {
 
 export function SimulateReaderSheet({ open, onClose }: SimulateReaderSheetProps) {
   const navigate = useNavigate()
+  const { user } = useUser()
   const { startSimulation } = useSimulation()
   const { data: collections = [] } = useCollectionsQuery()
   const ownedCollections = useMemo(
-    () => collections.filter((collection) => collection.access === 'owner'),
-    [collections],
+    () => collections.filter((collection) => isCollectionOwner(collection, user?.id)),
+    [collections, user?.id],
   )
 
   const [selectedId, setSelectedId] = useState<string>('')

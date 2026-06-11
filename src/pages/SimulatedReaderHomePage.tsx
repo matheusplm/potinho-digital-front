@@ -20,6 +20,7 @@ import {
   useReaderAchievementsQuery,
 } from '../hooks/useNotes'
 import { colors, font, radius } from '../design-system'
+import { isCollectionReader } from '../utils/collectionAccess'
 import { simulatePackOpen } from '../utils/simulationPlay'
 import { computeAchievements } from '../utils/achievements'
 import { NoteDetailDialog, PACK_OPEN_ANIMATION_MS, PackOpeningDialog, RewardCard, type ReadableNote, wait } from './CollectionPlayPage'
@@ -53,14 +54,14 @@ export function SimulatedReaderHomePage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { theme } = useBackground()
-  const { user } = useUser()
+  const { user, persona } = useUser()
   const simulation = useSimulation()
   const { session } = simulation
   const { activeCollectionId, setActiveCollectionId, addUnread } = useReader()
   const { data: collections = [], isLoading: collectionsLoading } = useCollectionsQuery()
-  const isRealReader = !simulation.isActive && user?.role === 'reader'
+  const isRealReader = !simulation.isActive && persona === 'reader'
   const readerCollections = useMemo(
-    () => isRealReader ? collections.filter((c) => c.access === 'reader') : [],
+    () => isRealReader ? collections.filter((c) => isCollectionReader(c, user?.id)) : [],
     [collections, isRealReader],
   )
   const readerCollection = useMemo(
@@ -73,7 +74,6 @@ export function SimulatedReaderHomePage() {
     [activeCollectionId, collections, isRealReader, readerCollections],
   )
 
-  // Mantém a coleção ativa (multi-tenant) sincronizada com a resolvida.
   useEffect(() => {
     if (isRealReader && readerCollection && readerCollection.id !== activeCollectionId) {
       setActiveCollectionId(readerCollection.id)

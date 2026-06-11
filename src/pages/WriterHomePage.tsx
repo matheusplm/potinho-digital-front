@@ -9,6 +9,7 @@ import { useCollectionsQuery } from '../hooks/useNotes'
 import { Card, ScrollablePage } from '../components/ui'
 import { colors, font } from '../design-system'
 import { useBackground } from '../context/BackgroundContext'
+import { isCollectionOwner } from '../utils/collectionAccess'
 
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(16px); }
@@ -29,7 +30,7 @@ export function WriterHomePage() {
   const { data: collections = [] } = useCollectionsQuery()
 
   const firstName = user?.name?.split(' ')[0] ?? ''
-  const ownedCount = collections.filter((c) => c.access === 'owner').length
+  const ownedCount = collections.filter((c) => isCollectionOwner(c, user?.id)).length
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite'
 

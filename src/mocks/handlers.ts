@@ -23,8 +23,6 @@ import {
 
 function evaluateReaderAchievements(collection: CollectionState) {
   const { ownership, notes, achievements, achievementState } = collection
-  // Conta a partir das notas existentes (igual ao backend) — ids "stale" de notas
-  // deletadas não saem dos Sets de ownership, então não dá pra usar .size direto.
   const ownedCount = notes.filter((n) => ownership.owned.has(n.id)).length
   const favorites = notes.filter((n) => ownership.owned.has(n.id) && ownership.favorites.has(n.id)).length
   const presentRarities = new Set(notes.map((n) => n.rarity))
@@ -86,8 +84,20 @@ function tokenFrom(request: Request): string | null {
   return header?.startsWith('Bearer ') ? header.slice(7) : null
 }
 
+function inferMockRole(user: MockUser) {
+  const normalizedEmail = user.email.toLowerCase().trim()
+  const owns = db.collections.some((collection) => collection.meta.ownerId === user.id)
+  const hasGrant = db.collections.some((collection) =>
+    collection.meta.ownerId !== user.id
+    && collection.access.some((entry) => entry.email.toLowerCase().trim() === normalizedEmail),
+  )
+  if (hasGrant && !owns) return 'reader' as const
+  if (owns) return 'writer' as const
+  return user.role
+}
+
 function publicUser(user: MockUser) {
-  return { id: user.id, name: user.name, role: user.role }
+  return { id: user.id, name: user.name, role: inferMockRole(user) }
 }
 
 function dailyStatus(lastOpenDate: string | null, now: Date) {
@@ -143,7 +153,7 @@ const authHandlers = [
     const user = resolveUser(tokenFrom(request))
     if (!user) return HttpResponse.json({ message: 'Não autenticado.' }, { status: 401 })
     return HttpResponse.json({
-      id: user.id, name: user.name, role: user.role,
+      id: user.id, name: user.name, role: inferMockRole(user),
     })
   }),
 ]
