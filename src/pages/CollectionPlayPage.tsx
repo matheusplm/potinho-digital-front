@@ -7,11 +7,10 @@ import SearchIcon from '@mui/icons-material/Search'
 import CloseIcon from '@mui/icons-material/Close'
 import { Box, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, LinearProgress, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
-import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Button, Card, LoadingState, ScrollablePage, toast } from '../components/ui'
-import { useCollectionPlayQuery, useOpenCollectionDailyMutation, useCollectionRaritiesQuery, useCollectionTypesQuery, useCollectionsQuery, useCollectionNotesQuery, useToggleCollectionFavoriteMutation, useCollectionPacksQuery, useOpenCollectionPackMutation } from '../hooks/useNotes'
+import { Button, Card, LoadingState, ScrollablePage } from '../components/ui'
+import { useCollectionPlayQuery, useCollectionRaritiesQuery, useCollectionTypesQuery, useCollectionsQuery, useCollectionNotesQuery, useToggleCollectionFavoriteMutation } from '../hooks/useNotes'
 import { useBackground } from '../context/BackgroundContext'
 import { useUser } from '../context/UserContext'
 import { useSimulation } from '../context/SimulationContext'
@@ -19,14 +18,12 @@ import { useReader } from '../context/ReaderContext'
 import { colors, font, radius } from '../design-system'
 import type { BackgroundTheme } from '../design-system'
 import { slugify } from '../utils/slug'
-import { simulateDailyOpen } from '../utils/simulationPlay'
-import type { CollectionDailyReward, CollectionNoteView, CollectionPack, CollectionPlayView, NoteRecord, RarityConfig, NoteTypeConfig } from '../types/note'
+import type { CollectionDailyReward, CollectionNoteView, NoteRecord, RarityConfig, NoteTypeConfig } from '../types/note'
 
 export const PACK_OPEN_ANIMATION_MS = 2200
 
 const fadeIn = keyframes`from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); }`
 const cardIn = keyframes`from { opacity:0; transform:translateY(20px) scale(0.96); } to { opacity:1; transform:translateY(0) scale(1); }`
-const pulse = keyframes`0%,100%{box-shadow:0 0 0 0 rgba(244,63,94,0.5)} 65%{box-shadow:0 0 0 24px rgba(244,63,94,0)}`
 const rarityShine = keyframes`0%{transform:translateX(-140%) rotate(18deg);opacity:0}20%{opacity:.55}55%,100%{transform:translateX(160%) rotate(18deg);opacity:0}`
 const packOpening = keyframes`
   0%{transform:translate3d(-50%,18px,0) rotate(-8deg) scale(0.86);filter:drop-shadow(0 18px 26px rgba(15,23,42,0.1));}
@@ -69,19 +66,6 @@ const revealFlash = keyframes`
 
 type AlbumFilter = 'all' | 'favorites'
 export type ReadableNote = CollectionDailyReward | CollectionNoteView | NoteRecord
-
-function formatTime(iso: string) {
-  return new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit' }).format(new Date(iso))
-}
-
-function Countdown({ availableAt }: { availableAt: string }) {
-  const target = new Date(availableAt).getTime()
-  const now = Date.now()
-  const diffMs = Math.max(target - now, 0)
-  const h = Math.floor(diffMs / 3600000)
-  const m = Math.floor((diffMs % 3600000) / 60000)
-  return <>{h > 0 ? `${h}h ${m}m` : `${m}m`}</>
-}
 
 function rarityCardSx(r?: RarityConfig, compact = false) {
   const glow = r?.glowColor || r?.borderColor || 'rgba(244,63,94,0.2)'
@@ -775,7 +759,6 @@ function AlbumSection({
 export function CollectionPlayPage() {
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
   const { user } = useUser()
   const { theme } = useBackground()
   const reader = useReader()
@@ -791,30 +774,16 @@ export function CollectionPlayPage() {
   const { data: playFromApi, isLoading: playLoading } = useCollectionPlayQuery(cid, { enabled: !isSimulating })
   const { data: notes = [], isLoading: notesLoading } = useCollectionNotesQuery(cid, { enabled: isSimulating })
   const play = isSimulating ? simulation.getPlayView(notes) : playFromApi
-  const [rewards, setRewards] = useState<CollectionDailyReward[]>([])
-  const [isOpeningPack, setIsOpeningPack] = useState(false)
-  const [openingSnapshot, setOpeningSnapshot] = useState<CollectionPlayView | null>(null)
   const [albumFilter, setAlbumFilter] = useState<AlbumFilter>('all')
   const [albumSearch, setAlbumSearch] = useState('')
   const [albumRarity, setAlbumRarity] = useState('all')
   const [albumType, setAlbumType] = useState('all')
   const [selectedNote, setSelectedNote] = useState<ReadableNote | null>(null)
-  const [selectedBonusPack, setSelectedBonusPack] = useState<CollectionPack | null>(null)
-  const [openedBonusIds, setOpenedBonusIds] = useState<string[]>([])
-  const [openingPackVisual, setOpeningPackVisual] = useState<{ emoji: string; accent: string } | null>(null)
-  const displayPlay = isOpeningPack && openingSnapshot ? openingSnapshot : play
+  const displayPlay = play
   const isLoading = collectionsLoading || (!!cid && (isSimulating ? notesLoading : playLoading))
   const { data: rarities = [] } = useCollectionRaritiesQuery(cid)
   const { data: types = [] } = useCollectionTypesQuery(cid)
-  const { data: packs = [] } = useCollectionPacksQuery(cid)
-  const openMutation = useOpenCollectionDailyMutation(cid)
-  const openPackMutation = useOpenCollectionPackMutation(cid)
   const favoriteMutation = useToggleCollectionFavoriteMutation(cid)
-
-  const bonusPacks = useMemo(
-    () => isSimulating ? [] : packs.filter((pack) => pack.status === 'active' && pack.category !== 'daily' && !openedBonusIds.includes(pack.id)),
-    [isSimulating, packs, openedBonusIds],
-  )
 
   const isReaderView = !isSimulating && user?.role === 'reader'
 
@@ -833,19 +802,12 @@ export function CollectionPlayPage() {
   }, [isReaderView, cid, reader])
 
   useEffect(() => {
-    setRewards([])
-    setIsOpeningPack(false)
-    setOpeningSnapshot(null)
     setAlbumSearch('')
     setAlbumRarity('all')
     setAlbumType('all')
     setSelectedNote(null)
-    setSelectedBonusPack(null)
-    setOpenedBonusIds([])
-    setOpeningPackVisual(null)
   }, [cid, isSimulating])
 
-  const canOpen = displayPlay?.daily.canOpen ?? false
   const completion = displayPlay && displayPlay.total > 0 ? Math.round((displayPlay.owned / displayPlay.total) * 100) : 0
   const discoveredItems = useMemo(() => (displayPlay?.items ?? []).filter((item) => item.owned), [displayPlay?.items])
   const discoveredRarityIds = useMemo(() => new Set(discoveredItems.map((item) => item.rarity)), [discoveredItems])
@@ -881,87 +843,6 @@ export function CollectionPlayPage() {
     }
   }, [albumFilter, hasFavorites])
 
-  async function waitForPackAnimation(startedAt: number) {
-    const elapsed = Date.now() - startedAt
-    await wait(Math.max(0, PACK_OPEN_ANIMATION_MS - elapsed))
-  }
-
-  async function handleOpen() {
-    if (!cid || !play || isOpeningPack) return
-    if (isSimulating && notes.length === 0) {
-      toast.info('Adicione bilhetes na coleção para simular a abertura.')
-      return
-    }
-
-    const startedAt = Date.now()
-    setOpeningSnapshot(play)
-    setIsOpeningPack(true)
-
-    try {
-      if (isSimulating) {
-        const ownedIds = play.items.filter((item) => item.owned).map((item) => item.id)
-        const pendingRewards = simulateDailyOpen(notes, rarities, ownedIds)
-        if (pendingRewards.length === 0) {
-          setIsOpeningPack(false)
-          setOpeningSnapshot(null)
-          toast.info('Você já descobriu todos os bilhetes disponíveis nessa coleção.')
-          return
-        }
-        await waitForPackAnimation(startedAt)
-        const revealedRewards = simulation.commitDailyOpen(pendingRewards)
-        setRewards(revealedRewards)
-        toast.love(
-          `${revealedRewards.length} bilhete${revealedRewards.length !== 1 ? 's' : ''}!`,
-          { description: `${revealedRewards.length} novo${revealedRewards.length !== 1 ? 's' : ''} na prévia ✨` },
-        )
-        return
-      }
-
-      const result = await openMutation.mutateAsync()
-      await waitForPackAnimation(startedAt)
-      await queryClient.invalidateQueries({ queryKey: ['col-play', cid] })
-      setRewards(result.rewards)
-      reader.addUnread(cid, result.rewards.map((r) => r.id))
-      const newCount = result.rewards.filter((r) => r.isNew).length
-      toast.love(
-        `${result.rewards.length} bilhete${result.rewards.length !== 1 ? 's' : ''}!`,
-        { description: newCount > 0 ? `${newCount} novo${newCount !== 1 ? 's' : ''} na coleção ✨` : 'Pacotinho do dia aberto!' },
-      )
-    } catch (e) {
-      toast.error((e as Error).message ?? 'Erro ao abrir pacotinho.')
-    } finally {
-      setIsOpeningPack(false)
-      setOpeningSnapshot(null)
-    }
-  }
-
-  async function handleOpenBonus(pack: CollectionPack) {
-    if (!cid || !play || isOpeningPack) return
-    setSelectedBonusPack(null)
-    const startedAt = Date.now()
-    setOpeningSnapshot(play)
-    setOpeningPackVisual({ emoji: pack.emoji, accent: pack.accent })
-    setIsOpeningPack(true)
-    try {
-      const result = await openPackMutation.mutateAsync(pack.id)
-      await waitForPackAnimation(startedAt)
-      await queryClient.invalidateQueries({ queryKey: ['col-play', cid] })
-      setRewards(result.rewards)
-      reader.addUnread(cid, result.rewards.map((r) => r.id))
-      setOpenedBonusIds((ids) => [...new Set([...ids, pack.id])])
-      const newCount = result.rewards.filter((r) => r.isNew).length
-      toast.love(
-        `${result.rewards.length} bilhete${result.rewards.length !== 1 ? 's' : ''}!`,
-        { description: newCount > 0 ? `${newCount} novo${newCount !== 1 ? 's' : ''} na coleção ✨` : `${pack.name} aberto!` },
-      )
-    } catch (e) {
-      toast.error((e as Error).message ?? 'Erro ao abrir pacotinho.')
-    } finally {
-      setIsOpeningPack(false)
-      setOpeningSnapshot(null)
-      setOpeningPackVisual(null)
-    }
-  }
 
   const isWriter = user?.role === 'writer' && !isSimulating
 
@@ -1111,125 +992,6 @@ export function CollectionPlayPage() {
               />
             )}
 
-            {!isSimulating && (
-            <Stack spacing={1.5} alignItems="center">
-              <Box
-                onClick={canOpen && !openMutation.isPending && !isOpeningPack ? handleOpen : undefined}
-                onMouseDown={(event) => event.preventDefault()}
-                sx={{
-                  width: 120, height: 120, borderRadius: '50%', cursor: canOpen ? 'pointer' : 'default',
-                  background: canOpen
-                    ? 'linear-gradient(135deg, #f43f5e, #e11d48)'
-                    : `linear-gradient(135deg, ${colors.primary.main}, ${colors.purple.main})`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  boxShadow: canOpen ? '0 8px 32px rgba(244,63,94,0.4)' : `0 8px 32px ${colors.primary.glow}`,
-                  transition: 'all 0.3s',
-                  animation: canOpen ? `${pulse} 2.2s ease-in-out infinite` : 'none',
-                  userSelect: 'none',
-                  WebkitUserSelect: 'none',
-                  WebkitTapHighlightColor: 'transparent',
-                  outline: 'none',
-                  touchAction: 'manipulation',
-                  '&:hover': canOpen ? { transform: 'scale(1.06)' } : {},
-                  '&:focus': { outline: 'none' },
-                  '&:focus-visible': { outline: 'none' },
-                }}
-              >
-                <FavoriteIcon sx={{ fontSize: 44, color: '#fff', opacity: 0.9, pointerEvents: 'none', userSelect: 'none' }} />
-              </Box>
-
-              {canOpen ? (
-                <Stack spacing={0.3} alignItems="center">
-                  <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1rem', color: theme.textOnBg }}>
-                    Seu pacotinho está pronto!
-                  </Typography>
-                  <Typography sx={{ fontSize: '0.8rem', color: theme.textOnBgMuted }}>
-                    Toque no coração para abrir ✨
-                  </Typography>
-                </Stack>
-              ) : (
-                <Stack spacing={0.3} alignItems="center">
-                  <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1rem', color: theme.textOnBg }}>
-                    Próximo pacotinho
-                  </Typography>
-                  <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBgMuted }}>
-                    às {formatTime(displayPlay.daily.availableAt)} · <Countdown availableAt={displayPlay.daily.availableAt} />
-                  </Typography>
-                </Stack>
-              )}
-            </Stack>
-            )}
-
-            {!isSimulating && bonusPacks.length > 0 && (
-              <Stack spacing={1.2}>
-                <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1.2, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
-                  Pacotinhos especiais
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 1.1, overflowX: 'auto', pb: 0.5, mx: -0.5, px: 0.5, scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
-                  {bonusPacks.map((pack) => (
-                    <Box
-                      key={pack.id}
-                      role="button"
-                      aria-label={`Abrir ${pack.name}`}
-                      onClick={() => !isOpeningPack && setSelectedBonusPack(pack)}
-                      sx={{
-                        flexShrink: 0,
-                        width: 158,
-                        p: 1.5,
-                        borderRadius: radius.xl,
-                        cursor: isOpeningPack ? 'default' : 'pointer',
-                        background: pack.gradient,
-                        border: '1.5px solid rgba(255,255,255,0.7)',
-                        boxShadow: `0 8px 24px ${pack.accent}28`,
-                        position: 'relative',
-                        overflow: 'hidden',
-                        transition: 'transform 0.16s ease, box-shadow 0.16s ease',
-                        '&:hover': isOpeningPack ? {} : { transform: 'translateY(-2px)', boxShadow: `0 12px 30px ${pack.accent}3a` },
-                        '&:active': { transform: 'scale(0.98)' },
-                      }}
-                    >
-                      <Box sx={{
-                        position: 'absolute', top: 8, right: 8,
-                        width: 9, height: 9, borderRadius: radius.full,
-                        background: colors.rose.main,
-                        boxShadow: `0 0 0 3px rgba(255,255,255,0.86), 0 0 12px ${colors.rose.glow}`,
-                      }} />
-                      <Typography sx={{ fontSize: '1.9rem', lineHeight: 1, mb: 0.6, filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.16))' }}>
-                        {pack.emoji}
-                      </Typography>
-                      <Typography sx={{
-                        fontFamily: font.serif, fontWeight: 800, fontSize: '0.92rem', color: colors.text.primary,
-                        lineHeight: 1.2, display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden',
-                      }}>
-                        {pack.name}
-                      </Typography>
-                      <Stack direction="row" spacing={0.5} sx={{ mt: 0.7, flexWrap: 'wrap', rowGap: 0.4 }}>
-                        <Box sx={{ px: 0.7, py: 0.25, borderRadius: radius.full, background: `${pack.accent}22`, color: pack.accent, fontSize: '0.6rem', fontWeight: 850 }}>
-                          {pack.cardsPerOpen} bilhete{pack.cardsPerOpen !== 1 ? 's' : ''}
-                        </Box>
-                        {pack.guaranteedRarityId && (
-                          <Box sx={{ px: 0.7, py: 0.25, borderRadius: radius.full, background: 'rgba(255,255,255,0.78)', color: '#c2410c', fontSize: '0.6rem', fontWeight: 850 }}>
-                            garantido
-                          </Box>
-                        )}
-                      </Stack>
-                    </Box>
-                  ))}
-                </Box>
-              </Stack>
-            )}
-
-            {!isSimulating && !isOpeningPack && rewards.length > 0 && (
-              <Stack spacing={1.2}>
-                <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1.2, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
-                  Você acabou de abrir ✨
-                </Typography>
-                {rewards.map((item, index) => (
-                  <RewardCard key={`${item.id}-${index}`} reward={item} rarities={rarities} types={types} onClick={() => handleSelectNote(item)} />
-                ))}
-              </Stack>
-            )}
-
             {!isSimulating && displayPlay.total > 0 && displayPlay.items.filter((n) => !n.owned).length > 0 && (
               <Stack spacing={1}>
                 <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1.2, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
@@ -1254,69 +1016,7 @@ export function CollectionPlayPage() {
           </Stack>
         )}
       </ScrollablePage>
-      <PackOpeningDialog open={isOpeningPack} emoji={openingPackVisual?.emoji ?? collection?.emoji ?? '💌'} accent={openingPackVisual?.accent ?? theme.accent} />
       <NoteDetailDialog note={selectedNote} rarities={rarities} types={types} onClose={() => setSelectedNote(null)} />
-      <Dialog
-        open={!!selectedBonusPack}
-        onClose={() => setSelectedBonusPack(null)}
-        maxWidth="xs"
-        fullWidth
-        slotProps={{
-          paper: {
-            sx: {
-              mx: 2,
-              borderRadius: radius.xl,
-              overflow: 'hidden',
-              background: selectedBonusPack?.gradient ?? 'rgba(255,250,247,0.98)',
-              boxShadow: `0 24px 70px ${selectedBonusPack?.accent ?? theme.accent}28`,
-            },
-          },
-          backdrop: { sx: { background: 'rgba(15,23,42,0.18)', backdropFilter: 'blur(8px)' } },
-        }}
-      >
-        {selectedBonusPack && (
-          <>
-            <Box sx={{ p: 2, position: 'relative', background: 'radial-gradient(circle at 18% 0%, rgba(255,255,255,0.64), transparent 40%)' }}>
-              <DialogTitle sx={{ p: 0, fontFamily: font.serif, fontWeight: 850, fontSize: '1.18rem', color: colors.text.primary, lineHeight: 1.2, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
-                {selectedBonusPack.emoji} {selectedBonusPack.name}
-              </DialogTitle>
-              <Typography sx={{ mt: 0.45, fontSize: '0.78rem', color: colors.text.secondary, fontWeight: 700 }}>
-                Pacotinho especial disponível
-              </Typography>
-            </Box>
-            <DialogContent sx={{ px: 2, pt: 1.5, pb: 1 }}>
-              <Box sx={{ p: 1.25, borderRadius: radius.lg, background: 'rgba(255,255,255,0.72)', border: '1px solid rgba(255,255,255,0.62)', backdropFilter: 'blur(8px)' }}>
-                <Typography sx={{ fontSize: '0.83rem', color: colors.text.secondary, lineHeight: 1.55, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
-                  {selectedBonusPack.description || 'Abra este pacote especial para tentar descobrir novos bilhetinhos da coleção.'}
-                </Typography>
-                <Stack direction="row" spacing={0.7} sx={{ mt: 1, flexWrap: 'wrap', rowGap: 0.6 }}>
-                  <Box sx={{ px: 0.85, py: 0.35, borderRadius: radius.full, background: `${selectedBonusPack.accent}18`, color: selectedBonusPack.accent, fontSize: '0.68rem', fontWeight: 850 }}>
-                    {selectedBonusPack.cardsPerOpen} bilhete{selectedBonusPack.cardsPerOpen !== 1 ? 's' : ''}
-                  </Box>
-                  {selectedBonusPack.cooldownHours && (
-                    <Box sx={{ px: 0.85, py: 0.35, borderRadius: radius.full, background: 'rgba(255,255,255,0.72)', color: colors.text.secondary, fontSize: '0.68rem', fontWeight: 800 }}>
-                      {selectedBonusPack.cooldownHours}h cooldown
-                    </Box>
-                  )}
-                  {selectedBonusPack.guaranteedRarityId && (
-                    <Box sx={{ px: 0.85, py: 0.35, borderRadius: radius.full, background: 'rgba(255,247,237,0.9)', color: '#c2410c', fontSize: '0.68rem', fontWeight: 850 }}>
-                      garantia especial
-                    </Box>
-                  )}
-                </Stack>
-              </Box>
-            </DialogContent>
-            <DialogActions sx={{ px: 2, pb: 2, gap: 1 }}>
-              <Button variant="ghost" onClick={() => setSelectedBonusPack(null)} sx={{ flex: 1 }}>
-                Agora não
-              </Button>
-              <Button variant="primary" disabled={isOpeningPack} onClick={() => handleOpenBonus(selectedBonusPack)} sx={{ flex: 1, whiteSpace: 'nowrap' }}>
-                Abrir
-              </Button>
-            </DialogActions>
-          </>
-        )}
-      </Dialog>
     </Box>
   )
 }
