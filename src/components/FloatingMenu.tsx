@@ -2,11 +2,16 @@ import LogoutIcon from '@mui/icons-material/Logout'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined'
 import CheckIcon from '@mui/icons-material/Check'
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import { Box, Stack, Typography, Backdrop, IconButton } from '@mui/material'
 import { keyframes } from '@emotion/react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { useBackground } from '../context/BackgroundContext'
+import { useReader } from '../context/ReaderContext'
+import { useSimulation } from '../context/SimulationContext'
+import { useCollectionsQuery } from '../hooks/useNotes'
 import { backgroundThemes, colors, font, radius } from '../design-system'
 
 const menuIn = keyframes`
@@ -18,6 +23,23 @@ export function FloatingMenu() {
   const [open, setOpen] = useState(false)
   const { user, logout } = useUser()
   const { themeKey, setThemeKey, theme } = useBackground()
+  const { activeCollectionId, setActiveCollectionId, unreadFor } = useReader()
+  const { isActive: simulating } = useSimulation()
+  const navigate = useNavigate()
+
+  const isReader = user?.role === 'reader' && !simulating
+  const { data: collections = [] } = useCollectionsQuery()
+  const readerCollections = useMemo(
+    () => isReader ? collections.filter((c) => c.access === 'reader') : [],
+    [collections, isReader],
+  )
+  const showSwitcher = readerCollections.length > 1
+
+  function switchTo(id: string) {
+    setActiveCollectionId(id)
+    setOpen(false)
+    navigate('/home')
+  }
 
   return (
     <>
@@ -80,6 +102,65 @@ export function FloatingMenu() {
             </Stack>
 
             <Box sx={{ height: '1px', bgcolor: colors.border.subtle, mx: 1.5 }} />
+
+            {/* collection switcher (reader multi-tenant) */}
+            {showSwitcher && (
+              <>
+                <Box sx={{ px: 1.8, py: 1.4 }}>
+                  <Stack direction="row" spacing={0.6} sx={{ alignItems: 'center', mb: 1.1 }}>
+                    <SwapHorizIcon sx={{ fontSize: 14, color: colors.text.secondary }} />
+                    <Typography sx={{ fontSize: '0.66rem', fontWeight: 800, letterSpacing: 0.6, color: colors.text.secondary, textTransform: 'uppercase' }}>
+                      Seus potinhos
+                    </Typography>
+                  </Stack>
+                  <Stack spacing={0.5} sx={{ maxHeight: 196, overflowY: 'auto', mx: -0.6, px: 0.6 }}>
+                    {readerCollections.map((collection) => {
+                      const active = collection.id === activeCollectionId
+                      const hasUnread = unreadFor(collection.id).length > 0
+                      const bg = backgroundThemes.find((t) => t.key === collection.theme) ?? backgroundThemes[0]
+                      return (
+                        <Stack
+                          key={collection.id}
+                          direction="row"
+                          spacing={1}
+                          onClick={() => switchTo(collection.id)}
+                          sx={{
+                            alignItems: 'center', px: 1, py: 0.75, cursor: 'pointer', borderRadius: radius.md,
+                            border: `1.5px solid ${active ? `${theme.accent}66` : 'transparent'}`,
+                            background: active ? `${theme.accent}10` : 'transparent',
+                            transition: 'background 0.12s, border-color 0.12s',
+                            '&:hover': { background: active ? `${theme.accent}16` : 'rgba(0,0,0,0.035)' },
+                          }}
+                        >
+                          <Box sx={{
+                            width: 30, height: 30, borderRadius: radius.sm, flexShrink: 0, position: 'relative',
+                            background: bg.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem',
+                          }}>
+                            {collection.emoji}
+                            {hasUnread && !active && (
+                              <Box sx={{
+                                position: 'absolute', top: -3, right: -3, width: 9, height: 9, borderRadius: radius.full,
+                                background: colors.rose.main, border: '2px solid rgba(255,255,255,0.95)',
+                              }} />
+                            )}
+                          </Box>
+                          <Typography sx={{
+                            flex: 1, minWidth: 0, fontFamily: font.serif, fontSize: '0.85rem',
+                            fontWeight: active ? 800 : 600, color: colors.text.primary,
+                            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                          }}>
+                            {collection.name}
+                          </Typography>
+                          {active && <CheckIcon sx={{ fontSize: 16, color: theme.accent, flexShrink: 0 }} />}
+                        </Stack>
+                      )
+                    })}
+                  </Stack>
+                </Box>
+
+                <Box sx={{ height: '1px', bgcolor: colors.border.subtle, mx: 1.5 }} />
+              </>
+            )}
 
             {/* theme picker */}
             <Box sx={{ px: 1.8, py: 1.4 }}>

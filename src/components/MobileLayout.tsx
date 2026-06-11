@@ -1,5 +1,6 @@
 import HomeIcon from '@mui/icons-material/Home'
 import Inventory2Icon from '@mui/icons-material/Inventory2'
+import AutoStoriesOutlinedIcon from '@mui/icons-material/AutoStoriesOutlined'
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import StopCircleOutlinedIcon from '@mui/icons-material/StopCircleOutlined'
 import { Box, Typography } from '@mui/material'
@@ -13,6 +14,8 @@ import { useUser } from '../context/UserContext'
 import { useSimulation } from '../context/SimulationContext'
 import { useReader } from '../context/ReaderContext'
 import { useBackground } from '../context/BackgroundContext'
+import { useCollectionsQuery } from '../hooks/useNotes'
+import { slugify } from '../utils/slug'
 import { colors, radius } from '../design-system'
 
 interface NavItem {
@@ -21,11 +24,6 @@ interface NavItem {
   icon: React.ReactNode
   action?: 'simulate' | 'end-simulation'
 }
-
-const READER_NAV: NavItem[] = [
-  { label: 'Início', path: '/home', icon: <HomeIcon /> },
-  { label: 'Coleções', path: '/colecoes', icon: <Inventory2Icon /> },
-]
 
 const WRITER_NAV: NavItem[] = [
   { label: 'Início', path: '/home', icon: <HomeIcon /> },
@@ -39,12 +37,30 @@ export function MobileLayout() {
   const { user } = useUser()
   const { theme } = useBackground()
   const { isActive, session, endSimulation, hasUnreadNotes } = useSimulation()
-  const { hasUnread: readerHasUnread } = useReader()
+  const { hasUnread: readerHasUnread, activeCollectionId } = useReader()
   const [simulateOpen, setSimulateOpen] = useState(false)
   const isReader = user?.role === 'reader' && !isActive
 
-  const items = useMemo(() => {
-    if (user?.role !== 'writer') return READER_NAV
+  const { data: collections = [] } = useCollectionsQuery()
+  // Slug da coleção ativa do leitor — multi-tenant: o álbum é sempre o do mundo atual.
+  const readerAlbumPath = useMemo(() => {
+    if (!isReader) return '/home'
+    const readerCollections = collections.filter((c) => c.access === 'reader')
+    const active = readerCollections.find((c) => c.id === activeCollectionId) ?? readerCollections[0]
+    return active ? `/colecoes/${slugify(active.name)}` : '/home'
+  }, [isReader, collections, activeCollectionId])
+
+  const items = useMemo<NavItem[]>(() => {
+    if (isReader) {
+      return [
+        { label: 'Início', path: '/home', icon: <HomeIcon /> },
+        { label: 'Coleção', path: readerAlbumPath, icon: <AutoStoriesOutlinedIcon /> },
+      ]
+    }
+    if (user?.role !== 'writer') {
+      // leitor durante carregamento/estado de borda
+      return [{ label: 'Início', path: '/home', icon: <HomeIcon /> }]
+    }
     if (isActive) {
       return [
         { label: 'Início', path: '/home', icon: <HomeIcon /> },
@@ -53,15 +69,18 @@ export function MobileLayout() {
       ]
     }
     return WRITER_NAV
-  }, [user?.role, isActive, session])
+  }, [isReader, readerAlbumPath, user?.role, isActive, session])
 
   const navValue = useMemo(() => {
     if (isActive && location.pathname.startsWith('/colecoes/') && !location.pathname.endsWith('/gerenciar')) {
       return session ? `/colecoes/${session.collectionSlug}` : '/colecoes'
     }
+    if (isReader && location.pathname.startsWith('/colecoes/')) {
+      return readerAlbumPath
+    }
     const match = items.find((item) => item.path !== '/simular' && location.pathname.startsWith(item.path))
     return match?.path ?? '/home'
-  }, [location.pathname, items, isActive, user?.role])
+  }, [location.pathname, items, isActive, isReader, readerAlbumPath, session])
 
   const bannerOffset = isActive ? '52px' : '0px'
 
@@ -92,8 +111,7 @@ export function MobileLayout() {
             const active = navValue === item.path
             const isEnd = item.action === 'end-simulation'
             const showUnreadDot =
-              (isActive && item.label === 'Coleção' && hasUnreadNotes) ||
-              (isReader && item.label === 'Coleções' && readerHasUnread)
+              item.label === 'Coleção' && ((isActive && hasUnreadNotes) || (isReader && readerHasUnread))
             return (
               <Box
                 key={item.path + item.label}

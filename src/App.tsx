@@ -48,7 +48,7 @@ function AppRoutes() {
       <Route element={<MobileLayout />}>
         <Route index element={<Navigate to="/home" replace />} />
         <Route path="home" element={<HomeRoute />} />
-        <Route path="colecoes" element={<CollectionsListPage />} />
+        <Route path="colecoes" element={<RequireRole role="writer"><CollectionsListPage /></RequireRole>} />
         <Route path="colecoes/:slug" element={<CollectionPlayPage />} />
         <Route path="colecoes/:slug/gerenciar" element={<RequireRole role="writer"><CollectionManagePage /></RequireRole>} />
       </Route>

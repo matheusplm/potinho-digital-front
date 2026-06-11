@@ -974,8 +974,8 @@ export function CollectionPlayPage() {
           {!isSimulating && (
             <IconButton
               size="small"
-              aria-label="voltar para coleções"
-              onClick={() => navigate('/colecoes')}
+              aria-label={isReaderView ? 'voltar para o início' : 'voltar para coleções'}
+              onClick={() => navigate(isReaderView ? '/home' : '/colecoes')}
               sx={{
                 width: 38,
                 height: 38,
