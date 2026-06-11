@@ -15,6 +15,7 @@ import { useCollectionPlayQuery, useOpenCollectionDailyMutation, useCollectionRa
 import { useBackground } from '../context/BackgroundContext'
 import { useUser } from '../context/UserContext'
 import { useSimulation } from '../context/SimulationContext'
+import { useReader } from '../context/ReaderContext'
 import { colors, font, radius } from '../design-system'
 import type { BackgroundTheme } from '../design-system'
 import { slugify } from '../utils/slug'
@@ -777,6 +778,7 @@ export function CollectionPlayPage() {
   const queryClient = useQueryClient()
   const { user } = useUser()
   const { theme } = useBackground()
+  const reader = useReader()
 
   const { data: collections = [], isLoading: collectionsLoading } = useCollectionsQuery()
   const collection = collections.find((item) => slugify(item.name) === slug)
@@ -814,12 +816,21 @@ export function CollectionPlayPage() {
     [isSimulating, packs, openedBonusIds],
   )
 
+  const isReaderView = !isSimulating && user?.role === 'reader'
+
   function handleSelectNote(note: ReadableNote) {
     if (isSimulating) {
       simulation.markNoteViewed(note.id)
+    } else if (isReaderView && cid) {
+      reader.markViewed(cid, note.id)
     }
     setSelectedNote(note)
   }
+
+  // Coleção visitada vira a ativa (multi-tenant) — a home segue a última aberta.
+  useEffect(() => {
+    if (isReaderView && cid) reader.setActiveCollectionId(cid)
+  }, [isReaderView, cid, reader])
 
   useEffect(() => {
     setRewards([])
@@ -910,6 +921,7 @@ export function CollectionPlayPage() {
       await waitForPackAnimation(startedAt)
       await queryClient.invalidateQueries({ queryKey: ['col-play', cid] })
       setRewards(result.rewards)
+      reader.addUnread(cid, result.rewards.map((r) => r.id))
       const newCount = result.rewards.filter((r) => r.isNew).length
       toast.love(
         `${result.rewards.length} bilhete${result.rewards.length !== 1 ? 's' : ''}!`,
@@ -935,6 +947,7 @@ export function CollectionPlayPage() {
       await waitForPackAnimation(startedAt)
       await queryClient.invalidateQueries({ queryKey: ['col-play', cid] })
       setRewards(result.rewards)
+      reader.addUnread(cid, result.rewards.map((r) => r.id))
       setOpenedBonusIds((ids) => [...new Set([...ids, pack.id])])
       const newCount = result.rewards.filter((r) => r.isNew).length
       toast.love(
@@ -1093,7 +1106,7 @@ export function CollectionPlayPage() {
                   }
                   favoriteMutation.mutate({ id: note.id, favorite: !note.favorite })
                 }}
-                unreadIds={isSimulating ? simulation.unreadNoteIds : []}
+                unreadIds={isSimulating ? simulation.unreadNoteIds : (cid ? reader.unreadFor(cid) : [])}
                 emptyHint={isSimulating ? 'Abra pacotinhos na tela inicial ou ajuste os filtros.' : 'Abra um pacotinho ou ajuste os filtros.'}
               />
             )}

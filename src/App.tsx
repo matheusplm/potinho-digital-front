@@ -5,6 +5,7 @@ import { MobileLayout } from './components/MobileLayout'
 import { UserProvider, useUser, type UserRole } from './context/UserContext'
 import { BackgroundProvider } from './context/BackgroundContext'
 import { SimulationProvider, useSimulation } from './context/SimulationContext'
+import { ReaderProvider } from './context/ReaderContext'
 import { WriterHomePage } from './pages/WriterHomePage'
 import { SimulatedReaderHomePage } from './pages/SimulatedReaderHomePage'
 import { LoginPage } from './pages/LoginPage'
@@ -62,9 +63,11 @@ function App() {
     <BrowserRouter>
       <UserProvider>
         <BackgroundProvider>
-          <SimulationProvider>
-            <AppRoutes />
-          </SimulationProvider>
+          <ReaderProvider>
+            <SimulationProvider>
+              <AppRoutes />
+            </SimulationProvider>
+          </ReaderProvider>
           <Toaster
             position="top-center"
             gap={8}

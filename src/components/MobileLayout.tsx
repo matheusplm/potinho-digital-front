@@ -11,6 +11,7 @@ import { SimulationBanner } from './SimulationBanner'
 import { ScrollHint } from './ui'
 import { useUser } from '../context/UserContext'
 import { useSimulation } from '../context/SimulationContext'
+import { useReader } from '../context/ReaderContext'
 import { useBackground } from '../context/BackgroundContext'
 import { colors, radius } from '../design-system'
 
@@ -38,7 +39,9 @@ export function MobileLayout() {
   const { user } = useUser()
   const { theme } = useBackground()
   const { isActive, session, endSimulation, hasUnreadNotes } = useSimulation()
+  const { hasUnread: readerHasUnread } = useReader()
   const [simulateOpen, setSimulateOpen] = useState(false)
+  const isReader = user?.role === 'reader' && !isActive
 
   const items = useMemo(() => {
     if (user?.role !== 'writer') return READER_NAV
@@ -88,7 +91,9 @@ export function MobileLayout() {
           {items.map((item) => {
             const active = navValue === item.path
             const isEnd = item.action === 'end-simulation'
-            const showUnreadDot = isActive && item.label === 'Coleção' && hasUnreadNotes
+            const showUnreadDot =
+              (isActive && item.label === 'Coleção' && hasUnreadNotes) ||
+              (isReader && item.label === 'Coleções' && readerHasUnread)
             return (
               <Box
                 key={item.path + item.label}
