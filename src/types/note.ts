@@ -199,3 +199,49 @@ export interface CollectionDailyReward {
   typeId: string
   isNew: boolean
 }
+
+export type AchievementConditionType =
+  | 'collect_count'
+  | 'complete'
+  | 'rarity_count'
+  | 'type_complete'
+  | 'favorite_count'
+  | 'rainbow'
+
+/** Template de conquista (configurado pelo dono da coleção). */
+export interface CollectionAchievement {
+  id: string
+  collectionId: string
+  label: string
+  emoji: string
+  description: string
+  conditionType: AchievementConditionType
+  count: number | null
+  rarityId: string | null
+  typeId: string | null
+  order: number
+  createdAt?: string
+  updatedAt?: string
+}
+
+export type CollectionAchievementFormData = Omit<CollectionAchievement, 'collectionId' | 'createdAt' | 'updatedAt'> & {
+  id?: string
+}
+
+/** Conquista avaliada para o leitor (server-side). */
+export interface ReaderAchievement {
+  id: string
+  emoji: string
+  label: string
+  description: string
+  conditionType: AchievementConditionType
+  current: number
+  target: number
+  unlocked: boolean
+  unlockedAt: string | null
+}
+
+export interface ReaderAchievementsResponse {
+  achievements: ReaderAchievement[]
+  justUnlocked: string[]
+}

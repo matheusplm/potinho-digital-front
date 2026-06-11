@@ -6,17 +6,17 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import StopCircleOutlinedIcon from '@mui/icons-material/StopCircleOutlined'
 import { Box, Typography } from '@mui/material'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { FloatingMenu } from './FloatingMenu'
 import { SimulateReaderSheet } from './SimulateReaderSheet'
 import { SimulationBanner } from './SimulationBanner'
-import { ScrollHint } from './ui'
+import { ScrollHint, toast } from './ui'
 import { useUser } from '../context/UserContext'
 import { useSimulation } from '../context/SimulationContext'
 import { useReader } from '../context/ReaderContext'
 import { useBackground } from '../context/BackgroundContext'
-import { useCollectionsQuery } from '../hooks/useNotes'
+import { useCollectionsQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
 import { slugify } from '../utils/slug'
 import { colors, radius } from '../design-system'
 
@@ -44,13 +44,26 @@ export function MobileLayout() {
   const isReader = user?.role === 'reader' && !isActive
 
   const { data: collections = [] } = useCollectionsQuery()
-  // Slug da coleção ativa do leitor — multi-tenant: o álbum é sempre o do mundo atual.
-  const readerAlbumPath = useMemo(() => {
-    if (!isReader) return '/home'
+  const readerActive = useMemo(() => {
+    if (!isReader) return undefined
     const readerCollections = collections.filter((c) => c.access === 'reader')
-    const active = readerCollections.find((c) => c.id === activeCollectionId) ?? readerCollections[0]
-    return active ? `/colecoes/${slugify(active.name)}` : '/home'
+    return readerCollections.find((c) => c.id === activeCollectionId) ?? readerCollections[0]
   }, [isReader, collections, activeCollectionId])
+  // Slug da coleção ativa do leitor — multi-tenant: o álbum é sempre o do mundo atual.
+  const readerAlbumPath = readerActive ? `/colecoes/${slugify(readerActive.name)}` : '/home'
+
+  // Dono único do toast de conquista (server-authoritative): justUnlocked vem do servidor.
+  const { data: readerAch } = useReaderAchievementsQuery(readerActive?.id ?? '', { enabled: isReader && !!readerActive })
+  const justUnlockedKey = (readerAch?.justUnlocked ?? []).join(',')
+  useEffect(() => {
+    if (!readerAch || readerAch.justUnlocked.length === 0) return
+    const byId = Object.fromEntries(readerAch.achievements.map((a) => [a.id, a]))
+    readerAch.justUnlocked.forEach((id) => {
+      const a = byId[id]
+      if (a) toast.love('Conquista desbloqueada! 🏆', { description: `${a.emoji} ${a.label}` })
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [justUnlockedKey])
 
   const items = useMemo<NavItem[]>(() => {
     if (isReader) {

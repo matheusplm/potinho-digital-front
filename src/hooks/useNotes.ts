@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../services/api'
-import type { CollectionPackFormData, NoteFormData, RarityConfig, NoteTypeConfig } from '../types/note'
+import type { CollectionAchievementFormData, CollectionPackFormData, NoteFormData, RarityConfig, NoteTypeConfig } from '../types/note'
 
 export function useCollectionsQuery() {
   return useQuery({ queryKey: ['collections'], queryFn: api.listCollections })
@@ -205,6 +205,46 @@ export function useToggleCollectionFavoriteMutation(cid: string) {
   return useMutation({
     mutationFn: ({ id, favorite }: { id: string; favorite: boolean }) =>
       api.setCollectionFavorite(cid, id, favorite),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['col-play', cid] }) },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['col-play', cid] })
+      void queryClient.invalidateQueries({ queryKey: ['reader-achievements', cid] })
+    },
+  })
+}
+
+export function useCollectionAchievementsQuery(cid: string) {
+  return useQuery({ queryKey: ['col-achievements', cid], queryFn: () => api.getCollectionAchievements(cid), enabled: !!cid })
+}
+
+export function useReaderAchievementsQuery(cid: string, options?: { enabled?: boolean }) {
+  return useQuery({
+    queryKey: ['reader-achievements', cid],
+    queryFn: () => api.getReaderAchievements(cid),
+    enabled: !!cid && (options?.enabled ?? true),
+  })
+}
+
+export function useCreateCollectionAchievementMutation(cid: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: CollectionAchievementFormData) => api.createCollectionAchievement(cid, data),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['col-achievements', cid] }) },
+  })
+}
+
+export function useUpdateCollectionAchievementMutation(cid: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<CollectionAchievementFormData> }) =>
+      api.updateCollectionAchievement(cid, id, data),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['col-achievements', cid] }) },
+  })
+}
+
+export function useDeleteCollectionAchievementMutation(cid: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => api.deleteCollectionAchievement(cid, id),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['col-achievements', cid] }) },
   })
 }

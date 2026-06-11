@@ -1,34 +1,30 @@
 import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined'
 import { Box, LinearProgress, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
-import { useMemo } from 'react'
 import { Card, LoadingState, ScrollablePage } from '../components/ui'
 import { CollectionPanel } from '../components/album/CollectionPanel'
 import { useBackground } from '../context/BackgroundContext'
 import { useActiveReaderCollection } from '../hooks/useActiveReaderCollection'
-import { useAchievementUnlocks } from '../hooks/useAchievementUnlocks'
-import {
-  useCollectionPlayQuery,
-  useCollectionRaritiesQuery,
-  useCollectionTypesQuery,
-} from '../hooks/useNotes'
-import { computeAchievements } from '../utils/achievements'
+import { useCollectionPlayQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
 import { colors, font, radius } from '../design-system'
 
 const fadeIn = keyframes`from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); }`
+
+function formatDate(iso: string | null) {
+  if (!iso) return ''
+  return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit' }).format(new Date(iso))
+}
 
 export function ConquistasPage() {
   const { theme } = useBackground()
   const { collection, isLoading: collectionsLoading } = useActiveReaderCollection()
   const cid = collection?.id ?? ''
   const { data: play, isLoading: playLoading } = useCollectionPlayQuery(cid, { enabled: !!cid })
-  const { data: rarities = [] } = useCollectionRaritiesQuery(cid)
-  const { data: types = [] } = useCollectionTypesQuery(cid)
-  useAchievementUnlocks(play, rarities, types, cid, true)
+  const { data: achData, isLoading: achLoading } = useReaderAchievementsQuery(cid)
 
-  const achievements = useMemo(() => (play ? computeAchievements(play, rarities, types) : []), [play, rarities, types])
+  const achievements = achData?.achievements ?? []
   const unlocked = achievements.filter((a) => a.unlocked).length
-  const isLoading = collectionsLoading || (!!cid && playLoading)
+  const isLoading = collectionsLoading || (!!cid && (playLoading || achLoading))
 
   return (
     <Box sx={{ height: '100%', position: 'relative', overflow: 'hidden', background: theme.gradient }}>
@@ -95,6 +91,11 @@ export function ConquistasPage() {
                       <Typography sx={{ fontSize: '0.76rem', color: colors.text.secondary, mb: a.unlocked ? 0 : 0.5 }}>
                         {a.description}
                       </Typography>
+                      {a.unlocked && a.unlockedAt && (
+                        <Typography sx={{ fontSize: '0.66rem', fontWeight: 700, color: theme.accent }}>
+                          🏆 desbloqueada em {formatDate(a.unlockedAt)}
+                        </Typography>
+                      )}
                       {!a.unlocked && (
                         <Stack direction="row" alignItems="center" spacing={0.8}>
                           <LinearProgress variant="determinate" value={pct} sx={{

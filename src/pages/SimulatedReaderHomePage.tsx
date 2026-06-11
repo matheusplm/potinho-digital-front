@@ -18,11 +18,11 @@ import {
   useCollectionTypesQuery,
   useOpenCollectionDailyMutation,
   useOpenCollectionPackMutation,
+  useReaderAchievementsQuery,
 } from '../hooks/useNotes'
 import { colors, font, radius } from '../design-system'
 import { simulatePackOpen } from '../utils/simulationPlay'
 import { computeAchievements } from '../utils/achievements'
-import { useAchievementUnlocks } from '../hooks/useAchievementUnlocks'
 import { NoteDetailDialog, PACK_OPEN_ANIMATION_MS, PackOpeningDialog, RewardCard, type ReadableNote, wait } from './CollectionPlayPage'
 import type { CollectionDailyReward, CollectionPack } from '../types/note'
 import { slugify } from '../utils/slug'
@@ -99,12 +99,14 @@ export function SimulatedReaderHomePage() {
   const isLoading = isRealReader ? collectionsLoading || (!!cid && playLoading) : notesLoading
   const completion = play && play.total > 0 ? Math.round((play.owned / play.total) * 100) : 0
 
-  useAchievementUnlocks(play, rarities, types, cid, isRealReader)
+  const { data: readerAch } = useReaderAchievementsQuery(cid, { enabled: isRealReader && !!cid })
   const ownedItems = useMemo(() => (play?.items ?? []).filter((i) => i.owned), [play])
   const favCount = ownedItems.filter((i) => i.favorite).length
   const achievementsUnlocked = useMemo(
-    () => (play ? computeAchievements(play, rarities, types).filter((a) => a.unlocked).length : 0),
-    [play, rarities, types],
+    () => isRealReader
+      ? (readerAch?.achievements.filter((a) => a.unlocked).length ?? 0)
+      : (play ? computeAchievements(play, rarities, types).filter((a) => a.unlocked).length : 0),
+    [isRealReader, readerAch, play, rarities, types],
   )
   const relerNote = useMemo(
     () => (ownedItems.length > 0 ? ownedItems[Math.floor(Math.random() * ownedItems.length)] : undefined),
@@ -176,6 +178,7 @@ export function SimulatedReaderHomePage() {
           rewards = result.rewards
         }
         await wait(Math.max(0, PACK_OPEN_ANIMATION_MS - (Date.now() - startedAt)))
+        await queryClient.invalidateQueries({ queryKey: ['reader-achievements', cid] })
         setNow(Date.now())
         setRewards(rewards)
         addUnread(cid, rewards.map((r) => r.id))

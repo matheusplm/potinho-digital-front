@@ -1,6 +1,8 @@
 import type {
   Collection,
   CollectionAccess,
+  CollectionAchievement,
+  CollectionAchievementFormData,
   CollectionDailyReward,
   CollectionDailyStatus,
   CollectionFormData,
@@ -12,6 +14,7 @@ import type {
   NoteRecord,
   NoteTypeConfig,
   RarityConfig,
+  ReaderAchievementsResponse,
 } from '../types/note'
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? ''
@@ -162,4 +165,13 @@ export const api = {
       method: 'PATCH',
       body: JSON.stringify({ favorite }),
     }),
+
+  getCollectionAchievements: (cid: string) => request<CollectionAchievement[]>(`/api/collections/${cid}/achievements`),
+  getReaderAchievements: (cid: string) => request<ReaderAchievementsResponse>(`/api/collections/${cid}/achievements/me`),
+  createCollectionAchievement: (cid: string, data: CollectionAchievementFormData) =>
+    request<CollectionAchievement>(`/api/collections/${cid}/achievements`, { method: 'POST', body: JSON.stringify(data) }),
+  updateCollectionAchievement: (cid: string, id: string, data: Partial<CollectionAchievementFormData>) =>
+    request<CollectionAchievement>(`/api/collections/${cid}/achievements/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteCollectionAchievement: (cid: string, id: string) =>
+    request<{ deleted: boolean }>(`/api/collections/${cid}/achievements/${id}`, { method: 'DELETE' }),
 }
