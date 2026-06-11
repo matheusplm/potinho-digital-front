@@ -5,6 +5,11 @@ import SettingsIcon from '@mui/icons-material/Settings'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import SearchIcon from '@mui/icons-material/Search'
 import CloseIcon from '@mui/icons-material/Close'
+import ViewAgendaOutlinedIcon from '@mui/icons-material/ViewAgendaOutlined'
+import GridViewIcon from '@mui/icons-material/GridView'
+import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined'
+import SwapVertIcon from '@mui/icons-material/SwapVert'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { Box, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, LinearProgress, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useEffect, useMemo, useState } from 'react'
@@ -65,7 +70,21 @@ const revealFlash = keyframes`
 `
 
 type AlbumFilter = 'all' | 'favorites'
+export type AlbumView = 'list' | 'grid' | 'folders'
+export type AlbumSort = 'recent' | 'rarity' | 'az'
+type AlbumGroup = 'rarity' | 'type'
+export const ALBUM_VIEW_KEY = 'potinho-album-view'
+const SORT_LABEL: Record<AlbumSort, string> = { recent: 'Recentes', rarity: 'Raridade', az: 'A-Z' }
+const SORT_CYCLE: AlbumSort[] = ['recent', 'rarity', 'az']
 export type ReadableNote = CollectionDailyReward | CollectionNoteView | NoteRecord
+
+function sortNotes(items: CollectionNoteView[], sort: AlbumSort, order: Record<string, number>) {
+  const arr = [...items]
+  if (sort === 'az') arr.sort((a, b) => a.title.localeCompare(b.title, 'pt-BR'))
+  else if (sort === 'rarity') arr.sort((a, b) => (order[b.rarity] ?? 0) - (order[a.rarity] ?? 0) || a.title.localeCompare(b.title, 'pt-BR'))
+  else arr.sort((a, b) => (b.obtainedAt ?? '').localeCompare(a.obtainedAt ?? ''))
+  return arr
+}
 
 function rarityCardSx(r?: RarityConfig, compact = false) {
   const glow = r?.glowColor || r?.borderColor || 'rgba(244,63,94,0.2)'
@@ -524,8 +543,86 @@ export function PackOpeningDialog({ open, emoji, accent }: { open: boolean; emoj
   )
 }
 
+function NoteCard({ note, r, t, unread, variant, onSelect, onToggleFavorite }: {
+  note: CollectionNoteView
+  r?: RarityConfig
+  t?: NoteTypeConfig
+  unread: boolean
+  variant: 'list' | 'grid'
+  onSelect: (note: CollectionNoteView) => void
+  onToggleFavorite: (note: CollectionNoteView) => void
+}) {
+  const grid = variant === 'grid'
+  return (
+    <Card accent={r?.borderColor} onClick={() => onSelect(note)} sx={{ ...(rarityCardSx(r, true) as object), cursor: 'pointer', height: grid ? '100%' : undefined }}>
+      <Box sx={{ position: 'relative', zIndex: 1, height: '100%' }}>
+        {unread && (
+          <Box sx={{
+            position: 'absolute', top: -2, left: -2, width: 11, height: 11, zIndex: 3,
+            borderRadius: radius.full, background: colors.rose.main,
+            boxShadow: `0 0 0 3px rgba(255,255,255,0.82), 0 0 14px ${colors.rose.glow}`,
+          }} />
+        )}
+        <Box sx={{
+          position: 'relative', minWidth: 0, height: '100%', p: 1, pr: grid ? 3.4 : 4.4,
+          borderRadius: radius.lg, background: 'rgba(255,255,255,0.68)',
+          border: '1px solid rgba(255,255,255,0.58)', backdropFilter: 'blur(8px)',
+          display: 'flex', flexDirection: 'column',
+        }}>
+          <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.55, flexWrap: 'wrap', rowGap: 0.4 }}>
+            {r && (
+              <Chip size="small" label={`${r.emoji} ${r.label}`} sx={{
+                height: 19, fontSize: '0.62rem', fontWeight: 800,
+                background: r.chipBg, color: r.chipColor, border: `1px solid ${r.borderColor}`,
+                '& .MuiChip-label': { px: 0.8 },
+              }} />
+            )}
+            {t && !grid && (
+              <Chip size="small" label={`${t.emoji} ${t.label}`} sx={{
+                height: 19, fontSize: '0.62rem', fontWeight: 800,
+                background: t.tagBg, color: t.tagColor, border: `1px solid ${t.accentColor}44`,
+                '& .MuiChip-label': { px: 0.8 },
+              }} />
+            )}
+          </Stack>
+          <Typography sx={{
+            fontFamily: font.serif, fontWeight: 800, fontSize: grid ? '0.9rem' : '0.98rem',
+            color: r?.textColor ?? colors.text.primary, mb: 0.3,
+            display: '-webkit-box', WebkitLineClamp: grid ? 2 : 1, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+            overflowWrap: 'anywhere', wordBreak: 'break-word',
+          }}>
+            {note.title}
+          </Typography>
+          <Typography sx={{
+            fontSize: grid ? '0.74rem' : '0.8rem', color: r?.captionColor ?? colors.text.secondary, lineHeight: 1.5,
+            display: '-webkit-box', WebkitLineClamp: grid ? 3 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+            overflowWrap: 'anywhere', wordBreak: 'break-word',
+          }}>
+            {note.message}
+          </Typography>
+          <IconButton
+            size="small"
+            aria-label="favoritar bilhete"
+            onClick={(event) => { event.stopPropagation(); onToggleFavorite(note) }}
+            sx={{
+              position: 'absolute', top: 6, right: 6, p: 0.5, borderRadius: radius.md,
+              color: note.favorite ? colors.rose.main : (r?.captionColor ?? colors.text.muted),
+              background: note.favorite ? 'rgba(254,243,199,0.92)' : 'rgba(255,255,255,0.74)',
+              border: `1px solid ${note.favorite ? 'rgba(234,179,8,0.38)' : 'rgba(255,255,255,0.68)'}`,
+              backdropFilter: 'blur(8px)', boxShadow: '0 4px 12px rgba(15,23,42,0.08)',
+            }}
+          >
+            {note.favorite ? <StarIcon sx={{ fontSize: 16, color: '#eab308' }} /> : <StarBorderIcon sx={{ fontSize: 16 }} />}
+          </IconButton>
+        </Box>
+      </Box>
+    </Card>
+  )
+}
+
 function AlbumSection({
   search, setSearch, filter, setFilter, rarity, setRarity, type, setType,
+  view, setView, sort, setSort, group, setGroup,
   hasFavorites, discoveredRarities, discoveredTypes, items, rarities, types, theme,
   onSelect, onToggleFavorite, unreadIds, emptyHint,
 }: {
@@ -533,6 +630,9 @@ function AlbumSection({
   filter: AlbumFilter; setFilter: (v: AlbumFilter) => void
   rarity: string; setRarity: (v: string) => void
   type: string; setType: (v: string) => void
+  view: AlbumView; setView: (v: AlbumView) => void
+  sort: AlbumSort; setSort: (v: AlbumSort) => void
+  group: AlbumGroup; setGroup: (v: AlbumGroup) => void
   hasFavorites: boolean
   discoveredRarities: RarityConfig[]
   discoveredTypes: NoteTypeConfig[]
@@ -545,6 +645,37 @@ function AlbumSection({
   unreadIds: string[]
   emptyHint: string
 }) {
+  const order = useMemo(() => Object.fromEntries(rarities.map((r) => [r.id, r.order])), [rarities])
+  const sorted = useMemo(() => sortNotes(items, sort, order), [items, sort, order])
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
+
+  const groups = useMemo(() => {
+    if (view !== 'folders') return []
+    if (group === 'rarity') {
+      return [...discoveredRarities]
+        .sort((a, b) => b.order - a.order)
+        .map((r) => ({ key: r.id, label: `${r.emoji} ${r.label}`, accent: r.borderColor, items: sorted.filter((n) => n.rarity === r.id) }))
+        .filter((g) => g.items.length > 0)
+    }
+    return discoveredTypes
+      .map((t) => ({ key: t.id, label: `${t.emoji} ${t.label}`, accent: `${t.accentColor}66`, items: sorted.filter((n) => n.typeId === t.id) }))
+      .filter((g) => g.items.length > 0)
+  }, [view, group, discoveredRarities, discoveredTypes, sorted])
+
+  function renderCard(note: CollectionNoteView, variant: 'list' | 'grid') {
+    return (
+      <NoteCard
+        key={note.id}
+        note={note}
+        r={rarities.find((x) => x.id === note.rarity)}
+        t={types.find((x) => x.id === note.typeId)}
+        unread={unreadIds.includes(note.id)}
+        variant={variant}
+        onSelect={onSelect}
+        onToggleFavorite={onToggleFavorite}
+      />
+    )
+  }
   return (
     <Stack spacing={1.2}>
       <Box sx={{
@@ -661,6 +792,70 @@ function AlbumSection({
         </Box>
       )}
 
+      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mt: 0.2 }}>
+        <Box sx={{ display: 'flex', gap: 0.5 }}>
+          {([
+            { id: 'list' as AlbumView, Icon: ViewAgendaOutlinedIcon },
+            { id: 'grid' as AlbumView, Icon: GridViewIcon },
+            { id: 'folders' as AlbumView, Icon: FolderOutlinedIcon },
+          ]).map(({ id, Icon }) => (
+            <Box
+              key={id}
+              role="button"
+              aria-label={`Exibição ${id}`}
+              onClick={() => setView(id)}
+              sx={{
+                width: 32, height: 32, borderRadius: radius.md, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: view === id ? '#fff' : theme.textOnBgMuted,
+                background: view === id ? theme.accent : 'rgba(255,255,255,0.48)',
+                border: `1px solid ${view === id ? theme.accent : 'rgba(255,255,255,0.58)'}`,
+                backdropFilter: 'blur(10px)', transition: 'all 0.15s',
+              }}
+            >
+              <Icon sx={{ fontSize: 16 }} />
+            </Box>
+          ))}
+        </Box>
+        <Box
+          role="button"
+          aria-label="ordenar"
+          onClick={() => setSort(SORT_CYCLE[(SORT_CYCLE.indexOf(sort) + 1) % SORT_CYCLE.length])}
+          sx={{
+            display: 'flex', alignItems: 'center', gap: 0.4, px: 1.1, py: 0.5, borderRadius: radius.full,
+            cursor: 'pointer', fontSize: '0.72rem', fontWeight: 800, color: theme.textOnBgMuted,
+            background: 'rgba(255,255,255,0.48)', border: '1px solid rgba(255,255,255,0.58)', backdropFilter: 'blur(10px)',
+          }}
+        >
+          <SwapVertIcon sx={{ fontSize: 15 }} />
+          {SORT_LABEL[sort]}
+        </Box>
+      </Stack>
+
+      {view === 'folders' && (
+        <Box sx={{ display: 'flex', gap: 0.5 }}>
+          {([
+            { id: 'rarity' as AlbumGroup, label: 'Por raridade' },
+            { id: 'type' as AlbumGroup, label: 'Por tipo' },
+          ]).map((g) => (
+            <Box
+              key={g.id}
+              onClick={() => setGroup(g.id)}
+              sx={{
+                px: 1.05, py: 0.42, borderRadius: radius.full, cursor: 'pointer', flexShrink: 0,
+                fontSize: '0.68rem', fontWeight: 800,
+                color: group === g.id ? '#fff' : theme.textOnBgMuted,
+                background: group === g.id ? colors.purple.main : 'rgba(255,255,255,0.42)',
+                border: `1px solid ${group === g.id ? colors.purple.main : 'rgba(255,255,255,0.54)'}`,
+                backdropFilter: 'blur(10px)',
+              }}
+            >
+              {g.label}
+            </Box>
+          ))}
+        </Box>
+      )}
+
       {items.length === 0 ? (
         <Card sx={{ p: 2, textAlign: 'center' }}>
           <Typography sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, mb: 0.3 }}>
@@ -670,86 +865,52 @@ function AlbumSection({
             {emptyHint}
           </Typography>
         </Card>
+      ) : view === 'folders' ? (
+        <Stack spacing={1}>
+          {groups.map((g) => {
+            const isCollapsed = collapsed[g.key]
+            return (
+              <Box key={g.key}>
+                <Stack
+                  direction="row" alignItems="center" spacing={0.8}
+                  onClick={() => setCollapsed((c) => ({ ...c, [g.key]: !c[g.key] }))}
+                  sx={{
+                    px: 1.2, py: 0.8, mb: 0.8, borderRadius: radius.lg, cursor: 'pointer',
+                    background: 'rgba(255,255,255,0.5)', border: `1px solid ${g.accent}`,
+                    backdropFilter: 'blur(10px)',
+                  }}
+                >
+                  <ExpandMoreIcon sx={{ fontSize: 18, color: theme.textOnBgMuted, transition: 'transform 0.18s', transform: isCollapsed ? 'rotate(-90deg)' : 'none' }} />
+                  <Typography sx={{ flex: 1, fontSize: '0.8rem', fontWeight: 800, color: theme.textOnBg }}>
+                    {g.label}
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: theme.textOnBgMuted }}>
+                    {g.items.length}
+                  </Typography>
+                </Stack>
+                {!isCollapsed && (
+                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1, mb: 0.5 }}>
+                    {g.items.map((note) => renderCard(note, 'grid'))}
+                  </Box>
+                )}
+              </Box>
+            )
+          })}
+        </Stack>
       ) : (
         <Stack spacing={1}>
           <Typography sx={{ fontSize: '0.65rem', fontWeight: 900, letterSpacing: 1.1, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
-            Cartinhas da coleção — {items.length}
+            Cartinhas da coleção — {sorted.length}
           </Typography>
-          {items.map((note) => {
-            const r = rarities.find((x) => x.id === note.rarity)
-            const t = types.find((x) => x.id === note.typeId)
-            const isUnread = unreadIds.includes(note.id)
-            return (
-              <Card key={note.id} accent={r?.borderColor} onClick={() => onSelect(note)} sx={{
-                ...(rarityCardSx(r, true) as object),
-                cursor: 'pointer',
-              }}>
-                <Box sx={{ position: 'relative', zIndex: 1 }}>
-                  {isUnread && (
-                    <Box sx={{
-                      position: 'absolute', top: -2, left: -2, width: 11, height: 11,
-                      borderRadius: radius.full, background: colors.rose.main,
-                      boxShadow: `0 0 0 3px rgba(255,255,255,0.82), 0 0 14px ${colors.rose.glow}`,
-                      zIndex: 3,
-                    }} />
-                  )}
-                  <Box sx={{
-                    position: 'relative', minWidth: 0, p: 1, pr: 4.4, borderRadius: radius.lg,
-                    background: 'rgba(255,255,255,0.68)', border: '1px solid rgba(255,255,255,0.58)', backdropFilter: 'blur(8px)',
-                  }}>
-                    <Stack direction="row" alignItems="center" spacing={0.6} sx={{ mb: 0.65, flexWrap: 'wrap', rowGap: 0.5 }}>
-                      {r && (
-                        <Chip size="small" label={`${r.emoji} ${r.label}`} sx={{
-                          height: 19, fontSize: '0.62rem', fontWeight: 800,
-                          background: r.chipBg, color: r.chipColor, border: `1px solid ${r.borderColor}`,
-                          '& .MuiChip-label': { px: 0.8 },
-                        }} />
-                      )}
-                      {t && (
-                        <Chip size="small" label={`${t.emoji} ${t.label}`} sx={{
-                          height: 19, fontSize: '0.62rem', fontWeight: 800,
-                          background: t.tagBg, color: t.tagColor, border: `1px solid ${t.accentColor}44`,
-                          '& .MuiChip-label': { px: 0.8 },
-                        }} />
-                      )}
-                    </Stack>
-                    <Typography sx={{
-                      fontFamily: font.serif, fontWeight: 800, fontSize: '0.98rem',
-                      color: r?.textColor ?? colors.text.primary, mb: 0.3,
-                      display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden',
-                      overflowWrap: 'anywhere', wordBreak: 'break-word',
-                    }}>
-                      {note.title}
-                    </Typography>
-                    <Typography sx={{
-                      fontSize: '0.8rem', color: r?.captionColor ?? colors.text.secondary, lineHeight: 1.55,
-                      display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
-                      overflowWrap: 'anywhere', wordBreak: 'break-word',
-                    }}>
-                      {note.message}
-                    </Typography>
-                    <IconButton
-                      size="small"
-                      aria-label="favoritar bilhete"
-                      onClick={(event) => {
-                        event.stopPropagation()
-                        onToggleFavorite(note)
-                      }}
-                      sx={{
-                        position: 'absolute', top: 8, right: 8, p: 0.55, borderRadius: radius.md,
-                        color: note.favorite ? colors.rose.main : (r?.captionColor ?? colors.text.muted),
-                        background: note.favorite ? 'rgba(254,243,199,0.92)' : 'rgba(255,255,255,0.74)',
-                        border: `1px solid ${note.favorite ? 'rgba(234,179,8,0.38)' : 'rgba(255,255,255,0.68)'}`,
-                        backdropFilter: 'blur(8px)', boxShadow: '0 4px 12px rgba(15,23,42,0.08)',
-                      }}
-                    >
-                      {note.favorite ? <StarIcon sx={{ fontSize: 17, color: '#eab308' }} /> : <StarBorderIcon sx={{ fontSize: 17 }} />}
-                    </IconButton>
-                  </Box>
-                </Box>
-              </Card>
-            )
-          })}
+          {view === 'grid' ? (
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1 }}>
+              {sorted.map((note) => renderCard(note, 'grid'))}
+            </Box>
+          ) : (
+            <Stack spacing={1}>
+              {sorted.map((note) => renderCard(note, 'list'))}
+            </Stack>
+          )}
         </Stack>
       )}
     </Stack>
@@ -778,7 +939,15 @@ export function CollectionPlayPage() {
   const [albumSearch, setAlbumSearch] = useState('')
   const [albumRarity, setAlbumRarity] = useState('all')
   const [albumType, setAlbumType] = useState('all')
+  const [albumView, setAlbumView] = useState<AlbumView>(() => (localStorage.getItem(ALBUM_VIEW_KEY) as AlbumView) || 'list')
+  const [albumSort, setAlbumSort] = useState<AlbumSort>('recent')
+  const [albumGroup, setAlbumGroup] = useState<AlbumGroup>('rarity')
   const [selectedNote, setSelectedNote] = useState<ReadableNote | null>(null)
+
+  function changeAlbumView(v: AlbumView) {
+    setAlbumView(v)
+    localStorage.setItem(ALBUM_VIEW_KEY, v)
+  }
   const displayPlay = play
   const isLoading = collectionsLoading || (!!cid && (isSimulating ? notesLoading : playLoading))
   const { data: rarities = [] } = useCollectionRaritiesQuery(cid)
@@ -972,6 +1141,9 @@ export function CollectionPlayPage() {
                 filter={albumFilter} setFilter={setAlbumFilter}
                 rarity={albumRarity} setRarity={setAlbumRarity}
                 type={albumType} setType={setAlbumType}
+                view={albumView} setView={changeAlbumView}
+                sort={albumSort} setSort={setAlbumSort}
+                group={albumGroup} setGroup={setAlbumGroup}
                 hasFavorites={hasFavorites}
                 discoveredRarities={discoveredRarities}
                 discoveredTypes={discoveredTypes}
