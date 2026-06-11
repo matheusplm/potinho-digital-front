@@ -10,7 +10,7 @@ import GridViewIcon from '@mui/icons-material/GridView'
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined'
 import SwapVertIcon from '@mui/icons-material/SwapVert'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { Box, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, LinearProgress, Stack, Typography } from '@mui/material'
+import { Box, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -23,6 +23,8 @@ import { useReader } from '../context/ReaderContext'
 import { colors, font, radius } from '../design-system'
 import type { BackgroundTheme } from '../design-system'
 import { slugify } from '../utils/slug'
+import { CollectionPanel } from '../components/album/CollectionPanel'
+import { Achievements } from '../components/album/Achievements'
 import type { CollectionDailyReward, CollectionNoteView, NoteRecord, RarityConfig, NoteTypeConfig } from '../types/note'
 
 export const PACK_OPEN_ANIMATION_MS = 2200
@@ -977,7 +979,6 @@ export function CollectionPlayPage() {
     setSelectedNote(null)
   }, [cid, isSimulating])
 
-  const completion = displayPlay && displayPlay.total > 0 ? Math.round((displayPlay.owned / displayPlay.total) * 100) : 0
   const discoveredItems = useMemo(() => (displayPlay?.items ?? []).filter((item) => item.owned), [displayPlay?.items])
   const discoveredRarityIds = useMemo(() => new Set(discoveredItems.map((item) => item.rarity)), [discoveredItems])
   const discoveredTypeIds = useMemo(() => new Set(discoveredItems.map((item) => item.typeId)), [discoveredItems])
@@ -1115,25 +1116,16 @@ export function CollectionPlayPage() {
               </Card>
             )}
 
-            <Card sx={{ p: 2 }}>
-              <Stack spacing={1}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
-                  <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, letterSpacing: 0.8, color: colors.text.muted, textTransform: 'uppercase' }}>
-                    Sua coleção
-                  </Typography>
-                  <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.1rem', color: colors.primary.main }}>
-                    {completion}%
-                  </Typography>
-                </Stack>
-                <LinearProgress variant="determinate" value={completion} sx={{
-                  height: 6, borderRadius: radius.full, bgcolor: 'rgba(0,0,0,0.06)',
-                  '& .MuiLinearProgress-bar': { borderRadius: radius.full, background: `linear-gradient(90deg, ${colors.primary.main}, ${colors.purple.main})` },
-                }} />
-                <Typography sx={{ fontSize: '0.72rem', color: colors.text.muted }}>
-                  {displayPlay.owned} de {displayPlay.total} bilhetes coletados
-                </Typography>
-              </Stack>
-            </Card>
+            <CollectionPanel play={displayPlay} rarities={rarities} />
+
+            <Achievements
+              play={displayPlay}
+              rarities={rarities}
+              types={types}
+              collectionId={cid}
+              live={isReaderView}
+              theme={theme}
+            />
 
             {(isSimulating || discoveredItems.length > 0) && (
               <AlbumSection
