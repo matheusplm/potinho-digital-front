@@ -25,6 +25,7 @@ import type { BackgroundTheme } from '../design-system'
 import { slugify } from '../utils/slug'
 import { CollectionPanel } from '../components/album/CollectionPanel'
 import { Achievements } from '../components/album/Achievements'
+import { ShareCartinha } from '../components/album/ShareCartinha'
 import type { CollectionDailyReward, CollectionNoteView, NoteRecord, RarityConfig, NoteTypeConfig } from '../types/note'
 
 export const PACK_OPEN_ANIMATION_MS = 2200
@@ -221,6 +222,7 @@ export function NoteDetailDialog({ note, rarities, types, onClose }: {
   types: NoteTypeConfig[]
   onClose: () => void
 }) {
+  const { theme } = useBackground()
   const rarity = note ? rarities.find((item) => item.id === note.rarity) : undefined
   const type = note ? types.find((item) => item.id === note.typeId) : undefined
 
@@ -276,6 +278,12 @@ export function NoteDetailDialog({ note, rarities, types, onClose }: {
                   &ldquo;{note.message}&rdquo;
                 </Typography>
               </Box>
+              <Stack spacing={0.7}>
+                <Typography sx={{ fontSize: '0.62rem', fontWeight: 900, letterSpacing: 0.8, color: rarity?.captionColor ?? colors.text.muted, textTransform: 'uppercase' }}>
+                  Compartilhar
+                </Typography>
+                <ShareCartinha note={note} r={rarity} t={type} theme={theme} />
+              </Stack>
             </Stack>
           </DialogContent>
           <DialogActions sx={{ px: 3, pb: 2.4 }}>
