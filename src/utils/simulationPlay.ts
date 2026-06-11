@@ -52,34 +52,6 @@ export function buildSimulatedPlayView(
   }
 }
 
-export function simulateDailyOpen(notes: NoteRecord[], rarities: RarityConfig[], excludedIds: string[] = []): CollectionDailyReward[] {
-  const excluded = new Set(excludedIds)
-  const availableNotes = notes.filter((note) => !excluded.has(note.id))
-  if (availableNotes.length === 0) return []
-
-  const count = Math.min(3, availableNotes.length)
-  const rewards: CollectionDailyReward[] = []
-  const used = new Set<string>()
-
-  while (rewards.length < count) {
-    const pool = availableNotes.filter((note) => !used.has(note.id))
-    if (pool.length === 0) break
-    const note = pickWeightedNote(pool, rarities)
-    if (used.has(note.id)) continue
-    used.add(note.id)
-    rewards.push({
-      id: note.id,
-      title: note.title,
-      message: note.message,
-      rarity: note.rarity,
-      typeId: note.typeId,
-      isNew: true,
-    })
-  }
-
-  return rewards
-}
-
 export function simulatePackOpen(pack: CollectionPack, notes: NoteRecord[], rarities: RarityConfig[], excludedIds: string[] = []): CollectionDailyReward[] {
   const excluded = new Set(excludedIds)
   const eligibleNotes = notes.filter((note) =>

@@ -16,7 +16,6 @@ import {
   useCollectionRaritiesQuery,
   useCollectionsQuery,
   useCollectionTypesQuery,
-  useOpenCollectionDailyMutation,
   useOpenCollectionPackMutation,
   useReaderAchievementsQuery,
 } from '../hooks/useNotes'
@@ -80,6 +79,7 @@ export function SimulatedReaderHomePage() {
       setActiveCollectionId(readerCollection.id)
     }
   }, [isRealReader, readerCollection, activeCollectionId, setActiveCollectionId])
+
   const activeSession = session ?? (readerCollection ? {
     collectionId: readerCollection.id,
     collectionSlug: slugify(readerCollection.name),
@@ -88,12 +88,17 @@ export function SimulatedReaderHomePage() {
     preset: 'new_reader' as const,
   } : null)
   const cid = activeSession?.collectionId ?? ''
+
+  useEffect(() => {
+    setPackCooldowns({})
+    setOpenedBonusPackIds([])
+  }, [cid])
+
   const { data: notes = [], isLoading: notesLoading } = useCollectionNotesQuery(cid, { enabled: !!session })
   const { data: playFromApi, isLoading: playLoading } = useCollectionPlayQuery(cid, { enabled: isRealReader && !!cid })
   const { data: rarities = [] } = useCollectionRaritiesQuery(cid)
   const { data: types = [] } = useCollectionTypesQuery(cid)
   const { data: packs = [] } = useCollectionPacksQuery(cid)
-  const openDailyMutation = useOpenCollectionDailyMutation(cid)
   const openPackMutation = useOpenCollectionPackMutation(cid)
   const play = isRealReader ? playFromApi : simulation.getPlayView(notes)
   const isLoading = isRealReader ? collectionsLoading || (!!cid && playLoading) : notesLoading
@@ -120,6 +125,7 @@ export function SimulatedReaderHomePage() {
   const [openingPack, setOpeningPack] = useState<CollectionPack | null>(null)
   const [selectedBonusPack, setSelectedBonusPack] = useState<CollectionPack | null>(null)
   const [openedBonusPackIds, setOpenedBonusPackIds] = useState<string[]>([])
+  const [packCooldowns, setPackCooldowns] = useState<Record<string, string>>({})
   const [now, setNow] = useState(() => Date.now())
 
   const activePacks = useMemo(() => packs.filter((pack) => pack.status === 'active'), [packs])
@@ -134,10 +140,21 @@ export function SimulatedReaderHomePage() {
         : session?.preset === 'new_reader_with_bonus'
           ? packs.filter((pack) => pack.id !== mainPack?.id && pack.category !== 'daily')
           : activePacks.filter((pack) => pack.id !== mainPack?.id)
+      if (isRealReader) return source
       return source.filter((pack) => !openedBonusPackIds.includes(pack.id))
     },
     [activePacks, isRealReader, mainPack?.id, openedBonusPackIds, packs, session?.preset],
   )
+
+  function getBonusPackCooldownMs(packId: string) {
+    const availableAt = packCooldowns[packId]
+    if (!availableAt) return 0
+    return Math.max(0, Date.parse(availableAt) - now)
+  }
+
+  function canOpenBonusPack(pack: CollectionPack) {
+    return getBonusPackCooldownMs(pack.id) <= 0
+  }
   const nextMainPackAt = Date.parse(play?.daily.availableAt ?? '')
   const mainCooldownMs = Math.max(1, mainPack?.cooldownHours ?? 24) * 60 * 60 * 1000
   const remainingMainPackMs = !play || play.daily.canOpen || !Number.isFinite(nextMainPackAt)
@@ -149,10 +166,15 @@ export function SimulatedReaderHomePage() {
   const remainingLabel = formatRemainingTime(remainingMainPackMs)
 
   useEffect(() => {
-    if (!play || play.daily.canOpen) return
+    const mainOnCooldown = Boolean(play && !play.daily.canOpen)
+    const bonusOnCooldown = bonusPacks.some((pack) => {
+      const availableAt = packCooldowns[pack.id]
+      return availableAt ? Date.parse(availableAt) > Date.now() : false
+    })
+    if (!mainOnCooldown && !bonusOnCooldown) return
     const interval = window.setInterval(() => setNow(Date.now()), 30000)
     return () => window.clearInterval(interval)
-  }, [play])
+  }, [play?.daily.canOpen, bonusPacks, packCooldowns])
 
   async function handleOpenPack(pack: CollectionPack | undefined, isMain: boolean) {
     if (!activeSession || !play || isOpeningPack || !pack) return
@@ -169,12 +191,16 @@ export function SimulatedReaderHomePage() {
       try {
         let rewards: CollectionDailyReward[]
         if (isMain) {
-          const result = await openDailyMutation.mutateAsync()
+          if (!mainPack) {
+            toast.error('Nenhum pacotinho diário configurado.')
+            return
+          }
+          const result = await openPackMutation.mutateAsync(mainPack.id)
           await queryClient.invalidateQueries({ queryKey: ['col-play', cid] })
           rewards = result.rewards
         } else {
           const result = await openPackMutation.mutateAsync(pack.id)
-          setOpenedBonusPackIds((ids) => [...new Set([...ids, pack.id])])
+          setPackCooldowns((current) => ({ ...current, [pack.id]: result.status.availableAt }))
           rewards = result.rewards
         }
         await wait(Math.max(0, PACK_OPEN_ANIMATION_MS - (Date.now() - startedAt)))
@@ -233,7 +259,7 @@ export function SimulatedReaderHomePage() {
                 Nenhum potinho por aqui ainda
               </Typography>
               <Typography sx={{ fontSize: '0.85rem', color: theme.textOnBgMuted, maxWidth: 260 }}>
-                Peça o código de convite ou peça para liberarem seu email em uma coleção.
+                Peça para liberarem seu email em uma coleção.
               </Typography>
             </Stack>
           ) : (
@@ -608,7 +634,9 @@ export function SimulatedReaderHomePage() {
           boxSizing: 'border-box',
           pointerEvents: 'none',
         }}>
-          {bonusPacks.slice(0, 5).map((pack) => (
+          {bonusPacks.slice(0, 5).map((pack) => {
+            const onCooldown = isRealReader && !canOpenBonusPack(pack)
+            return (
             <Box
               key={pack.id}
               role="button"
@@ -635,29 +663,32 @@ export function SimulatedReaderHomePage() {
                 boxShadow: `0 10px 28px ${pack.accent}42`,
                 fontSize: '1.42rem',
                 position: 'relative',
-                transition: 'transform 0.16s ease, box-shadow 0.16s ease',
+                opacity: onCooldown ? 0.72 : 1,
+                transition: 'transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease',
                 userSelect: 'none',
                 WebkitUserSelect: 'none',
                 WebkitTapHighlightColor: 'transparent',
                 pointerEvents: 'auto',
                 '&:hover': { transform: 'translateY(-2px) scale(1.05)', boxShadow: `0 12px 32px ${pack.accent}52` },
                 '&:active': { transform: 'scale(0.96)' },
-                '&::after': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 3,
-                  right: 3,
-                  width: 9,
-                  height: 9,
-                  borderRadius: radius.full,
-                  background: colors.rose.main,
-                  boxShadow: `0 0 0 3px rgba(255,255,255,0.86), 0 0 14px ${colors.rose.glow}`,
-                },
+                ...(!onCooldown ? {
+                  '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 3,
+                    right: 3,
+                    width: 9,
+                    height: 9,
+                    borderRadius: radius.full,
+                    background: colors.rose.main,
+                    boxShadow: `0 0 0 3px rgba(255,255,255,0.86), 0 0 14px ${colors.rose.glow}`,
+                  },
+                } : {}),
               }}
             >
               {pack.emoji}
             </Box>
-          ))}
+          )})}
         </Box>
       )}
       <PackOpeningDialog open={isOpeningPack} emoji={openingPack?.emoji ?? activeSession.collectionEmoji} accent={openingPack?.accent ?? theme.accent} />
@@ -777,7 +808,9 @@ export function SimulatedReaderHomePage() {
                 {selectedBonusPack.emoji} {selectedBonusPack.name}
               </DialogTitle>
               <Typography sx={{ mt: 0.45, fontSize: '0.78rem', color: colors.text.secondary, fontWeight: 700 }}>
-                Pacotinho bônus disponível
+                {isRealReader && !canOpenBonusPack(selectedBonusPack)
+                  ? `Disponível em ${formatRemainingTime(getBonusPackCooldownMs(selectedBonusPack.id))}`
+                  : 'Pacotinho bônus disponível'}
               </Typography>
             </Box>
 
@@ -824,11 +857,11 @@ export function SimulatedReaderHomePage() {
               </Button>
               <Button
                 variant="primary"
-                disabled={isOpeningPack}
+                disabled={isOpeningPack || (isRealReader && !canOpenBonusPack(selectedBonusPack))}
                 onClick={() => handleOpenPack(selectedBonusPack, false)}
                 sx={{ flex: 1, whiteSpace: 'nowrap' }}
               >
-                Abrir bônus
+                {isRealReader && !canOpenBonusPack(selectedBonusPack) ? 'Em cooldown' : 'Abrir bônus'}
               </Button>
             </DialogActions>
           </>

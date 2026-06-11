@@ -27,8 +27,6 @@ export interface MockUser {
   email: string
   password: string
   role: Role
-  coupleCode: string
-  inviteEmail: string | null
   token: string
 }
 
@@ -83,7 +81,7 @@ function buildCollection(meta: Collection, ownedIds: string[], favoriteIds: stri
     types: cloneTypes(),
     packs: [...cloneStarterPacks(meta.id), ...cloneBonusPacks(meta.id)],
     access: meta.access === 'owner'
-      ? [{ collectionId: meta.id, email: 'leitor@potinho.app', createdAt: '2026-04-21T09:00:00.000Z' }]
+      ? [{ collectionId: meta.id, email: 'leitor@potinho.app', packIds: [], createdAt: '2026-04-21T09:00:00.000Z' }]
       : [],
     ownership: buildOwnership(ownedIds, favoriteIds),
     lastDailyOpenDate: null,
@@ -112,12 +110,12 @@ function buildEmptyCollection(meta: Collection): CollectionState {
 function createInitialDb(): MockDb {
   const writer: MockUser = {
     id: 'user_writer', name: 'Mathe', email: 'escritor@potinho.app', password: '123456',
-    role: 'writer', coupleCode: 'AMOR-2026', inviteEmail: 'leitor@potinho.app',
+    role: 'writer',
     token: 'mock-token-user_writer',
   }
   const reader: MockUser = {
     id: 'user_reader', name: 'Bê', email: 'leitor@potinho.app', password: '123456',
-    role: 'reader', coupleCode: 'AMOR-2026', inviteEmail: null,
+    role: 'reader',
     token: 'mock-token-user_reader',
   }
 

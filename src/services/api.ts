@@ -19,9 +19,47 @@ import type {
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? ''
 const API_SECRET = import.meta.env.VITE_API_SECRET ?? ''
+const ACCESS_PACKS_KEY = 'potinho-access-packs'
 
 let authToken = ''
 let redirectingToLogin = false
+
+class ApiRequestError extends Error {
+  constructor(message: string, public status: number) {
+    super(message)
+  }
+}
+
+function normalizeEmail(email: string) {
+  return email.toLowerCase().trim()
+}
+
+function readAccessPackStore(): Record<string, Record<string, string[]>> {
+  try {
+    return JSON.parse(localStorage.getItem(ACCESS_PACKS_KEY) ?? '{}') as Record<string, Record<string, string[]>>
+  } catch {
+    return {}
+  }
+}
+
+function saveAccessPacksLocally(cid: string, email: string, packIds: string[]) {
+  const store = readAccessPackStore()
+  const collection = store[cid] ?? {}
+  collection[normalizeEmail(email)] = [...new Set(packIds)]
+  store[cid] = collection
+  localStorage.setItem(ACCESS_PACKS_KEY, JSON.stringify(store))
+}
+
+function mergeLocalAccessPacks(cid: string, accesses: CollectionAccess[]) {
+  const collection = readAccessPackStore()[cid] ?? {}
+  return accesses.map((access) => {
+    const localPackIds = collection[normalizeEmail(access.email)] ?? []
+    return {
+      ...access,
+      packIds: [...new Set([...(access.packIds ?? []), ...localPackIds])],
+    }
+  })
+}
 
 export function setAuthToken(token: string) {
   authToken = token
@@ -71,7 +109,7 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
     if (code === 'INVALID_NOTE_CONFIG') {
       throw new Error('Algum bilhete usa raridade ou tipo que não existe nessa coleção.')
     }
-    throw new Error(payload.message ?? code ?? 'Erro inesperado na API.')
+    throw new ApiRequestError(payload.message ?? code ?? 'Erro inesperado na API.', response.status)
   }
 
   const json = await response.json()
@@ -83,21 +121,16 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
 
 export const api = {
   login: (email: string, password: string) =>
-    request<{ token: string; user: { id: string; name: string; role: string; coupleCode?: string } }>('/auth/login', {
+    request<{ token: string; user: { id: string; name: string; role: string } }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     }),
-  register: (name: string, email: string, password: string, inviteCode?: string) =>
-    request<{ id: string; name: string; role: string; coupleCode?: string }>('/auth/register', {
+  register: (name: string, email: string, password: string) =>
+    request<{ id: string; name: string; role: string }>('/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ name, email, password, ...(inviteCode ? { inviteCode } : {}) }),
+      body: JSON.stringify({ name, email, password }),
     }),
-  me: () => request<{ id: string; name: string; role: string; coupleCode?: string; inviteEmail?: string }>('/auth/me'),
-  setInviteEmail: (email: string) =>
-    request<{ inviteEmail: string }>('/auth/invite-email', {
-      method: 'PUT',
-      body: JSON.stringify({ email }),
-    }),
+  me: () => request<{ id: string; name: string; role: string }>('/auth/me'),
 
   listCollections: () => request<Collection[]>('/api/collections'),
   createCollection: (data: CollectionFormData) =>
@@ -107,12 +140,26 @@ export const api = {
   deleteCollection: (id: string) =>
     request<{ deleted: boolean }>(`/api/collections/${id}`, { method: 'DELETE' }),
 
-  listCollectionAccess: (cid: string) =>
-    request<CollectionAccess[]>(`/api/collections/${cid}/access`),
+  listCollectionAccess: async (cid: string) =>
+    mergeLocalAccessPacks(cid, await request<CollectionAccess[]>(`/api/collections/${cid}/access`)),
   grantAccess: (cid: string, email: string) =>
     request<CollectionAccess>(`/api/collections/${cid}/access`, { method: 'POST', body: JSON.stringify({ email }) }),
   revokeAccess: (cid: string, email: string) =>
     request<{ revoked: boolean }>(`/api/collections/${cid}/access/${encodeURIComponent(email)}`, { method: 'DELETE' }),
+  setAccessPacks: async (cid: string, email: string, packIds: string[]) => {
+    try {
+      const access = await request<CollectionAccess>(`/api/collections/${cid}/access/${encodeURIComponent(email)}/packs`, {
+        method: 'PUT',
+        body: JSON.stringify({ packIds }),
+      })
+      saveAccessPacksLocally(cid, email, access.packIds ?? packIds)
+      return access
+    } catch (error) {
+      if (!(error instanceof ApiRequestError) || ![404, 405].includes(error.status)) throw error
+      saveAccessPacksLocally(cid, email, packIds)
+      return { collectionId: cid, email, packIds, createdAt: new Date().toISOString() }
+    }
+  },
 
   getCollectionNotes: (cid: string) => request<NoteRecord[]>(`/api/collections/${cid}/notes`),
   createCollectionNote: (cid: string, data: NoteFormData) =>

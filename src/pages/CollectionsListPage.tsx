@@ -679,7 +679,7 @@ export function CollectionsListPage() {
                 {isWriter ? 'Nenhuma coleção ainda' : 'Nenhuma coleção'}
               </Typography>
               <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBgMuted, maxWidth: 240 }}>
-                {isWriter ? 'Crie sua primeira coleção de bilhetes' : 'Peça o código de convite para acessar uma coleção'}
+                {isWriter ? 'Crie sua primeira coleção de bilhetes' : 'Peça para liberarem seu email em uma coleção'}
               </Typography>
             </Stack>
             {isWriter && <AddGhostCard view="cards" onClick={() => setCreateOpen(true)} accent={theme.accent} />}

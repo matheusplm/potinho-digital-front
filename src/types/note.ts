@@ -171,6 +171,7 @@ export interface CollectionFormData {
 export interface CollectionAccess {
   collectionId: string
   email: string
+  packIds: string[]
   createdAt: string
 }
 

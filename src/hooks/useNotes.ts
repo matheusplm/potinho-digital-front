@@ -179,6 +179,15 @@ export function useRevokeAccessMutation(cid: string) {
   })
 }
 
+export function useSetAccessPacksMutation(cid: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ email, packIds }: { email: string; packIds: string[] }) =>
+      api.setAccessPacks(cid, email, packIds),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['col-access', cid] }) },
+  })
+}
+
 export function useCollectionPlayQuery(cid: string, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['col-play', cid],

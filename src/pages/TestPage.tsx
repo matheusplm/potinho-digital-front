@@ -69,12 +69,6 @@ export function TestPage() {
               onChange={(e) => setPassVal(e.target.value)}
               fullWidth
             />
-            <Input
-              label="Código de convite"
-              placeholder="Ex: AMOR01"
-              fullWidth
-              sx={{ '& input': { letterSpacing: '0.2em', fontWeight: 700 } }}
-            />
           </Stack>
         </Section>
 
@@ -94,7 +88,7 @@ export function TestPage() {
               onChange={setSeg2}
               options={[
                 { id: 'create', label: 'Criar potinho', icon: <AutoAwesomeIcon />, activeColor: '#1d4ed8' },
-                { id: 'invite', label: 'Tenho convite', icon: <FavoriteBorderIcon />, activeColor: '#e11d48' },
+                { id: 'reader', label: 'Sou leitor', icon: <FavoriteBorderIcon />, activeColor: '#e11d48' },
               ]}
             />
           </Stack>

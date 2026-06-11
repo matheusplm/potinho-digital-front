@@ -25,7 +25,7 @@ import {
   useCollectionTypesQuery, useCreateCollectionTypeMutation, useUpdateCollectionTypeMutation, useDeleteCollectionTypeMutation,
   useCollectionPacksQuery, useCreateCollectionPackMutation, useUpdateCollectionPackMutation, useDeleteCollectionPackMutation,
   useCollectionAchievementsQuery, useCreateCollectionAchievementMutation, useDeleteCollectionAchievementMutation,
-  useCollectionAccessQuery, useGrantAccessMutation, useRevokeAccessMutation,
+  useCollectionAccessQuery, useGrantAccessMutation, useRevokeAccessMutation, useSetAccessPacksMutation,
 } from '../hooks/useNotes'
 import { AchievementEditor } from '../components/manage/AchievementEditor'
 import { useBackground } from '../context/BackgroundContext'
@@ -126,7 +126,7 @@ const PACK_TEMPLATES: CollectionPackFormData[] = [
     name: 'Pacotinho diário',
     emoji: '💌',
     description: 'O pacote padrão da coleção, liberado automaticamente por tempo.',
-    cardsPerOpen: 3,
+    cardsPerOpen: 1,
     cooldownHours: 24,
     maxOpensPerUser: 1,
     distribution: 'all_with_access',
@@ -255,7 +255,7 @@ const PACK_STATUS_LABELS: Record<CollectionPackStatus, string> = {
 
 const PACK_DISTRIBUTION_LABELS: Record<CollectionPackDistribution, string> = {
   all_with_access: 'Todos com acesso',
-  manual_bonus: 'Bônus manual',
+  manual_bonus: 'Brinde manual',
   selected_readers: 'Selecionar leitores',
 }
 
@@ -1448,6 +1448,7 @@ export function CollectionManagePage() {
   const deleteAchievement = useDeleteCollectionAchievementMutation(cid)
   const grantMutation = useGrantAccessMutation(cid)
   const revokeMutation = useRevokeAccessMutation(cid)
+  const setAccessPacksMutation = useSetAccessPacksMutation(cid)
 
   function addAchievementPreset(preset: typeof ACHIEVEMENT_PRESETS[number]) {
     const id = uniqueConfigId(preset.label, achievements.map((a) => a.id))
@@ -1482,6 +1483,11 @@ export function CollectionManagePage() {
     })
   }, [packs, packFilter])
 
+  const accessBonusPacks = useMemo(
+    () => packs.filter((pack) => pack.category !== 'daily' && pack.distribution !== 'all_with_access'),
+    [packs],
+  )
+
   async function handleGrant() {
     const email = emailInput.trim()
     if (!email) return
@@ -1492,6 +1498,18 @@ export function CollectionManagePage() {
   async function handleRevoke(email: string) {
     try { await revokeMutation.mutateAsync(email); toast.info(`Acesso removido de ${email}`) }
     catch { toast.error('Erro ao revogar acesso.') }
+  }
+
+  async function handleToggleAccessPack(email: string, currentPackIds: string[], packId: string) {
+    const nextPackIds = currentPackIds.includes(packId)
+      ? currentPackIds.filter((id) => id !== packId)
+      : [...currentPackIds, packId]
+    try {
+      await setAccessPacksMutation.mutateAsync({ email, packIds: nextPackIds })
+      toast.success('Brindes atualizados.')
+    } catch (error) {
+      toast.error((error as Error).message || 'Erro ao atualizar brindes.')
+    }
   }
 
   const confirmDeleteNote = () => {
@@ -2043,18 +2061,59 @@ export function CollectionManagePage() {
 
             {accesses.map((a) => (
               <Card key={a.email} sx={{ p: 1.8 }}>
-                <Stack direction="row" alignItems="center" spacing={1.5}>
-                  <Box sx={{ width: 36, height: 36, borderRadius: radius.md, background: `linear-gradient(135deg,${colors.primary.main},${colors.rose.main})`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <Typography sx={{ fontFamily: font.serif, fontWeight: 700, color: '#fff', fontSize: '0.9rem' }}>
-                      {a.email[0].toUpperCase()}
+                <Stack spacing={1.4}>
+                  <Stack direction="row" alignItems="center" spacing={1.5}>
+                    <Box sx={{ width: 36, height: 36, borderRadius: radius.md, background: `linear-gradient(135deg,${colors.primary.main},${colors.rose.main})`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <Typography sx={{ fontFamily: font.serif, fontWeight: 700, color: '#fff', fontSize: '0.9rem' }}>
+                        {a.email[0].toUpperCase()}
+                      </Typography>
+                    </Box>
+                    <Typography sx={{ flex: 1, fontSize: '0.84rem', color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {a.email}
                     </Typography>
-                  </Box>
-                  <Typography sx={{ flex: 1, fontSize: '0.84rem', color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {a.email}
-                  </Typography>
-                  <IconButton size="small" aria-label="remover acesso" onClick={() => handleRevoke(a.email)} sx={{ ...actionButtonSx('danger'), flexShrink: 0 }}>
-                    <PersonRemoveIcon sx={{ fontSize: 17 }} />
-                  </IconButton>
+                    <IconButton size="small" aria-label="remover acesso" onClick={() => handleRevoke(a.email)} sx={{ ...actionButtonSx('danger'), flexShrink: 0 }}>
+                      <PersonRemoveIcon sx={{ fontSize: 17 }} />
+                    </IconButton>
+                  </Stack>
+
+                  {accessBonusPacks.length > 0 && (
+                    <Stack spacing={0.8}>
+                      <Typography sx={{ fontSize: '0.66rem', fontWeight: 800, letterSpacing: 0.7, color: colors.text.muted, textTransform: 'uppercase' }}>
+                        Brindes liberados
+                      </Typography>
+                      <Stack direction="row" spacing={0.7} sx={{ flexWrap: 'wrap', rowGap: 0.7 }}>
+                        {accessBonusPacks.map((pack) => {
+                          const selected = (a.packIds ?? []).includes(pack.id)
+                          return (
+                            <Chip
+                              key={pack.id}
+                              label={`${pack.emoji} ${pack.name}`}
+                              onClick={() => handleToggleAccessPack(a.email, a.packIds ?? [], pack.id)}
+                              disabled={setAccessPacksMutation.isPending}
+                              sx={{
+                                maxWidth: '100%',
+                                height: 28,
+                                borderRadius: radius.full,
+                                fontSize: '0.72rem',
+                                fontWeight: 800,
+                                color: selected ? '#fff' : pack.accent,
+                                background: selected ? pack.accent : `${pack.accent}12`,
+                                border: `1px solid ${pack.accent}${selected ? '00' : '33'}`,
+                                '& .MuiChip-label': {
+                                  px: 1,
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                },
+                                '&:hover': {
+                                  background: selected ? pack.accent : `${pack.accent}1f`,
+                                },
+                              }}
+                            />
+                          )
+                        })}
+                      </Stack>
+                    </Stack>
+                  )}
                 </Stack>
               </Card>
             ))}

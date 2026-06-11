@@ -8,8 +8,6 @@ export interface AuthUser {
   name: string
   role: UserRole
   token: string
-  coupleCode?: string
-  inviteEmail?: string
 }
 
 interface UserContextValue {
@@ -56,8 +54,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
             ...current,
             name: profile.name,
             role: profile.role as UserRole,
-            coupleCode: profile.coupleCode,
-            inviteEmail: profile.inviteEmail,
             token: current.token,
           }
           localStorage.setItem(STORAGE_KEY, JSON.stringify(merged))

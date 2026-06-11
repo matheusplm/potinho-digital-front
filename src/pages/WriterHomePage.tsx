@@ -1,18 +1,14 @@
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import Inventory2Icon from '@mui/icons-material/Inventory2'
-import LockIcon from '@mui/icons-material/Lock'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
-import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import { Box, IconButton, Stack, Typography } from '@mui/material'
+import { Box, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
-import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { useCollectionsQuery } from '../hooks/useNotes'
-import { Card, Button, Input, ScrollablePage, toast } from '../components/ui'
+import { Card, ScrollablePage } from '../components/ui'
 import { colors, font } from '../design-system'
 import { useBackground } from '../context/BackgroundContext'
-import { api } from '../services/api'
 
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(16px); }
@@ -27,36 +23,10 @@ const FLOATING = [
 ]
 
 export function WriterHomePage() {
-  const { user, setUser } = useUser()
+  const { user } = useUser()
   const { theme } = useBackground()
   const navigate = useNavigate()
   const { data: collections = [] } = useCollectionsQuery()
-  const [inviteEmailInput, setInviteEmailInput] = useState(user?.inviteEmail ?? '')
-  const [savingEmail, setSavingEmail] = useState(false)
-
-  async function handleSaveInviteEmail() {
-    if (!inviteEmailInput.trim()) return
-    setSavingEmail(true)
-    try {
-      await api.setInviteEmail(inviteEmailInput.trim())
-      setUser({ ...user!, inviteEmail: inviteEmailInput.trim().toLowerCase() })
-      toast.success('Email de convite atualizado!')
-    } catch {
-      toast.error('Erro ao salvar email.')
-    } finally {
-      setSavingEmail(false)
-    }
-  }
-
-  async function handleCopyInviteCode() {
-    if (!user?.coupleCode) return
-    try {
-      await navigator.clipboard.writeText(user.coupleCode)
-      toast.success('Código copiado!')
-    } catch {
-      toast.error('Não foi possível copiar o código.')
-    }
-  }
 
   const firstName = user?.name?.split(' ')[0] ?? ''
   const ownedCount = collections.filter((c) => c.access === 'owner').length
@@ -116,78 +86,6 @@ export function WriterHomePage() {
             <ChevronRightIcon sx={{ color: colors.text.muted, flexShrink: 0 }} />
           </Stack>
         </Card>
-
-        {user?.coupleCode && (
-          <Card sx={{ p: 2, background: `linear-gradient(135deg,${colors.primary.main}08,${colors.rose.main}08)` }}>
-            <Stack spacing={1.5}>
-              <Stack spacing={0.5}>
-                <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1, color: colors.text.muted, textTransform: 'uppercase' }}>
-                  Código de convite
-                </Typography>
-                <Stack direction="row" alignItems="center" spacing={0.8}>
-                  <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.8rem', color: colors.text.primary, letterSpacing: '0.2em', minWidth: 0 }}>
-                    {user.coupleCode}
-                  </Typography>
-                  <IconButton
-                    size="small"
-                    aria-label="copiar código de convite"
-                    onClick={handleCopyInviteCode}
-                    sx={{
-                      width: 34,
-                      height: 34,
-                      flexShrink: 0,
-                      color: colors.primary.main,
-                      background: `${colors.primary.main}12`,
-                      border: `1px solid ${colors.primary.main}22`,
-                      '&:hover': {
-                        background: `${colors.primary.main}1f`,
-                        transform: 'translateY(-1px)',
-                      },
-                    }}
-                  >
-                    <ContentCopyIcon sx={{ fontSize: 16 }} />
-                  </IconButton>
-                </Stack>
-                <Typography sx={{ fontSize: '0.72rem', color: colors.text.muted, fontStyle: 'italic' }}>
-                  Compartilhe com quem você ama 💙
-                </Typography>
-              </Stack>
-
-              <Box sx={{ height: '1px', bgcolor: colors.border.subtle }} />
-
-              <Stack spacing={0.8}>
-                <Stack direction="row" spacing={0.6} sx={{ alignItems: 'center' }}>
-                  <LockIcon sx={{ fontSize: 13, color: colors.text.secondary }} />
-                  <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: 0.8, color: colors.text.secondary, textTransform: 'uppercase' }}>
-                    Email autorizado
-                  </Typography>
-                </Stack>
-                <Stack direction="row" spacing={1} sx={{ alignItems: 'flex-end' }}>
-                  <Input
-                    type="email"
-                    placeholder="email@exemplo.com"
-                    value={inviteEmailInput}
-                    onChange={(e) => setInviteEmailInput(e.target.value)}
-                    sx={{ flex: 1, '& .MuiOutlinedInput-root': { fontSize: '0.82rem' }, '& input': { py: 0.7 } }}
-                  />
-                  <Button
-                    variant="primary"
-                    loading={savingEmail}
-                    onClick={handleSaveInviteEmail}
-                    sx={{ py: 0.85, px: 1.5, fontSize: '0.78rem', whiteSpace: 'nowrap' }}
-                  >
-                    Salvar
-                  </Button>
-                </Stack>
-                {user.inviteEmail && (
-                  <Typography sx={{ fontSize: '0.72rem', color: colors.success.main }}>
-                    ✓ {user.inviteEmail}
-                  </Typography>
-                )}
-              </Stack>
-            </Stack>
-          </Card>
-        )}
       </ScrollablePage>
     </Box>
   )
