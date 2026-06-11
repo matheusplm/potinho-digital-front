@@ -64,7 +64,7 @@ export function ConquistasPage() {
           <Stack spacing={2}>
             {play && <CollectionPanel play={play} rarities={rarities} />}
 
-            {achievements.length === 0 && (
+            {achData && achievements.length === 0 && (
               <Card sx={{ p: 2.5, textAlign: 'center' }}>
                 <Typography sx={{ fontSize: '2rem', mb: 0.5 }}>🏅</Typography>
                 <Typography sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, mb: 0.3 }}>

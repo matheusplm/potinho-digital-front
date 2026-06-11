@@ -23,8 +23,10 @@ import {
 
 function evaluateReaderAchievements(collection: CollectionState) {
   const { ownership, notes, achievements, achievementState } = collection
-  const ownedCount = ownership.owned.size
-  const favorites = [...ownership.favorites].filter((id) => ownership.owned.has(id)).length
+  // Conta a partir das notas existentes (igual ao backend) — ids "stale" de notas
+  // deletadas não saem dos Sets de ownership, então não dá pra usar .size direto.
+  const ownedCount = notes.filter((n) => ownership.owned.has(n.id)).length
+  const favorites = notes.filter((n) => ownership.owned.has(n.id) && ownership.favorites.has(n.id)).length
   const presentRarities = new Set(notes.map((n) => n.rarity))
   const ownedRarities = new Set(notes.filter((n) => ownership.owned.has(n.id)).map((n) => n.rarity))
   const ownedByRarity = new Map<string, number>()
