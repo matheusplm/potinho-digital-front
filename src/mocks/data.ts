@@ -72,6 +72,49 @@ export const defaultPacks: CollectionPack[] = [
   },
 ]
 
+export const bonusPacks: CollectionPack[] = [
+  {
+    id: 'bonus_carinho',
+    collectionId: '',
+    name: 'Mimo de Carinho',
+    emoji: '🤗',
+    description: 'Um pacotinho extra cheio de carinho, liberado a cada 6 horas.',
+    category: 'bonus',
+    status: 'active',
+    distribution: 'all_with_access',
+    cardsPerOpen: 2,
+    cooldownHours: 6,
+    maxOpensPerUser: null,
+    allowedTypeIds: [],
+    allowedRarityIds: [],
+    guaranteedRarityId: null,
+    gradient: 'linear-gradient(135deg,#eef2ff,#e0e7ff,#c7d2fe)',
+    accent: '#6366f1',
+    createdAt: '2026-04-20T10:00:00.000Z',
+    updatedAt: '2026-04-20T10:00:00.000Z',
+  },
+  {
+    id: 'bonus_lendario',
+    collectionId: '',
+    name: 'Cofre Lendário',
+    emoji: '👑',
+    description: 'Pacote especial com 1 bilhete garantido de raridade rara ou acima.',
+    category: 'guaranteed',
+    status: 'active',
+    distribution: 'all_with_access',
+    cardsPerOpen: 1,
+    cooldownHours: 24,
+    maxOpensPerUser: null,
+    allowedTypeIds: [],
+    allowedRarityIds: [],
+    guaranteedRarityId: 'raro',
+    gradient: 'linear-gradient(135deg,#fff7ed,#ffe4e6,#fbcfe8)',
+    accent: '#e11d48',
+    createdAt: '2026-04-20T10:00:00.000Z',
+    updatedAt: '2026-04-20T10:00:00.000Z',
+  },
+]
+
 const seedTimestamp = '2026-04-20T10:00:00.000Z'
 
 export const noteSeeds: NoteRecord[] = [
@@ -113,6 +156,10 @@ export function cloneStarterTypes(): NoteTypeConfig[] {
 
 export function cloneStarterPacks(collectionId: string): CollectionPack[] {
   return defaultPacks.map((pack) => ({ ...pack, collectionId }))
+}
+
+export function cloneBonusPacks(collectionId: string): CollectionPack[] {
+  return bonusPacks.map((pack) => ({ ...pack, collectionId }))
 }
 
 export function cloneNotes(): NoteRecord[] {

@@ -1,5 +1,4 @@
 import FavoriteIcon from '@mui/icons-material/Favorite'
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import StarIcon from '@mui/icons-material/Star'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import SettingsIcon from '@mui/icons-material/Settings'
@@ -12,14 +11,15 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Button, Card, LoadingState, ScrollablePage, toast } from '../components/ui'
-import { useCollectionPlayQuery, useOpenCollectionDailyMutation, useCollectionRaritiesQuery, useCollectionTypesQuery, useCollectionsQuery, useCollectionNotesQuery, useToggleCollectionFavoriteMutation } from '../hooks/useNotes'
+import { useCollectionPlayQuery, useOpenCollectionDailyMutation, useCollectionRaritiesQuery, useCollectionTypesQuery, useCollectionsQuery, useCollectionNotesQuery, useToggleCollectionFavoriteMutation, useCollectionPacksQuery, useOpenCollectionPackMutation } from '../hooks/useNotes'
 import { useBackground } from '../context/BackgroundContext'
 import { useUser } from '../context/UserContext'
 import { useSimulation } from '../context/SimulationContext'
 import { colors, font, radius } from '../design-system'
+import type { BackgroundTheme } from '../design-system'
 import { slugify } from '../utils/slug'
 import { simulateDailyOpen } from '../utils/simulationPlay'
-import type { CollectionDailyReward, CollectionNoteView, CollectionPlayView, NoteRecord, RarityConfig, NoteTypeConfig } from '../types/note'
+import type { CollectionDailyReward, CollectionNoteView, CollectionPack, CollectionPlayView, NoteRecord, RarityConfig, NoteTypeConfig } from '../types/note'
 
 export const PACK_OPEN_ANIMATION_MS = 2200
 
@@ -539,6 +539,238 @@ export function PackOpeningDialog({ open, emoji, accent }: { open: boolean; emoj
   )
 }
 
+function AlbumSection({
+  search, setSearch, filter, setFilter, rarity, setRarity, type, setType,
+  hasFavorites, discoveredRarities, discoveredTypes, items, rarities, types, theme,
+  onSelect, onToggleFavorite, unreadIds, emptyHint,
+}: {
+  search: string; setSearch: (v: string) => void
+  filter: AlbumFilter; setFilter: (v: AlbumFilter) => void
+  rarity: string; setRarity: (v: string) => void
+  type: string; setType: (v: string) => void
+  hasFavorites: boolean
+  discoveredRarities: RarityConfig[]
+  discoveredTypes: NoteTypeConfig[]
+  items: CollectionNoteView[]
+  rarities: RarityConfig[]
+  types: NoteTypeConfig[]
+  theme: BackgroundTheme
+  onSelect: (note: CollectionNoteView) => void
+  onToggleFavorite: (note: CollectionNoteView) => void
+  unreadIds: string[]
+  emptyHint: string
+}) {
+  return (
+    <Stack spacing={1.2}>
+      <Box sx={{
+        display: 'flex', alignItems: 'center', gap: 1, px: 1.3, py: 0.82,
+        background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(14px)',
+        border: '1.5px solid rgba(255,255,255,0.62)', borderRadius: radius.xl,
+      }}>
+        <SearchIcon sx={{ fontSize: 17, color: theme.textOnBgMuted, flexShrink: 0 }} />
+        <Box
+          component="input"
+          value={search}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearch(event.target.value)}
+          placeholder="Buscar cartinha..."
+          sx={{
+            flex: 1, minWidth: 0, border: 'none', outline: 'none', background: 'transparent',
+            color: theme.textOnBg, fontFamily: 'inherit', fontSize: '0.84rem',
+            '&::placeholder': { color: theme.textOnBgMuted },
+          }}
+        />
+        {search && (
+          <Box onClick={() => setSearch('')} sx={{ display: 'flex', color: theme.textOnBgMuted, cursor: 'pointer', flexShrink: 0 }}>
+            <CloseIcon sx={{ fontSize: 16 }} />
+          </Box>
+        )}
+      </Box>
+
+      <Box sx={{ display: 'flex', gap: 0.6, overflowX: 'auto', pb: 0.2, scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
+        {[
+          { id: 'all' as AlbumFilter, label: 'Todas' },
+          ...(hasFavorites ? [{ id: 'favorites' as AlbumFilter, label: 'Favoritas' }] : []),
+        ].map((item) => (
+          <Box
+            key={item.id}
+            onClick={() => setFilter(item.id)}
+            sx={{
+              px: 1.1, py: 0.52, borderRadius: radius.full, cursor: 'pointer', flexShrink: 0,
+              fontSize: '0.72rem', fontWeight: 800,
+              color: filter === item.id ? '#fff' : theme.textOnBgMuted,
+              background: filter === item.id ? theme.accent : 'rgba(255,255,255,0.48)',
+              border: `1px solid ${filter === item.id ? theme.accent : 'rgba(255,255,255,0.58)'}`,
+              backdropFilter: 'blur(10px)',
+            }}
+          >
+            {item.label}
+          </Box>
+        ))}
+      </Box>
+
+      {discoveredRarities.length > 0 && (
+        <Box sx={{ display: 'flex', gap: 0.6, overflowX: 'auto', pb: 0.2, scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
+          <Box
+            onClick={() => setRarity('all')}
+            sx={{
+              px: 1.05, py: 0.48, borderRadius: radius.full, cursor: 'pointer', flexShrink: 0,
+              fontSize: '0.7rem', fontWeight: 800,
+              color: rarity === 'all' ? '#fff' : theme.textOnBgMuted,
+              background: rarity === 'all' ? colors.primary.main : 'rgba(255,255,255,0.42)',
+              border: `1px solid ${rarity === 'all' ? colors.primary.main : 'rgba(255,255,255,0.54)'}`,
+              backdropFilter: 'blur(10px)',
+            }}
+          >
+            Todas raridades
+          </Box>
+          {discoveredRarities.map((r) => (
+            <Box
+              key={r.id}
+              onClick={() => setRarity(r.id)}
+              sx={{
+                px: 1.05, py: 0.48, borderRadius: radius.full, cursor: 'pointer', flexShrink: 0,
+                fontSize: '0.7rem', fontWeight: 800,
+                color: rarity === r.id ? r.chipColor : theme.textOnBgMuted,
+                background: rarity === r.id ? r.chipBg : 'rgba(255,255,255,0.42)',
+                border: `1px solid ${rarity === r.id ? r.borderColor : 'rgba(255,255,255,0.54)'}`,
+                backdropFilter: 'blur(10px)',
+              }}
+            >
+              {r.emoji} {r.label}
+            </Box>
+          ))}
+        </Box>
+      )}
+
+      {discoveredTypes.length > 0 && (
+        <Box sx={{ display: 'flex', gap: 0.6, overflowX: 'auto', pb: 0.2, scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
+          <Box
+            onClick={() => setType('all')}
+            sx={{
+              px: 1.05, py: 0.48, borderRadius: radius.full, cursor: 'pointer', flexShrink: 0,
+              fontSize: '0.7rem', fontWeight: 800,
+              color: type === 'all' ? '#fff' : theme.textOnBgMuted,
+              background: type === 'all' ? colors.purple.main : 'rgba(255,255,255,0.42)',
+              border: `1px solid ${type === 'all' ? colors.purple.main : 'rgba(255,255,255,0.54)'}`,
+              backdropFilter: 'blur(10px)',
+            }}
+          >
+            Todos tipos
+          </Box>
+          {discoveredTypes.map((t) => (
+            <Box
+              key={t.id}
+              onClick={() => setType(t.id)}
+              sx={{
+                px: 1.05, py: 0.48, borderRadius: radius.full, cursor: 'pointer', flexShrink: 0,
+                fontSize: '0.7rem', fontWeight: 800,
+                color: type === t.id ? t.tagColor : theme.textOnBgMuted,
+                background: type === t.id ? t.tagBg : 'rgba(255,255,255,0.42)',
+                border: `1px solid ${type === t.id ? `${t.accentColor}66` : 'rgba(255,255,255,0.54)'}`,
+                backdropFilter: 'blur(10px)',
+              }}
+            >
+              {t.emoji} {t.label}
+            </Box>
+          ))}
+        </Box>
+      )}
+
+      {items.length === 0 ? (
+        <Card sx={{ p: 2, textAlign: 'center' }}>
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, mb: 0.3 }}>
+            Nenhuma cartinha encontrada
+          </Typography>
+          <Typography sx={{ fontSize: '0.78rem', color: colors.text.secondary }}>
+            {emptyHint}
+          </Typography>
+        </Card>
+      ) : (
+        <Stack spacing={1}>
+          <Typography sx={{ fontSize: '0.65rem', fontWeight: 900, letterSpacing: 1.1, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
+            Cartinhas da coleção — {items.length}
+          </Typography>
+          {items.map((note) => {
+            const r = rarities.find((x) => x.id === note.rarity)
+            const t = types.find((x) => x.id === note.typeId)
+            const isUnread = unreadIds.includes(note.id)
+            return (
+              <Card key={note.id} accent={r?.borderColor} onClick={() => onSelect(note)} sx={{
+                ...(rarityCardSx(r, true) as object),
+                cursor: 'pointer',
+              }}>
+                <Box sx={{ position: 'relative', zIndex: 1 }}>
+                  {isUnread && (
+                    <Box sx={{
+                      position: 'absolute', top: -2, left: -2, width: 11, height: 11,
+                      borderRadius: radius.full, background: colors.rose.main,
+                      boxShadow: `0 0 0 3px rgba(255,255,255,0.82), 0 0 14px ${colors.rose.glow}`,
+                      zIndex: 3,
+                    }} />
+                  )}
+                  <Box sx={{
+                    position: 'relative', minWidth: 0, p: 1, pr: 4.4, borderRadius: radius.lg,
+                    background: 'rgba(255,255,255,0.68)', border: '1px solid rgba(255,255,255,0.58)', backdropFilter: 'blur(8px)',
+                  }}>
+                    <Stack direction="row" alignItems="center" spacing={0.6} sx={{ mb: 0.65, flexWrap: 'wrap', rowGap: 0.5 }}>
+                      {r && (
+                        <Chip size="small" label={`${r.emoji} ${r.label}`} sx={{
+                          height: 19, fontSize: '0.62rem', fontWeight: 800,
+                          background: r.chipBg, color: r.chipColor, border: `1px solid ${r.borderColor}`,
+                          '& .MuiChip-label': { px: 0.8 },
+                        }} />
+                      )}
+                      {t && (
+                        <Chip size="small" label={`${t.emoji} ${t.label}`} sx={{
+                          height: 19, fontSize: '0.62rem', fontWeight: 800,
+                          background: t.tagBg, color: t.tagColor, border: `1px solid ${t.accentColor}44`,
+                          '& .MuiChip-label': { px: 0.8 },
+                        }} />
+                      )}
+                    </Stack>
+                    <Typography sx={{
+                      fontFamily: font.serif, fontWeight: 800, fontSize: '0.98rem',
+                      color: r?.textColor ?? colors.text.primary, mb: 0.3,
+                      display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                      overflowWrap: 'anywhere', wordBreak: 'break-word',
+                    }}>
+                      {note.title}
+                    </Typography>
+                    <Typography sx={{
+                      fontSize: '0.8rem', color: r?.captionColor ?? colors.text.secondary, lineHeight: 1.55,
+                      display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                      overflowWrap: 'anywhere', wordBreak: 'break-word',
+                    }}>
+                      {note.message}
+                    </Typography>
+                    <IconButton
+                      size="small"
+                      aria-label="favoritar bilhete"
+                      onClick={(event) => {
+                        event.stopPropagation()
+                        onToggleFavorite(note)
+                      }}
+                      sx={{
+                        position: 'absolute', top: 8, right: 8, p: 0.55, borderRadius: radius.md,
+                        color: note.favorite ? colors.rose.main : (r?.captionColor ?? colors.text.muted),
+                        background: note.favorite ? 'rgba(254,243,199,0.92)' : 'rgba(255,255,255,0.74)',
+                        border: `1px solid ${note.favorite ? 'rgba(234,179,8,0.38)' : 'rgba(255,255,255,0.68)'}`,
+                        backdropFilter: 'blur(8px)', boxShadow: '0 4px 12px rgba(15,23,42,0.08)',
+                      }}
+                    >
+                      {note.favorite ? <StarIcon sx={{ fontSize: 17, color: '#eab308' }} /> : <StarBorderIcon sx={{ fontSize: 17 }} />}
+                    </IconButton>
+                  </Box>
+                </Box>
+              </Card>
+            )
+          })}
+        </Stack>
+      )}
+    </Stack>
+  )
+}
+
 export function CollectionPlayPage() {
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
@@ -565,12 +797,22 @@ export function CollectionPlayPage() {
   const [albumRarity, setAlbumRarity] = useState('all')
   const [albumType, setAlbumType] = useState('all')
   const [selectedNote, setSelectedNote] = useState<ReadableNote | null>(null)
+  const [selectedBonusPack, setSelectedBonusPack] = useState<CollectionPack | null>(null)
+  const [openedBonusIds, setOpenedBonusIds] = useState<string[]>([])
+  const [openingPackVisual, setOpeningPackVisual] = useState<{ emoji: string; accent: string } | null>(null)
   const displayPlay = isOpeningPack && openingSnapshot ? openingSnapshot : play
   const isLoading = collectionsLoading || (!!cid && (isSimulating ? notesLoading : playLoading))
   const { data: rarities = [] } = useCollectionRaritiesQuery(cid)
   const { data: types = [] } = useCollectionTypesQuery(cid)
+  const { data: packs = [] } = useCollectionPacksQuery(cid)
   const openMutation = useOpenCollectionDailyMutation(cid)
+  const openPackMutation = useOpenCollectionPackMutation(cid)
   const favoriteMutation = useToggleCollectionFavoriteMutation(cid)
+
+  const bonusPacks = useMemo(
+    () => isSimulating ? [] : packs.filter((pack) => pack.status === 'active' && pack.category !== 'daily' && !openedBonusIds.includes(pack.id)),
+    [isSimulating, packs, openedBonusIds],
+  )
 
   function handleSelectNote(note: ReadableNote) {
     if (isSimulating) {
@@ -587,6 +829,9 @@ export function CollectionPlayPage() {
     setAlbumRarity('all')
     setAlbumType('all')
     setSelectedNote(null)
+    setSelectedBonusPack(null)
+    setOpenedBonusIds([])
+    setOpeningPackVisual(null)
   }, [cid, isSimulating])
 
   const canOpen = displayPlay?.daily.canOpen ?? false
@@ -675,6 +920,33 @@ export function CollectionPlayPage() {
     } finally {
       setIsOpeningPack(false)
       setOpeningSnapshot(null)
+    }
+  }
+
+  async function handleOpenBonus(pack: CollectionPack) {
+    if (!cid || !play || isOpeningPack) return
+    setSelectedBonusPack(null)
+    const startedAt = Date.now()
+    setOpeningSnapshot(play)
+    setOpeningPackVisual({ emoji: pack.emoji, accent: pack.accent })
+    setIsOpeningPack(true)
+    try {
+      const result = await openPackMutation.mutateAsync(pack.id)
+      await waitForPackAnimation(startedAt)
+      await queryClient.invalidateQueries({ queryKey: ['col-play', cid] })
+      setRewards(result.rewards)
+      setOpenedBonusIds((ids) => [...new Set([...ids, pack.id])])
+      const newCount = result.rewards.filter((r) => r.isNew).length
+      toast.love(
+        `${result.rewards.length} bilhete${result.rewards.length !== 1 ? 's' : ''}!`,
+        { description: newCount > 0 ? `${newCount} novo${newCount !== 1 ? 's' : ''} na coleção ✨` : `${pack.name} aberto!` },
+      )
+    } catch (e) {
+      toast.error((e as Error).message ?? 'Erro ao abrir pacotinho.')
+    } finally {
+      setIsOpeningPack(false)
+      setOpeningSnapshot(null)
+      setOpeningPackVisual(null)
     }
   }
 
@@ -800,291 +1072,30 @@ export function CollectionPlayPage() {
               </Stack>
             </Card>
 
-            {isSimulating && (
-              <Stack spacing={1.2}>
-                <Box sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  px: 1.3,
-                  py: 0.82,
-                  background: 'rgba(255,255,255,0.5)',
-                  backdropFilter: 'blur(14px)',
-                  border: '1.5px solid rgba(255,255,255,0.62)',
-                  borderRadius: radius.xl,
-                }}>
-                  <SearchIcon sx={{ fontSize: 17, color: theme.textOnBgMuted, flexShrink: 0 }} />
-                  <Box
-                    component="input"
-                    value={albumSearch}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => setAlbumSearch(event.target.value)}
-                    placeholder="Buscar cartinha..."
-                    sx={{
-                      flex: 1,
-                      minWidth: 0,
-                      border: 'none',
-                      outline: 'none',
-                      background: 'transparent',
-                      color: theme.textOnBg,
-                      fontFamily: 'inherit',
-                      fontSize: '0.84rem',
-                      '&::placeholder': { color: theme.textOnBgMuted },
-                    }}
-                  />
-                  {albumSearch && (
-                    <Box
-                      onClick={() => setAlbumSearch('')}
-                      sx={{ display: 'flex', color: theme.textOnBgMuted, cursor: 'pointer', flexShrink: 0 }}
-                    >
-                      <CloseIcon sx={{ fontSize: 16 }} />
-                    </Box>
-                  )}
-                </Box>
-
-                <Box sx={{ display: 'flex', gap: 0.6, overflowX: 'auto', pb: 0.2, scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
-                  {[
-                    { id: 'all' as AlbumFilter, label: 'Todas' },
-                    ...(hasFavorites ? [{ id: 'favorites' as AlbumFilter, label: 'Favoritas' }] : []),
-                  ].map((item) => (
-                    <Box
-                      key={item.id}
-                      onClick={() => setAlbumFilter(item.id)}
-                      sx={{
-                        px: 1.1,
-                        py: 0.52,
-                        borderRadius: radius.full,
-                        cursor: 'pointer',
-                        flexShrink: 0,
-                        fontSize: '0.72rem',
-                        fontWeight: 800,
-                        color: albumFilter === item.id ? '#fff' : theme.textOnBgMuted,
-                        background: albumFilter === item.id ? theme.accent : 'rgba(255,255,255,0.48)',
-                        border: `1px solid ${albumFilter === item.id ? theme.accent : 'rgba(255,255,255,0.58)'}`,
-                        backdropFilter: 'blur(10px)',
-                      }}
-                    >
-                      {item.label}
-                    </Box>
-                  ))}
-                </Box>
-
-                {discoveredRarities.length > 0 && (
-                  <Box sx={{ display: 'flex', gap: 0.6, overflowX: 'auto', pb: 0.2, scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
-                    <Box
-                      onClick={() => setAlbumRarity('all')}
-                      sx={{
-                        px: 1.05,
-                        py: 0.48,
-                        borderRadius: radius.full,
-                        cursor: 'pointer',
-                        flexShrink: 0,
-                        fontSize: '0.7rem',
-                        fontWeight: 800,
-                        color: albumRarity === 'all' ? '#fff' : theme.textOnBgMuted,
-                        background: albumRarity === 'all' ? colors.primary.main : 'rgba(255,255,255,0.42)',
-                        border: `1px solid ${albumRarity === 'all' ? colors.primary.main : 'rgba(255,255,255,0.54)'}`,
-                        backdropFilter: 'blur(10px)',
-                      }}
-                    >
-                      Todas raridades
-                    </Box>
-                    {discoveredRarities.map((rarity) => (
-                      <Box
-                        key={rarity.id}
-                        onClick={() => setAlbumRarity(rarity.id)}
-                        sx={{
-                          px: 1.05,
-                          py: 0.48,
-                          borderRadius: radius.full,
-                          cursor: 'pointer',
-                          flexShrink: 0,
-                          fontSize: '0.7rem',
-                          fontWeight: 800,
-                          color: albumRarity === rarity.id ? rarity.chipColor : theme.textOnBgMuted,
-                          background: albumRarity === rarity.id ? rarity.chipBg : 'rgba(255,255,255,0.42)',
-                          border: `1px solid ${albumRarity === rarity.id ? rarity.borderColor : 'rgba(255,255,255,0.54)'}`,
-                          backdropFilter: 'blur(10px)',
-                        }}
-                      >
-                        {rarity.emoji} {rarity.label}
-                      </Box>
-                    ))}
-                  </Box>
-                )}
-
-                {discoveredTypes.length > 0 && (
-                  <Box sx={{ display: 'flex', gap: 0.6, overflowX: 'auto', pb: 0.2, scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
-                    <Box
-                      onClick={() => setAlbumType('all')}
-                      sx={{
-                        px: 1.05,
-                        py: 0.48,
-                        borderRadius: radius.full,
-                        cursor: 'pointer',
-                        flexShrink: 0,
-                        fontSize: '0.7rem',
-                        fontWeight: 800,
-                        color: albumType === 'all' ? '#fff' : theme.textOnBgMuted,
-                        background: albumType === 'all' ? colors.purple.main : 'rgba(255,255,255,0.42)',
-                        border: `1px solid ${albumType === 'all' ? colors.purple.main : 'rgba(255,255,255,0.54)'}`,
-                        backdropFilter: 'blur(10px)',
-                      }}
-                    >
-                      Todos tipos
-                    </Box>
-                    {discoveredTypes.map((type) => (
-                      <Box
-                        key={type.id}
-                        onClick={() => setAlbumType(type.id)}
-                        sx={{
-                          px: 1.05,
-                          py: 0.48,
-                          borderRadius: radius.full,
-                          cursor: 'pointer',
-                          flexShrink: 0,
-                          fontSize: '0.7rem',
-                          fontWeight: 800,
-                          color: albumType === type.id ? type.tagColor : theme.textOnBgMuted,
-                          background: albumType === type.id ? type.tagBg : 'rgba(255,255,255,0.42)',
-                          border: `1px solid ${albumType === type.id ? `${type.accentColor}66` : 'rgba(255,255,255,0.54)'}`,
-                          backdropFilter: 'blur(10px)',
-                        }}
-                      >
-                        {type.emoji} {type.label}
-                      </Box>
-                    ))}
-                  </Box>
-                )}
-
-                {albumItems.length === 0 ? (
-                  <Card sx={{ p: 2, textAlign: 'center' }}>
-                    <Typography sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, mb: 0.3 }}>
-                      Nenhuma cartinha encontrada
-                    </Typography>
-                    <Typography sx={{ fontSize: '0.78rem', color: colors.text.secondary }}>
-                      Abra pacotinhos na tela inicial ou ajuste os filtros.
-                    </Typography>
-                  </Card>
-                ) : (
-                  <Stack spacing={1}>
-                    <Typography sx={{ fontSize: '0.65rem', fontWeight: 900, letterSpacing: 1.1, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
-                      Cartinhas da coleção — {albumItems.length}
-                    </Typography>
-                    {albumItems.map((note) => {
-                      const r = rarities.find((x) => x.id === note.rarity)
-                      const t = types.find((x) => x.id === note.typeId)
-                      const isUnread = isSimulating && simulation.unreadNoteIds.includes(note.id)
-                      return (
-                        <Card key={note.id} accent={r?.borderColor} onClick={() => handleSelectNote(note)} sx={{
-                          ...(rarityCardSx(r, true) as object),
-                          cursor: 'pointer',
-                        }}>
-                          <Box sx={{ position: 'relative', zIndex: 1 }}>
-                            {isUnread && (
-                              <Box sx={{
-                                position: 'absolute',
-                                top: -2,
-                                left: -2,
-                                width: 11,
-                                height: 11,
-                                borderRadius: radius.full,
-                                background: colors.rose.main,
-                                boxShadow: `0 0 0 3px rgba(255,255,255,0.82), 0 0 14px ${colors.rose.glow}`,
-                                zIndex: 3,
-                              }} />
-                            )}
-                            <Box sx={{
-                              position: 'relative',
-                              minWidth: 0,
-                              p: 1,
-                              pr: 4.4,
-                              borderRadius: radius.lg,
-                              background: 'rgba(255,255,255,0.68)',
-                              border: '1px solid rgba(255,255,255,0.58)',
-                              backdropFilter: 'blur(8px)',
-                            }}>
-                                <Stack direction="row" alignItems="center" spacing={0.6} sx={{ mb: 0.65, flexWrap: 'wrap', rowGap: 0.5 }}>
-                                  {r && (
-                                    <Chip size="small" label={`${r.emoji} ${r.label}`} sx={{
-                                      height: 19,
-                                      fontSize: '0.62rem',
-                                      fontWeight: 800,
-                                      background: r.chipBg,
-                                      color: r.chipColor,
-                                      border: `1px solid ${r.borderColor}`,
-                                      '& .MuiChip-label': { px: 0.8 },
-                                    }} />
-                                  )}
-                                  {t && (
-                                    <Chip size="small" label={`${t.emoji} ${t.label}`} sx={{
-                                      height: 19,
-                                      fontSize: '0.62rem',
-                                      fontWeight: 800,
-                                      background: t.tagBg,
-                                      color: t.tagColor,
-                                      border: `1px solid ${t.accentColor}44`,
-                                      '& .MuiChip-label': { px: 0.8 },
-                                    }} />
-                                  )}
-                                </Stack>
-                                <Typography sx={{
-                                  fontFamily: font.serif,
-                                  fontWeight: 800,
-                                  fontSize: '0.98rem',
-                                  color: r?.textColor ?? colors.text.primary,
-                                  mb: 0.3,
-                                  display: '-webkit-box',
-                                  WebkitLineClamp: 1,
-                                  WebkitBoxOrient: 'vertical',
-                                  overflow: 'hidden',
-                                  overflowWrap: 'anywhere',
-                                  wordBreak: 'break-word',
-                                }}>
-                                  {note.title}
-                                </Typography>
-                                <Typography sx={{
-                                  fontSize: '0.8rem',
-                                  color: r?.captionColor ?? colors.text.secondary,
-                                  lineHeight: 1.55,
-                                  display: '-webkit-box',
-                                  WebkitLineClamp: 2,
-                                  WebkitBoxOrient: 'vertical',
-                                  overflow: 'hidden',
-                                  overflowWrap: 'anywhere',
-                                  wordBreak: 'break-word',
-                                }}>
-                                  {note.message}
-                                </Typography>
-                                <IconButton
-                                size="small"
-                                aria-label="favoritar bilhete"
-                                  onClick={(event) => {
-                                    event.stopPropagation()
-                                    simulation.toggleFavorite(note.id, !note.favorite)
-                                  }}
-                                sx={{
-                                  position: 'absolute',
-                                  top: 8,
-                                  right: 8,
-                                  p: 0.55,
-                                  borderRadius: radius.md,
-                                  color: note.favorite ? colors.rose.main : (r?.captionColor ?? colors.text.muted),
-                                  background: note.favorite ? 'rgba(254,243,199,0.92)' : 'rgba(255,255,255,0.74)',
-                                  border: `1px solid ${note.favorite ? 'rgba(234,179,8,0.38)' : 'rgba(255,255,255,0.68)'}`,
-                                  backdropFilter: 'blur(8px)',
-                                  boxShadow: '0 4px 12px rgba(15,23,42,0.08)',
-                                }}
-                              >
-                                {note.favorite ? <StarIcon sx={{ fontSize: 17, color: '#eab308' }} /> : <StarBorderIcon sx={{ fontSize: 17 }} />}
-                              </IconButton>
-                            </Box>
-                          </Box>
-                        </Card>
-                      )
-                    })}
-                  </Stack>
-                )}
-              </Stack>
+            {(isSimulating || discoveredItems.length > 0) && (
+              <AlbumSection
+                search={albumSearch} setSearch={setAlbumSearch}
+                filter={albumFilter} setFilter={setAlbumFilter}
+                rarity={albumRarity} setRarity={setAlbumRarity}
+                type={albumType} setType={setAlbumType}
+                hasFavorites={hasFavorites}
+                discoveredRarities={discoveredRarities}
+                discoveredTypes={discoveredTypes}
+                items={albumItems}
+                rarities={rarities}
+                types={types}
+                theme={theme}
+                onSelect={handleSelectNote}
+                onToggleFavorite={(note) => {
+                  if (isSimulating) {
+                    simulation.toggleFavorite(note.id, !note.favorite)
+                    return
+                  }
+                  favoriteMutation.mutate({ id: note.id, favorite: !note.favorite })
+                }}
+                unreadIds={isSimulating ? simulation.unreadNoteIds : []}
+                emptyHint={isSimulating ? 'Abra pacotinhos na tela inicial ou ajuste os filtros.' : 'Abra um pacotinho ou ajuste os filtros.'}
+              />
             )}
 
             {!isSimulating && (
@@ -1136,121 +1147,73 @@ export function CollectionPlayPage() {
             </Stack>
             )}
 
+            {!isSimulating && bonusPacks.length > 0 && (
+              <Stack spacing={1.2}>
+                <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1.2, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
+                  Pacotinhos especiais
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1.1, overflowX: 'auto', pb: 0.5, mx: -0.5, px: 0.5, scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
+                  {bonusPacks.map((pack) => (
+                    <Box
+                      key={pack.id}
+                      role="button"
+                      aria-label={`Abrir ${pack.name}`}
+                      onClick={() => !isOpeningPack && setSelectedBonusPack(pack)}
+                      sx={{
+                        flexShrink: 0,
+                        width: 158,
+                        p: 1.5,
+                        borderRadius: radius.xl,
+                        cursor: isOpeningPack ? 'default' : 'pointer',
+                        background: pack.gradient,
+                        border: '1.5px solid rgba(255,255,255,0.7)',
+                        boxShadow: `0 8px 24px ${pack.accent}28`,
+                        position: 'relative',
+                        overflow: 'hidden',
+                        transition: 'transform 0.16s ease, box-shadow 0.16s ease',
+                        '&:hover': isOpeningPack ? {} : { transform: 'translateY(-2px)', boxShadow: `0 12px 30px ${pack.accent}3a` },
+                        '&:active': { transform: 'scale(0.98)' },
+                      }}
+                    >
+                      <Box sx={{
+                        position: 'absolute', top: 8, right: 8,
+                        width: 9, height: 9, borderRadius: radius.full,
+                        background: colors.rose.main,
+                        boxShadow: `0 0 0 3px rgba(255,255,255,0.86), 0 0 12px ${colors.rose.glow}`,
+                      }} />
+                      <Typography sx={{ fontSize: '1.9rem', lineHeight: 1, mb: 0.6, filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.16))' }}>
+                        {pack.emoji}
+                      </Typography>
+                      <Typography sx={{
+                        fontFamily: font.serif, fontWeight: 800, fontSize: '0.92rem', color: colors.text.primary,
+                        lineHeight: 1.2, display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                      }}>
+                        {pack.name}
+                      </Typography>
+                      <Stack direction="row" spacing={0.5} sx={{ mt: 0.7, flexWrap: 'wrap', rowGap: 0.4 }}>
+                        <Box sx={{ px: 0.7, py: 0.25, borderRadius: radius.full, background: `${pack.accent}22`, color: pack.accent, fontSize: '0.6rem', fontWeight: 850 }}>
+                          {pack.cardsPerOpen} bilhete{pack.cardsPerOpen !== 1 ? 's' : ''}
+                        </Box>
+                        {pack.guaranteedRarityId && (
+                          <Box sx={{ px: 0.7, py: 0.25, borderRadius: radius.full, background: 'rgba(255,255,255,0.78)', color: '#c2410c', fontSize: '0.6rem', fontWeight: 850 }}>
+                            garantido
+                          </Box>
+                        )}
+                      </Stack>
+                    </Box>
+                  ))}
+                </Box>
+              </Stack>
+            )}
+
             {!isSimulating && !isOpeningPack && rewards.length > 0 && (
               <Stack spacing={1.2}>
                 <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1.2, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
-                  Pacotinho de hoje
+                  Você acabou de abrir ✨
                 </Typography>
                 {rewards.map((item, index) => (
                   <RewardCard key={`${item.id}-${index}`} reward={item} rarities={rarities} types={types} onClick={() => handleSelectNote(item)} />
                 ))}
-              </Stack>
-            )}
-
-            {!isSimulating && displayPlay.items.filter((n) => n.owned).length > 0 && (
-              <Stack spacing={1}>
-                <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1.2, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
-                  Bilhetes coletados
-                </Typography>
-                {displayPlay.items.filter((n) => n.owned).map((note) => {
-                  const r = rarities.find((x) => x.id === note.rarity)
-                  const t = types.find((x) => x.id === note.typeId)
-                  return (
-                    <Card key={note.id} accent={r?.borderColor} onClick={() => handleSelectNote(note)} sx={{ ...(rarityCardSx(r, true) as object), cursor: 'pointer' }}>
-                      <Box sx={{ position: 'relative', zIndex: 1 }}>
-                        <Stack direction="row" spacing={1} alignItems="flex-start">
-                          <Box sx={{
-                            flex: 1,
-                            minWidth: 0,
-                            p: 1,
-                            borderRadius: radius.lg,
-                            background: 'rgba(255,255,255,0.68)',
-                            border: '1px solid rgba(255,255,255,0.58)',
-                            backdropFilter: 'blur(8px)',
-                          }}>
-                            <Stack direction="row" alignItems="center" spacing={0.6} sx={{ mb: 0.65, flexWrap: 'wrap', rowGap: 0.5 }}>
-                              {r && (
-                                <Chip size="small" label={`${r.emoji} ${r.label}`} sx={{
-                                  height: 19,
-                                  fontSize: '0.62rem',
-                                  fontWeight: 800,
-                                  background: r.chipBg,
-                                  color: r.chipColor,
-                                  border: `1px solid ${r.borderColor}`,
-                                  '& .MuiChip-label': { px: 0.8 },
-                                }} />
-                              )}
-                              {t && (
-                                <Chip size="small" label={`${t.emoji} ${t.label}`} sx={{
-                                  height: 19,
-                                  fontSize: '0.62rem',
-                                  fontWeight: 800,
-                                  background: t.tagBg,
-                                  color: t.tagColor,
-                                  border: `1px solid ${t.accentColor}44`,
-                                  '& .MuiChip-label': { px: 0.8 },
-                                }} />
-                              )}
-                            </Stack>
-                            <Typography sx={{
-                              fontFamily: font.serif,
-                              fontWeight: 700,
-                              fontSize: '0.98rem',
-                              color: r?.textColor ?? colors.text.primary,
-                              mb: 0.3,
-                              display: '-webkit-box',
-                              WebkitLineClamp: 1,
-                              WebkitBoxOrient: 'vertical',
-                              overflow: 'hidden',
-                              overflowWrap: 'anywhere',
-                              wordBreak: 'break-word',
-                            }}>
-                              {note.title}
-                            </Typography>
-                            <Typography sx={{
-                              fontSize: '0.8rem', color: r?.captionColor ?? colors.text.secondary, lineHeight: 1.55,
-                              display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
-                              overflowWrap: 'anywhere',
-                              wordBreak: 'break-word',
-                            }}>
-                              {note.message}
-                            </Typography>
-                          </Box>
-                          <Stack spacing={0.4} alignItems="center" sx={{ flexShrink: 0 }}>
-                            <IconButton
-                              size="small"
-                              aria-label="favoritar bilhete"
-                              onClick={(event) => {
-                                event.stopPropagation()
-                                if (isSimulating) {
-                                  simulation.toggleFavorite(note.id, !note.favorite)
-                                  return
-                                }
-                                favoriteMutation.mutate({ id: note.id, favorite: !note.favorite })
-                              }}
-                              sx={{
-                                p: 0.55,
-                                borderRadius: radius.md,
-                                color: note.favorite ? colors.rose.main : (r?.captionColor ?? colors.text.muted),
-                                background: note.favorite ? 'rgba(244,63,94,0.14)' : 'rgba(255,255,255,0.38)',
-                                border: `1px solid ${note.favorite ? 'rgba(244,63,94,0.28)' : 'rgba(255,255,255,0.48)'}`,
-                                backdropFilter: 'blur(8px)',
-                                transition: 'transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease',
-                                '&:hover': {
-                                  transform: 'translateY(-1px) scale(1.06)',
-                                  background: note.favorite ? 'rgba(244,63,94,0.22)' : 'rgba(255,255,255,0.62)',
-                                  boxShadow: `0 5px 14px ${note.favorite ? 'rgba(244,63,94,0.22)' : (r?.glowColor || 'rgba(15,23,42,0.12)')}`,
-                                },
-                              }}
-                            >
-                              {note.favorite ? <FavoriteIcon sx={{ fontSize: 17 }} /> : <FavoriteBorderIcon sx={{ fontSize: 17 }} />}
-                            </IconButton>
-                          </Stack>
-                        </Stack>
-                      </Box>
-                    </Card>
-                  )
-                })}
               </Stack>
             )}
 
@@ -1278,8 +1241,69 @@ export function CollectionPlayPage() {
           </Stack>
         )}
       </ScrollablePage>
-      <PackOpeningDialog open={isOpeningPack} emoji={collection?.emoji ?? '💌'} accent={theme.accent} />
+      <PackOpeningDialog open={isOpeningPack} emoji={openingPackVisual?.emoji ?? collection?.emoji ?? '💌'} accent={openingPackVisual?.accent ?? theme.accent} />
       <NoteDetailDialog note={selectedNote} rarities={rarities} types={types} onClose={() => setSelectedNote(null)} />
+      <Dialog
+        open={!!selectedBonusPack}
+        onClose={() => setSelectedBonusPack(null)}
+        maxWidth="xs"
+        fullWidth
+        slotProps={{
+          paper: {
+            sx: {
+              mx: 2,
+              borderRadius: radius.xl,
+              overflow: 'hidden',
+              background: selectedBonusPack?.gradient ?? 'rgba(255,250,247,0.98)',
+              boxShadow: `0 24px 70px ${selectedBonusPack?.accent ?? theme.accent}28`,
+            },
+          },
+          backdrop: { sx: { background: 'rgba(15,23,42,0.18)', backdropFilter: 'blur(8px)' } },
+        }}
+      >
+        {selectedBonusPack && (
+          <>
+            <Box sx={{ p: 2, position: 'relative', background: 'radial-gradient(circle at 18% 0%, rgba(255,255,255,0.64), transparent 40%)' }}>
+              <DialogTitle sx={{ p: 0, fontFamily: font.serif, fontWeight: 850, fontSize: '1.18rem', color: colors.text.primary, lineHeight: 1.2, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                {selectedBonusPack.emoji} {selectedBonusPack.name}
+              </DialogTitle>
+              <Typography sx={{ mt: 0.45, fontSize: '0.78rem', color: colors.text.secondary, fontWeight: 700 }}>
+                Pacotinho especial disponível
+              </Typography>
+            </Box>
+            <DialogContent sx={{ px: 2, pt: 1.5, pb: 1 }}>
+              <Box sx={{ p: 1.25, borderRadius: radius.lg, background: 'rgba(255,255,255,0.72)', border: '1px solid rgba(255,255,255,0.62)', backdropFilter: 'blur(8px)' }}>
+                <Typography sx={{ fontSize: '0.83rem', color: colors.text.secondary, lineHeight: 1.55, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                  {selectedBonusPack.description || 'Abra este pacote especial para tentar descobrir novos bilhetinhos da coleção.'}
+                </Typography>
+                <Stack direction="row" spacing={0.7} sx={{ mt: 1, flexWrap: 'wrap', rowGap: 0.6 }}>
+                  <Box sx={{ px: 0.85, py: 0.35, borderRadius: radius.full, background: `${selectedBonusPack.accent}18`, color: selectedBonusPack.accent, fontSize: '0.68rem', fontWeight: 850 }}>
+                    {selectedBonusPack.cardsPerOpen} bilhete{selectedBonusPack.cardsPerOpen !== 1 ? 's' : ''}
+                  </Box>
+                  {selectedBonusPack.cooldownHours && (
+                    <Box sx={{ px: 0.85, py: 0.35, borderRadius: radius.full, background: 'rgba(255,255,255,0.72)', color: colors.text.secondary, fontSize: '0.68rem', fontWeight: 800 }}>
+                      {selectedBonusPack.cooldownHours}h cooldown
+                    </Box>
+                  )}
+                  {selectedBonusPack.guaranteedRarityId && (
+                    <Box sx={{ px: 0.85, py: 0.35, borderRadius: radius.full, background: 'rgba(255,247,237,0.9)', color: '#c2410c', fontSize: '0.68rem', fontWeight: 850 }}>
+                      garantia especial
+                    </Box>
+                  )}
+                </Stack>
+              </Box>
+            </DialogContent>
+            <DialogActions sx={{ px: 2, pb: 2, gap: 1 }}>
+              <Button variant="ghost" onClick={() => setSelectedBonusPack(null)} sx={{ flex: 1 }}>
+                Agora não
+              </Button>
+              <Button variant="primary" disabled={isOpeningPack} onClick={() => handleOpenBonus(selectedBonusPack)} sx={{ flex: 1, whiteSpace: 'nowrap' }}>
+                Abrir
+              </Button>
+            </DialogActions>
+          </>
+        )}
+      </Dialog>
     </Box>
   )
 }

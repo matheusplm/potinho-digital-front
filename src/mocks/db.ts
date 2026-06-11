@@ -7,6 +7,7 @@ import type {
   RarityConfig,
 } from '../types/note'
 import {
+  cloneBonusPacks,
   cloneNotes,
   cloneRarities,
   cloneStarterPacks,
@@ -45,6 +46,7 @@ export interface CollectionState {
   access: CollectionAccess[]
   ownership: OwnershipState
   lastDailyOpenDate: string | null
+  packOpens: Record<string, { lastOpenAt: string; totalOpens: number }>
 }
 
 export interface MockDb {
@@ -65,12 +67,13 @@ function buildCollection(meta: Collection, ownedIds: string[], favoriteIds: stri
     notes: cloneNotes(),
     rarities: cloneRarities(),
     types: cloneTypes(),
-    packs: cloneStarterPacks(meta.id),
+    packs: [...cloneStarterPacks(meta.id), ...cloneBonusPacks(meta.id)],
     access: meta.access === 'owner'
       ? [{ collectionId: meta.id, email: 'leitor@potinho.app', createdAt: '2026-04-21T09:00:00.000Z' }]
       : [],
     ownership: buildOwnership(ownedIds, favoriteIds),
     lastDailyOpenDate: null,
+    packOpens: {},
   }
 }
 
@@ -84,6 +87,7 @@ function buildEmptyCollection(meta: Collection): CollectionState {
     access: [],
     ownership: buildOwnership([], []),
     lastDailyOpenDate: null,
+    packOpens: {},
   }
 }
 

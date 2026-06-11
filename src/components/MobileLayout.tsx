@@ -22,6 +22,7 @@ interface NavItem {
 }
 
 const READER_NAV: NavItem[] = [
+  { label: 'Início', path: '/home', icon: <HomeIcon /> },
   { label: 'Coleções', path: '/colecoes', icon: <Inventory2Icon /> },
 ]
 
@@ -56,7 +57,7 @@ export function MobileLayout() {
       return session ? `/colecoes/${session.collectionSlug}` : '/colecoes'
     }
     const match = items.find((item) => item.path !== '/simular' && location.pathname.startsWith(item.path))
-    return match?.path ?? (user?.role === 'writer' ? '/home' : '/colecoes')
+    return match?.path ?? '/home'
   }, [location.pathname, items, isActive, user?.role])
 
   const bannerOffset = isActive ? '52px' : '0px'

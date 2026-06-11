@@ -47,6 +47,14 @@ export function useCreateCollectionNoteMutation(cid: string) {
   })
 }
 
+export function useImportCollectionNotesMutation(cid: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (json: string) => api.importCollectionNotes(cid, json),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['col-notes', cid] }) },
+  })
+}
+
 export function useUpdateCollectionNoteMutation(cid: string) {
   const queryClient = useQueryClient()
   return useMutation({
@@ -183,6 +191,12 @@ export function useCollectionPlayQuery(cid: string, options?: { enabled?: boolea
 export function useOpenCollectionDailyMutation(cid: string) {
   return useMutation({
     mutationFn: () => api.openCollectionDaily(cid),
+  })
+}
+
+export function useOpenCollectionPackMutation(cid: string) {
+  return useMutation({
+    mutationFn: (packId: string) => api.openCollectionPack(cid, packId),
   })
 }
 

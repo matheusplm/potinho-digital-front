@@ -19,7 +19,7 @@ function HomeRoute() {
   const { user } = useUser()
   const simulation = useSimulation()
   if (simulation.isActive) return <SimulatedReaderHomePage />
-  return user?.role === 'writer' ? <WriterHomePage /> : <Navigate to="/colecoes" replace />
+  return user?.role === 'writer' ? <WriterHomePage /> : <SimulatedReaderHomePage />
 }
 
 function RequireRole({ role, children }: { role: UserRole; children: ReactElement }) {

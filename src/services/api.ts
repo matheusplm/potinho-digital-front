@@ -62,6 +62,12 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
     if (code === 'VALIDATION_ERROR') {
       throw new Error('Dados inválidos. Verifique os campos e tente novamente.')
     }
+    if (code === 'INVALID_JSON') {
+      throw new Error('JSON inválido. Revise o formato e tente novamente.')
+    }
+    if (code === 'INVALID_NOTE_CONFIG') {
+      throw new Error('Algum bilhete usa raridade ou tipo que não existe nessa coleção.')
+    }
     throw new Error(payload.message ?? code ?? 'Erro inesperado na API.')
   }
 
@@ -108,6 +114,11 @@ export const api = {
   getCollectionNotes: (cid: string) => request<NoteRecord[]>(`/api/collections/${cid}/notes`),
   createCollectionNote: (cid: string, data: NoteFormData) =>
     request<NoteRecord>(`/api/collections/${cid}/notes`, { method: 'POST', body: JSON.stringify(data) }),
+  importCollectionNotes: (cid: string, json: string) =>
+    request<{ created: number; items: NoteRecord[] }>(`/api/collections/${cid}/notes/import`, {
+      method: 'POST',
+      body: JSON.stringify({ json }),
+    }),
   updateCollectionNote: (cid: string, id: string, data: Partial<NoteFormData>) =>
     request<NoteRecord>(`/api/collections/${cid}/notes/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteCollectionNote: (cid: string, id: string) =>
@@ -141,6 +152,10 @@ export const api = {
   openCollectionDaily: (cid: string) =>
     request<{ rewards: CollectionDailyReward[]; status: CollectionDailyStatus }>(
       `/api/collections/${cid}/daily/open`, { method: 'POST', body: JSON.stringify({}) }
+    ),
+  openCollectionPack: (cid: string, packId: string) =>
+    request<{ rewards: CollectionDailyReward[]; status: CollectionDailyStatus }>(
+      `/api/collections/${cid}/packs/${packId}/open`, { method: 'POST', body: JSON.stringify({}) }
     ),
   setCollectionFavorite: (cid: string, id: string, favorite: boolean) =>
     request<CollectionNoteView>(`/api/collections/${cid}/notes/${id}/favorite`, {

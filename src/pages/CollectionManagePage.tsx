@@ -20,7 +20,7 @@ import { Button, Card, Input, LoadingState, PageTitle, ScrollablePage, Segmented
 import { NoteDetailDialog, type ReadableNote } from './CollectionPlayPage'
 import {
   useCollectionsQuery,
-  useCollectionNotesQuery, useCreateCollectionNoteMutation, useUpdateCollectionNoteMutation, useDeleteCollectionNoteMutation,
+  useCollectionNotesQuery, useCreateCollectionNoteMutation, useImportCollectionNotesMutation, useUpdateCollectionNoteMutation, useDeleteCollectionNoteMutation,
   useCollectionRaritiesQuery, useCreateCollectionRarityMutation, useUpdateCollectionRarityMutation, useDeleteCollectionRarityMutation,
   useCollectionTypesQuery, useCreateCollectionTypeMutation, useUpdateCollectionTypeMutation, useDeleteCollectionTypeMutation,
   useCollectionPacksQuery, useCreateCollectionPackMutation, useUpdateCollectionPackMutation, useDeleteCollectionPackMutation,
@@ -85,6 +85,14 @@ const TABS = [
 ]
 
 const EMPTY_NOTE: NoteFormData = { title: '', message: '', rarity: '', typeId: '' }
+const DEFAULT_IMPORT_JSON = `[
+  {
+    "title": "Seu título aqui",
+    "message": "Seu bilhetinho aqui",
+    "rarity": "comum",
+    "typeId": "alegria"
+  }
+]`
 
 const NEW_RARITY: RarityConfig = {
   id: '', label: 'Nova raridade', emoji: '✨', odds: 10, order: 99,
@@ -1393,6 +1401,8 @@ export function CollectionManagePage() {
   const [editingNote, setEditingNote] = useState<NoteRecord | null>(null)
   const [deletingNote, setDeletingNote] = useState<NoteRecord | null>(null)
   const [viewingNote, setViewingNote] = useState<ReadableNote | null>(null)
+  const [importDialogOpen, setImportDialogOpen] = useState(false)
+  const [importJson, setImportJson] = useState(DEFAULT_IMPORT_JSON)
 
   const [rarityDialogOpen, setRarityDialogOpen] = useState(false)
   const [editingRarity, setEditingRarity] = useState<RarityConfig | null>(null)
@@ -1410,6 +1420,7 @@ export function CollectionManagePage() {
   const { data: packs = [], isLoading: packsLoading } = useCollectionPacksQuery(cid)
   const { data: accesses = [], isLoading: accessLoading } = useCollectionAccessQuery(cid)
   const deleteNote = useDeleteCollectionNoteMutation(cid)
+  const importNotes = useImportCollectionNotesMutation(cid)
   const deleteRarity = useDeleteCollectionRarityMutation(cid)
   const deleteType = useDeleteCollectionTypeMutation(cid)
   const updatePack = useUpdateCollectionPackMutation(cid)
@@ -1452,6 +1463,23 @@ export function CollectionManagePage() {
       onSuccess: () => { toast.success('Bilhete removido.'); setDeletingNote(null) },
       onError: () => toast.error('Erro ao remover.'),
     })
+  }
+
+  async function handleImportNotes() {
+    try {
+      JSON.parse(importJson)
+    } catch {
+      toast.error('JSON inválido. Revise vírgulas, aspas e colchetes.')
+      return
+    }
+
+    try {
+      const result = await importNotes.mutateAsync(importJson)
+      toast.success(`${result.created} bilhete${result.created !== 1 ? 's' : ''} importado${result.created !== 1 ? 's' : ''}.`)
+      setImportDialogOpen(false)
+    } catch (error) {
+      toast.error((error as Error).message || 'Erro ao importar bilhetes.')
+    }
   }
   const confirmDeleteRarity = () => {
     if (!deletingRarity) return
@@ -1543,9 +1571,14 @@ export function CollectionManagePage() {
               <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted, fontWeight: 600 }}>
                 {notes.length} bilhete{notes.length !== 1 ? 's' : ''}
               </Typography>
-              <Button variant="primary" onClick={() => { setEditingNote(null); setNoteDialog(true) }} sx={{ py: 0.7, px: 1.4, fontSize: '0.78rem' }}>
-                <AddIcon sx={{ fontSize: 15, mr: 0.4 }} /> Novo
-              </Button>
+              <Stack direction="row" spacing={0.8}>
+                <Button variant="ghost" onClick={() => setImportDialogOpen(true)} sx={{ py: 0.7, px: 1.2, fontSize: '0.76rem', background: 'rgba(255,255,255,0.44)' }}>
+                  Importar JSON
+                </Button>
+                <Button variant="primary" onClick={() => { setEditingNote(null); setNoteDialog(true) }} sx={{ py: 0.7, px: 1.4, fontSize: '0.78rem' }}>
+                  <AddIcon sx={{ fontSize: 15, mr: 0.4 }} /> Novo
+                </Button>
+              </Stack>
             </Stack>
 
             {notes.length > 0 && (
@@ -1922,6 +1955,67 @@ export function CollectionManagePage() {
           </Stack>
         )}
       </ScrollablePage>
+
+      <Dialog
+        open={importDialogOpen}
+        onClose={() => setImportDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'rgba(255,253,251,0.98)' } } }}
+      >
+        <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, pb: 0.5 }}>
+          Importar bilhetes por JSON
+        </DialogTitle>
+        <DialogContent sx={{ pt: 1 }}>
+          <Stack spacing={1.3}>
+            <Typography sx={{ fontSize: '0.82rem', color: colors.text.secondary, lineHeight: 1.5 }}>
+              Cole uma lista de bilhetes. Cada item precisa ter <strong>title</strong>, <strong>message</strong>, <strong>rarity</strong> e <strong>typeId</strong>.
+            </Typography>
+            <TextField
+              multiline
+              minRows={10}
+              value={importJson}
+              onChange={(event) => setImportJson(event.target.value)}
+              fullWidth
+              spellCheck={false}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: radius.lg,
+                  background: colors.surface.base,
+                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                  fontSize: '0.75rem',
+                  alignItems: 'flex-start',
+                },
+              }}
+            />
+            <Box sx={{ p: 1.1, borderRadius: radius.lg, background: `${theme.accent}10`, border: `1px solid ${theme.accent}24` }}>
+              <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, color: theme.accent, mb: 0.5, textTransform: 'uppercase', letterSpacing: 0.7 }}>
+                IDs aceitos
+              </Typography>
+              <Typography sx={{ fontSize: '0.74rem', color: colors.text.secondary, lineHeight: 1.5 }}>
+                Raridades: {rarities.map((rarity) => rarity.id).join(', ') || 'crie uma raridade primeiro'}
+              </Typography>
+              <Typography sx={{ fontSize: '0.74rem', color: colors.text.secondary, lineHeight: 1.5 }}>
+                Tipos: {types.map((type) => type.id).join(', ') || 'crie um tipo primeiro'}
+              </Typography>
+            </Box>
+          </Stack>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
+          <Button variant="ghost" onClick={() => setImportDialogOpen(false)} sx={{ flex: 1 }}>
+            Cancelar
+          </Button>
+          <Button
+            variant="primary"
+            loading={importNotes.isPending}
+            disabled={!importJson.trim() || importNotes.isPending}
+            onClick={handleImportNotes}
+            sx={{ flex: 1 }}
+          >
+            Importar
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <NoteDialog open={noteDialog} editing={editingNote} rarities={rarities} types={types} cid={cid} onClose={() => { setNoteDialog(false); setEditingNote(null) }} />
 

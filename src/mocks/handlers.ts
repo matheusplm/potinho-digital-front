@@ -114,9 +114,21 @@ const authHandlers = [
 ]
 
 const collectionHandlers = [
-  http.get('/api/collections', async () => {
+  http.get('/api/collections', async ({ request }) => {
     await delay(220)
-    return HttpResponse.json(db.collections.map((collection) => collection.meta))
+    const user = resolveUser(tokenFrom(request))
+    if (!user) return HttpResponse.json({ message: 'Não autenticado.' }, { status: 401 })
+    const email = user.email.toLowerCase().trim()
+    const views = db.collections.flatMap((collection) => {
+      const meta = collection.meta
+      if (meta.ownerId === user.id) return [{ ...meta, access: 'owner' as const }]
+      const owner = db.users.find((candidate) => candidate.id === meta.ownerId)
+      const hasGrant = collection.access.some((entry) => entry.email.toLowerCase().trim() === email)
+      const sharesCode = !!user.coupleCode && owner?.coupleCode === user.coupleCode
+      if (hasGrant || sharesCode) return [{ ...meta, access: 'reader' as const }]
+      return []
+    })
+    return HttpResponse.json(views)
   }),
 
   http.post('/api/collections', async ({ request }) => {
@@ -224,6 +236,65 @@ const collectionHandlers = [
     if (index === -1) return notFound('Pacotinho não encontrado.')
     collection.packs.splice(index, 1)
     return HttpResponse.json({ deleted: true })
+  }),
+
+  http.post('/api/collections/:cid/packs/:packId/open', async ({ params }) => {
+    await delay(600)
+    const collection = findCollection(String(params.cid))
+    if (!collection) return notFound('Coleção não encontrada.')
+    const pack = collection.packs.find((p) => p.id === params.packId)
+    if (!pack) return notFound('Pacotinho não encontrado.')
+    if (pack.status !== 'active') {
+      return HttpResponse.json({ message: 'Este pacotinho não está disponível.' }, { status: 409 })
+    }
+    const now = new Date()
+    const packOpen = collection.packOpens[pack.id]
+    if (pack.cooldownHours && packOpen?.lastOpenAt) {
+      const elapsed = now.getTime() - new Date(packOpen.lastOpenAt).getTime()
+      if (elapsed < pack.cooldownHours * 3_600_000) {
+        const availableAt = new Date(new Date(packOpen.lastOpenAt).getTime() + pack.cooldownHours * 3_600_000).toISOString()
+        return HttpResponse.json({ message: 'Pacotinho ainda em cooldown.', availableAt }, { status: 429 })
+      }
+    }
+    if (pack.maxOpensPerUser !== null && packOpen && packOpen.totalOpens >= pack.maxOpensPerUser) {
+      return HttpResponse.json({ message: 'Você já abriu o máximo permitido deste pacotinho.' }, { status: 409 })
+    }
+    const eligible = collection.notes.filter((note) =>
+      (pack.allowedTypeIds.length === 0 || pack.allowedTypeIds.includes(note.typeId)) &&
+      (pack.allowedRarityIds.length === 0 || pack.allowedRarityIds.includes(note.rarity)),
+    )
+    if (eligible.length === 0) {
+      return HttpResponse.json({ message: 'Nenhum bilhete elegível neste pacotinho.' }, { status: 409 })
+    }
+    const { ownership } = collection
+    const rewards: Array<{ id: string; title: string; message: string; rarity: string; typeId: string; isNew: boolean }> = []
+    const used = new Set<string>()
+    if (pack.guaranteedRarityId) {
+      const pool = eligible.filter((n) => n.rarity === pack.guaranteedRarityId && !used.has(n.id))
+      if (pool.length > 0) {
+        const note = pool[Math.floor(Math.random() * pool.length)]
+        const isNew = !ownership.owned.has(note.id)
+        if (isNew) { ownership.owned.add(note.id); ownership.obtainedAt[note.id] = now.toISOString() }
+        used.add(note.id)
+        rewards.push({ id: note.id, title: note.title, message: note.message, rarity: note.rarity, typeId: note.typeId, isNew })
+      }
+    }
+    const count = Math.max(1, pack.cardsPerOpen)
+    while (rewards.length < count) {
+      const pool = eligible.filter((n) => !used.has(n.id))
+      if (pool.length === 0) break
+      const reward = drawReward(pool, collection.rarities, ownership.owned, ownership.obtainedAt)
+      const note = collection.notes.find((n) => n.id === reward.id)
+      if (!note) break
+      used.add(reward.id)
+      rewards.push({ id: reward.id, title: reward.title, message: note.message, rarity: reward.rarity, typeId: reward.typeId, isNew: reward.isNew })
+    }
+    collection.packOpens[pack.id] = { lastOpenAt: now.toISOString(), totalOpens: (packOpen?.totalOpens ?? 0) + 1 }
+    const cooldownMs = Math.max(1, pack.cooldownHours ?? 24) * 3_600_000
+    return HttpResponse.json({
+      rewards,
+      status: { canOpen: false, availableAt: new Date(now.getTime() + cooldownMs).toISOString(), serverTime: now.toISOString() },
+    })
   }),
 
   http.get('/api/collections/:cid/notes', async ({ params }) => {

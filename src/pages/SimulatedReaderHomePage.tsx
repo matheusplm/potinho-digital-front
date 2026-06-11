@@ -1,16 +1,28 @@
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, Dialog, DialogActions, DialogContent, DialogTitle, LinearProgress, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
+import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Card, LoadingState, ScrollablePage, toast } from '../components/ui'
 import { useBackground } from '../context/BackgroundContext'
 import { useSimulation } from '../context/SimulationContext'
-import { useCollectionNotesQuery, useCollectionPacksQuery, useCollectionRaritiesQuery, useCollectionTypesQuery } from '../hooks/useNotes'
-import { colors, font, radius } from '../design-system'
+import { useUser } from '../context/UserContext'
+import {
+  useCollectionNotesQuery,
+  useCollectionPacksQuery,
+  useCollectionPlayQuery,
+  useCollectionRaritiesQuery,
+  useCollectionsQuery,
+  useCollectionTypesQuery,
+  useOpenCollectionDailyMutation,
+  useOpenCollectionPackMutation,
+} from '../hooks/useNotes'
+import { backgroundThemes, colors, font, radius } from '../design-system'
 import { simulatePackOpen } from '../utils/simulationPlay'
 import { NoteDetailDialog, PACK_OPEN_ANIMATION_MS, PackOpeningDialog, RewardCard, type ReadableNote, wait } from './CollectionPlayPage'
-import type { CollectionDailyReward, CollectionPack } from '../types/note'
+import type { Collection, CollectionDailyReward, CollectionPack } from '../types/note'
+import { slugify } from '../utils/slug'
 
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(14px); }
@@ -35,18 +47,172 @@ function formatRemainingTime(ms: number) {
   return `${hours}h ${minutes}min`
 }
 
+const readyPulse = keyframes`
+  0%, 100% { box-shadow: 0 0 0 0 rgba(244,63,94,0.45); }
+  60% { box-shadow: 0 0 0 7px rgba(244,63,94,0); }
+`
+
+function ReaderCollectionCard({ collection }: { collection: Collection }) {
+  const navigate = useNavigate()
+  const { data: play } = useCollectionPlayQuery(collection.id)
+  const { data: packs = [] } = useCollectionPacksQuery(collection.id)
+  const bg = backgroundThemes.find((t) => t.key === collection.theme) ?? backgroundThemes[0]
+  const completion = play && play.total > 0 ? Math.round((play.owned / play.total) * 100) : 0
+  const canOpen = play?.daily.canOpen ?? false
+  const remainingMs = !canOpen && play ? Math.max(0, Date.parse(play.daily.availableAt) - Date.now()) : 0
+  const favoritesCount = play?.items.filter((item) => item.favorite).length ?? 0
+  const hasBonus = packs.some((pack) => pack.status === 'active' && pack.category !== 'daily')
+  const isComplete = play ? play.total > 0 && play.owned === play.total : false
+
+  function fmt(ms: number) {
+    const h = Math.floor(ms / 3_600_000)
+    const m = Math.ceil((ms % 3_600_000) / 60_000)
+    return h > 0 ? (m === 0 ? `${h}h` : `${h}h ${m}min`) : `${m}min`
+  }
+
+  return (
+    <Box
+      onClick={() => navigate(`/colecoes/${slugify(collection.name)}`)}
+      sx={{
+        borderRadius: radius.xl, overflow: 'hidden', cursor: 'pointer',
+        background: 'rgba(255,255,255,0.88)', backdropFilter: 'blur(14px)',
+        border: `1px solid ${canOpen ? `${bg.accent}3a` : 'rgba(255,255,255,0.62)'}`,
+        boxShadow: '0 2px 12px rgba(15,23,42,0.08)',
+        transition: 'transform 0.18s ease, box-shadow 0.18s ease',
+        '&:hover': { transform: 'translateY(-2px)', boxShadow: `0 8px 28px ${bg.accent}28` },
+        '&:active': { transform: 'scale(0.985)' },
+      }}
+    >
+      <Box sx={{
+        height: 58, background: bg.gradient, display: 'flex', alignItems: 'center',
+        px: 2, gap: 1.2, position: 'relative', overflow: 'hidden',
+      }}>
+        <Box sx={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 20% 50%, rgba(255,255,255,0.22), transparent 65%)', pointerEvents: 'none' }} />
+        <Typography sx={{ fontSize: '1.6rem', lineHeight: 1, zIndex: 1, filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.18))' }}>
+          {collection.emoji}
+        </Typography>
+        <Typography sx={{
+          flex: 1, minWidth: 0, zIndex: 1,
+          fontFamily: font.serif, fontWeight: 700, fontSize: '1rem',
+          color: bg.isDark ? 'rgba(255,255,255,0.95)' : colors.text.primary,
+          lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+        }}>
+          {collection.name}
+        </Typography>
+        {canOpen && (
+          <Box sx={{
+            zIndex: 1, px: 1.1, py: 0.45, borderRadius: radius.full,
+            background: 'rgba(255,255,255,0.92)', border: `1px solid ${bg.accent}44`, flexShrink: 0,
+            animation: `${readyPulse} 2.2s ease-in-out infinite`,
+          }}>
+            <Typography sx={{ fontSize: '0.62rem', fontWeight: 800, color: bg.accent, whiteSpace: 'nowrap' }}>
+              💌 Abrir
+            </Typography>
+          </Box>
+        )}
+      </Box>
+      <Box sx={{ px: 2, py: 1.3 }}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.6 }}>
+          <Typography sx={{ fontSize: '0.68rem', color: colors.text.muted }}>
+            {play ? `${play.owned} de ${play.total} bilhetes` : '···'}
+          </Typography>
+          <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: isComplete ? colors.success.main : bg.accent }}>
+            {isComplete ? '✓ Completo' : `${completion}%`}
+          </Typography>
+        </Stack>
+        <LinearProgress variant="determinate" value={completion} sx={{
+          height: 4, borderRadius: radius.full, bgcolor: 'rgba(0,0,0,0.06)',
+          '& .MuiLinearProgress-bar': { borderRadius: radius.full, background: `linear-gradient(90deg, ${bg.accent}bb, ${bg.accent})` },
+        }} />
+        <Stack direction="row" spacing={0.7} sx={{ mt: 0.85, flexWrap: 'wrap', rowGap: 0.5, alignItems: 'center' }}>
+          {hasBonus && (
+            <Box sx={{ px: 0.85, py: 0.28, borderRadius: radius.full, background: 'rgba(99,102,241,0.12)', color: '#4f46e5', fontSize: '0.62rem', fontWeight: 800 }}>
+              🎁 Bônus
+            </Box>
+          )}
+          {favoritesCount > 0 && (
+            <Box sx={{ px: 0.85, py: 0.28, borderRadius: radius.full, background: 'rgba(244,63,94,0.1)', color: colors.rose.main, fontSize: '0.62rem', fontWeight: 800 }}>
+              ♥ {favoritesCount}
+            </Box>
+          )}
+          {!canOpen && remainingMs > 0 && (
+            <Typography sx={{ fontSize: '0.66rem', color: colors.text.muted, ml: 'auto' }}>
+              ⏳ {fmt(remainingMs)}
+            </Typography>
+          )}
+        </Stack>
+      </Box>
+    </Box>
+  )
+}
+
+function ReaderCollectionsHome({ collections }: { collections: Collection[] }) {
+  const { theme } = useBackground()
+  const { user } = useUser()
+  const firstName = user?.name?.split(' ')[0] ?? ''
+  const hour = new Date().getHours()
+  const greeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite'
+
+  return (
+    <Box sx={{ height: '100%', position: 'relative', overflow: 'hidden', background: theme.gradient }}>
+      <FavoriteIcon sx={{ position: 'absolute', bottom: -80, right: -80, fontSize: 480, color: 'rgba(225,29,72,0.05)', pointerEvents: 'none' }} />
+      <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.4s ease` }}>
+        <Stack spacing={0.3} sx={{ mb: 3 }}>
+          <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBgMuted, fontWeight: 500 }}>
+            {greeting},
+          </Typography>
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2rem', color: theme.textOnBg, lineHeight: 1.1, letterSpacing: '-0.5px' }}>
+            {firstName} 💙
+          </Typography>
+          <Typography sx={{ fontSize: '0.85rem', color: theme.textOnBgMuted, fontStyle: 'italic', mt: 0.5 }}>
+            {collections.length} potinho{collections.length !== 1 ? 's' : ''} esperando por você 💌
+          </Typography>
+        </Stack>
+        <Stack spacing={1.4}>
+          {collections.map((col) => (
+            <ReaderCollectionCard key={col.id} collection={col} />
+          ))}
+        </Stack>
+      </ScrollablePage>
+    </Box>
+  )
+}
+
 export function SimulatedReaderHomePage() {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const { theme } = useBackground()
+  const { user } = useUser()
   const simulation = useSimulation()
   const { session } = simulation
-  const cid = session?.collectionId ?? ''
-  const { data: notes = [], isLoading } = useCollectionNotesQuery(cid, { enabled: !!session })
+  const { data: collections = [], isLoading: collectionsLoading } = useCollectionsQuery()
+  const isRealReader = !simulation.isActive && user?.role === 'reader'
+  const readerCollections = useMemo(
+    () => isRealReader ? collections.filter((c) => c.access === 'reader') : [],
+    [collections, isRealReader],
+  )
+  const readerCollection = useMemo(
+    () => isRealReader ? (readerCollections[0] ?? collections[0]) : undefined,
+    [collections, isRealReader, readerCollections],
+  )
+  const activeSession = session ?? (readerCollection ? {
+    collectionId: readerCollection.id,
+    collectionSlug: slugify(readerCollection.name),
+    collectionName: readerCollection.name,
+    collectionEmoji: readerCollection.emoji,
+    preset: 'new_reader' as const,
+  } : null)
+  const cid = activeSession?.collectionId ?? ''
+  const { data: notes = [], isLoading: notesLoading } = useCollectionNotesQuery(cid, { enabled: !!session })
+  const { data: playFromApi, isLoading: playLoading } = useCollectionPlayQuery(cid, { enabled: isRealReader && !!cid })
   const { data: rarities = [] } = useCollectionRaritiesQuery(cid)
   const { data: types = [] } = useCollectionTypesQuery(cid)
   const { data: packs = [] } = useCollectionPacksQuery(cid)
-  const play = simulation.getPlayView(notes)
-  const completion = play.total > 0 ? Math.round((play.owned / play.total) * 100) : 0
+  const openDailyMutation = useOpenCollectionDailyMutation(cid)
+  const openPackMutation = useOpenCollectionPackMutation(cid)
+  const play = isRealReader ? playFromApi : simulation.getPlayView(notes)
+  const isLoading = isRealReader ? collectionsLoading || (!!cid && playLoading) : notesLoading
+  const completion = play && play.total > 0 ? Math.round((play.owned / play.total) * 100) : 0
   const [isOpeningPack, setIsOpeningPack] = useState(false)
   const [rewards, setRewards] = useState<CollectionDailyReward[]>([])
   const [highlightOpen, setHighlightOpen] = useState(false)
@@ -63,34 +229,68 @@ export function SimulatedReaderHomePage() {
   )
   const bonusPacks = useMemo(
     () => {
-      const source = session?.preset === 'new_reader_with_bonus'
-        ? packs.filter((pack) => pack.id !== mainPack?.id && pack.category !== 'daily')
-        : activePacks.filter((pack) => pack.id !== mainPack?.id)
-
+      const source = isRealReader
+        ? activePacks.filter((pack) => pack.id !== mainPack?.id)
+        : session?.preset === 'new_reader_with_bonus'
+          ? packs.filter((pack) => pack.id !== mainPack?.id && pack.category !== 'daily')
+          : activePacks.filter((pack) => pack.id !== mainPack?.id)
       return source.filter((pack) => !openedBonusPackIds.includes(pack.id))
     },
-    [activePacks, mainPack?.id, openedBonusPackIds, packs, session?.preset],
+    [activePacks, isRealReader, mainPack?.id, openedBonusPackIds, packs, session?.preset],
   )
-  const nextMainPackAt = Date.parse(play.daily.availableAt)
+  const nextMainPackAt = Date.parse(play?.daily.availableAt ?? '')
   const mainCooldownMs = Math.max(1, mainPack?.cooldownHours ?? 24) * 60 * 60 * 1000
-  const remainingMainPackMs = play.daily.canOpen || !Number.isFinite(nextMainPackAt)
+  const remainingMainPackMs = !play || play.daily.canOpen || !Number.isFinite(nextMainPackAt)
     ? 0
     : Math.max(0, nextMainPackAt - now)
-  const cooldownProgress = play.daily.canOpen
+  const cooldownProgress = !play || play.daily.canOpen
     ? 1
     : Math.min(1, Math.max(0, 1 - remainingMainPackMs / mainCooldownMs))
   const remainingLabel = formatRemainingTime(remainingMainPackMs)
 
   useEffect(() => {
-    if (play.daily.canOpen) return
+    if (!play || play.daily.canOpen) return
     const interval = window.setInterval(() => setNow(Date.now()), 30000)
     return () => window.clearInterval(interval)
-  }, [play.daily.canOpen, play.daily.availableAt])
+  }, [play])
 
   async function handleOpenPack(pack: CollectionPack | undefined, isMain: boolean) {
-    if (!session || isOpeningPack || !pack) return
-    if (notes.length === 0) {
+    if (!activeSession || !play || isOpeningPack || !pack) return
+    if (!isRealReader && notes.length === 0) {
       toast.info('Essa coleção ainda não tem bilhetes para abrir.')
+      return
+    }
+
+    if (isRealReader) {
+      setSelectedBonusPack(null)
+      setOpeningPack(pack)
+      setIsOpeningPack(true)
+      const startedAt = Date.now()
+      try {
+        let rewards: CollectionDailyReward[]
+        if (isMain) {
+          const result = await openDailyMutation.mutateAsync()
+          await queryClient.invalidateQueries({ queryKey: ['col-play', cid] })
+          rewards = result.rewards
+        } else {
+          const result = await openPackMutation.mutateAsync(pack.id)
+          setOpenedBonusPackIds((ids) => [...new Set([...ids, pack.id])])
+          rewards = result.rewards
+        }
+        await wait(Math.max(0, PACK_OPEN_ANIMATION_MS - (Date.now() - startedAt)))
+        setNow(Date.now())
+        setRewards(rewards)
+        setHighlightOpen(true)
+        const newCount = rewards.filter((r) => r.isNew).length
+        toast.love(`${rewards.length} bilhete${rewards.length !== 1 ? 's' : ''}!`, {
+          description: newCount > 0 ? `${newCount} novo${newCount !== 1 ? 's' : ''} na coleção ✨` : `${pack.name} aberto!`,
+        })
+      } catch (error) {
+        toast.error((error as Error).message ?? 'Erro ao abrir pacotinho.')
+      } finally {
+        setIsOpeningPack(false)
+        setOpeningPack(null)
+      }
       return
     }
 
@@ -121,11 +321,36 @@ export function SimulatedReaderHomePage() {
     })
   }
 
-  if (!session) {
+  if (isRealReader && !collectionsLoading && readerCollections.length > 1) {
+    return <ReaderCollectionsHome collections={readerCollections} />
+  }
+
+  if (!activeSession) {
     return (
       <Box sx={{ height: '100%', background: theme.gradient }}>
         <ScrollablePage sx={{ px: 2.5, py: 2.5 }}>
-          <LoadingState label="Preparando prévia" accent={theme.accent} textColor={theme.textOnBg} mutedColor={theme.textOnBgMuted} sx={{ minHeight: 360 }} />
+          {isRealReader && !collectionsLoading ? (
+            <Stack spacing={1.2} alignItems="center" justifyContent="center" sx={{ minHeight: 360, textAlign: 'center' }}>
+              <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.3rem', color: theme.textOnBg }}>
+                Nenhum potinho por aqui ainda
+              </Typography>
+              <Typography sx={{ fontSize: '0.85rem', color: theme.textOnBgMuted, maxWidth: 260 }}>
+                Peça o código de convite ou peça para liberarem seu email em uma coleção.
+              </Typography>
+            </Stack>
+          ) : (
+            <LoadingState label="Preparando potinho" accent={theme.accent} textColor={theme.textOnBg} mutedColor={theme.textOnBgMuted} sx={{ minHeight: 360 }} />
+          )}
+        </ScrollablePage>
+      </Box>
+    )
+  }
+
+  if (!play) {
+    return (
+      <Box sx={{ height: '100%', background: theme.gradient }}>
+        <ScrollablePage sx={{ px: 2.5, py: 2.5 }}>
+          <LoadingState label="Carregando potinho" accent={theme.accent} textColor={theme.textOnBg} mutedColor={theme.textOnBgMuted} sx={{ minHeight: 360 }} />
         </ScrollablePage>
       </Box>
     )
@@ -138,7 +363,7 @@ export function SimulatedReaderHomePage() {
       <ScrollablePage sx={{ px: 2.5, py: 2.2, animation: `${fadeIn} 0.35s ease` }}>
         <Stack spacing={0.35} sx={{ mb: 1.35 }}>
           <Typography sx={{ fontSize: '0.78rem', color: theme.textOnBgMuted, fontWeight: 700 }}>
-            Prévia do leitor
+            {isRealReader ? 'Para você' : 'Prévia do leitor'}
           </Typography>
           <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.72rem', color: theme.textOnBg, lineHeight: 1.08 }}>
             Seu potinho chegou 💌
@@ -284,7 +509,7 @@ export function SimulatedReaderHomePage() {
                     transform: 'translateY(-3px)',
                     filter: 'drop-shadow(0 5px 12px rgba(0,0,0,0.18))',
                   }}>
-                    {mainPack?.emoji ?? session.collectionEmoji}
+                    {mainPack?.emoji ?? activeSession.collectionEmoji}
                   </Typography>
                 </Box>
               ) : (
@@ -381,26 +606,28 @@ export function SimulatedReaderHomePage() {
                 <Typography sx={{ fontSize: '0.78rem', color: theme.textOnBgMuted, textAlign: 'center', maxWidth: 280, lineHeight: 1.45 }}>
                   {remainingLabel}
                 </Typography>
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    simulation.resetDailyCooldown()
-                    setNow(Date.now())
-                    toast.info('Cooldown resetado na prévia.')
-                  }}
-                  sx={{
-                    mt: 0.45,
-                    py: 0.58,
-                    px: 1.25,
-                    fontSize: '0.72rem',
-                    background: 'rgba(255,255,255,0.42)',
-                    color: theme.textOnBg,
-                    border: '1px solid rgba(255,255,255,0.48)',
-                    '&:hover': { background: 'rgba(255,255,255,0.56)' },
-                  }}
-                >
-                  Resetar cooldown
-                </Button>
+                {!isRealReader && (
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      simulation.resetDailyCooldown()
+                      setNow(Date.now())
+                      toast.info('Cooldown resetado na prévia.')
+                    }}
+                    sx={{
+                      mt: 0.45,
+                      py: 0.58,
+                      px: 1.25,
+                      fontSize: '0.72rem',
+                      background: 'rgba(255,255,255,0.42)',
+                      color: theme.textOnBg,
+                      border: '1px solid rgba(255,255,255,0.48)',
+                      '&:hover': { background: 'rgba(255,255,255,0.56)' },
+                    }}
+                  >
+                    Resetar cooldown
+                  </Button>
+                )}
               </Stack>
             )}
           </Stack>
@@ -474,7 +701,7 @@ export function SimulatedReaderHomePage() {
           ))}
         </Box>
       )}
-      <PackOpeningDialog open={isOpeningPack} emoji={openingPack?.emoji ?? session.collectionEmoji} accent={openingPack?.accent ?? theme.accent} />
+      <PackOpeningDialog open={isOpeningPack} emoji={openingPack?.emoji ?? activeSession.collectionEmoji} accent={openingPack?.accent ?? theme.accent} />
       <Dialog
         open={highlightOpen}
         onClose={() => setHighlightOpen(false)}
@@ -536,7 +763,7 @@ export function SimulatedReaderHomePage() {
             variant="primary"
             onClick={() => {
               setHighlightOpen(false)
-              navigate(`/colecoes/${session.collectionSlug}`)
+              navigate(`/colecoes/${activeSession.collectionSlug}`)
             }}
             sx={{ flex: 1, whiteSpace: 'nowrap' }}
           >
