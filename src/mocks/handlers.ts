@@ -119,13 +119,13 @@ const collectionHandlers = [
     const user = resolveUser(tokenFrom(request))
     if (!user) return HttpResponse.json({ message: 'Não autenticado.' }, { status: 401 })
     const email = user.email.toLowerCase().trim()
-    const views = db.collections.flatMap((collection) => {
+    const views = db.collections.flatMap((collection): Collection[] => {
       const meta = collection.meta
-      if (meta.ownerId === user.id) return [{ ...meta, access: 'owner' as const }]
+      if (meta.ownerId === user.id) return [{ ...meta, access: 'owner' }]
       const owner = db.users.find((candidate) => candidate.id === meta.ownerId)
       const hasGrant = collection.access.some((entry) => entry.email.toLowerCase().trim() === email)
       const sharesCode = !!user.coupleCode && owner?.coupleCode === user.coupleCode
-      if (hasGrant || sharesCode) return [{ ...meta, access: 'reader' as const }]
+      if (hasGrant || sharesCode) return [{ ...meta, access: 'reader' }]
       return []
     })
     return HttpResponse.json(views)

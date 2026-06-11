@@ -224,7 +224,7 @@ export interface CollectionAchievement {
   updatedAt?: string
 }
 
-export type CollectionAchievementFormData = Omit<CollectionAchievement, 'collectionId' | 'createdAt' | 'updatedAt'> & {
+export type CollectionAchievementFormData = Omit<CollectionAchievement, 'id' | 'collectionId' | 'createdAt' | 'updatedAt'> & {
   id?: string
 }
 

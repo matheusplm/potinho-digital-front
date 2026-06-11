@@ -5,7 +5,7 @@ import { Card, LoadingState, ScrollablePage } from '../components/ui'
 import { CollectionPanel } from '../components/album/CollectionPanel'
 import { useBackground } from '../context/BackgroundContext'
 import { useActiveReaderCollection } from '../hooks/useActiveReaderCollection'
-import { useCollectionPlayQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
+import { useCollectionPlayQuery, useCollectionRaritiesQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
 import { colors, font, radius } from '../design-system'
 
 const fadeIn = keyframes`from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); }`
@@ -20,6 +20,7 @@ export function ConquistasPage() {
   const { collection, isLoading: collectionsLoading } = useActiveReaderCollection()
   const cid = collection?.id ?? ''
   const { data: play, isLoading: playLoading } = useCollectionPlayQuery(cid, { enabled: !!cid })
+  const { data: rarities = [] } = useCollectionRaritiesQuery(cid)
   const { data: achData, isLoading: achLoading } = useReaderAchievementsQuery(cid)
 
   const achievements = achData?.achievements ?? []
@@ -62,6 +63,18 @@ export function ConquistasPage() {
         {!isLoading && play && (
           <Stack spacing={2}>
             <CollectionPanel play={play} rarities={rarities} />
+
+            {achievements.length === 0 && (
+              <Card sx={{ p: 2.5, textAlign: 'center' }}>
+                <Typography sx={{ fontSize: '2rem', mb: 0.5 }}>🏅</Typography>
+                <Typography sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, mb: 0.3 }}>
+                  Sem conquistas por aqui
+                </Typography>
+                <Typography sx={{ fontSize: '0.8rem', color: colors.text.secondary }}>
+                  Esta coleção ainda não tem conquistas definidas.
+                </Typography>
+              </Card>
+            )}
 
             <Stack spacing={1}>
               {achievements.map((a) => {
