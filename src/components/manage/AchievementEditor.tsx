@@ -7,7 +7,7 @@ import {
   useUpdateCollectionAchievementMutation,
 } from '../../hooks/useNotes'
 import { colors, font, radius } from '../../design-system'
-import { slugify } from '../../utils/slug'
+import { uniqueConfigId } from '../../utils/slug'
 import type {
   AchievementConditionType,
   CollectionAchievement,
@@ -92,10 +92,7 @@ export function AchievementEditor({ cid, achievement, rarities, types, onClose }
     }
 
     if (isNew) {
-      const ids = existing.map((a) => a.id)
-      let id = slugify(label) || 'conquista'
-      let n = 2
-      while (ids.includes(id)) { id = `${slugify(label)}_${n}`; n += 1 }
+      const id = uniqueConfigId(label, existing.map((a) => a.id))
       createMutation.mutate({ ...payload, id }, options)
     } else {
       const { label: l, emoji, description, conditionType, count, rarityId, typeId, order } = payload

@@ -1450,10 +1450,7 @@ export function CollectionManagePage() {
   const revokeMutation = useRevokeAccessMutation(cid)
 
   function addAchievementPreset(preset: typeof ACHIEVEMENT_PRESETS[number]) {
-    const ids = achievements.map((a) => a.id)
-    let id = slugify(preset.label) || 'conquista'
-    let n = 2
-    while (ids.includes(id)) { id = `${slugify(preset.label)}_${n}`; n += 1 }
+    const id = uniqueConfigId(preset.label, achievements.map((a) => a.id))
     createAchievement.mutate(
       { id, label: preset.label, emoji: preset.emoji, description: preset.description, conditionType: preset.conditionType, count: preset.count, rarityId: null, typeId: null, order: achievements.length + 1 },
       { onSuccess: () => toast.success('Conquista adicionada!'), onError: (e: Error) => toast.error(e.message || 'Erro ao adicionar.') },

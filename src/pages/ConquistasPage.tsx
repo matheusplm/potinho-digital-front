@@ -38,7 +38,7 @@ export function ConquistasPage() {
           <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.6rem', color: theme.textOnBg, lineHeight: 1.1 }}>
             {collection?.name ?? 'Suas conquistas'}
           </Typography>
-          {play && (
+          {achData && (
             <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBgMuted, fontStyle: 'italic', mt: 0.3 }}>
               {unlocked} de {achievements.length} desbloqueadas
             </Typography>
@@ -60,9 +60,9 @@ export function ConquistasPage() {
           </Stack>
         )}
 
-        {!isLoading && play && (
+        {!isLoading && collection && (
           <Stack spacing={2}>
-            <CollectionPanel play={play} rarities={rarities} />
+            {play && <CollectionPanel play={play} rarities={rarities} />}
 
             {achievements.length === 0 && (
               <Card sx={{ p: 2.5, textAlign: 'center' }}>
