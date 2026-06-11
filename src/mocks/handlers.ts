@@ -1,12 +1,15 @@
 import { delay, http, HttpResponse } from 'msw'
 import type {
   Collection,
+  CollectionAchievement,
+  CollectionAchievementFormData,
   CollectionFormData,
   CollectionPackFormData,
   NoteFormData,
   NoteTypeConfig,
   RarityConfig,
 } from '../types/note'
+import { toConfigId } from '../utils/slug'
 import { buildNoteView, drawReward } from './data'
 import {
   createEmptyCollection,
@@ -14,8 +17,57 @@ import {
   findCollection,
   nextId,
   resolveUser,
+  type CollectionState,
   type MockUser,
 } from './db'
+
+function evaluateReaderAchievements(collection: CollectionState) {
+  const { ownership, notes, achievements, achievementState } = collection
+  const ownedCount = ownership.owned.size
+  const favorites = [...ownership.favorites].filter((id) => ownership.owned.has(id)).length
+  const presentRarities = new Set(notes.map((n) => n.rarity))
+  const ownedRarities = new Set(notes.filter((n) => ownership.owned.has(n.id)).map((n) => n.rarity))
+  const ownedByRarity = new Map<string, number>()
+  const ownedByType = new Map<string, number>()
+  const totalByType = new Map<string, number>()
+  for (const n of notes) {
+    totalByType.set(n.typeId, (totalByType.get(n.typeId) ?? 0) + 1)
+    if (ownership.owned.has(n.id)) {
+      ownedByRarity.set(n.rarity, (ownedByRarity.get(n.rarity) ?? 0) + 1)
+      ownedByType.set(n.typeId, (ownedByType.get(n.typeId) ?? 0) + 1)
+    }
+  }
+  const evalOne = (a: CollectionAchievement): { current: number; target: number } => {
+    switch (a.conditionType) {
+      case 'collect_count': return { current: ownedCount, target: a.count ?? 1 }
+      case 'complete': return { current: ownedCount, target: notes.length }
+      case 'rarity_count': return { current: a.rarityId ? ownedByRarity.get(a.rarityId) ?? 0 : 0, target: a.count ?? 1 }
+      case 'type_complete': return { current: a.typeId ? ownedByType.get(a.typeId) ?? 0 : 0, target: a.typeId ? totalByType.get(a.typeId) ?? 0 : 0 }
+      case 'favorite_count': return { current: favorites, target: a.count ?? 1 }
+      case 'rainbow': return { current: ownedRarities.size, target: presentRarities.size }
+      default: return { current: 0, target: 1 }
+    }
+  }
+  const hasBaseline = achievementState.baseline
+  const justUnlocked: string[] = []
+  const now = new Date().toISOString()
+  const result = achievements.map((a) => {
+    const { current, target } = evalOne(a)
+    const meetsNow = target > 0 && current >= target
+    let unlockedAt = achievementState.unlocked[a.id] ?? null
+    if (meetsNow && !unlockedAt) {
+      unlockedAt = now
+      achievementState.unlocked[a.id] = now
+      if (hasBaseline) justUnlocked.push(a.id)
+    }
+    return {
+      id: a.id, emoji: a.emoji, label: a.label, description: a.description, conditionType: a.conditionType,
+      current: Math.min(current, target || current), target, unlocked: !!unlockedAt, unlockedAt,
+    }
+  })
+  if (!hasBaseline) achievementState.baseline = true
+  return { achievements: result, justUnlocked }
+}
 
 const COLLECTION_PACK_SIZE = 3
 
@@ -462,6 +514,53 @@ const collectionHandlers = [
       ...buildNoteView(record, ownership.owned, ownership.favorites, ownership.obtainedAt),
       message: record.message,
     })
+  }),
+
+  http.get('/api/collections/:cid/achievements', async ({ params }) => {
+    await delay(140)
+    const collection = findCollection(String(params.cid))
+    if (!collection) return notFound('Coleção não encontrada.')
+    return HttpResponse.json(collection.achievements)
+  }),
+
+  http.get('/api/collections/:cid/achievements/me', async ({ params }) => {
+    await delay(180)
+    const collection = findCollection(String(params.cid))
+    if (!collection) return notFound('Coleção não encontrada.')
+    return HttpResponse.json(evaluateReaderAchievements(collection))
+  }),
+
+  http.post('/api/collections/:cid/achievements', async ({ params, request }) => {
+    await delay(200)
+    const collection = findCollection(String(params.cid))
+    if (!collection) return notFound('Coleção não encontrada.')
+    const data = (await request.json()) as CollectionAchievementFormData
+    const id = data.id || toConfigId(data.label)
+    if (collection.achievements.some((a) => a.id === id)) {
+      return HttpResponse.json({ error: 'ACHIEVEMENT_ALREADY_EXISTS' }, { status: 400 })
+    }
+    const now = new Date().toISOString()
+    const achievement: CollectionAchievement = { ...data, id, collectionId: collection.meta.id, createdAt: now, updatedAt: now }
+    collection.achievements.push(achievement)
+    return HttpResponse.json(achievement)
+  }),
+
+  http.put('/api/collections/:cid/achievements/:id', async ({ params, request }) => {
+    await delay(180)
+    const collection = findCollection(String(params.cid))
+    if (!collection) return notFound('Coleção não encontrada.')
+    const achievement = collection.achievements.find((a) => a.id === params.id)
+    if (!achievement) return notFound('Conquista não encontrada.')
+    Object.assign(achievement, await request.json(), { updatedAt: new Date().toISOString() })
+    return HttpResponse.json(achievement)
+  }),
+
+  http.delete('/api/collections/:cid/achievements/:id', async ({ params }) => {
+    await delay(160)
+    const collection = findCollection(String(params.cid))
+    if (!collection) return notFound('Coleção não encontrada.')
+    collection.achievements = collection.achievements.filter((a) => a.id !== params.id)
+    return HttpResponse.json({ deleted: true })
   }),
 ]
 

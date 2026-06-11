@@ -1,6 +1,7 @@
 import type {
   Collection,
   CollectionAccess,
+  CollectionAchievement,
   CollectionPack,
   NoteRecord,
   NoteTypeConfig,
@@ -47,6 +48,19 @@ export interface CollectionState {
   ownership: OwnershipState
   lastDailyOpenDate: string | null
   packOpens: Record<string, { lastOpenAt: string; totalOpens: number }>
+  achievements: CollectionAchievement[]
+  achievementState: { unlocked: Record<string, string>; baseline: boolean }
+}
+
+function cloneAchievements(collectionId: string): CollectionAchievement[] {
+  const now = '2026-04-20T10:00:00.000Z'
+  const base = { collectionId, rarityId: null, typeId: null, createdAt: now, updatedAt: now }
+  return [
+    { ...base, id: 'primeiro_bilhete', label: 'Primeiro bilhete', emoji: '🌱', description: 'Coletou o primeiro bilhetinho.', conditionType: 'collect_count', count: 1, order: 1 },
+    { ...base, id: 'colecionador', label: 'Colecionador(a)', emoji: '🎴', description: 'Coletou 5 bilhetes.', conditionType: 'collect_count', count: 5, order: 2 },
+    { ...base, id: 'colecao_completa', label: 'Coleção completa', emoji: '👑', description: 'Coletou todos os bilhetes.', conditionType: 'complete', count: null, order: 3 },
+    { ...base, id: 'coracao_cheio', label: 'Coração cheio', emoji: '❤️', description: 'Favoritou 3 bilhetes.', conditionType: 'favorite_count', count: 3, order: 4 },
+  ]
 }
 
 export interface MockDb {
@@ -74,6 +88,8 @@ function buildCollection(meta: Collection, ownedIds: string[], favoriteIds: stri
     ownership: buildOwnership(ownedIds, favoriteIds),
     lastDailyOpenDate: null,
     packOpens: {},
+    achievements: cloneAchievements(meta.id),
+    achievementState: { unlocked: {}, baseline: false },
   }
 }
 
@@ -88,6 +104,8 @@ function buildEmptyCollection(meta: Collection): CollectionState {
     ownership: buildOwnership([], []),
     lastDailyOpenDate: null,
     packOpens: {},
+    achievements: [],
+    achievementState: { unlocked: {}, baseline: false },
   }
 }
 
