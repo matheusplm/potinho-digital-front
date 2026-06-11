@@ -21,6 +21,8 @@ import {
 } from '../hooks/useNotes'
 import { colors, font, radius } from '../design-system'
 import { simulatePackOpen } from '../utils/simulationPlay'
+import { computeAchievements } from '../utils/achievements'
+import { useAchievementUnlocks } from '../hooks/useAchievementUnlocks'
 import { NoteDetailDialog, PACK_OPEN_ANIMATION_MS, PackOpeningDialog, RewardCard, type ReadableNote, wait } from './CollectionPlayPage'
 import type { CollectionDailyReward, CollectionPack } from '../types/note'
 import { slugify } from '../utils/slug'
@@ -96,6 +98,19 @@ export function SimulatedReaderHomePage() {
   const play = isRealReader ? playFromApi : simulation.getPlayView(notes)
   const isLoading = isRealReader ? collectionsLoading || (!!cid && playLoading) : notesLoading
   const completion = play && play.total > 0 ? Math.round((play.owned / play.total) * 100) : 0
+
+  useAchievementUnlocks(play, rarities, types, cid, isRealReader)
+  const ownedItems = useMemo(() => (play?.items ?? []).filter((i) => i.owned), [play])
+  const favCount = ownedItems.filter((i) => i.favorite).length
+  const achievementsUnlocked = useMemo(
+    () => (play ? computeAchievements(play, rarities, types).filter((a) => a.unlocked).length : 0),
+    [play, rarities, types],
+  )
+  const relerNote = useMemo(
+    () => (ownedItems.length > 0 ? ownedItems[Math.floor(Math.random() * ownedItems.length)] : undefined),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [cid, ownedItems.length],
+  )
   const [isOpeningPack, setIsOpeningPack] = useState(false)
   const [rewards, setRewards] = useState<CollectionDailyReward[]>([])
   const [highlightOpen, setHighlightOpen] = useState(false)
@@ -261,6 +276,27 @@ export function SimulatedReaderHomePage() {
           </Typography>
         </Stack>
 
+        <Stack direction="row" spacing={0.8} sx={{ mb: 1.35 }}>
+          {[
+            { emoji: '🎴', value: play.owned, label: 'coletados' },
+            { emoji: '❤️', value: favCount, label: 'favoritas' },
+            { emoji: '🏅', value: achievementsUnlocked, label: 'conquistas' },
+          ].map((s) => (
+            <Box key={s.label} sx={{
+              flex: 1, px: 1, py: 0.85, borderRadius: radius.lg, textAlign: 'center',
+              background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.6)', backdropFilter: 'blur(12px)',
+            }}>
+              <Typography sx={{ fontSize: '1rem', lineHeight: 1 }}>{s.emoji}</Typography>
+              <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.05rem', color: theme.textOnBg, lineHeight: 1.2, mt: 0.25 }}>
+                {s.value}
+              </Typography>
+              <Typography sx={{ fontSize: '0.6rem', fontWeight: 700, color: theme.textOnBgMuted }}>
+                {s.label}
+              </Typography>
+            </Box>
+          ))}
+        </Stack>
+
         <Stack spacing={1.15} sx={{ minHeight: 'calc(100dvh - 214px)' }}>
           <Card sx={{ p: 1.05, background: 'rgba(255,255,255,0.62)', backdropFilter: 'blur(14px)' }}>
             <Stack spacing={0.65}>
@@ -289,6 +325,35 @@ export function SimulatedReaderHomePage() {
               )}
             </Stack>
           </Card>
+
+          {relerNote && (
+            <Card
+              onClick={() => setSelectedNote(relerNote)}
+              sx={{ p: 1.15, cursor: 'pointer', background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(12px)', transition: 'transform 0.16s', '&:active': { transform: 'scale(0.99)' } }}
+            >
+              <Stack direction="row" alignItems="center" spacing={1.1}>
+                <Box sx={{
+                  width: 38, height: 38, borderRadius: radius.lg, flexShrink: 0, fontSize: '1.15rem',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: `${theme.accent}16`, border: `1px solid ${theme.accent}26`,
+                }}>
+                  💭
+                </Box>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <Typography sx={{ fontSize: '0.6rem', fontWeight: 900, letterSpacing: 0.6, color: theme.accent, textTransform: 'uppercase' }}>
+                    Pra reler agora
+                  </Typography>
+                  <Typography sx={{
+                    fontFamily: font.serif, fontWeight: 800, fontSize: '0.92rem', color: colors.text.primary, lineHeight: 1.25,
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  }}>
+                    {relerNote.title}
+                  </Typography>
+                </Box>
+                <Typography sx={{ fontSize: '1.1rem', color: theme.textOnBgMuted, flexShrink: 0 }}>›</Typography>
+              </Stack>
+            </Card>
+          )}
 
           <Stack spacing={1.2} alignItems="center" justifyContent="center" sx={{
             flex: 1,

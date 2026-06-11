@@ -24,7 +24,6 @@ import { colors, font, radius } from '../design-system'
 import type { BackgroundTheme } from '../design-system'
 import { slugify } from '../utils/slug'
 import { CollectionPanel } from '../components/album/CollectionPanel'
-import { Achievements } from '../components/album/Achievements'
 import { ShareCartinha } from '../components/album/ShareCartinha'
 import type { CollectionDailyReward, CollectionNoteView, NoteRecord, RarityConfig, NoteTypeConfig } from '../types/note'
 
@@ -553,7 +552,7 @@ export function PackOpeningDialog({ open, emoji, accent }: { open: boolean; emoj
   )
 }
 
-function NoteCard({ note, r, t, unread, variant, onSelect, onToggleFavorite }: {
+export function NoteCard({ note, r, t, unread, variant, onSelect, onToggleFavorite }: {
   note: CollectionNoteView
   r?: RarityConfig
   t?: NoteTypeConfig
@@ -1125,15 +1124,6 @@ export function CollectionPlayPage() {
             )}
 
             <CollectionPanel play={displayPlay} rarities={rarities} />
-
-            <Achievements
-              play={displayPlay}
-              rarities={rarities}
-              types={types}
-              collectionId={cid}
-              live={isReaderView}
-              theme={theme}
-            />
 
             {(isSimulating || discoveredItems.length > 0) && (
               <AlbumSection
