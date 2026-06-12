@@ -14,6 +14,7 @@ import { RegisterPage } from './pages/RegisterPage'
 import { CollectionsListPage } from './pages/CollectionsListPage'
 import { CollectionPlayPage } from './pages/CollectionPlayPage'
 import { CollectionManagePage } from './pages/CollectionManagePage'
+import { ReaderCollectionPage } from './pages/ReaderCollectionPage'
 import { ConquistasPage } from './pages/ConquistasPage'
 import { FavoritasPage } from './pages/FavoritasPage'
 import { TestPage } from './pages/TestPage'
@@ -66,6 +67,7 @@ function AppRoutes() {
         <Route path="conquistas" element={<ConquistasPage />} />
         <Route path="favoritas" element={<FavoritasPage />} />
         <Route path="colecoes/:slug/gerenciar" element={<RequireRole role="writer"><CollectionManagePage /></RequireRole>} />
+        <Route path="colecoes/:slug/gerenciar/leitores/:email" element={<RequireRole role="writer"><ReaderCollectionPage /></RequireRole>} />
       </Route>
       {import.meta.env.DEV && <Route path="test" element={<TestPage />} />}
       <Route path="*" element={<NotFoundPage />} />
