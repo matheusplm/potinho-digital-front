@@ -17,7 +17,10 @@ interface SegmentedControlProps<T extends string> {
 
 export function SegmentedControl<T extends string>({ options, value, onChange }: SegmentedControlProps<T>) {
   return (
-    <Box sx={{ display: 'flex', p: 0.5, borderRadius: '10px', bgcolor: 'rgba(0,0,0,0.06)' }}>
+    <Box sx={{
+      display: 'flex', flexWrap: 'wrap', p: 0.5, rowGap: 0.5,
+      borderRadius: '10px', bgcolor: 'rgba(0,0,0,0.06)',
+    }}>
       {options.map((opt) => {
         const active = value === opt.id
         const color = opt.activeColor ?? colors.primary.main
@@ -26,7 +29,7 @@ export function SegmentedControl<T extends string>({ options, value, onChange }:
             key={opt.id}
             onClick={() => onChange(opt.id)}
             sx={{
-              flex: 1, py: 1, px: 1.2, borderRadius: '8px', cursor: 'pointer',
+              flex: '1 1 28%', py: 1, px: 1.2, borderRadius: '8px', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.7,
               bgcolor: active ? '#fff' : 'transparent',
               boxShadow: active ? '0 1px 6px rgba(0,0,0,0.1)' : 'none',
