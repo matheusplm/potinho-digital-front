@@ -777,7 +777,9 @@ function PackEditor({ cid, pack, rarities, types, onClose }: {
           <Stack direction="row" spacing={1.5}>
             <Input label="Cartas" type="number" value={form.cardsPerOpen} onChange={(e) => set('cardsPerOpen', Number(e.target.value))} sx={{ flex: 1 }} />
             <Input label="Cooldown h" type="number" value={form.cooldownHours ?? ''} onChange={(e) => set('cooldownHours', e.target.value === '' ? null : Number(e.target.value))} sx={{ flex: 1 }} />
-            <Input label="Máx." type="number" value={form.maxOpensPerUser ?? ''} onChange={(e) => set('maxOpensPerUser', e.target.value === '' ? null : Number(e.target.value))} sx={{ flex: 1 }} />
+            {form.distribution === 'all_with_access' && (
+              <Input label="Máx. por pessoa" type="number" value={form.maxOpensPerUser ?? ''} onChange={(e) => set('maxOpensPerUser', e.target.value === '' ? null : Number(e.target.value))} sx={{ flex: 1 }} />
+            )}
           </Stack>
 
           <Box>
@@ -868,11 +870,12 @@ function formatCooldown(hours: number | null) {
 }
 
 function buildPackRules(pack: CollectionPack) {
+  const isManual = pack.distribution === 'manual_bonus' || pack.distribution === 'selected_readers'
   return [
     pack.allowedTypeIds.length > 0 ? `${pack.allowedTypeIds.length} tipo${pack.allowedTypeIds.length === 1 ? '' : 's'} permitido${pack.allowedTypeIds.length === 1 ? '' : 's'}` : 'Todos os tipos',
     pack.allowedRarityIds.length > 0 ? `${pack.allowedRarityIds.length} raridade${pack.allowedRarityIds.length === 1 ? '' : 's'} permitida${pack.allowedRarityIds.length === 1 ? '' : 's'}` : 'Todas as raridades',
     pack.guaranteedRarityId ? `Garante ${pack.guaranteedRarityId}` : 'Sem garantia fixa',
-    pack.maxOpensPerUser ? `${pack.maxOpensPerUser} abertura${pack.maxOpensPerUser === 1 ? '' : 's'} por pessoa` : 'Sem limite por pessoa',
+    ...(!isManual ? [pack.maxOpensPerUser ? `${pack.maxOpensPerUser} abertura${pack.maxOpensPerUser === 1 ? '' : 's'} por pessoa` : 'Sem limite por pessoa'] : []),
   ]
 }
 
