@@ -328,20 +328,14 @@ export function SimulatedReaderHomePage() {
   const bonusPacks = useMemo(
     () => {
       const source = isRealReader
-        ? activePacks.filter((pack) => {
-            if (pack.id === mainPack?.id) return false
-            // enquanto play carrega, não filtra por packOpens (evita flash de desaparecimento)
-            if (playLoading) return true
-            if (pack.distribution !== 'all_with_access' && play?.packOpens?.[pack.id] === undefined) return false
-            return true
-          })
+        ? activePacks.filter((pack) => pack.id !== mainPack?.id)
         : session?.preset === 'new_reader_with_bonus'
           ? packs.filter((pack) => pack.id !== mainPack?.id && pack.category !== 'daily')
           : activePacks.filter((pack) => pack.id !== mainPack?.id)
       if (isRealReader) return source
       return source.filter((pack) => !openedBonusPackIds.includes(pack.id))
     },
-    [activePacks, isRealReader, mainPack?.id, openedBonusPackIds, packs, play, playLoading, session?.preset],
+    [activePacks, isRealReader, mainPack?.id, openedBonusPackIds, packs, session?.preset],
   )
 
   function getBonusPackCooldownMs(packId: string) {
@@ -354,15 +348,17 @@ export function SimulatedReaderHomePage() {
     return exhaustedPackIds.includes(packId)
   }
 
-  function bonusPackBlock(pack: CollectionPack): 'exhausted' | 'cooldown' | null {
+  function bonusPackBlock(pack: CollectionPack): 'exhausted' | 'cooldown' | 'locked' | null {
     if (pack.distribution !== 'all_with_access') {
       const opens = play?.packOpens?.[pack.id]
       if (opens !== undefined) {
-        // backend é fonte da verdade para esses packs — ignora localStorage
+        // backend é fonte da verdade — ignora localStorage
         if (opens === 0) return 'exhausted'
         if (getBonusPackCooldownMs(pack.id) > 0) return 'cooldown'
         return null
       }
+      // não atribuído: mostra bolinha bloqueada enquanto play carrega ou se nunca foi dado
+      if (!playLoading) return 'locked'
     }
     if (isPackExhausted(pack.id)) return 'exhausted'
     if (getBonusPackCooldownMs(pack.id) > 0) return 'cooldown'
@@ -961,12 +957,14 @@ export function SimulatedReaderHomePage() {
                   gap: 0.1,
                   color: '#fff',
                 }}>
-                  {block === 'exhausted'
+                  {(block === 'exhausted' || block === 'locked')
                     ? <LockRoundedIcon sx={{ fontSize: 18, filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.4))' }} />
                     : <AccessTimeRoundedIcon sx={{ fontSize: 17, filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.4))' }} />}
-                  <Typography sx={{ fontSize: '0.5rem', fontWeight: 800, lineHeight: 1, textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
-                    {block === 'exhausted' ? 'esgotado' : formatCooldownBadge(getBonusPackCooldownMs(pack.id))}
-                  </Typography>
+                  {block !== 'locked' && (
+                    <Typography sx={{ fontSize: '0.5rem', fontWeight: 800, lineHeight: 1, textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
+                      {block === 'exhausted' ? 'esgotado' : formatCooldownBadge(getBonusPackCooldownMs(pack.id))}
+                    </Typography>
+                  )}
                 </Box>
               )}
             </Box>
@@ -1094,7 +1092,9 @@ export function SimulatedReaderHomePage() {
                   ? 'Você já abriu o máximo deste pacotinho'
                   : isRealReader && bonusPackBlock(selectedBonusPack) === 'cooldown'
                     ? `Disponível em ${formatRemainingTime(getBonusPackCooldownMs(selectedBonusPack.id))}`
-                    : 'Pacotinho bônus disponível'}
+                    : isRealReader && bonusPackBlock(selectedBonusPack) === 'locked'
+                      ? 'Este pacotinho ainda não foi liberado para você'
+                      : 'Pacotinho bônus disponível'}
               </Typography>
             </Box>
 
@@ -1151,7 +1151,9 @@ export function SimulatedReaderHomePage() {
                   ? 'Esgotado'
                   : isRealReader && bonusPackBlock(selectedBonusPack) === 'cooldown'
                     ? 'Em cooldown'
-                    : 'Abrir bônus'}
+                    : isRealReader && bonusPackBlock(selectedBonusPack) === 'locked'
+                      ? 'Bloqueado'
+                      : 'Abrir bônus'}
               </Button>
             </DialogActions>
           </>
