@@ -209,7 +209,6 @@ export type AchievementConditionType =
   | 'favorite_count'
   | 'rainbow'
 
-/** Template de conquista (configurado pelo dono da coleção). */
 export interface CollectionAchievement {
   id: string
   collectionId: string
@@ -229,7 +228,6 @@ export type CollectionAchievementFormData = Omit<CollectionAchievement, 'id' | '
   id?: string
 }
 
-/** Conquista avaliada para o leitor (server-side). */
 export interface ReaderAchievement {
   id: string
   emoji: string

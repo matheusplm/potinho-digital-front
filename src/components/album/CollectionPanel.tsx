@@ -4,7 +4,6 @@ import { Card } from '../ui'
 import { colors, font, radius } from '../../design-system'
 import type { CollectionPlayView, RarityConfig } from '../../types/note'
 
-/** Painel de progresso da coleção: % total + quebra por raridade + a mais rara já obtida. */
 export function CollectionPanel({ play, rarities }: {
   play: CollectionPlayView
   rarities: RarityConfig[]

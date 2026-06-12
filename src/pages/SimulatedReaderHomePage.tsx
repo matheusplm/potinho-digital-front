@@ -21,7 +21,43 @@ import {
 } from '../hooks/useNotes'
 import { colors, font, radius } from '../design-system'
 import { isCollectionReader } from '../utils/collectionAccess'
+import { ApiRequestError } from '../services/api'
 import { simulatePackOpen } from '../utils/simulationPlay'
+
+const PACK_COOLDOWN_KEY = 'potinho-pack-cooldowns'
+
+function readPackCooldownStore(): Record<string, Record<string, string>> {
+  try {
+    return JSON.parse(localStorage.getItem(PACK_COOLDOWN_KEY) ?? '{}') as Record<string, Record<string, string>>
+  } catch {
+    return {}
+  }
+}
+
+function loadPackCooldowns(cid: string): Record<string, string> {
+  if (!cid) return {}
+  const stored = readPackCooldownStore()[cid] ?? {}
+  const now = Date.now()
+  return Object.fromEntries(
+    Object.entries(stored).filter(([, availableAt]) => Date.parse(availableAt) > now),
+  )
+}
+
+function savePackCooldowns(cid: string, cooldowns: Record<string, string>) {
+  if (!cid) return
+  const store = readPackCooldownStore()
+  const now = Date.now()
+  const active = Object.fromEntries(
+    Object.entries(cooldowns).filter(([, availableAt]) => Date.parse(availableAt) > now),
+  )
+  if (Object.keys(active).length > 0) store[cid] = active
+  else delete store[cid]
+  try {
+    localStorage.setItem(PACK_COOLDOWN_KEY, JSON.stringify(store))
+  } catch {
+    void 0
+  }
+}
 import { computeAchievements } from '../utils/achievements'
 import { NoteDetailDialog, PACK_OPEN_ANIMATION_MS, PackOpeningDialog, RewardCard, type ReadableNote, wait } from './CollectionPlayPage'
 import type { CollectionDailyReward, CollectionPack } from '../types/note'
@@ -90,9 +126,9 @@ export function SimulatedReaderHomePage() {
   const cid = activeSession?.collectionId ?? ''
 
   useEffect(() => {
-    setPackCooldowns({})
+    setPackCooldowns(isRealReader ? loadPackCooldowns(cid) : {})
     setOpenedBonusPackIds([])
-  }, [cid])
+  }, [cid, isRealReader])
 
   const { data: notes = [], isLoading: notesLoading } = useCollectionNotesQuery(cid, { enabled: !!session })
   const { data: playFromApi, isLoading: playLoading } = useCollectionPlayQuery(cid, { enabled: isRealReader && !!cid })
@@ -115,7 +151,6 @@ export function SimulatedReaderHomePage() {
   )
   const relerNote = useMemo(
     () => (ownedItems.length > 0 ? ownedItems[Math.floor(Math.random() * ownedItems.length)] : undefined),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [cid, ownedItems.length],
   )
   const [isOpeningPack, setIsOpeningPack] = useState(false)
@@ -200,7 +235,11 @@ export function SimulatedReaderHomePage() {
           rewards = result.rewards
         } else {
           const result = await openPackMutation.mutateAsync(pack.id)
-          setPackCooldowns((current) => ({ ...current, [pack.id]: result.status.availableAt }))
+          setPackCooldowns((current) => {
+            const next = { ...current, [pack.id]: result.status.availableAt }
+            savePackCooldowns(cid, next)
+            return next
+          })
           rewards = result.rewards
         }
         await wait(Math.max(0, PACK_OPEN_ANIMATION_MS - (Date.now() - startedAt)))
@@ -214,7 +253,21 @@ export function SimulatedReaderHomePage() {
           description: newCount > 0 ? `${newCount} novo${newCount !== 1 ? 's' : ''} na coleção ✨` : `${pack.name} aberto!`,
         })
       } catch (error) {
-        toast.error((error as Error).message ?? 'Erro ao abrir pacotinho.')
+        if (error instanceof ApiRequestError && error.status === 429) {
+          if (isMain) {
+            await queryClient.invalidateQueries({ queryKey: ['col-play', cid] })
+          } else if (error.availableAt) {
+            setPackCooldowns((current) => {
+              const next = { ...current, [pack.id]: error.availableAt as string }
+              savePackCooldowns(cid, next)
+              return next
+            })
+          }
+          setNow(Date.now())
+          toast.info(error.message ?? 'Pacotinho ainda em cooldown.')
+        } else {
+          toast.error((error as Error).message ?? 'Erro ao abrir pacotinho.')
+        }
       } finally {
         setIsOpeningPack(false)
         setOpeningPack(null)

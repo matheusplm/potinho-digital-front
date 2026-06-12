@@ -120,7 +120,6 @@ export function ShareCartinha({ note, r, t, theme }: {
         </Button>
       </Stack>
 
-      {/* nós de captura escondidos (renderizados fora da tela) */}
       <Box aria-hidden sx={{ position: 'fixed', left: -99999, top: 0, pointerEvents: 'none', opacity: 0 }}>
         <Box ref={cardRef} sx={{ width: 540, height: 540 }}>{inner(false)}</Box>
         <Box ref={storyRef} sx={{ width: 540, height: 960 }}>{inner(true)}</Box>

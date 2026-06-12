@@ -24,8 +24,8 @@ const ACCESS_PACKS_KEY = 'potinho-access-packs'
 let authToken = ''
 let redirectingToLogin = false
 
-class ApiRequestError extends Error {
-  constructor(message: string, public status: number) {
+export class ApiRequestError extends Error {
+  constructor(message: string, public status: number, public availableAt?: string) {
     super(message)
   }
 }
@@ -92,7 +92,7 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
   }
 
   if (!response.ok) {
-    const payload = (await response.json()) as { message?: string; error?: string; details?: unknown }
+    const payload = (await response.json()) as { message?: string; error?: string; details?: unknown; availableAt?: string }
     const code = payload.error
     if (code === 'ODDS_MUST_SUM_100') {
       throw new Error('A soma das chances das raridades não pode passar de 100%.')
@@ -109,7 +109,7 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
     if (code === 'INVALID_NOTE_CONFIG') {
       throw new Error('Algum bilhete usa raridade ou tipo que não existe nessa coleção.')
     }
-    throw new ApiRequestError(payload.message ?? code ?? 'Erro inesperado na API.', response.status)
+    throw new ApiRequestError(payload.message ?? code ?? 'Erro inesperado na API.', response.status, payload.availableAt)
   }
 
   const json = await response.json()

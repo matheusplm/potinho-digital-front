@@ -10,10 +10,6 @@ export interface Achievement {
   target: number
 }
 
-/**
- * Conquistas derivadas 100% do progresso atual (sem backend).
- * Recalculadas a cada render; a persistência do "já visto" fica no componente.
- */
 export function computeAchievements(
   play: CollectionPlayView | undefined,
   rarities: RarityConfig[],
@@ -34,7 +30,6 @@ export function computeAchievements(
   )
   const ownsTopRarity = topRarity ? owned.some((i) => i.rarity === topRarity.id) : false
 
-  // Maior nº de bilhetes possuídos dentro de um mesmo tipo / se algum tipo está completo.
   const typeComplete = types.some((t) => {
     const inType = items.filter((i) => i.typeId === t.id)
     return inType.length > 0 && inType.every((i) => i.owned)
@@ -52,7 +47,6 @@ export function computeAchievements(
     },
   ]
 
-  // Tiers de coleção que façam sentido pro tamanho da coleção.
   for (const tier of [5, 15, 30]) {
     if (total >= tier) {
       list.push({

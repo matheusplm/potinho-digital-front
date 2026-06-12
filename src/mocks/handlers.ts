@@ -158,6 +158,29 @@ const authHandlers = [
   }),
 ]
 
+type CollectionAuth =
+  | { ok: true; user: MockUser; collection: CollectionState }
+  | { ok: false; response: Response }
+
+function authorizeCollection(request: Request, cid: string, mode: 'read' | 'owner'): CollectionAuth {
+  const user = resolveUser(tokenFrom(request))
+  if (!user) return { ok: false, response: HttpResponse.json({ message: 'Não autenticado.' }, { status: 401 }) }
+  const collection = findCollection(cid)
+  if (!collection) return { ok: false, response: notFound('Coleção não encontrada.') }
+  const isOwner = collection.meta.ownerId === user.id
+  if (!isOwner) {
+    if (mode === 'owner') {
+      return { ok: false, response: HttpResponse.json({ message: 'Apenas o autor pode gerenciar esta coleção.' }, { status: 403 }) }
+    }
+    const email = user.email.toLowerCase().trim()
+    const hasGrant = collection.access.some((entry) => entry.email.toLowerCase().trim() === email)
+    if (!hasGrant) {
+      return { ok: false, response: HttpResponse.json({ message: 'Você não tem acesso a esta coleção.' }, { status: 403 }) }
+    }
+  }
+  return { ok: true, user, collection }
+}
+
 const collectionHandlers = [
   http.get('/api/collections', async ({ request }) => {
     await delay(220)
@@ -188,31 +211,35 @@ const collectionHandlers = [
 
   http.put('/api/collections/:id', async ({ params, request }) => {
     await delay(240)
-    const collection = findCollection(String(params.id))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.id), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     Object.assign(collection.meta, await request.json(), { updatedAt: new Date().toISOString() })
     return HttpResponse.json(collection.meta)
   }),
 
-  http.delete('/api/collections/:id', async ({ params }) => {
+  http.delete('/api/collections/:id', async ({ params, request }) => {
     await delay(220)
+    const auth = authorizeCollection(request, String(params.id), 'owner')
+    if (!auth.ok) return auth.response
     const index = db.collections.findIndex((collection) => collection.meta.id === params.id)
-    if (index === -1) return notFound('Coleção não encontrada.')
     db.collections.splice(index, 1)
     return HttpResponse.json({ deleted: true })
   }),
 
-  http.get('/api/collections/:cid/access', async ({ params }) => {
+  http.get('/api/collections/:cid/access', async ({ params, request }) => {
     await delay(180)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     return HttpResponse.json(collection.access)
   }),
 
   http.post('/api/collections/:cid/access', async ({ params, request }) => {
     await delay(220)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     const { email } = (await request.json()) as { email: string }
     const entry = { collectionId: collection.meta.id, email, packIds: [], createdAt: new Date().toISOString() }
     if (!collection.access.some((item) => item.email === email)) collection.access.push(entry)
@@ -221,8 +248,9 @@ const collectionHandlers = [
 
   http.put('/api/collections/:cid/access/:email/packs', async ({ params, request }) => {
     await delay(180)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     const email = decodeURIComponent(String(params.email))
     const access = collection.access.find((item) => item.email === email)
     if (!access) return notFound('Acesso não encontrado.')
@@ -232,10 +260,11 @@ const collectionHandlers = [
     return HttpResponse.json(access)
   }),
 
-  http.delete('/api/collections/:cid/access/:email', async ({ params }) => {
+  http.delete('/api/collections/:cid/access/:email', async ({ params, request }) => {
     await delay(180)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     const email = decodeURIComponent(String(params.email))
     collection.access = collection.access.filter((item) => item.email !== email)
     return HttpResponse.json({ revoked: true })
@@ -243,10 +272,10 @@ const collectionHandlers = [
 
   http.get('/api/collections/:cid/packs', async ({ params, request }) => {
     await delay(160)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
-    const user = resolveUser(tokenFrom(request))
-    if (user?.role !== 'reader') return HttpResponse.json(collection.packs)
+    const auth = authorizeCollection(request, String(params.cid), 'read')
+    if (!auth.ok) return auth.response
+    const { user, collection } = auth
+    if (collection.meta.ownerId === user.id) return HttpResponse.json(collection.packs)
     const access = collection.access.find((entry) => entry.email.toLowerCase().trim() === user.email.toLowerCase().trim())
     const grantedPackIds = new Set(access?.packIds ?? [])
     return HttpResponse.json(collection.packs.filter((pack) =>
@@ -256,8 +285,9 @@ const collectionHandlers = [
 
   http.post('/api/collections/:cid/packs', async ({ params, request }) => {
     await delay(220)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     const data = (await request.json()) as CollectionPackFormData
     const now = new Date().toISOString()
     const pack = {
@@ -271,10 +301,11 @@ const collectionHandlers = [
     return HttpResponse.json(pack)
   }),
 
-  http.get('/api/collections/:cid/packs/:id', async ({ params }) => {
+  http.get('/api/collections/:cid/packs/:id', async ({ params, request }) => {
     await delay(140)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'read')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     const pack = collection.packs.find((item) => item.id === params.id)
     if (!pack) return notFound('Pacotinho não encontrado.')
     return HttpResponse.json(pack)
@@ -282,18 +313,20 @@ const collectionHandlers = [
 
   http.put('/api/collections/:cid/packs/:id', async ({ params, request }) => {
     await delay(220)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     const pack = collection.packs.find((item) => item.id === params.id)
     if (!pack) return notFound('Pacotinho não encontrado.')
     Object.assign(pack, await request.json(), { updatedAt: new Date().toISOString() })
     return HttpResponse.json(pack)
   }),
 
-  http.delete('/api/collections/:cid/packs/:id', async ({ params }) => {
+  http.delete('/api/collections/:cid/packs/:id', async ({ params, request }) => {
     await delay(180)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     const index = collection.packs.findIndex((item) => item.id === params.id)
     if (index === -1) return notFound('Pacotinho não encontrado.')
     collection.packs.splice(index, 1)
@@ -302,12 +335,13 @@ const collectionHandlers = [
 
   http.post('/api/collections/:cid/packs/:packId/open', async ({ params, request }) => {
     await delay(600)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'read')
+    if (!auth.ok) return auth.response
+    const { user, collection } = auth
     const pack = collection.packs.find((p) => p.id === params.packId)
     if (!pack) return notFound('Pacotinho não encontrado.')
-    const user = resolveUser(tokenFrom(request))
-    if (user?.role === 'reader' && pack.distribution !== 'all_with_access') {
+    const isOwner = collection.meta.ownerId === user.id
+    if (!isOwner && pack.distribution !== 'all_with_access') {
       const access = collection.access.find((entry) => entry.email.toLowerCase().trim() === user.email.toLowerCase().trim())
       if (!access?.packIds.includes(pack.id)) {
         return HttpResponse.json({ message: 'Este pacotinho não está liberado para você.' }, { status: 403 })
@@ -372,17 +406,19 @@ const collectionHandlers = [
     return HttpResponse.json({ rewards, status })
   }),
 
-  http.get('/api/collections/:cid/notes', async ({ params }) => {
+  http.get('/api/collections/:cid/notes', async ({ params, request }) => {
     await delay(200)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     return HttpResponse.json(collection.notes)
   }),
 
   http.post('/api/collections/:cid/notes', async ({ params, request }) => {
     await delay(240)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     const data = (await request.json()) as NoteFormData
     const record = { id: nextId('note'), ...data, createdAt: new Date().toISOString() }
     collection.notes.push(record)
@@ -391,35 +427,39 @@ const collectionHandlers = [
 
   http.put('/api/collections/:cid/notes/:id', async ({ params, request }) => {
     await delay(220)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     const record = collection.notes.find((note) => note.id === params.id)
     if (!record) return notFound('Bilhete não encontrado.')
     Object.assign(record, await request.json())
     return HttpResponse.json(record)
   }),
 
-  http.delete('/api/collections/:cid/notes/:id', async ({ params }) => {
+  http.delete('/api/collections/:cid/notes/:id', async ({ params, request }) => {
     await delay(200)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     const index = collection.notes.findIndex((note) => note.id === params.id)
     if (index === -1) return notFound('Bilhete não encontrado.')
     collection.notes.splice(index, 1)
     return HttpResponse.json({ deleted: true })
   }),
 
-  http.get('/api/collections/:cid/rarities', async ({ params }) => {
+  http.get('/api/collections/:cid/rarities', async ({ params, request }) => {
     await delay(140)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'read')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     return HttpResponse.json(collection.rarities)
   }),
 
   http.post('/api/collections/:cid/rarities', async ({ params, request }) => {
     await delay(200)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     const data = (await request.json()) as RarityConfig
     const rarity = { ...data, id: data.id || nextId('rarity'), createdAt: new Date().toISOString() }
     collection.rarities.push(rarity)
@@ -428,33 +468,37 @@ const collectionHandlers = [
 
   http.put('/api/collections/:cid/rarities/:id', async ({ params, request }) => {
     await delay(200)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     const rarity = collection.rarities.find((item) => item.id === params.id)
     if (!rarity) return notFound('Raridade não encontrada.')
     Object.assign(rarity, await request.json(), { updatedAt: new Date().toISOString() })
     return HttpResponse.json(rarity)
   }),
 
-  http.delete('/api/collections/:cid/rarities/:id', async ({ params }) => {
+  http.delete('/api/collections/:cid/rarities/:id', async ({ params, request }) => {
     await delay(180)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     collection.rarities = collection.rarities.filter((item) => item.id !== params.id)
     return HttpResponse.json({ deleted: true })
   }),
 
-  http.get('/api/collections/:cid/types', async ({ params }) => {
+  http.get('/api/collections/:cid/types', async ({ params, request }) => {
     await delay(140)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'read')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     return HttpResponse.json(collection.types)
   }),
 
   http.post('/api/collections/:cid/types', async ({ params, request }) => {
     await delay(200)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     const data = (await request.json()) as NoteTypeConfig
     const type = { ...data, id: data.id || nextId('type'), createdAt: new Date().toISOString() }
     collection.types.push(type)
@@ -463,31 +507,36 @@ const collectionHandlers = [
 
   http.put('/api/collections/:cid/types/:id', async ({ params, request }) => {
     await delay(200)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     const type = collection.types.find((item) => item.id === params.id)
     if (!type) return notFound('Tipo não encontrado.')
     Object.assign(type, await request.json(), { updatedAt: new Date().toISOString() })
     return HttpResponse.json(type)
   }),
 
-  http.delete('/api/collections/:cid/types/:id', async ({ params }) => {
+  http.delete('/api/collections/:cid/types/:id', async ({ params, request }) => {
     await delay(180)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     collection.types = collection.types.filter((item) => item.id !== params.id)
     return HttpResponse.json({ deleted: true })
   }),
 
-  http.get('/api/collections/:cid/play', async ({ params }) => {
+  http.get('/api/collections/:cid/play', async ({ params, request }) => {
     await delay(280)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'read')
+    if (!auth.ok) return auth.response
+    const { user, collection } = auth
+    const isOwner = collection.meta.ownerId === user.id
     const { ownership } = collection
-    const items = collection.notes.map((note) => ({
-      ...buildNoteView(note, ownership.owned, ownership.favorites, ownership.obtainedAt),
-      message: note.message,
-    }))
+    const items = collection.notes.map((note) => {
+      const view = buildNoteView(note, ownership.owned, ownership.favorites, ownership.obtainedAt)
+      const canSeeMessage = isOwner || ownership.owned.has(note.id)
+      return { ...view, message: canSeeMessage ? note.message : '' }
+    })
     return HttpResponse.json({
       total: items.length,
       owned: ownership.owned.size,
@@ -496,10 +545,11 @@ const collectionHandlers = [
     })
   }),
 
-  http.post('/api/collections/:cid/daily/open', async ({ params }) => {
+  http.post('/api/collections/:cid/daily/open', async ({ params, request }) => {
     await delay(600)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'read')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     const now = new Date()
     if (!dailyStatus(collection.lastDailyOpenDate, now).canOpen) {
       return HttpResponse.json({ message: 'Pacotinho do dia já foi aberto. Volte amanhã.' }, { status: 429 })
@@ -527,8 +577,9 @@ const collectionHandlers = [
 
   http.patch('/api/collections/:cid/notes/:id/favorite', async ({ params, request }) => {
     await delay(150)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'read')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     const record = collection.notes.find((note) => note.id === params.id)
     if (!record) return notFound('Bilhete não encontrado.')
     const { favorite } = (await request.json()) as { favorite: boolean }
@@ -541,24 +592,27 @@ const collectionHandlers = [
     })
   }),
 
-  http.get('/api/collections/:cid/achievements', async ({ params }) => {
+  http.get('/api/collections/:cid/achievements', async ({ params, request }) => {
     await delay(140)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'read')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     return HttpResponse.json(collection.achievements)
   }),
 
-  http.get('/api/collections/:cid/achievements/me', async ({ params }) => {
+  http.get('/api/collections/:cid/achievements/me', async ({ params, request }) => {
     await delay(180)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'read')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     return HttpResponse.json(evaluateReaderAchievements(collection))
   }),
 
   http.post('/api/collections/:cid/achievements', async ({ params, request }) => {
     await delay(200)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     const data = (await request.json()) as CollectionAchievementFormData
     const id = data.id || toConfigId(data.label)
     if (collection.achievements.some((a) => a.id === id)) {
@@ -572,18 +626,20 @@ const collectionHandlers = [
 
   http.put('/api/collections/:cid/achievements/:id', async ({ params, request }) => {
     await delay(180)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     const achievement = collection.achievements.find((a) => a.id === params.id)
     if (!achievement) return notFound('Conquista não encontrada.')
     Object.assign(achievement, await request.json(), { updatedAt: new Date().toISOString() })
     return HttpResponse.json(achievement)
   }),
 
-  http.delete('/api/collections/:cid/achievements/:id', async ({ params }) => {
+  http.delete('/api/collections/:cid/achievements/:id', async ({ params, request }) => {
     await delay(160)
-    const collection = findCollection(String(params.cid))
-    if (!collection) return notFound('Coleção não encontrada.')
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     collection.achievements = collection.achievements.filter((a) => a.id !== params.id)
     return HttpResponse.json({ deleted: true })
   }),

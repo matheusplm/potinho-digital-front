@@ -3,10 +3,8 @@ import { createContext, useCallback, useContext, useMemo, useState, type ReactNo
 const ACTIVE_KEY = 'potinho-active-collection'
 
 interface ReaderContextValue {
-  /** Coleção ativa do leitor (multi-tenant) — cada coleção é um mundo isolado. */
   activeCollectionId: string | null
   setActiveCollectionId: (id: string | null) => void
-  /** Sinalização client-only de bilhetes novos (não-lidos), isolada por coleção. */
   unreadFor: (collectionId: string) => string[]
   addUnread: (collectionId: string, ids: string[]) => void
   markViewed: (collectionId: string, id: string) => void

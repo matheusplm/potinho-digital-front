@@ -3,7 +3,6 @@ import { useReader } from '../context/ReaderContext'
 import { isCollectionReader } from '../utils/collectionAccess'
 import { useCollectionsQuery } from './useNotes'
 
-/** Resolve a coleção ativa do leitor (multi-tenant) — usada pelas telas do footer. */
 export function useActiveReaderCollection() {
   const { user, persona } = useUser()
   const { activeCollectionId } = useReader()
