@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { api } from '../services/api'
-import type { CollectionAchievementFormData, CollectionPackFormData, NoteFormData, RarityConfig, NoteTypeConfig } from '../types/note'
+import { api, ApiRequestError } from '../services/api'
+import type { CollectionAchievementFormData, CollectionPackFormData, NoteFormData, PackStatusResponse, RarityConfig, NoteTypeConfig } from '../types/note'
 
 export function useCollectionsQuery(options?: { enabled?: boolean }) {
   return useQuery({
@@ -136,6 +136,30 @@ export function useDeleteCollectionTypeMutation(cid: string) {
 
 export function useCollectionPacksQuery(cid: string) {
   return useQuery({ queryKey: ['col-packs', cid], queryFn: () => api.getCollectionPacks(cid), enabled: !!cid })
+}
+
+export function useCollectionPackStatusesQuery(cid: string, packIds: string[], enabled = true) {
+  return useQuery({
+    queryKey: ['col-pack-statuses', cid, packIds.join(',')],
+    queryFn: async () => {
+      const entries = await Promise.all(
+        packIds.map(async (packId) => {
+          try {
+            const status = await api.getCollectionPackStatus(cid, packId)
+            return [packId, status] as const
+          } catch (error) {
+            if (error instanceof ApiRequestError && [404, 405].includes(error.status)) {
+              return [packId, null] as const
+            }
+            throw error
+          }
+        }),
+      )
+      return Object.fromEntries(entries) as Record<string, PackStatusResponse | null>
+    },
+    enabled: !!cid && packIds.length > 0 && enabled,
+    refetchInterval: enabled ? 30_000 : false,
+  })
 }
 
 export function useCreateCollectionPackMutation(cid: string) {

@@ -5,13 +5,18 @@ import { resolvePersona } from '../utils/collectionAccess'
 
 export function PersonaBootstrap() {
   const { user, personaReady, setPersona, markPersonaReady } = useUser()
-  const { data: collections, isSuccess } = useCollectionsQuery({ enabled: !!user })
+  const { data: collections, isSuccess, isError } = useCollectionsQuery({ enabled: !!user })
 
   useEffect(() => {
-    if (!user || !isSuccess || !collections || personaReady) return
-    setPersona(resolvePersona(collections, user.id, user.role))
-    markPersonaReady()
-  }, [user, collections, isSuccess, personaReady, setPersona, markPersonaReady])
+    if (!user || personaReady) return
+    if (isSuccess && collections) {
+      setPersona(resolvePersona(collections, user.id, user.role))
+      markPersonaReady()
+    } else if (isError) {
+      setPersona(user.role)
+      markPersonaReady()
+    }
+  }, [user, collections, isSuccess, isError, personaReady, setPersona, markPersonaReady])
 
   return null
 }

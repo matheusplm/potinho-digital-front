@@ -117,6 +117,41 @@ function findDailyPack(collection: CollectionState) {
   return collection.packs.find((pack) => pack.category === 'daily') ?? collection.packs[0]
 }
 
+function computePackReaderStatus(collection: CollectionState, pack: CollectionPack, now = new Date()) {
+  const packOpen = collection.packOpens[pack.id]
+  if (pack.category === 'daily') {
+    const daily = dailyStatus(collection.lastDailyOpenDate, now)
+    return {
+      canOpen: daily.canOpen,
+      availableAt: daily.availableAt,
+      nextAvailableAt: daily.availableAt,
+      exhausted: false,
+    }
+  }
+  if (pack.maxOpensPerUser !== null && packOpen && packOpen.totalOpens >= pack.maxOpensPerUser) {
+    return { canOpen: false, availableAt: '', nextAvailableAt: '', exhausted: true }
+  }
+  if (pack.cooldownHours && packOpen?.lastOpenAt) {
+    const availableAt = new Date(new Date(packOpen.lastOpenAt).getTime() + pack.cooldownHours * 3_600_000)
+    if (availableAt > now) {
+      const iso = availableAt.toISOString()
+      return { canOpen: false, availableAt: iso, nextAvailableAt: iso, exhausted: false }
+    }
+  }
+  return { canOpen: true, availableAt: now.toISOString(), nextAvailableAt: now.toISOString(), exhausted: false }
+}
+
+function packStatusResponse(collection: CollectionState, pack: CollectionPack, now = new Date()) {
+  const reader = computePackReaderStatus(collection, pack, now)
+  return {
+    canOpen: reader.canOpen,
+    remainingOpensToday: reader.canOpen ? 1 : 0,
+    nextAvailableAt: reader.nextAvailableAt,
+    serverTime: now.toISOString(),
+    exhausted: reader.exhausted,
+  }
+}
+
 const authHandlers = [
   http.post('/auth/login', async ({ request }) => {
     await delay(300)
@@ -278,9 +313,23 @@ const collectionHandlers = [
     if (collection.meta.ownerId === user.id) return HttpResponse.json(collection.packs)
     const access = collection.access.find((entry) => entry.email.toLowerCase().trim() === user.email.toLowerCase().trim())
     const grantedPackIds = new Set(access?.packIds ?? [])
+    const now = new Date()
     return HttpResponse.json(collection.packs.filter((pack) =>
       pack.distribution === 'all_with_access' || grantedPackIds.has(pack.id),
-    ))
+    ).map((pack) => ({
+      ...pack,
+      readerStatus: computePackReaderStatus(collection, pack, now),
+    })))
+  }),
+
+  http.get('/api/collections/:cid/packs/:packId/status', async ({ params, request }) => {
+    await delay(120)
+    const auth = authorizeCollection(request, String(params.cid), 'read')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
+    const pack = collection.packs.find((item) => item.id === params.packId)
+    if (!pack) return notFound('Pacotinho não encontrado.')
+    return HttpResponse.json(packStatusResponse(collection, pack))
   }),
 
   http.post('/api/collections/:cid/packs', async ({ params, request }) => {
@@ -363,7 +412,7 @@ const collectionHandlers = [
       }
     }
     if (pack.maxOpensPerUser !== null && packOpen && packOpen.totalOpens >= pack.maxOpensPerUser) {
-      return HttpResponse.json({ message: 'Você já abriu o máximo permitido deste pacotinho.' }, { status: 409 })
+      return HttpResponse.json({ error: 'PACK_LIMIT_REACHED', message: 'Você já abriu o máximo permitido deste pacotinho.' }, { status: 409 })
     }
     const eligible = collection.notes.filter((note) =>
       (pack.allowedTypeIds.length === 0 || pack.allowedTypeIds.includes(note.typeId)) &&

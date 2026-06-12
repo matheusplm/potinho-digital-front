@@ -93,6 +93,7 @@ export interface CollectionPack {
   accent: string
   createdAt?: string
   updatedAt?: string
+  readerStatus?: CollectionPackReaderStatus
 }
 
 export type CollectionPackFormData = Omit<CollectionPack, 'id' | 'collectionId' | 'createdAt' | 'updatedAt'> & {
@@ -134,6 +135,14 @@ export interface PackStatusResponse {
   remainingOpensToday: number
   nextAvailableAt: string
   serverTime: string
+  exhausted?: boolean
+}
+
+export interface CollectionPackReaderStatus {
+  canOpen: boolean
+  availableAt?: string
+  nextAvailableAt?: string
+  exhausted?: boolean
 }
 
 export interface StatsResponse {

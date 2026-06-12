@@ -13,6 +13,7 @@ import type {
   NoteFormData,
   NoteRecord,
   NoteTypeConfig,
+  PackStatusResponse,
   RarityConfig,
   ReaderAchievementsResponse,
 } from '../types/note'
@@ -25,9 +26,23 @@ let authToken = ''
 let redirectingToLogin = false
 
 export class ApiRequestError extends Error {
-  constructor(message: string, public status: number, public availableAt?: string) {
+  constructor(message: string, public status: number, public availableAt?: string, public code?: string) {
     super(message)
   }
+}
+
+const FRIENDLY_ERROR_MESSAGES: Record<string, string> = {
+  ODDS_MUST_SUM_100: 'A soma das chances das raridades não pode passar de 100%.',
+  RARITY_ALREADY_EXISTS: 'Já existe uma raridade com esse identificador.',
+  VALIDATION_ERROR: 'Dados inválidos. Verifique os campos e tente novamente.',
+  INVALID_JSON: 'JSON inválido. Revise o formato e tente novamente.',
+  INVALID_NOTE_CONFIG: 'Algum bilhete usa raridade ou tipo que não existe nessa coleção.',
+  PACK_LIMIT_REACHED: 'Você já abriu este pacotinho o máximo de vezes permitido.',
+  PACK_ON_COOLDOWN: 'Pacotinho ainda em cooldown.',
+  DAILY_ALREADY_OPENED: 'O pacotinho do dia já foi aberto. Volte amanhã!',
+  NO_ELIGIBLE_NOTES: 'Esse pacotinho não tem bilhetes compatíveis agora.',
+  PACK_NOT_ACTIVE: 'Este pacotinho não está disponível.',
+  PACK_NOT_ALLOWED: 'Este pacotinho não está liberado para você.',
 }
 
 function normalizeEmail(email: string) {
@@ -94,22 +109,8 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
   if (!response.ok) {
     const payload = (await response.json()) as { message?: string; error?: string; details?: unknown; availableAt?: string }
     const code = payload.error
-    if (code === 'ODDS_MUST_SUM_100') {
-      throw new Error('A soma das chances das raridades não pode passar de 100%.')
-    }
-    if (code === 'RARITY_ALREADY_EXISTS') {
-      throw new Error('Já existe uma raridade com esse identificador.')
-    }
-    if (code === 'VALIDATION_ERROR') {
-      throw new Error('Dados inválidos. Verifique os campos e tente novamente.')
-    }
-    if (code === 'INVALID_JSON') {
-      throw new Error('JSON inválido. Revise o formato e tente novamente.')
-    }
-    if (code === 'INVALID_NOTE_CONFIG') {
-      throw new Error('Algum bilhete usa raridade ou tipo que não existe nessa coleção.')
-    }
-    throw new ApiRequestError(payload.message ?? code ?? 'Erro inesperado na API.', response.status, payload.availableAt)
+    const message = (code && FRIENDLY_ERROR_MESSAGES[code]) ?? payload.message ?? code ?? 'Erro inesperado na API.'
+    throw new ApiRequestError(message, response.status, payload.availableAt, code)
   }
 
   const json = await response.json()
@@ -191,6 +192,8 @@ export const api = {
     request<{ deleted: boolean }>(`/api/collections/${cid}/types/${id}`, { method: 'DELETE' }),
 
   getCollectionPacks: (cid: string) => request<CollectionPack[]>(`/api/collections/${cid}/packs`),
+  getCollectionPackStatus: (cid: string, packId: string) =>
+    request<PackStatusResponse>(`/api/collections/${cid}/packs/${packId}/status`),
   createCollectionPack: (cid: string, data: CollectionPackFormData) =>
     request<CollectionPack>(`/api/collections/${cid}/packs`, { method: 'POST', body: JSON.stringify(data) }),
   updateCollectionPack: (cid: string, id: string, data: Partial<CollectionPackFormData>) =>
