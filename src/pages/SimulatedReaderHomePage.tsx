@@ -330,6 +330,8 @@ export function SimulatedReaderHomePage() {
       const source = isRealReader
         ? activePacks.filter((pack) => {
             if (pack.id === mainPack?.id) return false
+            // enquanto play carrega, não filtra por packOpens (evita flash de desaparecimento)
+            if (playLoading) return true
             if (pack.distribution !== 'all_with_access' && play?.packOpens?.[pack.id] === undefined) return false
             return true
           })
@@ -339,7 +341,7 @@ export function SimulatedReaderHomePage() {
       if (isRealReader) return source
       return source.filter((pack) => !openedBonusPackIds.includes(pack.id))
     },
-    [activePacks, isRealReader, mainPack?.id, openedBonusPackIds, packs, play, session?.preset],
+    [activePacks, isRealReader, mainPack?.id, openedBonusPackIds, packs, play, playLoading, session?.preset],
   )
 
   function getBonusPackCooldownMs(packId: string) {
@@ -353,7 +355,15 @@ export function SimulatedReaderHomePage() {
   }
 
   function bonusPackBlock(pack: CollectionPack): 'exhausted' | 'cooldown' | null {
-    if (pack.distribution !== 'all_with_access' && play?.packOpens?.[pack.id] === 0) return 'exhausted'
+    if (pack.distribution !== 'all_with_access') {
+      const opens = play?.packOpens?.[pack.id]
+      if (opens !== undefined) {
+        // backend é fonte da verdade para esses packs — ignora localStorage
+        if (opens === 0) return 'exhausted'
+        if (getBonusPackCooldownMs(pack.id) > 0) return 'cooldown'
+        return null
+      }
+    }
     if (isPackExhausted(pack.id)) return 'exhausted'
     if (getBonusPackCooldownMs(pack.id) > 0) return 'cooldown'
     return null
