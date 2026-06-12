@@ -147,6 +147,8 @@ export const api = {
     request<CollectionAccess>(`/api/collections/${cid}/access`, { method: 'POST', body: JSON.stringify({ email }) }),
   revokeAccess: (cid: string, email: string) =>
     request<{ revoked: boolean }>(`/api/collections/${cid}/access/${encodeURIComponent(email)}`, { method: 'DELETE' }),
+  getReaderView: (cid: string, email: string) =>
+    request<CollectionPlayView>(`/api/collections/${cid}/access/${encodeURIComponent(email)}/view`),
   addPackOpens: (cid: string, email: string, packId: string, opens: number) =>
     request<CollectionAccess>(`/api/collections/${cid}/access/${encodeURIComponent(email)}/packs`, {
       method: 'PATCH',

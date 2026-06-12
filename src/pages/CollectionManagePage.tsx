@@ -4,6 +4,7 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove'
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import SearchIcon from '@mui/icons-material/Search'
 import CloseIcon from '@mui/icons-material/Close'
@@ -25,7 +26,7 @@ import {
   useCollectionTypesQuery, useCreateCollectionTypeMutation, useUpdateCollectionTypeMutation, useDeleteCollectionTypeMutation,
   useCollectionPacksQuery, useCreateCollectionPackMutation, useUpdateCollectionPackMutation, useDeleteCollectionPackMutation,
   useCollectionAchievementsQuery, useCreateCollectionAchievementMutation, useDeleteCollectionAchievementMutation,
-  useCollectionAccessQuery, useGrantAccessMutation, useRevokeAccessMutation, useAddPackOpensMutation,
+  useCollectionAccessQuery, useGrantAccessMutation, useRevokeAccessMutation, useAddPackOpensMutation, useReaderViewQuery,
 } from '../hooks/useNotes'
 import { AchievementEditor } from '../components/manage/AchievementEditor'
 import { useBackground } from '../context/BackgroundContext'
@@ -1415,6 +1416,119 @@ function PackSimulationDialog({ simulation, rarities, types, onClose, onSimulate
   )
 }
 
+function ReaderViewDialog({ cid, email, packs, rarities, onClose }: {
+  cid: string
+  email: string | null
+  packs: CollectionPack[]
+  rarities: RarityConfig[]
+  onClose: () => void
+}) {
+  const { data: view, isLoading } = useReaderViewQuery(cid, email)
+  const bonusPacks = packs.filter((p) => p.distribution !== 'all_with_access')
+  const ownedNotes = view?.items.filter((i) => i.owned) ?? []
+  const completion = view && view.total > 0 ? Math.round((view.owned / view.total) * 100) : 0
+
+  return (
+    <Dialog
+      open={!!email}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, maxHeight: '88vh', background: 'rgba(255,253,251,0.98)' } } }}
+    >
+      <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, pb: 0.5 }}>
+        Coleção do leitor
+      </DialogTitle>
+      <DialogContent sx={{ pt: 0.5 }}>
+        {email && (
+          <Typography sx={{ fontSize: '0.78rem', color: colors.text.secondary, mb: 1.5, wordBreak: 'break-all' }}>
+            {email}
+          </Typography>
+        )}
+        {isLoading && (
+          <Stack alignItems="center" justifyContent="center" sx={{ py: 4 }}>
+            <Typography sx={{ fontSize: '0.82rem', color: colors.text.muted }}>Carregando...</Typography>
+          </Stack>
+        )}
+        {view && !isLoading && (
+          <Stack spacing={1.8}>
+            <Stack direction="row" spacing={1}>
+              {[
+                { label: 'coletados', value: `${view.owned}/${view.total}` },
+                { label: 'conclusão', value: `${completion}%` },
+                { label: 'favoritas', value: view.items.filter((i) => i.favorite).length },
+                { label: 'pacote hoje', value: view.daily.canOpen ? '✓ disponível' : '⏳ aberto' },
+              ].map((s) => (
+                <Box key={s.label} sx={{ flex: 1, p: 0.9, borderRadius: radius.md, background: 'rgba(0,0,0,0.03)', border: '1px solid rgba(0,0,0,0.06)', textAlign: 'center' }}>
+                  <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '0.88rem', color: colors.text.primary }}>
+                    {s.value}
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.58rem', fontWeight: 700, color: colors.text.muted, textTransform: 'uppercase', letterSpacing: 0.4 }}>
+                    {s.label}
+                  </Typography>
+                </Box>
+              ))}
+            </Stack>
+
+            {bonusPacks.length > 0 && (
+              <Box>
+                <Typography sx={{ fontSize: '0.66rem', fontWeight: 800, letterSpacing: 0.7, color: colors.text.muted, textTransform: 'uppercase', mb: 0.7 }}>
+                  Brindes
+                </Typography>
+                <Stack direction="row" spacing={0.7} sx={{ flexWrap: 'wrap', rowGap: 0.6 }}>
+                  {bonusPacks.map((pack) => {
+                    const opens = view.packOpens?.[pack.id]
+                    return (
+                      <Box key={pack.id} sx={{ px: 0.9, py: 0.4, borderRadius: radius.full, background: opens ? `${pack.accent}14` : 'rgba(0,0,0,0.04)', border: `1px solid ${opens ? pack.accent + '33' : 'rgba(0,0,0,0.08)'}` }}>
+                        <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, color: opens ? pack.accent : colors.text.muted }}>
+                          {pack.emoji} {pack.name} {opens !== undefined ? `(${opens}x)` : '—'}
+                        </Typography>
+                      </Box>
+                    )
+                  })}
+                </Stack>
+              </Box>
+            )}
+
+            {ownedNotes.length > 0 && (
+              <Box>
+                <Typography sx={{ fontSize: '0.66rem', fontWeight: 800, letterSpacing: 0.7, color: colors.text.muted, textTransform: 'uppercase', mb: 0.7 }}>
+                  Bilhetes coletados ({ownedNotes.length})
+                </Typography>
+                <Stack spacing={0.5} sx={{ maxHeight: 260, overflowY: 'auto', pr: 0.5 }}>
+                  {ownedNotes.map((note) => {
+                    const rarity = rarities.find((r) => r.id === note.rarity)
+                    return (
+                      <Stack key={note.id} direction="row" alignItems="center" spacing={1} sx={{ p: 0.8, borderRadius: radius.md, background: 'rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.05)' }}>
+                        {rarity && (
+                          <Box sx={{ width: 8, height: 8, borderRadius: radius.full, background: rarity.cardBg, flexShrink: 0 }} />
+                        )}
+                        <Typography sx={{ flex: 1, fontSize: '0.78rem', color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {note.title}
+                        </Typography>
+                        {note.favorite && <FavoriteIcon sx={{ fontSize: 11, color: colors.rose.main, flexShrink: 0 }} />}
+                      </Stack>
+                    )
+                  })}
+                </Stack>
+              </Box>
+            )}
+
+            {ownedNotes.length === 0 && (
+              <Typography sx={{ fontSize: '0.82rem', color: colors.text.muted, textAlign: 'center', py: 1 }}>
+                Ainda não coletou nenhum bilhete.
+              </Typography>
+            )}
+          </Stack>
+        )}
+      </DialogContent>
+      <DialogActions sx={{ px: 3, pb: 2 }}>
+        <Button variant="primary" onClick={onClose} sx={{ flex: 1 }}>Fechar</Button>
+      </DialogActions>
+    </Dialog>
+  )
+}
+
 export function CollectionManagePage() {
   const { slug = '' } = useParams<{ slug: string }>()
   const navigate = useNavigate()
@@ -1470,6 +1584,7 @@ export function CollectionManagePage() {
   const [emailInput, setEmailInput] = useState('')
   const [packOpensDialog, setPackOpensDialog] = useState<{ email: string; pack: CollectionPack; currentOpens: number | undefined } | null>(null)
   const [packOpensInput, setPackOpensInput] = useState(1)
+  const [viewReaderEmail, setViewReaderEmail] = useState<string | null>(null)
 
   const { data: notes = [], isLoading: notesLoading } = useCollectionNotesQuery(cid)
   const { data: rarities = [] } = useCollectionRaritiesQuery(cid)
@@ -2339,6 +2454,9 @@ export function CollectionManagePage() {
                     <Typography sx={{ flex: 1, fontSize: '0.84rem', color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {a.email}
                     </Typography>
+                    <IconButton size="small" aria-label="ver coleção" onClick={() => setViewReaderEmail(a.email)} sx={{ ...actionButtonSx('neutral'), flexShrink: 0 }}>
+                      <VisibilityOutlinedIcon sx={{ fontSize: 17 }} />
+                    </IconButton>
                     <IconButton size="small" aria-label="remover acesso" onClick={() => handleRevoke(a.email)} sx={{ ...actionButtonSx('danger'), flexShrink: 0 }}>
                       <PersonRemoveIcon sx={{ fontSize: 17 }} />
                     </IconButton>
@@ -2392,6 +2510,14 @@ export function CollectionManagePage() {
           </Stack>
         )}
       </ScrollablePage>
+
+      <ReaderViewDialog
+        cid={cid}
+        email={viewReaderEmail}
+        packs={packs}
+        rarities={rarities}
+        onClose={() => setViewReaderEmail(null)}
+      />
 
       <Dialog
         open={importDialogOpen}

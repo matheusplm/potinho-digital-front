@@ -216,6 +216,14 @@ export function useSetAccessPacksMutation(cid: string) {
   })
 }
 
+export function useReaderViewQuery(cid: string, email: string | null) {
+  return useQuery({
+    queryKey: ['reader-view', cid, email],
+    queryFn: () => api.getReaderView(cid, email!),
+    enabled: !!cid && !!email,
+  })
+}
+
 export function useAddPackOpensMutation(cid: string) {
   const queryClient = useQueryClient()
   return useMutation({
