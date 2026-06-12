@@ -328,7 +328,7 @@ export function SimulatedReaderHomePage() {
   const bonusPacks = useMemo(
     () => {
       const source = isRealReader
-        ? activePacks.filter((pack) => pack.id !== mainPack?.id)
+        ? activePacks.filter((pack) => pack.category !== 'daily')
         : session?.preset === 'new_reader_with_bonus'
           ? packs.filter((pack) => pack.id !== mainPack?.id && pack.category !== 'daily')
           : activePacks.filter((pack) => pack.id !== mainPack?.id)
