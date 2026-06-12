@@ -4,7 +4,7 @@ import LockRoundedIcon from '@mui/icons-material/LockRounded'
 import { Box, Dialog, DialogActions, DialogContent, DialogTitle, LinearProgress, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Card, LoadingState, ScrollablePage, toast } from '../components/ui'
 import { useBackground } from '../context/BackgroundContext'
@@ -211,6 +211,23 @@ export function SimulatedReaderHomePage() {
     isRealReader && !!cid && !packsEmbedStatus && !packStatusEndpointMissing,
   )
   const openPackMutation = useOpenCollectionPackMutation(cid)
+
+  const prevCanOpen = useRef<boolean | null>(null)
+  useEffect(() => {
+    if (!playFromApi) return
+    const canOpen = playFromApi.daily.canOpen
+    if (
+      prevCanOpen.current === false &&
+      canOpen &&
+      typeof Notification !== 'undefined' &&
+      Notification.permission === 'granted' &&
+      localStorage.getItem('potinho-notif') === 'true'
+    ) {
+      new Notification('Potinho Digital 🎁', { body: 'Existem pacotes disponíveis para você!' })
+    }
+    prevCanOpen.current = canOpen
+  }, [playFromApi?.daily.canOpen])
+
   const play = isRealReader ? playFromApi : simulation.getPlayView(notes)
   const isLoading = isRealReader ? collectionsLoading || (!!cid && playLoading) : notesLoading
   const completion = play && play.total > 0 ? Math.round((play.owned / play.total) * 100) : 0

@@ -238,7 +238,11 @@ export function useCollectionPlayQuery(cid: string, options?: { enabled?: boolea
     queryKey: ['col-play', cid],
     queryFn: () => api.getCollectionPlay(cid),
     enabled: !!cid && (options?.enabled ?? true),
-    refetchInterval: options?.enabled === false ? false : 30_000,
+    refetchInterval: (query) => {
+      if (options?.enabled === false) return false
+      if (query.state.data?.daily.canOpen) return false
+      return 30 * 60_000
+    },
   })
 }
 

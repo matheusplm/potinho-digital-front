@@ -13,7 +13,7 @@ import ViewListIcon from '@mui/icons-material/ViewList'
 import CasinoOutlinedIcon from '@mui/icons-material/CasinoOutlined'
 import StarIcon from '@mui/icons-material/Star'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
-import { Box, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, TextField, Typography } from '@mui/material'
+import { Box, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, TextField, Typography, useMediaQuery } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -1423,10 +1423,20 @@ function ReaderViewDialog({ cid, email, packs, rarities, onClose }: {
   rarities: RarityConfig[]
   onClose: () => void
 }) {
-  const { data: view, isLoading } = useReaderViewQuery(cid, email)
-  const bonusPacks = packs.filter((p) => p.distribution !== 'all_with_access')
+  const { data: view, isLoading, isError } = useReaderViewQuery(cid, email)
+  const isMobile = useMediaQuery('(max-width:600px)')
+  const [rarityFilter, setRarityFilter] = useState<string | null>(null)
+  const [showContent, setShowContent] = useState(false)
+
+  const bonusPacks = packs.filter((p) => p.distribution !== 'all_with_access' && view?.packOpens?.[p.id] !== undefined)
   const ownedNotes = view?.items.filter((i) => i.owned) ?? []
   const completion = view && view.total > 0 ? Math.round((view.owned / view.total) * 100) : 0
+
+  const ownedRarities = useMemo(
+    () => rarities.filter((r) => ownedNotes.some((n) => n.rarity === r.id)).sort((a, b) => a.order - b.order),
+    [ownedNotes, rarities],
+  )
+  const filteredNotes = rarityFilter ? ownedNotes.filter((n) => n.rarity === rarityFilter) : ownedNotes
 
   return (
     <Dialog
@@ -1434,33 +1444,56 @@ function ReaderViewDialog({ cid, email, packs, rarities, onClose }: {
       onClose={onClose}
       maxWidth="sm"
       fullWidth
-      slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, maxHeight: '88vh', background: 'rgba(255,253,251,0.98)' } } }}
+      fullScreen={isMobile}
+      slotProps={isMobile ? undefined : { paper: { sx: { borderRadius: radius.xl, mx: 2, maxHeight: '92vh', background: 'rgba(255,253,251,0.98)' } } }}
     >
-      <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, pb: 0.5 }}>
-        Coleção do leitor
+      <DialogTitle sx={{ pb: 0.5, ...(isMobile ? { background: 'rgba(255,253,251,0.98)', pt: 2 } : {}) }}>
+        <Stack direction="row" alignItems="center" spacing={1}>
+          {isMobile && (
+            <IconButton size="small" onClick={onClose} sx={{ ml: -0.5, mr: 0.5 }}>
+              <ArrowBackIcon sx={{ fontSize: 20 }} />
+            </IconButton>
+          )}
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, lineHeight: 1.2 }}>
+              Coleção do leitor
+            </Typography>
+            {email && (
+              <Typography sx={{ fontSize: '0.72rem', color: colors.text.secondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {email}
+              </Typography>
+            )}
+          </Box>
+          {!isMobile && (
+            <IconButton size="small" onClick={onClose} sx={{ mr: -0.5 }}>
+              <CloseIcon sx={{ fontSize: 18 }} />
+            </IconButton>
+          )}
+        </Stack>
       </DialogTitle>
-      <DialogContent sx={{ pt: 0.5 }}>
-        {email && (
-          <Typography sx={{ fontSize: '0.78rem', color: colors.text.secondary, mb: 1.5, wordBreak: 'break-all' }}>
-            {email}
-          </Typography>
-        )}
+
+      <DialogContent sx={{ pt: 1, ...(isMobile ? { background: 'rgba(255,253,251,0.98)' } : {}) }}>
         {isLoading && (
-          <Stack alignItems="center" justifyContent="center" sx={{ py: 4 }}>
+          <Stack alignItems="center" justifyContent="center" sx={{ py: 6 }}>
             <Typography sx={{ fontSize: '0.82rem', color: colors.text.muted }}>Carregando...</Typography>
           </Stack>
         )}
+        {isError && !isLoading && (
+          <Typography sx={{ fontSize: '0.82rem', color: colors.rose.main, textAlign: 'center', py: 2 }}>
+            Não foi possível carregar a coleção.
+          </Typography>
+        )}
         {view && !isLoading && (
-          <Stack spacing={1.8}>
-            <Stack direction="row" spacing={1}>
+          <Stack spacing={2}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)' }, gap: 1 }}>
               {[
                 { label: 'coletados', value: `${view.owned}/${view.total}` },
                 { label: 'conclusão', value: `${completion}%` },
                 { label: 'favoritas', value: view.items.filter((i) => i.favorite).length },
                 { label: 'pacote hoje', value: view.daily.canOpen ? '✓ disponível' : '⏳ aberto' },
               ].map((s) => (
-                <Box key={s.label} sx={{ flex: 1, p: 0.9, borderRadius: radius.md, background: 'rgba(0,0,0,0.03)', border: '1px solid rgba(0,0,0,0.06)', textAlign: 'center' }}>
-                  <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '0.88rem', color: colors.text.primary }}>
+                <Box key={s.label} sx={{ p: 1, borderRadius: radius.md, background: 'rgba(0,0,0,0.03)', border: '1px solid rgba(0,0,0,0.06)', textAlign: 'center' }}>
+                  <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '0.9rem', color: colors.text.primary }}>
                     {s.value}
                   </Typography>
                   <Typography sx={{ fontSize: '0.58rem', fontWeight: 700, color: colors.text.muted, textTransform: 'uppercase', letterSpacing: 0.4 }}>
@@ -1468,7 +1501,7 @@ function ReaderViewDialog({ cid, email, packs, rarities, onClose }: {
                   </Typography>
                 </Box>
               ))}
-            </Stack>
+            </Box>
 
             {bonusPacks.length > 0 && (
               <Box>
@@ -1477,37 +1510,14 @@ function ReaderViewDialog({ cid, email, packs, rarities, onClose }: {
                 </Typography>
                 <Stack direction="row" spacing={0.7} sx={{ flexWrap: 'wrap', rowGap: 0.6 }}>
                   {bonusPacks.map((pack) => {
-                    const opens = view.packOpens?.[pack.id]
+                    const opens = view.packOpens?.[pack.id] ?? 0
+                    const active = opens > 0
                     return (
-                      <Box key={pack.id} sx={{ px: 0.9, py: 0.4, borderRadius: radius.full, background: opens ? `${pack.accent}14` : 'rgba(0,0,0,0.04)', border: `1px solid ${opens ? pack.accent + '33' : 'rgba(0,0,0,0.08)'}` }}>
-                        <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, color: opens ? pack.accent : colors.text.muted }}>
-                          {pack.emoji} {pack.name} {opens !== undefined ? `(${opens}x)` : '—'}
+                      <Box key={pack.id} sx={{ px: 0.9, py: 0.4, borderRadius: radius.full, background: active ? `${pack.accent}14` : 'rgba(0,0,0,0.04)', border: `1px solid ${active ? pack.accent + '33' : 'rgba(0,0,0,0.08)'}` }}>
+                        <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, color: active ? pack.accent : colors.text.muted }}>
+                          {pack.emoji} {pack.name} ({opens}x)
                         </Typography>
                       </Box>
-                    )
-                  })}
-                </Stack>
-              </Box>
-            )}
-
-            {ownedNotes.length > 0 && (
-              <Box>
-                <Typography sx={{ fontSize: '0.66rem', fontWeight: 800, letterSpacing: 0.7, color: colors.text.muted, textTransform: 'uppercase', mb: 0.7 }}>
-                  Bilhetes coletados ({ownedNotes.length})
-                </Typography>
-                <Stack spacing={0.5} sx={{ maxHeight: 260, overflowY: 'auto', pr: 0.5 }}>
-                  {ownedNotes.map((note) => {
-                    const rarity = rarities.find((r) => r.id === note.rarity)
-                    return (
-                      <Stack key={note.id} direction="row" alignItems="center" spacing={1} sx={{ p: 0.8, borderRadius: radius.md, background: 'rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.05)' }}>
-                        {rarity && (
-                          <Box sx={{ width: 8, height: 8, borderRadius: radius.full, background: rarity.cardBg, flexShrink: 0 }} />
-                        )}
-                        <Typography sx={{ flex: 1, fontSize: '0.78rem', color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {note.title}
-                        </Typography>
-                        {note.favorite && <FavoriteIcon sx={{ fontSize: 11, color: colors.rose.main, flexShrink: 0 }} />}
-                      </Stack>
                     )
                   })}
                 </Stack>
@@ -1519,12 +1529,90 @@ function ReaderViewDialog({ cid, email, packs, rarities, onClose }: {
                 Ainda não coletou nenhum bilhete.
               </Typography>
             )}
+
+            {ownedNotes.length > 0 && (
+              <Box>
+                <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+                  <Typography sx={{ fontSize: '0.66rem', fontWeight: 800, letterSpacing: 0.7, color: colors.text.muted, textTransform: 'uppercase' }}>
+                    Bilhetes coletados ({ownedNotes.length})
+                  </Typography>
+                  <Chip
+                    label={showContent ? 'só títulos' : 'ver conteúdo'}
+                    size="small"
+                    onClick={() => setShowContent((v) => !v)}
+                    sx={{
+                      fontSize: '0.66rem', fontWeight: 700, height: 22, cursor: 'pointer',
+                      background: showContent ? `${colors.primary.main}14` : 'rgba(0,0,0,0.05)',
+                      color: showContent ? colors.primary.main : colors.text.secondary,
+                      border: `1px solid ${showContent ? `${colors.primary.main}33` : 'transparent'}`,
+                    }}
+                  />
+                </Stack>
+
+                {ownedRarities.length > 1 && (
+                  <Stack direction="row" spacing={0.5} sx={{ flexWrap: 'wrap', rowGap: 0.5, mb: 1.2 }}>
+                    <Chip
+                      label="Todos"
+                      size="small"
+                      onClick={() => setRarityFilter(null)}
+                      sx={{
+                        fontSize: '0.66rem', fontWeight: 700, height: 22, cursor: 'pointer',
+                        background: !rarityFilter ? `${colors.primary.main}14` : 'rgba(0,0,0,0.05)',
+                        color: !rarityFilter ? colors.primary.main : colors.text.secondary,
+                        border: `1px solid ${!rarityFilter ? `${colors.primary.main}33` : 'transparent'}`,
+                      }}
+                    />
+                    {ownedRarities.map((r) => (
+                      <Chip
+                        key={r.id}
+                        label={`${r.emoji} ${r.label}`}
+                        size="small"
+                        onClick={() => setRarityFilter(rarityFilter === r.id ? null : r.id)}
+                        sx={{
+                          fontSize: '0.66rem', fontWeight: 700, height: 22, cursor: 'pointer',
+                          background: rarityFilter === r.id ? `${r.cardBg}44` : 'rgba(0,0,0,0.05)',
+                          color: rarityFilter === r.id ? r.textColor : colors.text.secondary,
+                          border: `1px solid ${rarityFilter === r.id ? `${r.cardBg}88` : 'transparent'}`,
+                        }}
+                      />
+                    ))}
+                  </Stack>
+                )}
+
+                <Stack spacing={0.6}>
+                  {filteredNotes.map((note) => {
+                    const rarity = rarities.find((r) => r.id === note.rarity)
+                    return (
+                      <Box key={note.id} sx={{ px: 1, py: 0.9, borderRadius: radius.md, background: 'rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.05)' }}>
+                        <Stack direction="row" alignItems="center" spacing={1}>
+                          {rarity && (
+                            <Box sx={{ width: 8, height: 8, borderRadius: radius.full, background: rarity.cardBg, flexShrink: 0 }} />
+                          )}
+                          <Typography sx={{ flex: 1, fontSize: '0.78rem', fontWeight: 600, color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: showContent ? 'normal' : 'nowrap' }}>
+                            {note.title}
+                          </Typography>
+                          {note.favorite && <FavoriteIcon sx={{ fontSize: 11, color: colors.rose.main, flexShrink: 0 }} />}
+                        </Stack>
+                        {showContent && note.message && (
+                          <Typography sx={{ fontSize: '0.73rem', color: colors.text.secondary, mt: 0.5, lineHeight: 1.55, pl: 2.5 }}>
+                            {note.message}
+                          </Typography>
+                        )}
+                      </Box>
+                    )
+                  })}
+                </Stack>
+              </Box>
+            )}
           </Stack>
         )}
       </DialogContent>
-      <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button variant="primary" onClick={onClose} sx={{ flex: 1 }}>Fechar</Button>
-      </DialogActions>
+
+      {!isMobile && (
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button variant="primary" onClick={onClose} sx={{ flex: 1 }}>Fechar</Button>
+        </DialogActions>
+      )}
     </Dialog>
   )
 }
@@ -2512,6 +2600,7 @@ export function CollectionManagePage() {
       </ScrollablePage>
 
       <ReaderViewDialog
+        key={viewReaderEmail ?? 'closed'}
         cid={cid}
         email={viewReaderEmail}
         packs={packs}

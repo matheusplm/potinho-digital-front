@@ -5,6 +5,9 @@ import CheckIcon from '@mui/icons-material/Check'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined'
+import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined'
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
+import BlockIcon from '@mui/icons-material/Block'
 import { Box, Stack, Typography, Backdrop, IconButton } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useMemo, useState } from 'react'
@@ -31,6 +34,26 @@ export function FloatingMenu() {
   const navigate = useNavigate()
 
   const isReader = persona === 'reader' && !simulating
+  const notifSupported = typeof Notification !== 'undefined'
+  const [notifEnabled, setNotifEnabled] = useState(
+    () => notifSupported && Notification.permission === 'granted' && localStorage.getItem('potinho-notif') === 'true',
+  )
+  const notifStatus = notifSupported ? Notification.permission : 'denied'
+
+  async function handleNotificationToggle() {
+    if (!notifSupported || notifStatus === 'denied') return
+    if (notifEnabled) {
+      localStorage.removeItem('potinho-notif')
+      setNotifEnabled(false)
+      return
+    }
+    const result = await Notification.requestPermission()
+    if (result === 'granted') {
+      localStorage.setItem('potinho-notif', 'true')
+      setNotifEnabled(true)
+      new Notification('Potinho Digital 🎁', { body: 'Notificações ativadas!' })
+    }
+  }
   const { data: collections = [] } = useCollectionsQuery()
   const { canSwitch, canWriter, canReader } = useMemo(
     () => personaCapabilities(collections, user?.id, user?.role ?? 'writer'),
@@ -251,6 +274,46 @@ export function FloatingMenu() {
                 ))}
               </Stack>
             </Box>
+
+            {notifSupported && (
+              <>
+                <Box sx={{ height: '1px', bgcolor: colors.border.subtle, mx: 1.5 }} />
+                <Box sx={{ p: 1 }}>
+                  <Stack
+                    direction="row" spacing={1.4}
+                    onClick={() => { void handleNotificationToggle() }}
+                    sx={{
+                      alignItems: 'center', px: 1.4, py: 1, borderRadius: radius.md,
+                      cursor: notifStatus === 'denied' ? 'not-allowed' : 'pointer',
+                      opacity: notifStatus === 'denied' ? 0.5 : 1,
+                      transition: 'background 0.12s',
+                      '&:hover': notifStatus !== 'denied' ? { bgcolor: `${theme.accent}0e` } : undefined,
+                    }}
+                  >
+                    <Box sx={{
+                      width: 30, height: 30, borderRadius: radius.sm, flexShrink: 0,
+                      background: notifEnabled ? `${theme.accent}18` : 'rgba(0,0,0,0.05)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      {notifStatus === 'denied'
+                        ? <BlockIcon sx={{ fontSize: 15, color: colors.text.muted }} />
+                        : notifEnabled
+                          ? <NotificationsActiveIcon sx={{ fontSize: 16, color: theme.accent }} />
+                          : <NotificationsNoneOutlinedIcon sx={{ fontSize: 16, color: colors.text.muted }} />
+                      }
+                    </Box>
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: colors.text.primary }}>
+                        Notificações
+                      </Typography>
+                      <Typography sx={{ fontSize: '0.68rem', color: colors.text.muted }}>
+                        {notifStatus === 'denied' ? 'bloqueado pelo navegador' : notifEnabled ? 'ativo — toque para desligar' : 'toque para ativar'}
+                      </Typography>
+                    </Box>
+                  </Stack>
+                </Box>
+              </>
+            )}
 
             <Box sx={{ height: '1px', bgcolor: colors.border.subtle, mx: 1.5 }} />
 
