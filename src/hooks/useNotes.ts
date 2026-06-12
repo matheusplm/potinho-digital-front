@@ -216,6 +216,15 @@ export function useSetAccessPacksMutation(cid: string) {
   })
 }
 
+export function useAddPackOpensMutation(cid: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ email, packId, opens }: { email: string; packId: string; opens: number }) =>
+      api.addPackOpens(cid, email, packId, opens),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['col-access', cid] }) },
+  })
+}
+
 export function useCollectionPlayQuery(cid: string, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['col-play', cid],

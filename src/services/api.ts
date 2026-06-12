@@ -147,6 +147,11 @@ export const api = {
     request<CollectionAccess>(`/api/collections/${cid}/access`, { method: 'POST', body: JSON.stringify({ email }) }),
   revokeAccess: (cid: string, email: string) =>
     request<{ revoked: boolean }>(`/api/collections/${cid}/access/${encodeURIComponent(email)}`, { method: 'DELETE' }),
+  addPackOpens: (cid: string, email: string, packId: string, opens: number) =>
+    request<CollectionAccess>(`/api/collections/${cid}/access/${encodeURIComponent(email)}/packs`, {
+      method: 'PATCH',
+      body: JSON.stringify({ packId, opens }),
+    }),
   setAccessPacks: async (cid: string, email: string, packIds: string[]) => {
     try {
       const access = await request<CollectionAccess>(`/api/collections/${cid}/access/${encodeURIComponent(email)}/packs`, {

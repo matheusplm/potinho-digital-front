@@ -4,6 +4,7 @@ import type {
   CollectionAchievement,
   CollectionAchievementFormData,
   CollectionFormData,
+  CollectionPack,
   CollectionPackFormData,
   NoteFormData,
   NoteTypeConfig,

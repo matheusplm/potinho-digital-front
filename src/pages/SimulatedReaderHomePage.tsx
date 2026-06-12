@@ -328,14 +328,18 @@ export function SimulatedReaderHomePage() {
   const bonusPacks = useMemo(
     () => {
       const source = isRealReader
-        ? activePacks.filter((pack) => pack.id !== mainPack?.id)
+        ? activePacks.filter((pack) => {
+            if (pack.id === mainPack?.id) return false
+            if (pack.distribution !== 'all_with_access' && play?.packOpens?.[pack.id] === undefined) return false
+            return true
+          })
         : session?.preset === 'new_reader_with_bonus'
           ? packs.filter((pack) => pack.id !== mainPack?.id && pack.category !== 'daily')
           : activePacks.filter((pack) => pack.id !== mainPack?.id)
       if (isRealReader) return source
       return source.filter((pack) => !openedBonusPackIds.includes(pack.id))
     },
-    [activePacks, isRealReader, mainPack?.id, openedBonusPackIds, packs, session?.preset],
+    [activePacks, isRealReader, mainPack?.id, openedBonusPackIds, packs, play, session?.preset],
   )
 
   function getBonusPackCooldownMs(packId: string) {
@@ -349,6 +353,7 @@ export function SimulatedReaderHomePage() {
   }
 
   function bonusPackBlock(pack: CollectionPack): 'exhausted' | 'cooldown' | null {
+    if (pack.distribution !== 'all_with_access' && play?.packOpens?.[pack.id] === 0) return 'exhausted'
     if (isPackExhausted(pack.id)) return 'exhausted'
     if (getBonusPackCooldownMs(pack.id) > 0) return 'cooldown'
     return null
@@ -420,6 +425,7 @@ export function SimulatedReaderHomePage() {
           rewards = result.rewards
         } else {
           const result = await openPackMutation.mutateAsync(pack.id)
+          await queryClient.invalidateQueries({ queryKey: ['col-play', cid] })
           const bonusAvailableAt = result.status.availableAt
             || new Date(Date.now() + Math.max(1, pack.cooldownHours ?? 24) * 3_600_000).toISOString()
           setPackCooldowns((current) => {

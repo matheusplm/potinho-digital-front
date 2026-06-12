@@ -181,6 +181,7 @@ export interface CollectionAccess {
   collectionId: string
   email: string
   packIds: string[]
+  packOpens?: Record<string, number>
   createdAt: string
 }
 
@@ -199,6 +200,7 @@ export interface CollectionPlayView {
   owned: number
   items: CollectionNoteView[]
   daily: CollectionDailyStatus
+  packOpens?: Record<string, number>
 }
 
 export interface CollectionDailyReward {

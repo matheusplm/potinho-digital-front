@@ -964,7 +964,7 @@ export function CollectionPlayPage() {
   const { data: types = [] } = useCollectionTypesQuery(cid)
   const favoriteMutation = useToggleCollectionFavoriteMutation(cid)
 
-  const isCollectionOwnerUser = isCollectionOwner(collection, user?.id)
+  const isCollectionOwnerUser = collection ? isCollectionOwner(collection, user?.id) : false
   const isReaderView = !isSimulating && (persona === 'reader' || !isCollectionOwnerUser)
 
   function handleSelectNote(note: ReadableNote) {

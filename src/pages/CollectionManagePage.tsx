@@ -25,7 +25,7 @@ import {
   useCollectionTypesQuery, useCreateCollectionTypeMutation, useUpdateCollectionTypeMutation, useDeleteCollectionTypeMutation,
   useCollectionPacksQuery, useCreateCollectionPackMutation, useUpdateCollectionPackMutation, useDeleteCollectionPackMutation,
   useCollectionAchievementsQuery, useCreateCollectionAchievementMutation, useDeleteCollectionAchievementMutation,
-  useCollectionAccessQuery, useGrantAccessMutation, useRevokeAccessMutation, useSetAccessPacksMutation,
+  useCollectionAccessQuery, useGrantAccessMutation, useRevokeAccessMutation, useAddPackOpensMutation,
 } from '../hooks/useNotes'
 import { AchievementEditor } from '../components/manage/AchievementEditor'
 import { useBackground } from '../context/BackgroundContext'
@@ -1465,6 +1465,8 @@ export function CollectionManagePage() {
   const [deletingAchievement, setDeletingAchievement] = useState<CollectionAchievement | null>(null)
 
   const [emailInput, setEmailInput] = useState('')
+  const [packOpensDialog, setPackOpensDialog] = useState<{ email: string; pack: CollectionPack; currentOpens: number | undefined } | null>(null)
+  const [packOpensInput, setPackOpensInput] = useState(1)
 
   const { data: notes = [], isLoading: notesLoading } = useCollectionNotesQuery(cid)
   const { data: rarities = [] } = useCollectionRaritiesQuery(cid)
@@ -1482,7 +1484,7 @@ export function CollectionManagePage() {
   const deleteAchievement = useDeleteCollectionAchievementMutation(cid)
   const grantMutation = useGrantAccessMutation(cid)
   const revokeMutation = useRevokeAccessMutation(cid)
-  const setAccessPacksMutation = useSetAccessPacksMutation(cid)
+  const addPackOpensMutation = useAddPackOpensMutation(cid)
 
   function addAchievementPreset(preset: typeof ACHIEVEMENT_PRESETS[number]) {
     const id = uniqueConfigId(preset.label, achievements.map((a) => a.id))
@@ -1552,15 +1554,32 @@ export function CollectionManagePage() {
     catch { toast.error('Erro ao revogar acesso.') }
   }
 
-  async function handleToggleAccessPack(email: string, currentPackIds: string[], packId: string) {
-    const nextPackIds = currentPackIds.includes(packId)
-      ? currentPackIds.filter((id) => id !== packId)
-      : [...currentPackIds, packId]
+  function openPackOpensDialog(email: string, pack: CollectionPack, currentOpens: number | undefined) {
+    setPackOpensInput(1)
+    setPackOpensDialog({ email, pack, currentOpens })
+  }
+
+  async function handleConfirmPackOpens() {
+    if (!packOpensDialog) return
+    const { email, pack } = packOpensDialog
     try {
-      await setAccessPacksMutation.mutateAsync({ email, packIds: nextPackIds })
+      await addPackOpensMutation.mutateAsync({ email, packId: pack.id, opens: packOpensInput })
       toast.success('Brindes atualizados.')
+      setPackOpensDialog(null)
     } catch (error) {
       toast.error((error as Error).message || 'Erro ao atualizar brindes.')
+    }
+  }
+
+  async function handleRemovePackAccess() {
+    if (!packOpensDialog) return
+    const { email, pack } = packOpensDialog
+    try {
+      await addPackOpensMutation.mutateAsync({ email, packId: pack.id, opens: 0 })
+      toast.success('Acesso ao brinde removido.')
+      setPackOpensDialog(null)
+    } catch (error) {
+      toast.error((error as Error).message || 'Erro ao remover brinde.')
     }
   }
 
@@ -2329,13 +2348,17 @@ export function CollectionManagePage() {
                       </Typography>
                       <Stack direction="row" spacing={0.7} sx={{ flexWrap: 'wrap', rowGap: 0.7 }}>
                         {accessBonusPacks.map((pack) => {
-                          const selected = (a.packIds ?? []).includes(pack.id)
+                          const opens = a.packOpens?.[pack.id]
+                          const selected = opens !== undefined
+                          const label = selected
+                            ? `${pack.emoji} ${pack.name} (${opens})`
+                            : `${pack.emoji} ${pack.name}`
                           return (
                             <Chip
                               key={pack.id}
-                              label={`${pack.emoji} ${pack.name}`}
-                              onClick={() => handleToggleAccessPack(a.email, a.packIds ?? [], pack.id)}
-                              disabled={setAccessPacksMutation.isPending}
+                              label={label}
+                              onClick={() => openPackOpensDialog(a.email, pack, opens)}
+                              disabled={addPackOpensMutation.isPending}
                               sx={{
                                 maxWidth: '100%',
                                 height: 28,
@@ -2424,6 +2447,61 @@ export function CollectionManagePage() {
             sx={{ flex: 1 }}
           >
             Importar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={!!packOpensDialog}
+        onClose={() => setPackOpensDialog(null)}
+        maxWidth="xs"
+        fullWidth
+        slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'rgba(255,253,251,0.98)' } } }}
+      >
+        <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, pb: 0.5 }}>
+          {packOpensDialog ? `${packOpensDialog.pack.emoji} ${packOpensDialog.pack.name}` : ''}
+        </DialogTitle>
+        <DialogContent sx={{ pt: 1 }}>
+          <Stack spacing={1.5}>
+            {packOpensDialog?.currentOpens !== undefined && (
+              <Typography sx={{ fontSize: '0.82rem', color: colors.text.secondary }}>
+                Aberturas atuais: <strong>{packOpensDialog.currentOpens}</strong>
+              </Typography>
+            )}
+            <TextField
+              label="Quantas aberturas adicionar"
+              type="number"
+              value={packOpensInput}
+              onChange={(e) => setPackOpensInput(Math.max(1, Number(e.target.value)))}
+              inputProps={{ min: 1 }}
+              fullWidth
+              size="small"
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: radius.lg } }}
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5, gap: 1, flexWrap: 'wrap' }}>
+          {packOpensDialog?.currentOpens !== undefined && (
+            <Button
+              variant="ghost"
+              loading={addPackOpensMutation.isPending}
+              onClick={handleRemovePackAccess}
+              sx={{ flex: '1 1 100%', color: 'error.main' }}
+            >
+              Remover brinde
+            </Button>
+          )}
+          <Button variant="ghost" onClick={() => setPackOpensDialog(null)} sx={{ flex: 1 }}>
+            Cancelar
+          </Button>
+          <Button
+            variant="primary"
+            loading={addPackOpensMutation.isPending}
+            disabled={packOpensInput < 1 || addPackOpensMutation.isPending}
+            onClick={handleConfirmPackOpens}
+            sx={{ flex: 1 }}
+          >
+            Adicionar
           </Button>
         </DialogActions>
       </Dialog>
