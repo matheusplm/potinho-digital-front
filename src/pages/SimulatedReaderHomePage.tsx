@@ -402,7 +402,7 @@ export function SimulatedReaderHomePage() {
     return () => window.clearInterval(interval)
   }, [mainCanOpen, bonusPacks, packCooldowns, exhaustedPackIds])
 
-  async function handleOpenPack(pack: CollectionPack | undefined, isMain: boolean) {
+  async function handleOpenPack(pack: CollectionPack | undefined, isMain: boolean, count = 1) {
     if (!activeSession || !play || isOpeningPack || !pack) return
     if (!isRealReader && notes.length === 0) {
       toast.info('Essa coleção ainda não tem bilhetes para abrir.')
@@ -421,7 +421,7 @@ export function SimulatedReaderHomePage() {
             toast.error('Nenhum pacotinho diário configurado.')
             return
           }
-          const result = await openPackMutation.mutateAsync(mainPack.id)
+          const result = await openPackMutation.mutateAsync({ packId: mainPack.id, count })
           await queryClient.invalidateQueries({ queryKey: ['col-play', cid] })
           const mainAvailableAt = result.status.availableAt
             || new Date(Date.now() + Math.max(1, mainPack.cooldownHours ?? 24) * 3_600_000).toISOString()
@@ -432,7 +432,7 @@ export function SimulatedReaderHomePage() {
           })
           rewards = result.rewards
         } else {
-          const result = await openPackMutation.mutateAsync(pack.id)
+          const result = await openPackMutation.mutateAsync({ packId: pack.id, count })
           await queryClient.invalidateQueries({ queryKey: ['col-play', cid] })
           const bonusAvailableAt = result.status.availableAt
             || new Date(Date.now() + Math.max(1, pack.cooldownHours ?? 24) * 3_600_000).toISOString()
@@ -454,8 +454,9 @@ export function SimulatedReaderHomePage() {
           description: newCount > 0 ? `${newCount} novo${newCount !== 1 ? 's' : ''} na coleção ✨` : `${pack.name} aberto!`,
         })
       } catch (error) {
-        if (error instanceof ApiRequestError && error.code === 'PACK_LIMIT_REACHED') {
+        if (error instanceof ApiRequestError && (error.code === 'PACK_LIMIT_REACHED' || error.code === 'PACK_COUNT_EXCEEDED')) {
           if (!isMain) markPackExhausted(pack.id)
+          await queryClient.invalidateQueries({ queryKey: ['col-play', cid] })
           setNow(Date.now())
           toast.info(error.message)
         } else if (error instanceof ApiRequestError && (error.status === 429 || error.code === 'PACK_ON_COOLDOWN')) {
@@ -967,6 +968,27 @@ export function SimulatedReaderHomePage() {
                   </Typography>
                 </Box>
               )}
+              {isRealReader && pack.distribution !== 'all_with_access' && (
+                <Box sx={{
+                  position: 'absolute',
+                  bottom: 0,
+                  right: 0,
+                  minWidth: 17,
+                  height: 17,
+                  borderRadius: radius.full,
+                  background: '#fff',
+                  border: `1.5px solid ${pack.accent}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  px: 0.4,
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.18)',
+                }}>
+                  <Typography sx={{ fontSize: '0.55rem', fontWeight: 900, color: pack.accent, lineHeight: 1 }}>
+                    {play?.packOpens?.[pack.id] ?? 0}
+                  </Typography>
+                </Box>
+              )}
             </Box>
           )})}
         </Box>
@@ -1135,22 +1157,41 @@ export function SimulatedReaderHomePage() {
               </Box>
             </DialogContent>
 
-            <DialogActions sx={{ px: 2, pb: 2, gap: 1 }}>
-              <Button variant="ghost" onClick={() => setSelectedBonusPack(null)} sx={{ flex: 1 }}>
-                Agora não
-              </Button>
-              <Button
-                variant="primary"
-                disabled={isOpeningPack || (isRealReader && !canOpenBonusPack(selectedBonusPack))}
-                onClick={() => handleOpenPack(selectedBonusPack, false)}
-                sx={{ flex: 1, whiteSpace: 'nowrap' }}
-              >
-                {isRealReader && bonusPackBlock(selectedBonusPack) === 'exhausted'
-                  ? 'Esgotado'
-                  : isRealReader && bonusPackBlock(selectedBonusPack) === 'cooldown'
-                    ? 'Em cooldown'
-                    : 'Abrir bônus'}
-              </Button>
+            <DialogActions sx={{ px: 2, pb: 2, gap: 0.8, flexDirection: 'column' }}>
+              {(() => {
+                const opens = isRealReader && selectedBonusPack.distribution !== 'all_with_access'
+                  ? (play?.packOpens?.[selectedBonusPack.id] ?? 0)
+                  : 0
+                const canOpen = isRealReader ? canOpenBonusPack(selectedBonusPack) : true
+                const block = isRealReader ? bonusPackBlock(selectedBonusPack) : null
+                return (
+                  <>
+                    {opens > 1 && canOpen && (
+                      <Button
+                        variant="primary"
+                        disabled={isOpeningPack}
+                        onClick={() => handleOpenPack(selectedBonusPack, false, opens)}
+                        sx={{ width: '100%', whiteSpace: 'nowrap' }}
+                      >
+                        Abrir todos ({opens}x)
+                      </Button>
+                    )}
+                    <Stack direction="row" spacing={0.8} sx={{ width: '100%' }}>
+                      <Button variant="ghost" onClick={() => setSelectedBonusPack(null)} sx={{ flex: 1 }}>
+                        Agora não
+                      </Button>
+                      <Button
+                        variant="primary"
+                        disabled={isOpeningPack || (isRealReader && !canOpen)}
+                        onClick={() => handleOpenPack(selectedBonusPack, false)}
+                        sx={{ flex: 1, whiteSpace: 'nowrap' }}
+                      >
+                        {block === 'exhausted' ? 'Esgotado' : block === 'cooldown' ? 'Em cooldown' : opens > 1 ? 'Abrir 1' : 'Abrir bônus'}
+                      </Button>
+                    </Stack>
+                  </>
+                )
+              })()}
             </DialogActions>
           </>
         )}

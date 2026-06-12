@@ -242,7 +242,8 @@ export function useOpenCollectionDailyMutation(cid: string) {
 
 export function useOpenCollectionPackMutation(cid: string) {
   return useMutation({
-    mutationFn: (packId: string) => api.openCollectionPack(cid, packId),
+    mutationFn: ({ packId, count = 1 }: { packId: string; count?: number }) =>
+      api.openCollectionPack(cid, packId, count),
   })
 }
 

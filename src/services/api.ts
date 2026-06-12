@@ -211,9 +211,9 @@ export const api = {
     request<{ rewards: CollectionDailyReward[]; status: CollectionDailyStatus }>(
       `/api/collections/${cid}/daily/open`, { method: 'POST', body: JSON.stringify({}) }
     ),
-  openCollectionPack: (cid: string, packId: string) =>
+  openCollectionPack: (cid: string, packId: string, count = 1) =>
     request<{ rewards: CollectionDailyReward[]; status: CollectionDailyStatus }>(
-      `/api/collections/${cid}/packs/${packId}/open`, { method: 'POST', body: JSON.stringify({}) }
+      `/api/collections/${cid}/packs/${packId}/open`, { method: 'POST', body: JSON.stringify({ count }) }
     ),
   setCollectionFavorite: (cid: string, id: string, favorite: boolean) =>
     request<CollectionNoteView>(`/api/collections/${cid}/notes/${id}/favorite`, {
