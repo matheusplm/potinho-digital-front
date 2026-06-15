@@ -18,6 +18,7 @@ import { ReaderCollectionPage } from './pages/ReaderCollectionPage'
 import { ConquistasPage } from './pages/ConquistasPage'
 import { FavoritasPage } from './pages/FavoritasPage'
 import { TestPage } from './pages/TestPage'
+import { LandingPage } from './pages/LandingPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { LoadingState } from './components/ui'
 import { Box } from '@mui/material'
@@ -49,10 +50,11 @@ function AppRoutes() {
   if (!user) {
     return (
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         {import.meta.env.DEV && <Route path="/test" element={<TestPage />} />}
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     )
   }
