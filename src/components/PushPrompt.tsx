@@ -18,9 +18,9 @@ export function PushPrompt() {
   return (
     <Box sx={{
       mx: 2.5, mb: 2,
-      background: 'rgba(255,255,255,0.62)',
+      background: `${theme.accent}12`,
       backdropFilter: 'blur(16px)',
-      border: `1.5px solid ${theme.accent}22`,
+      border: `1.5px solid ${theme.accent}30`,
       borderLeft: `3px solid ${theme.accent}`,
       borderRadius: radius.xl,
       px: 2, py: 1.4,
