@@ -246,8 +246,8 @@ export function ReaderCollectionPage() {
       void queryClient.invalidateQueries({ queryKey: ['reader-view', cid, email] })
       toast.success('Brindes atualizados.')
       setPackOpensDialog(null)
-    } catch {
-      toast.error('Erro ao atualizar brindes.')
+    } catch (e) {
+      toast.error((e as Error).message || 'Erro ao atualizar brindes.')
     }
   }
 
@@ -259,8 +259,8 @@ export function ReaderCollectionPage() {
       void queryClient.invalidateQueries({ queryKey: ['reader-view', cid, email] })
       toast.success('Brinde removido.')
       setPackOpensDialog(null)
-    } catch {
-      toast.error('Erro ao remover brinde.')
+    } catch (e) {
+      toast.error((e as Error).message || 'Erro ao remover brinde.')
     }
   }
 
@@ -269,8 +269,8 @@ export function ReaderCollectionPage() {
       await revokeMutation.mutateAsync(email)
       toast.info(`Acesso removido de ${email}`)
       navigate(`/colecoes/${slug}/gerenciar`)
-    } catch {
-      toast.error('Erro ao revogar acesso.')
+    } catch (e) {
+      toast.error((e as Error).message || 'Erro ao revogar acesso.')
     }
   }
 

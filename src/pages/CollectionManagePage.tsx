@@ -389,7 +389,7 @@ function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
       if (editing) { await updateMutation.mutateAsync({ id: editing.id, data: form }); toast.success('Bilhete atualizado!') }
       else { await createMutation.mutateAsync(form); toast.success('Bilhete criado!') }
       onClose()
-    } catch { toast.error('Erro ao salvar bilhete.') }
+    } catch (e) { toast.error((e as Error).message || 'Erro ao salvar bilhete.') }
   }
 
   return (
@@ -1549,7 +1549,7 @@ export function CollectionManagePage() {
     const email = emailInput.trim()
     if (!email) return
     try { await grantMutation.mutateAsync(email); setEmailInput(''); toast.success(`Acesso concedido para ${email}`) }
-    catch { toast.error('Erro ao conceder acesso.') }
+    catch (e) { toast.error((e as Error).message || 'Erro ao conceder acesso.') }
   }
 
 
@@ -1586,7 +1586,7 @@ export function CollectionManagePage() {
     if (!deletingNote) return
     deleteNote.mutate(deletingNote.id, {
       onSuccess: () => { toast.success('Bilhete removido.'); setDeletingNote(null) },
-      onError: () => toast.error('Erro ao remover.'),
+      onError: (e: Error) => toast.error(e.message || 'Erro ao remover bilhete.'),
     })
   }
 
@@ -1610,14 +1610,14 @@ export function CollectionManagePage() {
     if (!deletingRarity) return
     deleteRarity.mutate(deletingRarity.id, {
       onSuccess: () => { toast.success('Raridade excluída.'); setDeletingRarity(null) },
-      onError: () => toast.error('Erro ao excluir raridade.'),
+      onError: (e: Error) => toast.error(e.message || 'Erro ao excluir raridade.'),
     })
   }
   const confirmDeleteType = () => {
     if (!deletingType) return
     deleteType.mutate(deletingType.id, {
       onSuccess: () => { toast.success('Tipo excluído.'); setDeletingType(null) },
-      onError: () => toast.error('Erro ao excluir tipo.'),
+      onError: (e: Error) => toast.error(e.message || 'Erro ao excluir tipo.'),
     })
   }
   const confirmDeletePack = () => {
