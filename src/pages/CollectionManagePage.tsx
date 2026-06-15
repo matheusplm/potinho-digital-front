@@ -3,7 +3,6 @@ import AddIcon from '@mui/icons-material/Add'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
-import PersonRemoveIcon from '@mui/icons-material/PersonRemove'
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import SearchIcon from '@mui/icons-material/Search'
@@ -26,7 +25,7 @@ import {
   useCollectionTypesQuery, useCreateCollectionTypeMutation, useUpdateCollectionTypeMutation, useDeleteCollectionTypeMutation,
   useCollectionPacksQuery, useCreateCollectionPackMutation, useUpdateCollectionPackMutation, useDeleteCollectionPackMutation,
   useCollectionAchievementsQuery, useCreateCollectionAchievementMutation, useDeleteCollectionAchievementMutation,
-  useCollectionAccessQuery, useGrantAccessMutation, useRevokeAccessMutation, useAddPackOpensMutation,
+  useCollectionAccessQuery, useGrantAccessMutation, useAddPackOpensMutation,
 } from '../hooks/useNotes'
 import { AchievementEditor } from '../components/manage/AchievementEditor'
 import { useBackground } from '../context/BackgroundContext'
@@ -1488,7 +1487,6 @@ export function CollectionManagePage() {
   const createAchievement = useCreateCollectionAchievementMutation(cid)
   const deleteAchievement = useDeleteCollectionAchievementMutation(cid)
   const grantMutation = useGrantAccessMutation(cid)
-  const revokeMutation = useRevokeAccessMutation(cid)
   const addPackOpensMutation = useAddPackOpensMutation(cid)
 
   function addAchievementPreset(preset: typeof ACHIEVEMENT_PRESETS[number]) {
@@ -1554,10 +1552,6 @@ export function CollectionManagePage() {
     catch { toast.error('Erro ao conceder acesso.') }
   }
 
-  async function handleRevoke(email: string) {
-    try { await revokeMutation.mutateAsync(email); toast.info(`Acesso removido de ${email}`) }
-    catch { toast.error('Erro ao revogar acesso.') }
-  }
 
   function openPackOpensDialog(email: string, pack: CollectionPack, currentOpens: number | undefined) {
     setPackOpensInput(1)
@@ -2343,9 +2337,6 @@ export function CollectionManagePage() {
                     </Typography>
                     <IconButton size="small" aria-label="ver coleção" onClick={() => navigate(`/colecoes/${slug}/gerenciar/leitores/${encodeURIComponent(a.email)}`)} sx={{ ...actionButtonSx('neutral'), flexShrink: 0 }}>
                       <VisibilityOutlinedIcon sx={{ fontSize: 17 }} />
-                    </IconButton>
-                    <IconButton size="small" aria-label="remover acesso" onClick={() => handleRevoke(a.email)} sx={{ ...actionButtonSx('danger'), flexShrink: 0 }}>
-                      <PersonRemoveIcon sx={{ fontSize: 17 }} />
                     </IconButton>
                   </Stack>
 
