@@ -9,6 +9,7 @@ import { Box, Typography } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { FloatingMenu } from './FloatingMenu'
+import { PushPrompt } from './PushPrompt'
 import { SimulateReaderSheet } from './SimulateReaderSheet'
 import { SimulationBanner } from './SimulationBanner'
 import { ScrollHint, toast } from './ui'
@@ -102,6 +103,7 @@ export function MobileLayout() {
     <Box sx={{ width: '100%', maxWidth: 480, height: '100dvh', mx: 'auto', bgcolor: 'background.default', overflow: 'hidden' }}>
       <FloatingMenu />
       <SimulationBanner />
+      {location.pathname === '/home' && !isActive && <PushPrompt />}
 
       <Box component="main" sx={{
         height: `calc(100% - 64px - env(safe-area-inset-bottom, 0px) - ${bannerOffset})`,

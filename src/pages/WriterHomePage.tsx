@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { useCollectionsQuery } from '../hooks/useNotes'
 import { Card, ScrollablePage } from '../components/ui'
-import { PushPrompt } from '../components/PushPrompt'
 import { colors, font } from '../design-system'
 import { useBackground } from '../context/BackgroundContext'
 import { isCollectionOwner } from '../utils/collectionAccess'
@@ -57,7 +56,6 @@ export function WriterHomePage() {
       ))}
 
       <ScrollablePage sx={{ px: 2.5, py: 2.5, gap: 3, animation: `${fadeIn} 0.4s ease` }}>
-        <PushPrompt />
         <Stack spacing={0.3}>
           <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBgMuted, fontWeight: 500 }}>
             {greeting},

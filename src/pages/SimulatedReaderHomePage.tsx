@@ -7,7 +7,6 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Card, LoadingState, ScrollablePage, toast } from '../components/ui'
-import { PushPrompt } from '../components/PushPrompt'
 import { useBackground } from '../context/BackgroundContext'
 import { useSimulation } from '../context/SimulationContext'
 import { useUser } from '../context/UserContext'
@@ -561,7 +560,6 @@ export function SimulatedReaderHomePage() {
       <FavoriteIcon sx={{ position: 'absolute', bottom: -80, right: -80, fontSize: 480, color: 'rgba(225,29,72,0.05)', pointerEvents: 'none' }} />
 
       <ScrollablePage sx={{ px: 2.5, py: 2.2, animation: `${fadeIn} 0.35s ease` }}>
-        {isRealReader && <PushPrompt />}
         <Stack spacing={0.35} sx={{ mb: 1.35 }}>
           <Typography sx={{ fontSize: '0.78rem', color: theme.textOnBgMuted, fontWeight: 700 }}>
             {isRealReader ? 'Para você' : 'Prévia do leitor'}

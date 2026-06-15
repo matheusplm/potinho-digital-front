@@ -17,13 +17,20 @@ export function PushPrompt() {
 
   return (
     <Box sx={{
-      mx: 2.5, mb: 2,
-      background: `${theme.accent}12`,
-      backdropFilter: 'blur(16px)',
+      position: 'fixed',
+      top: 10,
+      left: '50%',
+      transform: 'translateX(-50%)',
+      width: 'calc(100% - 40px)',
+      maxWidth: 440,
+      zIndex: 1200,
+      background: `${theme.accent}18`,
+      backdropFilter: 'blur(20px)',
       border: `1.5px solid ${theme.accent}30`,
       borderLeft: `3px solid ${theme.accent}`,
       borderRadius: radius.xl,
       px: 2, py: 1.4,
+      boxShadow: `0 4px 24px ${theme.accent}20`,
     }}>
       <Stack direction="row" alignItems="center" spacing={1.5}>
         <NotificationsNoneIcon sx={{ fontSize: 22, color: theme.accent, flexShrink: 0 }} />
