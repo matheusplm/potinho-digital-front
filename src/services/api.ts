@@ -245,6 +245,11 @@ export const api = {
       body: JSON.stringify({ favorite }),
     }),
 
+  subscribePush: (data: { endpoint: string; keys: { p256dh: string; auth: string } }) =>
+    request<{ success: boolean }>('/api/push/subscribe', { method: 'POST', body: JSON.stringify(data) }),
+  unsubscribePush: (endpoint: string) =>
+    request<{ success: boolean }>('/api/push/unsubscribe', { method: 'DELETE', body: JSON.stringify({ endpoint }) }),
+
   getCollectionAchievements: (cid: string) => request<CollectionAchievement[]>(`/api/collections/${cid}/achievements`),
   getReaderAchievements: (cid: string) => request<ReaderAchievementsResponse>(`/api/collections/${cid}/achievements/me`),
   createCollectionAchievement: (cid: string, data: CollectionAchievementFormData) =>

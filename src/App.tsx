@@ -1,4 +1,5 @@
 import type { ReactElement } from 'react'
+import { useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { MobileLayout } from './components/MobileLayout'
@@ -78,6 +79,12 @@ function AppRoutes() {
 }
 
 function App() {
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {})
+    }
+  }, [])
+
   return (
     <BrowserRouter>
       <UserProvider>
