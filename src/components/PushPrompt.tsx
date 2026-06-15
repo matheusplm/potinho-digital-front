@@ -2,7 +2,7 @@ import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone'
 import NotificationsOffIcon from '@mui/icons-material/NotificationsOff'
 import CloseIcon from '@mui/icons-material/Close'
 import { Box, IconButton, Stack, Typography } from '@mui/material'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { usePush } from '../hooks/usePush'
 import { Button } from './ui'
 import { colors, radius } from '../design-system'
@@ -12,6 +12,11 @@ export function PushPrompt() {
   const { state, loading, enable } = usePush()
   const { theme } = useBackground()
   const [dismissed, setDismissed] = useState(false)
+
+  useEffect(() => {
+    const t = setTimeout(() => setDismissed(true), 5000)
+    return () => clearTimeout(t)
+  }, [])
 
   if (dismissed || state !== 'default') return null
 
