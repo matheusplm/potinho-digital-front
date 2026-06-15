@@ -2,7 +2,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, Chip, Divider, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useNavigate } from 'react-router-dom'
-import { Button } from '../components/ui'
+import { Button, ScrollHint } from '../components/ui'
 import { backgroundThemes, colors, font, radius } from '../design-system'
 
 const fadeIn = keyframes`
@@ -345,6 +345,7 @@ export function LandingPage() {
         </Box>
 
       </Box>
+      <ScrollHint />
     </Box>
   )
 }
