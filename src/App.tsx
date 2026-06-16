@@ -2,7 +2,9 @@ import type { ReactElement } from 'react'
 import { useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Toaster } from 'sonner'
+import { useMediaQuery } from '@mui/material'
 import { MobileLayout } from './components/MobileLayout'
+import { DesktopLayout } from './components/DesktopLayout'
 import { PersonaBootstrap } from './components/PersonaBootstrap'
 import { UserProvider, useUser, type UserRole } from './context/UserContext'
 import { BackgroundProvider } from './context/BackgroundContext'
@@ -39,6 +41,8 @@ function RequireRole({ role, children }: { role: UserRole; children: ReactElemen
 
 function AppRoutes() {
   const { user, personaReady } = useUser()
+  const isDesktop = useMediaQuery('(min-width: 900px)')
+  const Layout = isDesktop ? DesktopLayout : MobileLayout
 
   if (user && !personaReady) {
     return (
@@ -62,7 +66,7 @@ function AppRoutes() {
 
   return (
     <Routes>
-      <Route element={<MobileLayout />}>
+      <Route element={<Layout />}>
         <Route index element={<Navigate to="/home" replace />} />
         <Route path="home" element={<HomeRoute />} />
         <Route path="colecoes" element={<RequireRole role="writer"><CollectionsListPage /></RequireRole>} />
