@@ -78,7 +78,7 @@ const STEPS = [
   { emoji: '✍️', n: 1, title: 'Você escreve', desc: 'Crie bilhetes — memórias, poemas, declarações. Defina a raridade de cada um do seu jeito.', color: colors.primary.main },
   { emoji: '🎁', n: 2, title: 'Monta os pacotinhos', desc: 'Configure pacotinhos diários, bônus e especiais com cooldown, raridades e regras únicas.', color: colors.rose.main },
   { emoji: '💌', n: 3, title: 'Libera o acesso', desc: 'Adiciona quem vai receber pelo email. Ela começa a abrir os pacotinhos e colecionar.', color: colors.purple.main },
-  { emoji: '✨', n: 4, title: 'Ela se apaixona', desc: 'Conquistas, álbum completo, favoritos — cada abertura é uma surpresa nova e especial.', color: '#d97706' },
+  { emoji: '✨', n: 4, title: 'A magia acontece', desc: 'Conquistas, álbum completo, favoritos — cada abertura é uma surpresa nova e especial.', color: '#d97706' },
 ]
 
 const CUSTOMIZATIONS = [
