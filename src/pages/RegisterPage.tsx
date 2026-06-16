@@ -30,13 +30,20 @@ const HEARTS = [
 export function RegisterPage() {
   const navigate = useNavigate()
   const [form, setForm] = useState({ name: '', email: '', password: '' })
+  const [passwordTouched, setPasswordTouched] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [field]: e.target.value }))
 
+  const passwordError = passwordTouched && form.password.length > 0 && form.password.length < 6
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (form.password.length < 6) {
+      setPasswordTouched(true)
+      return
+    }
     setLoading(true)
     try {
       await api.register(form.name, form.email, form.password)
@@ -96,7 +103,13 @@ export function RegisterPage() {
             <Stack spacing={2}>
               <Input label="Seu nome" value={form.name} onChange={set('name')} placeholder="Como te chamamos?" fullWidth required />
               <Input label="Email" type="email" value={form.email} onChange={set('email')} placeholder="seu@email.com" fullWidth required />
-              <Input label="Senha" type="password" value={form.password} onChange={set('password')} placeholder="••••••••" fullWidth required />
+              <Input
+                label="Senha" type="password" value={form.password}
+                onChange={set('password')} onBlur={() => setPasswordTouched(true)}
+                placeholder="••••••••" fullWidth required
+                error={passwordError}
+                helperText={passwordError ? 'Mínimo de 6 caracteres' : undefined}
+              />
               <Button
                 variant="primary"
                 type="submit" fullWidth loading={loading} sx={{ mt: 0.5 }}

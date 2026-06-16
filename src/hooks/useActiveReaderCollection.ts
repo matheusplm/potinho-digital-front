@@ -10,5 +10,5 @@ export function useActiveReaderCollection() {
   const isReader = persona === 'reader'
   const readerCollections = isReader ? collections.filter((c) => isCollectionReader(c, user?.id)) : []
   const collection = readerCollections.find((c) => c.id === activeCollectionId) ?? readerCollections[0]
-  return { collection, isReader, isLoading }
+  return { collection, readerCollections, isReader, isLoading }
 }

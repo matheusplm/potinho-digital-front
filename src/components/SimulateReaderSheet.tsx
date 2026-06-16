@@ -41,10 +41,17 @@ export function SimulateReaderSheet({ open, onClose }: SimulateReaderSheetProps)
     [collections, user?.id],
   )
 
-  const [selectedId, setSelectedId] = useState<string>('')
+  const [selectedId, setSelectedId] = useState<string>(
+    () => localStorage.getItem('potinho-sim-cid') ?? '',
+  )
   const [preset, setPreset] = useState<SimulationPreset>('new_reader')
 
   const selected = ownedCollections.find((collection) => collection.id === selectedId) ?? ownedCollections[0]
+
+  function selectCollection(id: string) {
+    localStorage.setItem('potinho-sim-cid', id)
+    setSelectedId(id)
+  }
 
   function handleStart() {
     const collection = selected ?? ownedCollections[0]
@@ -53,6 +60,7 @@ export function SimulateReaderSheet({ open, onClose }: SimulateReaderSheetProps)
       return
     }
 
+    localStorage.setItem('potinho-sim-cid', collection.id)
     const slug = slugify(collection.name)
     startSimulation({
       collectionId: collection.id,
@@ -101,7 +109,7 @@ export function SimulateReaderSheet({ open, onClose }: SimulateReaderSheetProps)
                     key={collection.id}
                     collection={collection}
                     active={(selected?.id ?? ownedCollections[0]?.id) === collection.id}
-                    onSelect={() => setSelectedId(collection.id)}
+                    onSelect={() => selectCollection(collection.id)}
                   />
                 ))}
               </Stack>

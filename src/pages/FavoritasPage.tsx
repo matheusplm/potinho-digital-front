@@ -20,7 +20,7 @@ const fadeIn = keyframes`from { opacity:0; transform:translateY(12px); } to { op
 export function FavoritasPage() {
   const { theme } = useBackground()
   const reader = useReader()
-  const { collection, isLoading: collectionsLoading } = useActiveReaderCollection()
+  const { collection, readerCollections, isLoading: collectionsLoading } = useActiveReaderCollection()
   const cid = collection?.id ?? ''
   const { data: play, isLoading: playLoading } = useCollectionPlayQuery(cid, { enabled: !!cid })
   const { data: rarities = [] } = useCollectionRaritiesQuery(cid)
@@ -40,8 +40,18 @@ export function FavoritasPage() {
             ❤️ Favoritas
           </Typography>
           <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.6rem', color: theme.textOnBg, lineHeight: 1.1 }}>
-            {collection?.name ?? 'Suas favoritas'}
+            Suas favoritas
           </Typography>
+          {readerCollections.length > 1 && collection && (
+            <Typography sx={{
+              display: 'inline-flex', alignItems: 'center', gap: 0.5, mt: 0.4,
+              fontSize: '0.74rem', fontWeight: 700, color: theme.textOnBgMuted,
+              bgcolor: `${theme.accent}14`, border: `1px solid ${theme.accent}28`,
+              borderRadius: '20px', px: 1, py: 0.25, alignSelf: 'flex-start',
+            }}>
+              {collection.emoji} {collection.name}
+            </Typography>
+          )}
           {favorites.length > 0 && (
             <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBgMuted, fontStyle: 'italic', mt: 0.3 }}>
               {favorites.length} cartinha{favorites.length !== 1 ? 's' : ''} que você mais ama

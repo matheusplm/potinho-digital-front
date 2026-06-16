@@ -17,7 +17,7 @@ function formatDate(iso: string | null) {
 
 export function ConquistasPage() {
   const { theme } = useBackground()
-  const { collection, isLoading: collectionsLoading } = useActiveReaderCollection()
+  const { collection, readerCollections, isLoading: collectionsLoading } = useActiveReaderCollection()
   const cid = collection?.id ?? ''
   const { data: play, isLoading: playLoading } = useCollectionPlayQuery(cid, { enabled: !!cid })
   const { data: rarities = [] } = useCollectionRaritiesQuery(cid)
@@ -36,8 +36,18 @@ export function ConquistasPage() {
             🏅 Conquistas
           </Typography>
           <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.6rem', color: theme.textOnBg, lineHeight: 1.1 }}>
-            {collection?.name ?? 'Suas conquistas'}
+            Suas conquistas
           </Typography>
+          {readerCollections.length > 1 && collection && (
+            <Typography sx={{
+              display: 'inline-flex', alignItems: 'center', gap: 0.5, mt: 0.4,
+              fontSize: '0.74rem', fontWeight: 700, color: theme.textOnBgMuted,
+              bgcolor: `${theme.accent}14`, border: `1px solid ${theme.accent}28`,
+              borderRadius: '20px', px: 1, py: 0.25, alignSelf: 'flex-start',
+            }}>
+              {collection.emoji} {collection.name}
+            </Typography>
+          )}
           {achData && (
             <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBgMuted, fontStyle: 'italic', mt: 0.3 }}>
               {unlocked} de {achievements.length} desbloqueadas

@@ -8,7 +8,7 @@ import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined'
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined'
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
 import BlockIcon from '@mui/icons-material/Block'
-import { Box, Stack, Typography, Backdrop, IconButton } from '@mui/material'
+import { Box, Stack, Typography, Backdrop, IconButton, Tooltip } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -148,11 +148,11 @@ export function FloatingMenu() {
                 </Typography>
                 <Stack direction="row" spacing={0.6}>
                   {([
-                    { role: 'reader' as const, label: 'Leitor', icon: <MenuBookOutlinedIcon sx={{ fontSize: 15 }} />, enabled: canReader },
-                    { role: 'writer' as const, label: 'Escritor', icon: <EditOutlinedIcon sx={{ fontSize: 15 }} />, enabled: canWriter },
-                  ]).map(({ role, label, icon, enabled }) => {
+                    { role: 'reader' as const, label: 'Leitor', icon: <MenuBookOutlinedIcon sx={{ fontSize: 15 }} />, enabled: canReader, disabledTip: 'Você ainda não tem acesso a nenhuma coleção como leitor' },
+                    { role: 'writer' as const, label: 'Escritor', icon: <EditOutlinedIcon sx={{ fontSize: 15 }} />, enabled: canWriter, disabledTip: 'Crie uma coleção para usar o modo escritor' },
+                  ]).map(({ role, label, icon, enabled, disabledTip }) => {
                     const active = persona === role
-                    return (
+                    const btn = (
                       <Box
                         key={role}
                         onClick={() => enabled && switchPersona(role)}
@@ -171,6 +171,11 @@ export function FloatingMenu() {
                           {label}
                         </Typography>
                       </Box>
+                    )
+                    return enabled ? btn : (
+                      <Tooltip key={role} title={disabledTip} enterTouchDelay={0} leaveTouchDelay={2000} placement="bottom" arrow sx={{ flex: 1 }}>
+                        <span style={{ flex: 1 }}>{btn}</span>
+                      </Tooltip>
                     )
                   })}
                 </Stack>
@@ -256,17 +261,19 @@ export function FloatingMenu() {
                       {backgroundThemes.filter((bg) => bg.isDark === dark).map((bg) => {
                         const active = bg.key === themeKey
                         return (
-                          <Box key={bg.key} onClick={() => setThemeKey(bg.key)} title={bg.label} sx={{
-                            width: 28, height: 28, borderRadius: '50%',
-                            background: bg.gradient, cursor: 'pointer', flexShrink: 0,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            border: `2px solid ${active ? bg.accent : 'rgba(0,0,0,0.08)'}`,
-                            boxShadow: active ? `0 2px 8px ${bg.accent}55` : 'none',
-                            transition: 'all 0.18s',
-                            '&:hover': { transform: 'scale(1.12)' },
-                          }}>
-                            {active && <CheckIcon sx={{ fontSize: 14, color: bg.accent }} />}
-                          </Box>
+                          <Tooltip key={bg.key} title={bg.label} enterTouchDelay={0} leaveTouchDelay={1500} placement="top" arrow>
+                            <Box onClick={() => setThemeKey(bg.key)} sx={{
+                              width: 28, height: 28, borderRadius: '50%',
+                              background: bg.gradient, cursor: 'pointer', flexShrink: 0,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              border: `2px solid ${active ? bg.accent : 'rgba(0,0,0,0.08)'}`,
+                              boxShadow: active ? `0 2px 8px ${bg.accent}55` : 'none',
+                              transition: 'all 0.18s',
+                              '&:hover': { transform: 'scale(1.12)' },
+                            }}>
+                              {active && <CheckIcon sx={{ fontSize: 14, color: bg.accent }} />}
+                            </Box>
+                          </Tooltip>
                         )
                       })}
                     </Box>

@@ -251,6 +251,7 @@ export function SimulatedReaderHomePage() {
   const [selectedNote, setSelectedNote] = useState<ReadableNote | null>(null)
   const [openingPack, setOpeningPack] = useState<CollectionPack | null>(null)
   const [selectedBonusPack, setSelectedBonusPack] = useState<CollectionPack | null>(null)
+  const [confirmOpenAll, setConfirmOpenAll] = useState(false)
   const [openedBonusPackIds, setOpenedBonusPackIds] = useState<string[]>([])
   const [packCooldowns, setPackCooldowns] = useState<Record<string, string>>(
     () => (cid ? loadPackCooldowns(cid) : {}),
@@ -1080,7 +1081,7 @@ export function SimulatedReaderHomePage() {
       </Dialog>
       <Dialog
         open={!!selectedBonusPack}
-        onClose={() => setSelectedBonusPack(null)}
+        onClose={() => { setSelectedBonusPack(null); setConfirmOpenAll(false) }}
         maxWidth="xs"
         fullWidth
         slotProps={{
@@ -1181,18 +1182,33 @@ export function SimulatedReaderHomePage() {
                 const block = isRealReader ? bonusPackBlock(selectedBonusPack) : null
                 return (
                   <>
-                    {opens > 1 && canOpen && (
+                    {opens > 1 && canOpen && !confirmOpenAll && (
                       <Button
                         variant="primary"
                         disabled={isOpeningPack}
-                        onClick={() => handleOpenPack(selectedBonusPack, false, opens)}
+                        onClick={() => setConfirmOpenAll(true)}
                         sx={{ width: '100%', whiteSpace: 'nowrap' }}
                       >
                         Abrir todos ({opens}x)
                       </Button>
                     )}
+                    {opens > 1 && canOpen && confirmOpenAll && (
+                      <Stack direction="row" spacing={0.8} sx={{ width: '100%' }}>
+                        <Button variant="ghost" onClick={() => setConfirmOpenAll(false)} sx={{ flex: 1 }}>
+                          Cancelar
+                        </Button>
+                        <Button
+                          variant="primary"
+                          disabled={isOpeningPack}
+                          onClick={() => { setConfirmOpenAll(false); handleOpenPack(selectedBonusPack, false, opens) }}
+                          sx={{ flex: 1, whiteSpace: 'nowrap' }}
+                        >
+                          Confirmar ({opens}x)
+                        </Button>
+                      </Stack>
+                    )}
                     <Stack direction="row" spacing={0.8} sx={{ width: '100%' }}>
-                      <Button variant="ghost" onClick={() => setSelectedBonusPack(null)} sx={{ flex: 1 }}>
+                      <Button variant="ghost" onClick={() => { setSelectedBonusPack(null); setConfirmOpenAll(false) }} sx={{ flex: 1 }}>
                         Agora não
                       </Button>
                       <Button

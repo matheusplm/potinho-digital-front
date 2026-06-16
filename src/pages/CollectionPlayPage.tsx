@@ -1157,9 +1157,14 @@ export function CollectionPlayPage() {
 
             {!isSimulating && displayPlay.total > 0 && displayPlay.items.filter((n) => !n.owned).length > 0 && (
               <Stack spacing={1}>
-                <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1.2, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
-                  Ainda por descobrir — {displayPlay.items.filter((n) => !n.owned).length}
-                </Typography>
+                <Box>
+                  <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1.2, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
+                    Ainda por descobrir — {displayPlay.items.filter((n) => !n.owned).length}
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted, mt: 0.3, fontStyle: 'italic' }}>
+                    Continue abrindo pacotinhos para descobrir estas cartinhas 💌
+                  </Typography>
+                </Box>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
                   {displayPlay.items.filter((n) => !n.owned).map((note) => {
                     const r = rarities.find((x) => x.id === note.rarity)
