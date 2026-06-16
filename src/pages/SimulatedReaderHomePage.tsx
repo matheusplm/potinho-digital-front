@@ -610,7 +610,7 @@ export function SimulatedReaderHomePage() {
               ) : (
                 <>
                   <Stack direction="row" justifyContent="space-between" alignItems="center">
-                    <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: colors.text.secondary }}>
+                    <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: theme.textOnBgMuted }}>
                       Coleção
                     </Typography>
                     <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.05rem', color: theme.accent }}>
@@ -623,7 +623,7 @@ export function SimulatedReaderHomePage() {
                     bgcolor: 'rgba(0,0,0,0.06)',
                     '& .MuiLinearProgress-bar': { borderRadius: radius.full, background: `linear-gradient(90deg, ${colors.rose.main}, ${theme.accent})` },
                   }} />
-                  <Typography sx={{ fontSize: '0.72rem', color: colors.text.muted }}>
+                  <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted }}>
                     {play.owned} de {play.total} bilhetes coletados
                   </Typography>
                 </>
@@ -648,7 +648,7 @@ export function SimulatedReaderHomePage() {
                     Pra reler agora
                   </Typography>
                   <Typography sx={{
-                    fontFamily: font.serif, fontWeight: 800, fontSize: '0.92rem', color: colors.text.primary, lineHeight: 1.25,
+                    fontFamily: font.serif, fontWeight: 800, fontSize: '0.92rem', color: theme.textOnBg, lineHeight: 1.25,
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   }}>
                     {relerNote.title}
@@ -828,7 +828,7 @@ export function SimulatedReaderHomePage() {
                     <Typography sx={{ fontFamily: font.serif, fontWeight: 900, fontSize: '1.02rem', color: theme.accent, lineHeight: 1.1 }}>
                       {remainingLabel}
                     </Typography>
-                    <Typography sx={{ fontSize: '0.68rem', fontWeight: 900, color: colors.text.muted, textTransform: 'uppercase', letterSpacing: 0.6 }}>
+                    <Typography sx={{ fontSize: '0.68rem', fontWeight: 900, color: theme.textOnBgMuted, textTransform: 'uppercase', letterSpacing: 0.6 }}>
                       restante
                     </Typography>
                   </Stack>

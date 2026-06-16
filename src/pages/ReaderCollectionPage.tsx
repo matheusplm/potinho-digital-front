@@ -385,16 +385,16 @@ export function ReaderCollectionPage() {
                 background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(12px)',
                 border: '1.5px solid rgba(255,255,255,0.6)', borderRadius: radius.lg,
               }}>
-                <SearchIcon sx={{ fontSize: 17, color: colors.text.muted, flexShrink: 0 }} />
+                <SearchIcon sx={{ fontSize: 17, color: theme.textOnBgMuted, flexShrink: 0 }} />
                 <Box
                   component="input"
                   value={search}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
                   placeholder="Buscar bilhete..."
-                  sx={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: '0.86rem', color: colors.text.primary, fontFamily: 'inherit', '&::placeholder': { color: colors.text.muted } }}
+                  sx={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: '0.86rem', color: theme.textOnBg, fontFamily: 'inherit', '&::placeholder': { color: theme.textOnBgMuted } }}
                 />
                 {search && (
-                  <Box onClick={() => setSearch('')} sx={{ display: 'flex', cursor: 'pointer', color: colors.text.muted }}>
+                  <Box onClick={() => setSearch('')} sx={{ display: 'flex', cursor: 'pointer', color: theme.textOnBgMuted }}>
                     <CloseIcon sx={{ fontSize: 15 }} />
                   </Box>
                 )}
@@ -405,8 +405,8 @@ export function ReaderCollectionPage() {
                   title={SORT_LABEL[sort]}
                   sx={{ p: 0.5, gap: 0.3, borderRadius: radius.sm, '&:hover': { background: 'rgba(0,0,0,0.06)' } }}
                 >
-                  <SwapVertIcon sx={{ fontSize: 15, color: colors.text.secondary }} />
-                  <Typography sx={{ fontSize: '0.70rem', fontWeight: 700, color: colors.text.secondary }}>{SORT_LABEL[sort]}</Typography>
+                  <SwapVertIcon sx={{ fontSize: 15, color: theme.textOnBgMuted }} />
+                  <Typography sx={{ fontSize: '0.70rem', fontWeight: 700, color: theme.textOnBgMuted }}>{SORT_LABEL[sort]}</Typography>
                 </IconButton>
                 <IconButton
                   size="small"
@@ -414,8 +414,8 @@ export function ReaderCollectionPage() {
                   sx={{ p: 0.5, borderRadius: radius.sm, '&:hover': { background: 'rgba(0,0,0,0.06)' } }}
                 >
                   {viewMode === 'list'
-                    ? <GridViewIcon sx={{ fontSize: 17, color: colors.text.secondary }} />
-                    : <ViewListIcon sx={{ fontSize: 17, color: colors.text.secondary }} />}
+                    ? <GridViewIcon sx={{ fontSize: 17, color: theme.textOnBgMuted }} />
+                    : <ViewListIcon sx={{ fontSize: 17, color: theme.textOnBgMuted }} />}
                 </IconButton>
               </Box>
               {(ownedRarities.length > 1 || favCount > 0) && (
@@ -427,7 +427,7 @@ export function ReaderCollectionPage() {
                     sx={{
                       height: 26, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer',
                       bgcolor: noFilter ? theme.accent : 'rgba(255,255,255,0.5)',
-                      color: noFilter ? '#fff' : colors.text.secondary,
+                      color: noFilter ? '#fff' : theme.textOnBgMuted,
                     }}
                   />
                   {favCount > 0 && (
@@ -438,7 +438,7 @@ export function ReaderCollectionPage() {
                       sx={{
                         height: 26, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer',
                         bgcolor: favFilter ? colors.rose.main : 'rgba(255,255,255,0.5)',
-                        color: favFilter ? '#fff' : colors.text.secondary,
+                        color: favFilter ? '#fff' : theme.textOnBgMuted,
                       }}
                     />
                   )}
@@ -454,7 +454,7 @@ export function ReaderCollectionPage() {
                         sx={{
                           height: 26, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer',
                           background: active ? r.chipBg : 'rgba(255,255,255,0.5)',
-                          color: active ? r.chipColor : colors.text.secondary,
+                          color: active ? r.chipColor : theme.textOnBgMuted,
                           border: `1.5px solid ${active ? r.borderColor : 'transparent'}`,
                         }}
                       />
