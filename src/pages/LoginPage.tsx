@@ -43,7 +43,7 @@ export function LoginPage() {
     setLoading(true)
     try {
       const { token, user } = await api.login(email, password)
-      setUser({ id: user.id, name: user.name, role: user.role as 'writer' | 'reader', token })
+      setUser({ id: user.id, name: user.name, email: user.email, role: user.role as 'writer' | 'reader', token })
       toast.success(`Bem-vindo, ${user.name.split(' ')[0]}! 💙`)
       navigate('/home')
     } catch (err) {

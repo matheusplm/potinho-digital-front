@@ -1573,6 +1573,10 @@ export function CollectionManagePage() {
   async function handleGrant() {
     const email = emailInput.trim()
     if (!email) return
+    if (user?.email && email.toLowerCase() === user.email.toLowerCase()) {
+      toast.error('Você não pode se adicionar como leitor da sua própria coleção.')
+      return
+    }
     try { await grantMutation.mutateAsync(email); setEmailInput(''); toast.success(`Acesso concedido para ${email}`) }
     catch (e) { toast.error((e as Error).message || 'Erro ao conceder acesso.') }
   }

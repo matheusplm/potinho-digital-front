@@ -6,6 +6,7 @@ export type UserRole = 'writer' | 'reader'
 export interface AuthUser {
   id: string
   name: string
+  email?: string
   role: UserRole
   token: string
 }
