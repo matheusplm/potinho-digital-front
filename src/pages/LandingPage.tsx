@@ -300,27 +300,24 @@ export function LandingPage() {
             </Box>
           ) : (
             <Stack alignItems="center" sx={{ animation: `${fadeIn} 0.6s ease both` }}>
-              <FavoriteIcon sx={{ fontSize: 56, color: '#e11d48', filter: 'drop-shadow(0 6px 20px rgba(225,29,72,0.4))', mb: 2.5 }} />
-              <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.8, px: 1.4, py: 0.5, mb: 2, borderRadius: radius.full, background: 'rgba(29,78,216,0.08)', border: '1px solid rgba(29,78,216,0.18)' }}>
+              <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.8, px: 1.4, py: 0.5, mb: 2.5, borderRadius: radius.full, background: 'rgba(29,78,216,0.08)', border: '1px solid rgba(29,78,216,0.18)' }}>
+                <AutoStoriesOutlinedIcon sx={{ fontSize: 13, color: colors.primary.main }} />
                 <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.primary.main, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Álbum afetivo digital
                 </Typography>
               </Box>
-              <Typography component="h1" sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '3rem', lineHeight: 0.95, color: '#1e3a5f', textAlign: 'center', letterSpacing: '-0.5px' }}>
-                O presente
+              <Typography component="h1" sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '2.8rem', lineHeight: 1.0, color: '#1e3a5f', textAlign: 'center', letterSpacing: '-0.5px' }}>
+                O presente que
               </Typography>
-              <Typography component="h1" sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '3rem', lineHeight: 0.95, color: '#1d4ed8', textAlign: 'center', letterSpacing: '-0.5px', mb: 1.5 }}>
-                que cresce.
+              <Typography component="h1" sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '2.8rem', lineHeight: 1.0, color: '#1d4ed8', textAlign: 'center', letterSpacing: '-0.5px', mb: 1.5 }}>
+                cresce todo dia.
               </Typography>
               <Box sx={{ width: 44, height: 3, borderRadius: 2, background: 'linear-gradient(90deg,#1d4ed8,#e11d48)', mb: 2.5 }} />
-              <Typography sx={{ fontFamily: font.serif, fontStyle: 'italic', fontSize: '1rem', color: '#1e3a5f', textAlign: 'center', mb: 1 }}>
-                Um bilhete especial por dia.
+              <Typography sx={{ fontSize: '0.9rem', color: colors.text.secondary, textAlign: 'center', lineHeight: 1.72, mb: 3.5, maxWidth: 310 }}>
+                Escreva bilhetes, monte pacotinhos surpresa e presenteie quem você ama com novas descobertas todo dia — como um álbum de figurinhas.
               </Typography>
-              <Typography sx={{ fontSize: '0.87rem', color: colors.text.secondary, textAlign: 'center', lineHeight: 1.7, mb: 4, maxWidth: 320 }}>
-                Escreva bilhetes, monte pacotinhos surpresa e presenteie quem você ama com novas descobertas todo dia.
-              </Typography>
-              <Stack spacing={1.2} sx={{ width: '100%', maxWidth: 300 }}>
-                <Button variant="primary" fullWidth onClick={() => navigate('/register')} sx={{ py: 1.3, fontSize: '0.96rem' }}>
+              <Stack spacing={1.2} sx={{ width: '100%', maxWidth: 320 }}>
+                <Button variant="primary" fullWidth onClick={() => navigate('/register')} sx={{ py: 1.35, fontSize: '0.97rem' }}>
                   Criar conta grátis
                 </Button>
                 <Button variant="ghost" fullWidth onClick={() => navigate('/login')} sx={{ py: 1.1, fontSize: '0.9rem' }}>
@@ -330,6 +327,12 @@ export function LandingPage() {
               <Typography sx={{ mt: 2, fontSize: '0.74rem', color: colors.text.muted }}>
                 ✓ Gratuito &nbsp;·&nbsp; ✓ Sem cartão de crédito
               </Typography>
+              <Box sx={{ mt: 4, width: '100%', maxWidth: 320, position: 'relative' }}>
+                <Box sx={{ position: 'absolute', top: 10, left: 10, right: 10, bottom: -10, background: 'linear-gradient(135deg,#eff6ff,#dbeafe)', borderRadius: radius.xl, border: '1.5px solid rgba(29,78,216,0.22)' }} />
+                <Box sx={{ position: 'relative' }}>
+                  <DemoNoteCard note={DEMO_NOTES[0]} />
+                </Box>
+              </Box>
             </Stack>
           )}
         </Box>
@@ -428,30 +431,28 @@ export function LandingPage() {
                 <SectionTitle sub="Toque em uma raridade para filtrar e veja como cada bilhete tem sua identidade visual única.">
                   Veja como ficam os bilhetes
                 </SectionTitle>
-                <Box sx={{ overflowX: 'auto', pb: 1, mx: -2.5, px: 2.5, '&::-webkit-scrollbar': { display: 'none' }, mb: 2.5 }}>
-                  <Stack direction="row" spacing={0.8} sx={{ width: 'max-content' }}>
-                    {RARITY_FILTERS.map((r) => (
-                      <Chip
-                        key={r}
-                        label={r}
-                        onClick={() => setActiveRarity(r)}
-                        size="small"
-                        sx={{
-                          fontSize: '0.74rem', fontWeight: activeRarity === r ? 700 : 500,
-                          background: activeRarity === r ? `${RARITY_COLOR[r]}14` : 'rgba(255,255,255,0.65)',
-                          color: activeRarity === r ? RARITY_COLOR[r] : colors.text.secondary,
-                          border: `1.5px solid ${activeRarity === r ? `${RARITY_COLOR[r]}40` : 'rgba(0,0,0,0.08)'}`,
-                          '& .MuiChip-label': { px: 1.2 },
-                        }}
-                      />
-                    ))}
-                  </Stack>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8, mb: 2.5 }}>
+                  {RARITY_FILTERS.map((r) => (
+                    <Chip
+                      key={r}
+                      label={r}
+                      onClick={() => setActiveRarity(r)}
+                      size="small"
+                      sx={{
+                        fontSize: '0.74rem', fontWeight: activeRarity === r ? 700 : 500,
+                        background: activeRarity === r ? `${RARITY_COLOR[r]}14` : 'rgba(255,255,255,0.65)',
+                        color: activeRarity === r ? RARITY_COLOR[r] : colors.text.secondary,
+                        border: `1.5px solid ${activeRarity === r ? `${RARITY_COLOR[r]}40` : 'rgba(0,0,0,0.08)'}`,
+                        '& .MuiChip-label': { px: 1.2 },
+                      }}
+                    />
+                  ))}
                 </Box>
-                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.2 }}>
+                <Stack spacing={1.4}>
                   {visibleNotes.map((note) => (
                     <DemoNoteCard key={note.id} note={note} />
                   ))}
-                </Box>
+                </Stack>
               </Box>
             )}
           </Box>
@@ -547,30 +548,44 @@ export function LandingPage() {
           <SectionTitle sub="O leitor escolhe o tema que mais combina com ele — do romântico e suave ao misterioso e sombrio.">
             {`${backgroundThemes.length} temas visuais`}
           </SectionTitle>
-          <Box sx={{ overflowX: 'auto', pb: 1, mx: isDesktop ? 0 : -2.5, px: isDesktop ? 0 : 2.5, '&::-webkit-scrollbar': { display: 'none' } }}>
-            <Box sx={{ display: 'flex', gap: 1.5, width: 'max-content' }}>
+          {isDesktop ? (
+            <Box sx={{ overflowX: 'auto', pb: 1, '&::-webkit-scrollbar': { display: 'none' } }}>
+              <Box sx={{ display: 'flex', gap: 1.5, width: 'max-content' }}>
+                {backgroundThemes.map((t) => (
+                  <Stack key={t.key} spacing={0.8} alignItems="center">
+                    <Box sx={{
+                      width: 64, height: 84, borderRadius: radius.xl, background: t.gradient,
+                      border: '1.5px solid rgba(255,255,255,0.65)', boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem',
+                      transition: 'transform 0.18s', '&:hover': { transform: 'translateY(-4px) scale(1.05)' }, cursor: 'default',
+                    }}>
+                      {t.emoji}
+                    </Box>
+                    <Typography sx={{ fontSize: '0.68rem', color: colors.text.secondary, fontWeight: 600, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                      {t.label}
+                    </Typography>
+                  </Stack>
+                ))}
+              </Box>
+            </Box>
+          ) : (
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.2, justifyContent: 'center' }}>
               {backgroundThemes.map((t) => (
-                <Stack key={t.key} spacing={0.8} alignItems="center">
+                <Stack key={t.key} spacing={0.6} alignItems="center" sx={{ width: 58 }}>
                   <Box sx={{
-                    width: isDesktop ? 64 : 54, height: isDesktop ? 84 : 72,
-                    borderRadius: radius.xl, background: t.gradient,
-                    border: '1.5px solid rgba(255,255,255,0.65)',
-                    boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: isDesktop ? '1.5rem' : '1.25rem',
-                    transition: 'transform 0.18s',
-                    '&:hover': { transform: 'translateY(-4px) scale(1.05)' },
-                    cursor: 'default',
+                    width: 52, height: 68, borderRadius: radius.xl, background: t.gradient,
+                    border: '1.5px solid rgba(255,255,255,0.65)', boxShadow: '0 3px 12px rgba(0,0,0,0.1)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem',
                   }}>
                     {t.emoji}
                   </Box>
-                  <Typography sx={{ fontSize: '0.68rem', color: colors.text.secondary, fontWeight: 600, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                  <Typography sx={{ fontSize: '0.62rem', color: colors.text.secondary, fontWeight: 600, textAlign: 'center', lineHeight: 1.2 }}>
                     {t.label}
                   </Typography>
                 </Stack>
               ))}
             </Box>
-          </Box>
+          )}
         </Box>
 
         {/* For whom */}
@@ -583,15 +598,29 @@ export function LandingPage() {
                   <SectionTitle>Para quem é?</SectionTitle>
                 </Stack>
               </Box>
-              <Box sx={{ display: 'grid', gridTemplateColumns: isDesktop ? 'repeat(3,1fr)' : 'repeat(3,1fr)', gap: 1.5, flex: 1 }}>
-                {AUDIENCES.map((a) => (
-                  <Box key={a.label} sx={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(14px)', border: '1.5px solid rgba(255,255,255,0.88)', borderRadius: radius.xl, p: isDesktop ? 2.5 : 1.8, textAlign: 'center' }}>
-                    <Box sx={{ fontSize: isDesktop ? '2.2rem' : '1.8rem', mb: 0.8 }}>{a.emoji}</Box>
-                    <Typography sx={{ fontSize: '0.82rem', fontWeight: 700, color: '#1e3a5f', mb: 0.4 }}>{a.label}</Typography>
-                    <Typography sx={{ fontSize: '0.72rem', color: colors.text.secondary, lineHeight: 1.55 }}>{a.desc}</Typography>
-                  </Box>
-                ))}
-              </Box>
+              {isDesktop ? (
+                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 1.5, flex: 1 }}>
+                  {AUDIENCES.map((a) => (
+                    <Box key={a.label} sx={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(14px)', border: '1.5px solid rgba(255,255,255,0.88)', borderRadius: radius.xl, p: 2.5, textAlign: 'center' }}>
+                      <Box sx={{ fontSize: '2.2rem', mb: 0.8 }}>{a.emoji}</Box>
+                      <Typography sx={{ fontSize: '0.82rem', fontWeight: 700, color: '#1e3a5f', mb: 0.4 }}>{a.label}</Typography>
+                      <Typography sx={{ fontSize: '0.72rem', color: colors.text.secondary, lineHeight: 1.55 }}>{a.desc}</Typography>
+                    </Box>
+                  ))}
+                </Box>
+              ) : (
+                <Stack spacing={1.2} sx={{ width: '100%' }}>
+                  {AUDIENCES.map((a) => (
+                    <Box key={a.label} sx={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(14px)', border: '1.5px solid rgba(255,255,255,0.88)', borderRadius: radius.xl, p: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Box sx={{ fontSize: '2rem', flexShrink: 0 }}>{a.emoji}</Box>
+                      <Box>
+                        <Typography sx={{ fontSize: '0.88rem', fontWeight: 700, color: '#1e3a5f', mb: 0.2 }}>{a.label}</Typography>
+                        <Typography sx={{ fontSize: '0.78rem', color: colors.text.secondary, lineHeight: 1.55 }}>{a.desc}</Typography>
+                      </Box>
+                    </Box>
+                  ))}
+                </Stack>
+              )}
             </Box>
           </Box>
         </Box>
