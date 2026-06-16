@@ -277,14 +277,12 @@ export function SimulatedReaderHomePage() {
         if (availableAt && Date.parse(availableAt) > ts) {
           cooldowns[packId] = availableAt
         } else {
-          // backend não retornou availableAt válido — calcula pelo cooldownHours do pack
           const p = activePacks.find((ap) => ap.id === packId)
           cooldowns[packId] = new Date(ts + Math.max(1, p?.cooldownHours ?? 24) * 3_600_000).toISOString()
         }
         return
       }
       if (canOpen === true) {
-        // só limpa se não tiver cooldown local ativo — protege contra dados inconsistentes do backend
         if (!cooldowns[packId]) {
           exhausted.delete(packId)
         }

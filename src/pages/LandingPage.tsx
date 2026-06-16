@@ -1,4 +1,4 @@
-import FavoriteIcon from '@mui/icons-material/Favorite'
+﻿import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, Chip, Divider, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useNavigate } from 'react-router-dom'
@@ -126,8 +126,6 @@ export function LandingPage() {
       ))}
 
       <Box sx={{ position: 'relative', zIndex: 1, maxWidth: 480, mx: 'auto', px: 2.5 }}>
-
-        {/* ── HERO ── */}
         <Stack alignItems="center" sx={{ pt: 8, pb: 6, animation: `${fadeIn} 0.6s ease both` }}>
           <FavoriteIcon sx={{ fontSize: 60, color: '#e11d48', filter: 'drop-shadow(0 6px 24px rgba(225,29,72,0.45))', mb: 3 }} />
           <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '3.2rem', lineHeight: 0.9, color: '#1e3a5f', textAlign: 'center', letterSpacing: '-0.5px' }}>
@@ -154,8 +152,6 @@ export function LandingPage() {
         </Stack>
 
         <Divider sx={{ opacity: 0.2, mb: 5 }} />
-
-        {/* ── O QUE É? ── */}
         <Box sx={{ mb: 5, animation: `${fadeIn} 0.6s 0.1s ease both` }}>
           <SectionTitle>O que é o Potinho Digital?</SectionTitle>
           <Typography sx={{ fontSize: '0.88rem', color: colors.text.secondary, lineHeight: 1.7, mb: 2.5 }}>
@@ -173,8 +169,6 @@ export function LandingPage() {
         </Box>
 
         <Divider sx={{ opacity: 0.2, mb: 5 }} />
-
-        {/* ── COMO FUNCIONA ── */}
         <Box sx={{ mb: 5, animation: `${fadeIn} 0.6s 0.15s ease both` }}>
           <SectionTitle>Como funciona?</SectionTitle>
           <Stack spacing={1.5}>
@@ -203,8 +197,6 @@ export function LandingPage() {
         </Box>
 
         <Divider sx={{ opacity: 0.2, mb: 5 }} />
-
-        {/* ── TUDO DO SEU JEITO ── */}
         <Box sx={{ mb: 5, animation: `${fadeIn} 0.6s 0.2s ease both` }}>
           <Box sx={{ mb: 3 }}>
             <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, px: 1.5, py: 0.5, borderRadius: radius.full, background: 'linear-gradient(90deg, rgba(29,78,216,0.1), rgba(225,29,72,0.08))', border: '1px solid rgba(29,78,216,0.15)', mb: 1.5 }}>
@@ -245,8 +237,6 @@ export function LandingPage() {
         </Box>
 
         <Divider sx={{ opacity: 0.2, mb: 5 }} />
-
-        {/* ── 11 TEMAS VISUAIS ── */}
         <Box sx={{ mb: 5, animation: `${fadeIn} 0.6s 0.25s ease both` }}>
           <SectionTitle>11 temas visuais</SectionTitle>
           <Typography sx={{ fontSize: '0.85rem', color: colors.text.secondary, lineHeight: 1.65, mb: 2 }}>
@@ -276,8 +266,6 @@ export function LandingPage() {
         </Box>
 
         <Divider sx={{ opacity: 0.2, mb: 5 }} />
-
-        {/* ── RARIDADES (exemplo) ── */}
         <Box sx={{ mb: 5, animation: `${fadeIn} 0.6s 0.3s ease both` }}>
           <SectionTitle>Raridades dos bilhetes</SectionTitle>
           <Typography sx={{ fontSize: '0.85rem', color: colors.text.secondary, lineHeight: 1.65, mb: 2.5 }}>
@@ -305,8 +293,6 @@ export function LandingPage() {
         </Box>
 
         <Divider sx={{ opacity: 0.2, mb: 5 }} />
-
-        {/* ── PARA QUEM É? ── */}
         <Box sx={{ mb: 5, animation: `${fadeIn} 0.6s 0.35s ease both` }}>
           <SectionTitle>Para quem é?</SectionTitle>
           <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 1.2 }}>
@@ -319,8 +305,6 @@ export function LandingPage() {
             ))}
           </Box>
         </Box>
-
-        {/* ── CTA FINAL ── */}
         <Box sx={{ pb: 8, animation: `${fadeIn} 0.6s 0.4s ease both` }}>
           <Box sx={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(18px)', border: '1.5px solid rgba(255,255,255,0.88)', borderRadius: radius.xl, p: 3.5, textAlign: 'center' }}>
             <FavoriteIcon sx={{ fontSize: 36, color: '#e11d48', mb: 1.5, filter: 'drop-shadow(0 4px 14px rgba(225,29,72,0.4))' }} />

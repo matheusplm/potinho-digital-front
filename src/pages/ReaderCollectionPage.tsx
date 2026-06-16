@@ -1,4 +1,4 @@
-import FavoriteIcon from '@mui/icons-material/Favorite'
+﻿import FavoriteIcon from '@mui/icons-material/Favorite'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import SearchIcon from '@mui/icons-material/Search'
 import CloseIcon from '@mui/icons-material/Close'
@@ -292,7 +292,6 @@ export function ReaderCollectionPage() {
       <FavoriteIcon sx={{ position: 'absolute', bottom: -60, right: -60, fontSize: 400, color: 'rgba(225,29,72,0.04)', pointerEvents: 'none' }} />
 
       <ScrollablePage sx={{ px: 2.5, py: 2.5 }}>
-        {/* Header */}
         <Stack direction="row" alignItems="center" spacing={1.2} sx={{ mb: 2.5 }}>
           <IconButton
             size="small"
@@ -329,8 +328,6 @@ export function ReaderCollectionPage() {
 
         {view && !isLoading && (
           <Stack spacing={2}>
-
-            {/* Stats */}
             <Card sx={{ p: 2 }}>
               <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1 }}>
                 {[
@@ -350,8 +347,6 @@ export function ReaderCollectionPage() {
                 ))}
               </Box>
             </Card>
-
-            {/* Brindes */}
             {bonusPacks.length > 0 && (
               <Card sx={{ p: 2 }}>
                 <Typography sx={{ fontSize: '0.66rem', fontWeight: 800, letterSpacing: 0.8, color: colors.text.muted, textTransform: 'uppercase', mb: 1 }}>
@@ -381,14 +376,10 @@ export function ReaderCollectionPage() {
                 </Stack>
               </Card>
             )}
-
-            {/* Bilhetes */}
             <Box>
               <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: theme.textOnBgMuted, mb: 1.2 }}>
                 {ownedNotes.length} bilhete{ownedNotes.length !== 1 ? 's' : ''}
               </Typography>
-
-              {/* Search bar - frosted glass */}
               <Box sx={{
                 display: 'flex', alignItems: 'center', gap: 1, px: 1.4, py: 0.75, mb: 1,
                 background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(12px)',
@@ -427,8 +418,6 @@ export function ReaderCollectionPage() {
                     : <ViewListIcon sx={{ fontSize: 17, color: colors.text.secondary }} />}
                 </IconButton>
               </Box>
-
-              {/* Filter chips */}
               {(ownedRarities.length > 1 || favCount > 0) && (
                 <Box sx={{ display: 'flex', gap: 0.6, flexWrap: 'wrap', mb: 1.2 }}>
                   <Chip
@@ -473,8 +462,6 @@ export function ReaderCollectionPage() {
                   })}
                 </Box>
               )}
-
-              {/* Notes */}
               {filteredNotes.length === 0 ? (
                 <Typography sx={{ py: 4, textAlign: 'center', fontSize: '0.85rem', color: theme.textOnBgMuted }}>
                   {search || rarityFilter || favFilter ? 'Nenhum bilhete encontrado.' : 'Ainda não coletou nenhum bilhete.'}
@@ -503,8 +490,6 @@ export function ReaderCollectionPage() {
       {viewingNote && (
         <NoteDetailDialog note={viewingNote} rarities={rarities} types={types} onClose={() => setViewingNote(null)} />
       )}
-
-      {/* Pack opens dialog */}
       <Dialog
         open={!!packOpensDialog}
         onClose={() => setPackOpensDialog(null)}
@@ -546,8 +531,6 @@ export function ReaderCollectionPage() {
           </Button>
         </DialogActions>
       </Dialog>
-
-      {/* Revoke confirmation dialog */}
       <Dialog
         open={revokeDialogOpen}
         onClose={() => setRevokeDialogOpen(false)}

@@ -33,8 +33,6 @@ export function usePush() {
     const permission = Notification.permission as PushState
     setState(permission)
 
-    // Se já tem permissão mas pode não ter subscription (ex: VAPID key estava faltando),
-    // tenta criar a subscription automaticamente
     if (permission === 'granted') {
       const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY as string | undefined
       if (!vapidKey) return
