@@ -1751,14 +1751,14 @@ export function CollectionManagePage() {
                   background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(12px)',
                   border: '1.5px solid rgba(255,255,255,0.6)', borderRadius: radius.lg,
                 }}>
-                  <SearchIcon sx={{ fontSize: 17, color: colors.text.muted, flexShrink: 0 }} />
+                  <SearchIcon sx={{ fontSize: 17, color: theme.textOnBgMuted, flexShrink: 0 }} />
                   <Box component="input" value={search}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
                     placeholder="Buscar bilhete..."
-                    sx={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: '0.86rem', color: colors.text.primary, fontFamily: 'inherit', '&::placeholder': { color: colors.text.muted } }}
+                    sx={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: '0.86rem', color: theme.textOnBg, fontFamily: 'inherit', '&::placeholder': { color: theme.textOnBgMuted } }}
                   />
                   {search && (
-                    <Box onClick={() => setSearch('')} sx={{ display: 'flex', cursor: 'pointer', color: colors.text.muted }}>
+                    <Box onClick={() => setSearch('')} sx={{ display: 'flex', cursor: 'pointer', color: theme.textOnBgMuted }}>
                       <CloseIcon sx={{ fontSize: 15 }} />
                     </Box>
                   )}
@@ -1768,12 +1768,12 @@ export function CollectionManagePage() {
                     <Chip label="Todas" size="small" onClick={() => setRarityFilter('all')}
                       sx={{ height: 26, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer',
                         bgcolor: rarityFilter === 'all' ? colors.primary.main : 'rgba(255,255,255,0.5)',
-                        color: rarityFilter === 'all' ? '#fff' : colors.text.secondary }} />
+                        color: rarityFilter === 'all' ? '#fff' : theme.textOnBgMuted }} />
                     {rarities.map((r) => (
                       <Chip key={r.id} label={`${r.emoji} ${r.label}`} size="small" onClick={() => setRarityFilter(r.id)}
                         sx={{ height: 26, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer',
                           background: rarityFilter === r.id ? r.chipBg : 'rgba(255,255,255,0.5)',
-                          color: rarityFilter === r.id ? r.chipColor : colors.text.secondary,
+                          color: rarityFilter === r.id ? r.chipColor : theme.textOnBgMuted,
                           border: `1.5px solid ${rarityFilter === r.id ? r.borderColor : 'transparent'}` }} />
                     ))}
                   </Box>
@@ -1800,7 +1800,7 @@ export function CollectionManagePage() {
                         fontWeight: 800,
                         cursor: 'pointer',
                         bgcolor: noteSort === option.id ? colors.purple.main : 'rgba(255,255,255,0.5)',
-                        color: noteSort === option.id ? '#fff' : colors.text.secondary,
+                        color: noteSort === option.id ? '#fff' : theme.textOnBgMuted,
                         border: `1.5px solid ${noteSort === option.id ? colors.purple.main : 'rgba(255,255,255,0.35)'}`,
                         '& .MuiChip-label': { px: 0.9 },
                       }}
@@ -2198,7 +2198,7 @@ export function CollectionManagePage() {
                         fontWeight: 800,
                         cursor: 'pointer',
                         background: active ? colors.primary.main : 'rgba(255,255,255,0.5)',
-                        color: active ? '#fff' : colors.text.secondary,
+                        color: active ? '#fff' : theme.textOnBgMuted,
                         border: `1.5px solid ${active ? colors.primary.main : 'rgba(255,255,255,0.55)'}`,
                         backdropFilter: 'blur(10px)',
                       }}
@@ -2208,12 +2208,12 @@ export function CollectionManagePage() {
               </Box>
             </Stack>
 
-            <Card sx={{ p: 1.7, background: 'rgba(255,255,255,0.64)', backdropFilter: 'blur(14px)', border: '1px solid rgba(255,255,255,0.62)' }}>
+            <Card sx={{ p: 1.7, background: theme.surfaceBg, backdropFilter: 'blur(14px)', border: `1px solid ${theme.surfaceBorder}` }}>
               <Box>
-                <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.98rem', color: colors.text.primary }}>
+                <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.98rem', color: theme.textOnBg }}>
                   Como vai funcionar
                 </Typography>
-                <Typography sx={{ fontSize: '0.8rem', color: colors.text.secondary, lineHeight: 1.55 }}>
+                <Typography sx={{ fontSize: '0.8rem', color: theme.textOnBgMuted, lineHeight: 1.55 }}>
                   Um pacotinho será uma regra de abertura dentro da coleção: quantidade de bilhetes, cooldown, filtros por tipo/raridade e formas de distribuição.
                 </Typography>
               </Box>

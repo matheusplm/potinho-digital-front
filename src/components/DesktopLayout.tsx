@@ -144,14 +144,14 @@ export function DesktopLayout() {
   }
 
   return (
-    <Box sx={{ display: 'flex', height: '100dvh', overflow: 'hidden' }}>
+    <Box sx={{ display: 'flex', height: '100dvh', overflow: 'hidden', background: theme.gradient }}>
 
       {/* ── Sidebar ── */}
       <Box sx={{
         width: SIDEBAR_W, flexShrink: 0, height: '100%',
         display: 'flex', flexDirection: 'column',
-        background: 'rgba(255,253,251,0.97)', backdropFilter: 'blur(20px)',
-        borderRight: `1px solid ${colors.border.subtle}`,
+        background: theme.surfaceBg, backdropFilter: 'blur(20px)',
+        borderRight: `1px solid ${theme.surfaceBorder}`,
         overflowY: 'auto', overflowX: 'hidden',
         scrollbarWidth: 'thin',
       }}>
@@ -165,24 +165,24 @@ export function DesktopLayout() {
           }}>
             <FavoriteIcon sx={{ fontSize: 17, color: '#fff' }} />
           </Box>
-          <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1rem', color: colors.text.primary, lineHeight: 1.2 }}>
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1rem', color: theme.textOnBg, lineHeight: 1.2 }}>
             Potinho Digital
           </Typography>
         </Stack>
 
-        <Divider sx={{ borderColor: colors.border.subtle }} />
+        <Divider sx={{ borderColor: theme.surfaceBorder }} />
 
         {/* User info */}
         <Box sx={{ px: 2, py: 1.6 }}>
-          <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.94rem', color: colors.text.primary, lineHeight: 1.2 }}>
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.94rem', color: theme.textOnBg, lineHeight: 1.2 }}>
             {user?.name}
           </Typography>
-          <Typography sx={{ fontSize: '0.72rem', color: colors.text.muted, mt: 0.2 }}>
+          <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted, mt: 0.2 }}>
             {persona === 'writer' ? 'escritor' : 'leitor'}
           </Typography>
         </Box>
 
-        <Divider sx={{ borderColor: colors.border.subtle }} />
+        <Divider sx={{ borderColor: theme.surfaceBorder }} />
 
         {/* Simulation indicator */}
         {isActive && session && (
@@ -198,13 +198,13 @@ export function DesktopLayout() {
                   <Typography sx={{ fontSize: '0.68rem', fontWeight: 900, letterSpacing: 0.5, color: colors.primary.main, textTransform: 'uppercase' }}>
                     Prévia
                   </Typography>
-                  <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, color: theme.textOnBg, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {session.collectionEmoji} {session.collectionName}
                   </Typography>
                 </Box>
               </Stack>
             </Box>
-            <Divider sx={{ borderColor: colors.border.subtle }} />
+            <Divider sx={{ borderColor: theme.surfaceBorder }} />
           </>
         )}
 
@@ -229,10 +229,10 @@ export function DesktopLayout() {
                   background: active || isEnd ? `${accentColor}12` : 'transparent',
                   transition: 'background 0.16s',
                   position: 'relative',
-                  '&:hover': { background: active || isEnd ? `${accentColor}18` : 'rgba(0,0,0,0.03)' },
+                  '&:hover': { background: active || isEnd ? `${accentColor}18` : theme.isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' },
                   '& svg': {
                     fontSize: '1.18rem',
-                    color: active || isEnd ? accentColor : colors.text.muted,
+                    color: active || isEnd ? accentColor : theme.textOnBgMuted,
                     transition: 'color 0.16s',
                   },
                 }}
@@ -244,13 +244,13 @@ export function DesktopLayout() {
                       position: 'absolute', top: -2, right: -4,
                       width: 7, height: 7, borderRadius: radius.full,
                       background: colors.rose.main,
-                      border: '2px solid rgba(255,253,251,0.97)',
+                      border: `2px solid ${theme.isDark ? 'rgba(0,0,0,0.88)' : 'rgba(255,253,251,0.97)'}`,
                     }} />
                   )}
                 </Box>
                 <Typography sx={{
                   fontSize: '0.88rem', fontWeight: active || isEnd ? 700 : 500,
-                  color: active || isEnd ? accentColor : colors.text.secondary,
+                  color: active || isEnd ? accentColor : theme.textOnBgMuted,
                   transition: 'color 0.16s',
                 }}>
                   {item.label}
@@ -263,11 +263,11 @@ export function DesktopLayout() {
         {/* Collection switcher */}
         {readerCollections.length > 1 && (
           <>
-            <Divider sx={{ borderColor: colors.border.subtle }} />
+            <Divider sx={{ borderColor: theme.surfaceBorder }} />
             <Box sx={{ px: 2, py: 1.4 }}>
               <Stack direction="row" spacing={0.6} alignItems="center" sx={{ mb: 1 }}>
-                <SwapHorizIcon sx={{ fontSize: 13, color: colors.text.muted }} />
-                <Typography sx={{ fontSize: '0.68rem', fontWeight: 800, letterSpacing: 0.5, color: colors.text.muted, textTransform: 'uppercase' }}>
+                <SwapHorizIcon sx={{ fontSize: 13, color: theme.textOnBgMuted }} />
+                <Typography sx={{ fontSize: '0.68rem', fontWeight: 800, letterSpacing: 0.5, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
                   Seus potinhos
                 </Typography>
               </Stack>
@@ -286,7 +286,7 @@ export function DesktopLayout() {
                         border: `1.5px solid ${active ? `${theme.accent}55` : 'transparent'}`,
                         background: active ? `${theme.accent}0c` : 'transparent',
                         transition: 'background 0.12s',
-                        '&:hover': { background: active ? `${theme.accent}14` : 'rgba(0,0,0,0.03)' },
+                        '&:hover': { background: active ? `${theme.accent}14` : theme.isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' },
                       }}
                     >
                       <Box sx={{
@@ -305,7 +305,7 @@ export function DesktopLayout() {
                       </Box>
                       <Typography sx={{
                         flex: 1, minWidth: 0, fontSize: '0.82rem',
-                        fontWeight: active ? 700 : 500, color: colors.text.primary,
+                        fontWeight: active ? 700 : 500, color: theme.textOnBg,
                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       }}>
                         {col.name}
@@ -321,12 +321,12 @@ export function DesktopLayout() {
         {/* Spacer */}
         <Box sx={{ flex: 1 }} />
 
-        <Divider sx={{ borderColor: colors.border.subtle }} />
+        <Divider sx={{ borderColor: theme.surfaceBorder }} />
 
         {/* Persona switch */}
         {(canWriter || canReader) && (
           <Box sx={{ px: 1.5, pt: 1.4, pb: 0.6 }}>
-            <Typography sx={{ fontSize: '0.68rem', fontWeight: 800, letterSpacing: 0.5, color: colors.text.muted, textTransform: 'uppercase', mb: 0.8, px: 0.3 }}>
+            <Typography sx={{ fontSize: '0.68rem', fontWeight: 800, letterSpacing: 0.5, color: theme.textOnBgMuted, textTransform: 'uppercase', mb: 0.8, px: 0.3 }}>
               Modo
             </Typography>
             <Stack direction="row" spacing={0.5}>
@@ -342,15 +342,15 @@ export function DesktopLayout() {
                     sx={{
                       flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.4,
                       py: 0.7, borderRadius: radius.md, cursor: enabled ? 'pointer' : 'default',
-                      border: `1.5px solid ${active ? `${theme.accent}55` : colors.border.subtle}`,
+                      border: `1.5px solid ${active ? `${theme.accent}55` : theme.surfaceBorder}`,
                       background: active ? `${theme.accent}10` : 'transparent',
                       opacity: enabled ? 1 : 0.4,
                       transition: 'all 0.14s',
-                      '&:hover': enabled ? { background: active ? `${theme.accent}16` : 'rgba(0,0,0,0.03)' } : undefined,
+                      '&:hover': enabled ? { background: active ? `${theme.accent}16` : theme.isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' } : undefined,
                     }}
                   >
-                    <Box sx={{ '& svg': { fontSize: '0.9rem', color: active ? theme.accent : colors.text.muted } }}>{icon}</Box>
-                    <Typography sx={{ fontSize: '0.76rem', fontWeight: active ? 700 : 500, color: active ? theme.accent : colors.text.secondary }}>
+                    <Box sx={{ '& svg': { fontSize: '0.9rem', color: active ? theme.accent : theme.textOnBgMuted } }}>{icon}</Box>
+                    <Typography sx={{ fontSize: '0.76rem', fontWeight: active ? 700 : 500, color: active ? theme.accent : theme.textOnBgMuted }}>
                       {label}
                     </Typography>
                   </Box>
@@ -362,12 +362,12 @@ export function DesktopLayout() {
 
         {/* Theme picker */}
         <Box sx={{ px: 2, pt: 1.2, pb: 1 }}>
-          <Typography sx={{ fontSize: '0.68rem', fontWeight: 800, letterSpacing: 0.5, color: colors.text.muted, textTransform: 'uppercase', mb: 0.9 }}>
+          <Typography sx={{ fontSize: '0.68rem', fontWeight: 800, letterSpacing: 0.5, color: theme.textOnBgMuted, textTransform: 'uppercase', mb: 0.9 }}>
             Tema de fundo
           </Typography>
           {([false, true] as const).map((dark) => (
             <Box key={String(dark)} sx={{ mb: 0.8 }}>
-              <Typography sx={{ fontSize: '0.62rem', fontWeight: 700, color: colors.text.muted, textTransform: 'uppercase', letterSpacing: 0.4, mb: 0.5 }}>
+              <Typography sx={{ fontSize: '0.62rem', fontWeight: 700, color: theme.textOnBgMuted, textTransform: 'uppercase', letterSpacing: 0.4, mb: 0.5 }}>
                 {dark ? 'Escuros' : 'Claros'}
               </Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.7 }}>
@@ -409,21 +409,21 @@ export function DesktopLayout() {
             >
               <Box sx={{
                 width: 28, height: 28, borderRadius: radius.sm, flexShrink: 0,
-                background: notifEnabled ? `${theme.accent}16` : 'rgba(0,0,0,0.05)',
+                background: notifEnabled ? `${theme.accent}16` : theme.isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
                 {notifStatus === 'denied'
-                  ? <BlockIcon sx={{ fontSize: 14, color: colors.text.muted }} />
+                  ? <BlockIcon sx={{ fontSize: 14, color: theme.textOnBgMuted }} />
                   : notifEnabled
                     ? <NotificationsActiveIcon sx={{ fontSize: 14, color: theme.accent }} />
-                    : <NotificationsNoneOutlinedIcon sx={{ fontSize: 14, color: colors.text.muted }} />
+                    : <NotificationsNoneOutlinedIcon sx={{ fontSize: 14, color: theme.textOnBgMuted }} />
                 }
               </Box>
               <Box sx={{ minWidth: 0 }}>
-                <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: colors.text.primary }}>
+                <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: theme.textOnBg }}>
                   {notifStatus === 'denied' ? 'Bloqueadas' : notifEnabled ? 'Notificações ativas' : 'Notificações'}
                 </Typography>
-                <Typography sx={{ fontSize: '0.68rem', color: colors.text.muted }}>
+                <Typography sx={{ fontSize: '0.68rem', color: theme.textOnBgMuted }}>
                   {notifStatus === 'denied' ? 'Ativar nas configurações' : notifEnabled ? 'Toque para desativar' : 'Toque para ativar'}
                 </Typography>
               </Box>
@@ -444,7 +444,7 @@ export function DesktopLayout() {
           >
             <Box sx={{
               width: 28, height: 28, borderRadius: radius.sm, flexShrink: 0,
-              background: 'rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: `${colors.rose.main}14`, display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
               <LogoutIcon sx={{ fontSize: 14, color: colors.rose.main }} />
             </Box>
