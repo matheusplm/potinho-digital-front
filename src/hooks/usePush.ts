@@ -30,7 +30,28 @@ export function usePush() {
       setState('unsupported')
       return
     }
-    setState(Notification.permission as PushState)
+    const permission = Notification.permission as PushState
+    setState(permission)
+
+    // Se já tem permissão mas pode não ter subscription (ex: VAPID key estava faltando),
+    // tenta criar a subscription automaticamente
+    if (permission === 'granted') {
+      const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY as string | undefined
+      if (!vapidKey) return
+      getSwRegistration().then(async (reg) => {
+        if (!reg) return
+        const existing = await reg.pushManager.getSubscription()
+        if (existing) return // já tem subscription, ok
+        const sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(vapidKey) as unknown as BufferSource,
+        })
+        const json = sub.toJSON()
+        if (json.endpoint && json.keys) {
+          await api.subscribePush({ endpoint: json.endpoint, keys: json.keys as { p256dh: string; auth: string } })
+        }
+      }).catch(() => {})
+    }
   }, [])
 
   const enable = useCallback(async () => {
