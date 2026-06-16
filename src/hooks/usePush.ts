@@ -39,7 +39,7 @@ export function usePush() {
       getSwRegistration().then(async (reg) => {
         if (!reg) return
         const existing = await reg.pushManager.getSubscription()
-        if (existing) return // já tem subscription, ok
+        if (existing) return
         const sub = await reg.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: urlBase64ToUint8Array(vapidKey) as unknown as BufferSource,
