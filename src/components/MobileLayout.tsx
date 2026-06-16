@@ -100,7 +100,8 @@ export function MobileLayout() {
   const bannerOffset = isActive ? '52px' : '0px'
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 480, height: '100dvh', mx: 'auto', bgcolor: 'background.default', overflow: 'hidden' }}>
+    <Box sx={{ background: theme.gradient, minHeight: '100dvh' }}>
+    <Box sx={{ width: '100%', maxWidth: 480, height: '100dvh', mx: 'auto', overflow: 'hidden' }}>
       <FloatingMenu />
       <SimulationBanner />
       {location.pathname === '/home' && !isActive && <PushPrompt />}
@@ -118,8 +119,8 @@ export function MobileLayout() {
       <Box sx={{
         position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)',
         width: '100%', maxWidth: 480, zIndex: 100,
-        background: 'rgba(255,253,251,0.96)', backdropFilter: 'blur(20px)',
-        borderTop: '1px solid rgba(0,0,0,0.055)',
+        background: theme.surfaceBg, backdropFilter: 'blur(20px)',
+        borderTop: `1px solid ${theme.surfaceBorder}`,
         pb: 'env(safe-area-inset-bottom, 0px)',
       }}>
         <Box sx={{ display: 'flex', height: 64 }}>
@@ -159,7 +160,7 @@ export function MobileLayout() {
                   position: 'relative',
                   '& svg': {
                     fontSize: '1.25rem',
-                    color: active || isEnd ? (isEnd ? colors.rose.main : theme.accent) : colors.text.muted,
+                    color: active || isEnd ? (isEnd ? colors.rose.main : theme.accent) : theme.textOnBgMuted,
                     transition: 'color 0.18s, transform 0.22s cubic-bezier(0.16,1,0.3,1)',
                     transform: active ? 'scale(1.15)' : 'scale(1)',
                   },
@@ -174,14 +175,14 @@ export function MobileLayout() {
                       height: 8,
                       borderRadius: radius.full,
                       background: colors.rose.main,
-                      boxShadow: `0 0 0 3px rgba(255,253,251,0.96), 0 0 12px ${colors.rose.glow}`,
+                      boxShadow: `0 0 0 3px ${theme.isDark ? 'rgba(0,0,0,0.88)' : 'rgba(255,253,251,0.96)'}, 0 0 12px ${colors.rose.glow}`,
                     }} />
                   )}
                 </Box>
                 <Typography sx={{
                   fontSize: '0.70rem',
                   fontWeight: active || isEnd ? 700 : 500,
-                  color: active || isEnd ? (isEnd ? colors.rose.main : theme.accent) : colors.text.muted,
+                  color: active || isEnd ? (isEnd ? colors.rose.main : theme.accent) : theme.textOnBgMuted,
                   lineHeight: 1, letterSpacing: 0.1,
                   transition: 'color 0.18s',
                   whiteSpace: 'nowrap',
@@ -195,6 +196,7 @@ export function MobileLayout() {
       </Box>
 
       <SimulateReaderSheet open={simulateOpen} onClose={() => setSimulateOpen(false)} />
+    </Box>
     </Box>
   )
 }

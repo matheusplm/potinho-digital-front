@@ -6,6 +6,8 @@ export interface BackgroundTheme {
   accent: string
   textOnBg: string
   textOnBgMuted: string
+  surfaceBg: string
+  surfaceBorder: string
   isDark: boolean
 }
 
@@ -18,6 +20,8 @@ export const backgroundThemes: BackgroundTheme[] = [
     accent: '#e11d48',
     textOnBg: '#1e3a5f',
     textOnBgMuted: '#64748b',
+    surfaceBg: 'rgba(255,253,251,0.97)',
+    surfaceBorder: 'rgba(0,0,0,0.06)',
     isDark: false,
   },
   {
@@ -28,6 +32,8 @@ export const backgroundThemes: BackgroundTheme[] = [
     accent: '#ea580c',
     textOnBg: '#431407',
     textOnBgMuted: '#92400e',
+    surfaceBg: 'rgba(255,253,251,0.97)',
+    surfaceBorder: 'rgba(0,0,0,0.06)',
     isDark: false,
   },
   {
@@ -38,6 +44,8 @@ export const backgroundThemes: BackgroundTheme[] = [
     accent: '#0891b2',
     textOnBg: '#0c4a6e',
     textOnBgMuted: '#0369a1',
+    surfaceBg: 'rgba(255,253,251,0.97)',
+    surfaceBorder: 'rgba(0,0,0,0.06)',
     isDark: false,
   },
   {
@@ -48,6 +56,8 @@ export const backgroundThemes: BackgroundTheme[] = [
     accent: '#059669',
     textOnBg: '#064e3b',
     textOnBgMuted: '#065f46',
+    surfaceBg: 'rgba(255,253,251,0.97)',
+    surfaceBorder: 'rgba(0,0,0,0.06)',
     isDark: false,
   },
   {
@@ -58,6 +68,8 @@ export const backgroundThemes: BackgroundTheme[] = [
     accent: '#f97316',
     textOnBg: '#431407',
     textOnBgMuted: '#9a3412',
+    surfaceBg: 'rgba(255,253,251,0.97)',
+    surfaceBorder: 'rgba(0,0,0,0.06)',
     isDark: false,
   },
   {
@@ -68,6 +80,8 @@ export const backgroundThemes: BackgroundTheme[] = [
     accent: '#7c3aed',
     textOnBg: '#2e1065',
     textOnBgMuted: '#5b21b6',
+    surfaceBg: 'rgba(255,253,251,0.97)',
+    surfaceBorder: 'rgba(0,0,0,0.06)',
     isDark: false,
   },
   {
@@ -78,6 +92,8 @@ export const backgroundThemes: BackgroundTheme[] = [
     accent: '#60a5fa',
     textOnBg: 'rgba(255,255,255,0.92)',
     textOnBgMuted: 'rgba(255,255,255,0.45)',
+    surfaceBg: 'rgba(0,0,0,0.52)',
+    surfaceBorder: 'rgba(255,255,255,0.09)',
     isDark: true,
   },
   {
@@ -88,6 +104,8 @@ export const backgroundThemes: BackgroundTheme[] = [
     accent: '#e879f9',
     textOnBg: 'rgba(255,255,255,0.92)',
     textOnBgMuted: 'rgba(255,255,255,0.45)',
+    surfaceBg: 'rgba(0,0,0,0.52)',
+    surfaceBorder: 'rgba(255,255,255,0.09)',
     isDark: true,
   },
   {
@@ -98,6 +116,8 @@ export const backgroundThemes: BackgroundTheme[] = [
     accent: '#fb7185',
     textOnBg: 'rgba(255,255,255,0.92)',
     textOnBgMuted: 'rgba(255,255,255,0.45)',
+    surfaceBg: 'rgba(0,0,0,0.52)',
+    surfaceBorder: 'rgba(255,255,255,0.09)',
     isDark: true,
   },
   {
@@ -108,6 +128,8 @@ export const backgroundThemes: BackgroundTheme[] = [
     accent: '#38bdf8',
     textOnBg: 'rgba(255,255,255,0.92)',
     textOnBgMuted: 'rgba(255,255,255,0.45)',
+    surfaceBg: 'rgba(0,0,0,0.52)',
+    surfaceBorder: 'rgba(255,255,255,0.09)',
     isDark: true,
   },
   {
@@ -118,6 +140,8 @@ export const backgroundThemes: BackgroundTheme[] = [
     accent: '#4ade80',
     textOnBg: 'rgba(255,255,255,0.92)',
     textOnBgMuted: 'rgba(255,255,255,0.45)',
+    surfaceBg: 'rgba(0,0,0,0.52)',
+    surfaceBorder: 'rgba(255,255,255,0.09)',
     isDark: true,
   },
 ]

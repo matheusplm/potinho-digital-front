@@ -89,13 +89,13 @@ export function FloatingMenu() {
           onClick={() => setOpen((v) => !v)}
           sx={{
             width: 36, height: 36, borderRadius: '50%',
-            bgcolor: open ? theme.accent : 'rgba(255,255,255,0.88)',
+            bgcolor: open ? theme.accent : theme.surfaceBg,
             backdropFilter: 'blur(12px)',
-            boxShadow: open ? `0 4px 16px ${theme.accent}55` : '0 2px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8)',
-            border: '1px solid rgba(0,0,0,0.07)',
-            color: open ? '#fff' : colors.text.primary,
+            boxShadow: open ? `0 4px 16px ${theme.accent}55` : '0 2px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.08)',
+            border: `1px solid ${theme.surfaceBorder}`,
+            color: open ? '#fff' : theme.textOnBg,
             transition: 'all 0.2s cubic-bezier(0.16,1,0.3,1)',
-            '&:hover': { bgcolor: open ? theme.accent : 'rgba(255,255,255,1)' },
+            '&:hover': { bgcolor: open ? theme.accent : theme.isDark ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,1)' },
           }}
         >
           <Stack spacing={0.4} sx={{ alignItems: 'center', justifyContent: 'center' }}>
@@ -103,7 +103,7 @@ export function FloatingMenu() {
               <Box key={i} sx={{
                 width: open ? (i === 1 ? 12 : 14) : 14,
                 height: 1.5, borderRadius: 1,
-                bgcolor: open ? '#fff' : colors.text.primary,
+                bgcolor: open ? '#fff' : theme.textOnBg,
                 transition: 'all 0.2s',
                 opacity: i === 1 ? 0.6 : 1,
               }} />
@@ -114,10 +114,10 @@ export function FloatingMenu() {
         {open && (
           <Box sx={{
             position: 'absolute', top: 44, right: 0, width: 220,
-            background: 'rgba(255,255,255,0.94)', backdropFilter: 'blur(24px)',
+            background: theme.surfaceBg, backdropFilter: 'blur(24px)',
             borderRadius: radius.lg,
-            boxShadow: '0 16px 48px rgba(0,0,0,0.16), 0 2px 8px rgba(0,0,0,0.08)',
-            border: '1px solid rgba(255,255,255,0.6)', overflow: 'hidden',
+            boxShadow: `0 16px 48px rgba(0,0,0,${theme.isDark ? '0.48' : '0.16'}), 0 2px 8px rgba(0,0,0,0.08)`,
+            border: `1px solid ${theme.surfaceBorder}`, overflow: 'hidden',
             animation: `${menuIn} 0.2s cubic-bezier(0.16,1,0.3,1)`,
             transformOrigin: 'top right',
           }}>
@@ -130,20 +130,20 @@ export function FloatingMenu() {
                 <FavoriteIcon sx={{ fontSize: 17, color: '#fff' }} />
               </Box>
               <Box sx={{ minWidth: 0 }}>
-                <Typography sx={{ fontFamily: font.serif, fontSize: '0.92rem', fontWeight: 700, color: colors.text.primary, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <Typography sx={{ fontFamily: font.serif, fontSize: '0.92rem', fontWeight: 700, color: theme.textOnBg, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {user?.name?.split(' ')[0]}
                 </Typography>
-                <Typography sx={{ fontSize: '0.68rem', color: colors.text.muted, lineHeight: 1.2 }}>
+                <Typography sx={{ fontSize: '0.68rem', color: theme.textOnBgMuted, lineHeight: 1.2 }}>
                   {persona === 'writer' ? 'escritor' : 'leitor'}
                 </Typography>
               </Box>
             </Stack>
 
-            <Box sx={{ height: '1px', bgcolor: colors.border.subtle, mx: 1.5 }} />
+            <Box sx={{ height: '1px', bgcolor: theme.surfaceBorder, mx: 1.5 }} />
 
             {(canSwitch || canWriter || canReader) && (
               <Box sx={{ px: 1.8, py: 1.4 }}>
-                <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.6, color: colors.text.secondary, textTransform: 'uppercase', mb: 1 }}>
+                <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.6, color: theme.textOnBgMuted, textTransform: 'uppercase', mb: 1 }}>
                   Modo de uso
                 </Typography>
                 <Stack direction="row" spacing={0.6}>
@@ -159,15 +159,15 @@ export function FloatingMenu() {
                         sx={{
                           flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5,
                           py: 0.85, borderRadius: radius.md, cursor: enabled ? 'pointer' : 'default',
-                          border: `1.5px solid ${active ? `${theme.accent}66` : colors.border.subtle}`,
+                          border: `1.5px solid ${active ? `${theme.accent}66` : theme.surfaceBorder}`,
                           background: active ? `${theme.accent}12` : 'transparent',
                           opacity: enabled ? 1 : 0.4,
                           transition: 'background 0.12s, border-color 0.12s',
-                          '&:hover': enabled ? { background: active ? `${theme.accent}18` : 'rgba(0,0,0,0.03)' } : undefined,
+                          '&:hover': enabled ? { background: active ? `${theme.accent}18` : theme.isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.03)' } : undefined,
                         }}
                       >
                         {icon}
-                        <Typography sx={{ fontSize: '0.78rem', fontWeight: active ? 800 : 600, color: active ? theme.accent : colors.text.secondary }}>
+                        <Typography sx={{ fontSize: '0.78rem', fontWeight: active ? 800 : 600, color: active ? theme.accent : theme.textOnBgMuted }}>
                           {label}
                         </Typography>
                       </Box>
@@ -183,15 +183,15 @@ export function FloatingMenu() {
             )}
 
             {(canSwitch || canWriter || canReader) && (
-              <Box sx={{ height: '1px', bgcolor: colors.border.subtle, mx: 1.5 }} />
+              <Box sx={{ height: '1px', bgcolor: theme.surfaceBorder, mx: 1.5 }} />
             )}
 
             {showCollectionSwitcher && (
               <>
                 <Box sx={{ px: 1.8, py: 1.4 }}>
                   <Stack direction="row" spacing={0.6} sx={{ alignItems: 'center', mb: 1.1 }}>
-                    <SwapHorizIcon sx={{ fontSize: 14, color: colors.text.secondary }} />
-                    <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.6, color: colors.text.secondary, textTransform: 'uppercase' }}>
+                    <SwapHorizIcon sx={{ fontSize: 14, color: theme.textOnBgMuted }} />
+                    <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.6, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
                       Seus potinhos
                     </Typography>
                   </Stack>
@@ -211,7 +211,7 @@ export function FloatingMenu() {
                             border: `1.5px solid ${active ? `${theme.accent}66` : 'transparent'}`,
                             background: active ? `${theme.accent}10` : 'transparent',
                             transition: 'background 0.12s, border-color 0.12s',
-                            '&:hover': { background: active ? `${theme.accent}16` : 'rgba(0,0,0,0.035)' },
+                            '&:hover': { background: active ? `${theme.accent}16` : theme.isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)' },
                           }}
                         >
                           <Box sx={{
@@ -222,13 +222,13 @@ export function FloatingMenu() {
                             {hasUnread && !active && (
                               <Box sx={{
                                 position: 'absolute', top: -3, right: -3, width: 9, height: 9, borderRadius: radius.full,
-                                background: colors.rose.main, border: '2px solid rgba(255,255,255,0.95)',
+                                background: colors.rose.main, border: `2px solid ${theme.isDark ? 'rgba(0,0,0,0.85)' : 'rgba(255,255,255,0.95)'}`,
                               }} />
                             )}
                           </Box>
                           <Typography sx={{
                             flex: 1, minWidth: 0, fontFamily: font.serif, fontSize: '0.85rem',
-                            fontWeight: active ? 800 : 600, color: colors.text.primary,
+                            fontWeight: active ? 800 : 600, color: theme.textOnBg,
                             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                           }}>
                             {collection.name}
@@ -240,21 +240,21 @@ export function FloatingMenu() {
                   </Stack>
                 </Box>
 
-                <Box sx={{ height: '1px', bgcolor: colors.border.subtle, mx: 1.5 }} />
+                <Box sx={{ height: '1px', bgcolor: theme.surfaceBorder, mx: 1.5 }} />
               </>
             )}
 
             <Box sx={{ px: 1.8, py: 1.4 }}>
               <Stack direction="row" spacing={0.6} sx={{ alignItems: 'center', mb: 1.2 }}>
-                <PaletteOutlinedIcon sx={{ fontSize: 14, color: colors.text.secondary }} />
-                <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.6, color: colors.text.secondary, textTransform: 'uppercase' }}>
+                <PaletteOutlinedIcon sx={{ fontSize: 14, color: theme.textOnBgMuted }} />
+                <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.6, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
                   Tema de fundo
                 </Typography>
               </Stack>
               <Stack spacing={1}>
                 {([false, true] as const).map((dark) => (
                   <Box key={String(dark)}>
-                    <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: 0.5, color: colors.text.muted, textTransform: 'uppercase', mb: 0.6 }}>
+                    <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: 0.5, color: theme.textOnBgMuted, textTransform: 'uppercase', mb: 0.6 }}>
                       {dark ? 'Escuros' : 'Claros'}
                     </Typography>
                     <Box sx={{ display: 'flex', gap: 0.8 }}>
@@ -284,7 +284,7 @@ export function FloatingMenu() {
 
             {notifSupported && (
               <>
-                <Box sx={{ height: '1px', bgcolor: colors.border.subtle, mx: 1.5 }} />
+                <Box sx={{ height: '1px', bgcolor: theme.surfaceBorder, mx: 1.5 }} />
                 <Box sx={{ p: 1 }}>
                   <Stack
                     direction="row" spacing={1.4}
@@ -299,21 +299,21 @@ export function FloatingMenu() {
                   >
                     <Box sx={{
                       width: 30, height: 30, borderRadius: radius.sm, flexShrink: 0,
-                      background: notifEnabled ? `${theme.accent}18` : 'rgba(0,0,0,0.05)',
+                      background: notifEnabled ? `${theme.accent}18` : theme.isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
                       {notifStatus === 'denied'
-                        ? <BlockIcon sx={{ fontSize: 15, color: colors.text.muted }} />
+                        ? <BlockIcon sx={{ fontSize: 15, color: theme.textOnBgMuted }} />
                         : notifEnabled
                           ? <NotificationsActiveIcon sx={{ fontSize: 16, color: theme.accent }} />
-                          : <NotificationsNoneOutlinedIcon sx={{ fontSize: 16, color: colors.text.muted }} />
+                          : <NotificationsNoneOutlinedIcon sx={{ fontSize: 16, color: theme.textOnBgMuted }} />
                       }
                     </Box>
                     <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: colors.text.primary }}>
+                      <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: theme.textOnBg }}>
                         Notificações
                       </Typography>
-                      <Typography sx={{ fontSize: '0.68rem', color: colors.text.muted }}>
+                      <Typography sx={{ fontSize: '0.68rem', color: theme.textOnBgMuted }}>
                         {notifStatus === 'denied' ? 'bloqueado pelo navegador' : notifEnabled ? 'ativo — toque para desligar' : 'toque para ativar'}
                       </Typography>
                     </Box>
@@ -322,7 +322,7 @@ export function FloatingMenu() {
               </>
             )}
 
-            <Box sx={{ height: '1px', bgcolor: colors.border.subtle, mx: 1.5 }} />
+            <Box sx={{ height: '1px', bgcolor: theme.surfaceBorder, mx: 1.5 }} />
 
             <Box sx={{ p: 1 }}>
               <Stack

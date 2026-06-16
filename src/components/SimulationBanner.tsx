@@ -1,10 +1,12 @@
 ﻿import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import { Box, Stack, Typography } from '@mui/material'
 import { useSimulation } from '../context/SimulationContext'
+import { useBackground } from '../context/BackgroundContext'
 import { colors, font, radius } from '../design-system'
 
 export function SimulationBanner() {
   const { session } = useSimulation()
+  const { theme } = useBackground()
   if (!session) return null
 
   return (
@@ -25,7 +27,7 @@ export function SimulationBanner() {
         px: 1.2,
         py: 0.85,
         borderRadius: radius.lg,
-        background: 'rgba(255,255,255,0.92)',
+        background: theme.surfaceBg,
         backdropFilter: 'blur(16px)',
         border: `1.5px solid ${colors.primary.main}28`,
         boxShadow: '0 10px 28px rgba(15,23,42,0.12)',
@@ -48,7 +50,7 @@ export function SimulationBanner() {
             <Typography sx={{ fontSize: '0.70rem', fontWeight: 900, letterSpacing: 0.7, color: colors.primary.main, textTransform: 'uppercase' }}>
               Prévia do leitor
             </Typography>
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.82rem', color: colors.text.primary, lineHeight: 1.2 }}>
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.82rem', color: theme.textOnBg, lineHeight: 1.2 }}>
               {session.collectionEmoji} {session.collectionName}
             </Typography>
           </Box>
