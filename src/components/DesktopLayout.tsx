@@ -19,6 +19,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { PushPrompt } from './PushPrompt'
 import { SimulateReaderSheet } from './SimulateReaderSheet'
+import { SimulationBanner } from './SimulationBanner'
 import { toast } from './ui'
 import { useUser, type UserRole } from '../context/UserContext'
 import { useSimulation } from '../context/SimulationContext'
@@ -152,7 +153,7 @@ export function DesktopLayout() {
         background: 'rgba(255,253,251,0.97)', backdropFilter: 'blur(20px)',
         borderRight: `1px solid ${colors.border.subtle}`,
         overflowY: 'auto', overflowX: 'hidden',
-        scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' },
+        scrollbarWidth: 'thin',
       }}>
 
         {/* Brand */}
@@ -323,7 +324,7 @@ export function DesktopLayout() {
         <Divider sx={{ borderColor: colors.border.subtle }} />
 
         {/* Persona switch */}
-        {(canWriter && canReader) && (
+        {(canWriter || canReader) && (
           <Box sx={{ px: 1.5, pt: 1.4, pb: 0.6 }}>
             <Typography sx={{ fontSize: '0.68rem', fontWeight: 800, letterSpacing: 0.5, color: colors.text.muted, textTransform: 'uppercase', mb: 0.8, px: 0.3 }}>
               Modo
@@ -456,7 +457,8 @@ export function DesktopLayout() {
 
       {/* ── Content area ── */}
       <Box sx={{ flex: 1, height: '100%', overflow: 'hidden', position: 'relative' }}>
-        <PushPrompt />
+        <SimulationBanner />
+        {location.pathname === '/home' && !isActive && <PushPrompt />}
         <Outlet />
       </Box>
 

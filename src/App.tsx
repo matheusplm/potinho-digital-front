@@ -41,7 +41,7 @@ function RequireRole({ role, children }: { role: UserRole; children: ReactElemen
 
 function AppRoutes() {
   const { user, personaReady } = useUser()
-  const isDesktop = useMediaQuery('(min-width: 900px)')
+  const isDesktop = useMediaQuery('(min-width: 900px)', { noSsr: true })
   const Layout = isDesktop ? DesktopLayout : MobileLayout
 
   if (user && !personaReady) {

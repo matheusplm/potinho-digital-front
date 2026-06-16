@@ -17,7 +17,7 @@ function formatDate(iso: string | null) {
 
 export function ConquistasPage() {
   const { theme } = useBackground()
-  const { collection, readerCollections, isLoading: collectionsLoading } = useActiveReaderCollection()
+  const { collection, isLoading: collectionsLoading } = useActiveReaderCollection()
   const cid = collection?.id ?? ''
   const { data: play, isLoading: playLoading } = useCollectionPlayQuery(cid, { enabled: !!cid })
   const { data: rarities = [] } = useCollectionRaritiesQuery(cid)
@@ -38,7 +38,7 @@ export function ConquistasPage() {
           <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.6rem', color: theme.textOnBg, lineHeight: 1.1 }}>
             Suas conquistas
           </Typography>
-          {readerCollections.length > 1 && collection && (
+          {collection && (
             <Typography sx={{
               display: 'inline-flex', alignItems: 'center', gap: 0.5, mt: 0.4,
               fontSize: '0.74rem', fontWeight: 700, color: theme.textOnBgMuted,

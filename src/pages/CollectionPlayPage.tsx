@@ -660,7 +660,7 @@ function AlbumSection({
   const sorted = useMemo(() => sortNotes(items, sort, order), [items, sort, order])
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
   const [filterSheetOpen, setFilterSheetOpen] = useState(false)
-  const activeFilterCount = (rarity !== 'all' ? 1 : 0) + (type !== 'all' ? 1 : 0)
+  const activeFilterCount = (rarity !== 'all' ? 1 : 0) + (type !== 'all' ? 1 : 0) + (view === 'folders' && group !== 'rarity' ? 1 : 0)
 
   const groups = useMemo(() => {
     if (view !== 'folders') return []

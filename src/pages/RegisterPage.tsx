@@ -36,7 +36,7 @@ export function RegisterPage() {
   const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [field]: e.target.value }))
 
-  const passwordError = passwordTouched && form.password.length > 0 && form.password.length < 6
+  const passwordError = passwordTouched && form.password.length < 6
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

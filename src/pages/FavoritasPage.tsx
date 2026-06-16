@@ -20,7 +20,7 @@ const fadeIn = keyframes`from { opacity:0; transform:translateY(12px); } to { op
 export function FavoritasPage() {
   const { theme } = useBackground()
   const reader = useReader()
-  const { collection, readerCollections, isLoading: collectionsLoading } = useActiveReaderCollection()
+  const { collection, isLoading: collectionsLoading } = useActiveReaderCollection()
   const cid = collection?.id ?? ''
   const { data: play, isLoading: playLoading } = useCollectionPlayQuery(cid, { enabled: !!cid })
   const { data: rarities = [] } = useCollectionRaritiesQuery(cid)
@@ -42,7 +42,7 @@ export function FavoritasPage() {
           <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.6rem', color: theme.textOnBg, lineHeight: 1.1 }}>
             Suas favoritas
           </Typography>
-          {readerCollections.length > 1 && collection && (
+          {collection && (
             <Typography sx={{
               display: 'inline-flex', alignItems: 'center', gap: 0.5, mt: 0.4,
               fontSize: '0.74rem', fontWeight: 700, color: theme.textOnBgMuted,

@@ -242,10 +242,10 @@ export function SimulatedReaderHomePage() {
       : (play ? computeAchievements(play, rarities, types).filter((a) => a.unlocked).length : 0),
     [isRealReader, readerAch, play, rarities, types],
   )
-  const [relerSeed, setRelerSeed] = useState(() => Math.random())
+  const [relerIndex, setRelerIndex] = useState(0)
   const relerNote = useMemo(
-    () => (ownedItems.length > 0 ? ownedItems[Math.floor(relerSeed * ownedItems.length) % ownedItems.length] : undefined),
-    [relerSeed, ownedItems],
+    () => (ownedItems.length > 0 ? ownedItems[relerIndex % ownedItems.length] : undefined),
+    [relerIndex, ownedItems],
   )
   const [isOpeningPack, setIsOpeningPack] = useState(false)
   const [rewards, setRewards] = useState<CollectionDailyReward[]>([])
@@ -656,7 +656,7 @@ export function SimulatedReaderHomePage() {
                 </Box>
                 {ownedItems.length > 1 && (
                   <Box
-                    onClick={(e) => { e.stopPropagation(); setRelerSeed(Math.random()) }}
+                    onClick={(e) => { e.stopPropagation(); setRelerIndex((i) => (i + 1 + Math.floor(Math.random() * (ownedItems.length - 1))) % ownedItems.length) }}
                     sx={{
                       width: 30, height: 30, borderRadius: '50%', flexShrink: 0, cursor: 'pointer',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
