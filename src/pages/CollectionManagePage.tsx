@@ -9,6 +9,7 @@ import SearchIcon from '@mui/icons-material/Search'
 import CloseIcon from '@mui/icons-material/Close'
 import ViewAgendaIcon from '@mui/icons-material/ViewAgenda'
 import ViewListIcon from '@mui/icons-material/ViewList'
+import DensitySmallIcon from '@mui/icons-material/DensitySmall'
 import CasinoOutlinedIcon from '@mui/icons-material/CasinoOutlined'
 import StarIcon from '@mui/icons-material/Star'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
@@ -104,7 +105,7 @@ const NOTE_SORT_OPTIONS: { id: NoteSort; label: string }[] = [
 const NOTE_VIEW_OPTIONS = [
   { id: 'cards' as NoteView, label: 'Cards', icon: <ViewAgendaIcon /> },
   { id: 'list' as NoteView, label: 'Lista', icon: <ViewListIcon /> },
-  { id: 'compact' as NoteView, label: 'Compacta', icon: <ViewListIcon /> },
+  { id: 'compact' as NoteView, label: 'Compacta', icon: <DensitySmallIcon /> },
 ]
 
 const NOTE_PAGE_SIZE = 60
@@ -628,7 +629,7 @@ function TypeEditor({ cid, type, onClose }: { cid: string; type: NoteTypeConfig 
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
         <Button variant="ghost" onClick={onClose} sx={{ flex: 1, py: 0.8 }}>Cancelar</Button>
-        <Button variant="rose" onClick={save} loading={isPending} disabled={!form.label.trim()} sx={{ flex: 1, py: 0.8 }}>
+        <Button variant="primary" onClick={save} loading={isPending} disabled={!form.label.trim()} sx={{ flex: 1, py: 0.8 }}>
           {isNew ? 'Criar' : 'Salvar'}
         </Button>
       </DialogActions>
@@ -1320,7 +1321,7 @@ function PackSimulationDialog({ simulation, rarities, types, onClose, onSimulate
                   </Box>
                 </Box>
                 <Typography sx={{ mt: 1.1, fontFamily: font.serif, fontSize: '1rem', fontWeight: 800, color: colors.text.primary }}>
-                  Abrindo o pacotito
+                  Abrindo o pacotinho
                 </Typography>
                 <Typography sx={{ mt: 0.35, fontSize: '0.76rem', color: colors.text.muted }}>
                   As cartinhas estão saindo do potinho...

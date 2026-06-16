@@ -565,7 +565,7 @@ export function ReaderCollectionPage() {
           <Button
             variant="ghost"
             loading={revokeMutation.isPending}
-            disabled={revokeInput.trim() !== email}
+            disabled={revokeInput.trim().toLowerCase() !== email.toLowerCase()}
             onClick={handleRevoke}
             sx={{ flex: 1, color: colors.rose.main, background: `${colors.rose.main}15`, border: `1px solid ${colors.rose.main}30`, '&:hover': { background: `${colors.rose.main}25` } }}
           >
