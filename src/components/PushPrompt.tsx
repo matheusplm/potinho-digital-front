@@ -8,13 +8,20 @@ import { Button } from './ui'
 import { colors, radius } from '../design-system'
 import { useBackground } from '../context/BackgroundContext'
 
+const SEEN_KEY = 'push-prompt-seen'
+
 export function PushPrompt() {
   const { state, loading, enable } = usePush()
   const { theme } = useBackground()
-  const [dismissed, setDismissed] = useState(false)
+  const [dismissed, setDismissed] = useState(() => !!sessionStorage.getItem(SEEN_KEY))
+
+  const dismiss = () => {
+    sessionStorage.setItem(SEEN_KEY, '1')
+    setDismissed(true)
+  }
 
   useEffect(() => {
-    const t = setTimeout(() => setDismissed(true), 5000)
+    const t = setTimeout(dismiss, 5000)
     return () => clearTimeout(t)
   }, [])
 
@@ -58,7 +65,7 @@ export function PushPrompt() {
           </Button>
           <IconButton
             size="small"
-            onClick={() => setDismissed(true)}
+            onClick={dismiss}
             sx={{ color: colors.text.muted, p: 0.4 }}
           >
             <CloseIcon sx={{ fontSize: 16 }} />
