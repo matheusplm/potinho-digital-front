@@ -1,4 +1,4 @@
-import AddIcon from '@mui/icons-material/Add'
+﻿import AddIcon from '@mui/icons-material/Add'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import ViewListIcon from '@mui/icons-material/ViewList'
@@ -201,7 +201,7 @@ function CollectionFormDialog({
           <Box>
             <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
               <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.text.secondary }}>Nome</Typography>
-              <Typography sx={{ fontSize: '0.65rem', color: form.name.length > 50 ? colors.error.main : colors.text.muted }}>
+              <Typography sx={{ fontSize: '0.72rem', color: form.name.length > 50 ? colors.error.main : colors.text.muted }}>
                 {form.name.length}/50
               </Typography>
             </Stack>
@@ -211,7 +211,7 @@ function CollectionFormDialog({
           <Box>
             <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
               <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.text.secondary }}>Descrição</Typography>
-              <Typography sx={{ fontSize: '0.65rem', color: colors.text.muted }}>{form.description.length}/200</Typography>
+              <Typography sx={{ fontSize: '0.72rem', color: colors.text.muted }}>{form.description.length}/200</Typography>
             </Stack>
             <TextField multiline rows={2} fullWidth placeholder="Um potinho cheio de amor..." value={form.description}
               onChange={(e) => setForm((f) => ({ ...f, description: e.target.value.slice(0, 200) }))}
@@ -224,7 +224,7 @@ function CollectionFormDialog({
             <Stack spacing={0.8}>
               {([false, true] as const).map((dark) => (
                 <Box key={String(dark)}>
-                  <Typography sx={{ fontSize: '0.58rem', fontWeight: 700, letterSpacing: 0.5, color: colors.text.muted, textTransform: 'uppercase', mb: 0.6 }}>
+                  <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: 0.5, color: colors.text.muted, textTransform: 'uppercase', mb: 0.6 }}>
                     {dark ? 'Escuros' : 'Claros'}
                   </Typography>
                   <Box sx={{ display: 'flex', gap: 0.8, flexWrap: 'wrap' }}>
@@ -342,7 +342,7 @@ function CollectionCardView({ col, i, onClick, onEdit, onDelete }: CardProps) {
             px: 0.9, py: 0.3, borderRadius: radius.full, flexShrink: 0, mt: 0.1,
             background: isOwner ? `${colors.primary.main}15` : `${colors.rose.main}15`,
             border: `1px solid ${isOwner ? colors.primary.main : colors.rose.main}30`,
-            fontSize: '0.58rem', fontWeight: 800, letterSpacing: 0.5,
+            fontSize: '0.68rem', fontWeight: 800, letterSpacing: 0.5,
             color: isOwner ? colors.primary.main : colors.rose.main,
             textTransform: 'uppercase',
           }}>
@@ -396,7 +396,7 @@ function CollectionGridItem({ col, i, onClick, onEdit, onDelete }: CardProps) {
         <Box sx={{
           alignSelf: 'flex-start', px: 0.7, py: 0.15, borderRadius: radius.full,
           background: isOwner ? `${colors.primary.main}15` : `${colors.rose.main}15`,
-          fontSize: '0.56rem', fontWeight: 800, letterSpacing: 0.4,
+          fontSize: '0.68rem', fontWeight: 800, letterSpacing: 0.4,
           color: isOwner ? colors.primary.main : colors.rose.main,
           textTransform: 'uppercase',
         }}>
@@ -450,7 +450,7 @@ function CollectionListItem({ col, i, onClick, onEdit, onDelete }: CardProps) {
           <Box sx={{
             px: 0.8, py: 0.2, borderRadius: radius.full, flexShrink: 0,
             background: `${colors.rose.main}15`,
-            fontSize: '0.57rem', fontWeight: 800, letterSpacing: 0.4,
+            fontSize: '0.68rem', fontWeight: 800, letterSpacing: 0.4,
             color: colors.rose.main, textTransform: 'uppercase',
           }}>
             convidada
@@ -513,7 +513,7 @@ function AddGhostCard({ view, onClick, accent }: { view: ViewMode; onClick: () =
           <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.86rem', color: accent, lineHeight: 1.2 }}>
             Nova coleção
           </Typography>
-          <Typography sx={{ fontSize: '0.6rem', color: accent, opacity: 0.5, mt: 0.2 }}>
+          <Typography sx={{ fontSize: '0.70rem', color: accent, opacity: 0.5, mt: 0.2 }}>
             Toque para criar
           </Typography>
         </Box>

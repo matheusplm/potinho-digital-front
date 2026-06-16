@@ -1,4 +1,4 @@
-import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
+﻿import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import { Box, Stack, Typography } from '@mui/material'
 import { useSimulation } from '../context/SimulationContext'
 import { colors, font, radius } from '../design-system'
@@ -45,7 +45,7 @@ export function SimulationBanner() {
             <VisibilityOutlinedIcon sx={{ fontSize: 17 }} />
           </Box>
           <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Typography sx={{ fontSize: '0.62rem', fontWeight: 900, letterSpacing: 0.7, color: colors.primary.main, textTransform: 'uppercase' }}>
+            <Typography sx={{ fontSize: '0.70rem', fontWeight: 900, letterSpacing: 0.7, color: colors.primary.main, textTransform: 'uppercase' }}>
               Prévia do leitor
             </Typography>
             <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.82rem', color: colors.text.primary, lineHeight: 1.2 }}>

@@ -185,7 +185,7 @@ export function LandingPage() {
                 <Box sx={{ pt: 0.3 }}>
                   <Stack direction="row" alignItems="center" spacing={0.8} sx={{ mb: 0.3 }}>
                     <Box sx={{ minWidth: 16, height: 16, borderRadius: '50%', background: s.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Typography sx={{ fontSize: '0.58rem', fontWeight: 800, color: '#fff', lineHeight: 1 }}>{s.step}</Typography>
+                      <Typography sx={{ fontSize: '0.68rem', fontWeight: 800, color: '#fff', lineHeight: 1 }}>{s.step}</Typography>
                     </Box>
                     <Typography sx={{ fontSize: '0.88rem', fontWeight: 700, color: '#1e3a5f', fontFamily: font.serif }}>{s.title}</Typography>
                   </Stack>
@@ -256,7 +256,7 @@ export function LandingPage() {
                   }}>
                     {t.emoji}
                   </Box>
-                  <Typography sx={{ fontSize: '0.62rem', color: colors.text.secondary, fontWeight: 600, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                  <Typography sx={{ fontSize: '0.70rem', color: colors.text.secondary, fontWeight: 600, textAlign: 'center', whiteSpace: 'nowrap' }}>
                     {t.label}
                   </Typography>
                 </Box>

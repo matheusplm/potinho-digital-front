@@ -1,4 +1,4 @@
-import LogoutIcon from '@mui/icons-material/Logout'
+﻿import LogoutIcon from '@mui/icons-material/Logout'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined'
 import CheckIcon from '@mui/icons-material/Check'
@@ -143,7 +143,7 @@ export function FloatingMenu() {
 
             {(canSwitch || canWriter || canReader) && (
               <Box sx={{ px: 1.8, py: 1.4 }}>
-                <Typography sx={{ fontSize: '0.66rem', fontWeight: 800, letterSpacing: 0.6, color: colors.text.secondary, textTransform: 'uppercase', mb: 1 }}>
+                <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.6, color: colors.text.secondary, textTransform: 'uppercase', mb: 1 }}>
                   Modo de uso
                 </Typography>
                 <Stack direction="row" spacing={0.6}>
@@ -191,7 +191,7 @@ export function FloatingMenu() {
                 <Box sx={{ px: 1.8, py: 1.4 }}>
                   <Stack direction="row" spacing={0.6} sx={{ alignItems: 'center', mb: 1.1 }}>
                     <SwapHorizIcon sx={{ fontSize: 14, color: colors.text.secondary }} />
-                    <Typography sx={{ fontSize: '0.66rem', fontWeight: 800, letterSpacing: 0.6, color: colors.text.secondary, textTransform: 'uppercase' }}>
+                    <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.6, color: colors.text.secondary, textTransform: 'uppercase' }}>
                       Seus potinhos
                     </Typography>
                   </Stack>
@@ -247,14 +247,14 @@ export function FloatingMenu() {
             <Box sx={{ px: 1.8, py: 1.4 }}>
               <Stack direction="row" spacing={0.6} sx={{ alignItems: 'center', mb: 1.2 }}>
                 <PaletteOutlinedIcon sx={{ fontSize: 14, color: colors.text.secondary }} />
-                <Typography sx={{ fontSize: '0.66rem', fontWeight: 800, letterSpacing: 0.6, color: colors.text.secondary, textTransform: 'uppercase' }}>
+                <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.6, color: colors.text.secondary, textTransform: 'uppercase' }}>
                   Tema de fundo
                 </Typography>
               </Stack>
               <Stack spacing={1}>
                 {([false, true] as const).map((dark) => (
                   <Box key={String(dark)}>
-                    <Typography sx={{ fontSize: '0.58rem', fontWeight: 700, letterSpacing: 0.5, color: colors.text.muted, textTransform: 'uppercase', mb: 0.6 }}>
+                    <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: 0.5, color: colors.text.muted, textTransform: 'uppercase', mb: 0.6 }}>
                       {dark ? 'Escuros' : 'Claros'}
                     </Typography>
                     <Box sx={{ display: 'flex', gap: 0.8 }}>

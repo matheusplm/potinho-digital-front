@@ -1,6 +1,7 @@
-import FavoriteIcon from '@mui/icons-material/Favorite'
+﻿import FavoriteIcon from '@mui/icons-material/Favorite'
 import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded'
 import LockRoundedIcon from '@mui/icons-material/LockRounded'
+import ShuffleIcon from '@mui/icons-material/Shuffle'
 import { Box, Dialog, DialogActions, DialogContent, DialogTitle, LinearProgress, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useQueryClient } from '@tanstack/react-query'
@@ -241,9 +242,10 @@ export function SimulatedReaderHomePage() {
       : (play ? computeAchievements(play, rarities, types).filter((a) => a.unlocked).length : 0),
     [isRealReader, readerAch, play, rarities, types],
   )
+  const [relerSeed, setRelerSeed] = useState(() => Math.random())
   const relerNote = useMemo(
-    () => (ownedItems.length > 0 ? ownedItems[Math.floor(Math.random() * ownedItems.length)] : undefined),
-    [cid, ownedItems.length],
+    () => (ownedItems.length > 0 ? ownedItems[Math.floor(relerSeed * ownedItems.length) % ownedItems.length] : undefined),
+    [relerSeed, ownedItems],
   )
   const [isOpeningPack, setIsOpeningPack] = useState(false)
   const [rewards, setRewards] = useState<CollectionDailyReward[]>([])
@@ -593,7 +595,7 @@ export function SimulatedReaderHomePage() {
               <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.05rem', color: theme.textOnBg, lineHeight: 1.2, mt: 0.25 }}>
                 {s.value}
               </Typography>
-              <Typography sx={{ fontSize: '0.6rem', fontWeight: 700, color: theme.textOnBgMuted }}>
+              <Typography sx={{ fontSize: '0.70rem', fontWeight: 700, color: theme.textOnBgMuted }}>
                 {s.label}
               </Typography>
             </Box>
@@ -629,10 +631,9 @@ export function SimulatedReaderHomePage() {
             </Stack>
           </Card>
 
-          {relerNote && (
+          {relerNote && ownedItems.length > 0 && (
             <Card
-              onClick={() => setSelectedNote(relerNote)}
-              sx={{ p: 1.15, cursor: 'pointer', background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(12px)', transition: 'transform 0.16s', '&:active': { transform: 'scale(0.99)' } }}
+              sx={{ p: 1.15, background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(12px)' }}
             >
               <Stack direction="row" alignItems="center" spacing={1.1}>
                 <Box sx={{
@@ -642,8 +643,8 @@ export function SimulatedReaderHomePage() {
                 }}>
                   💭
                 </Box>
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Typography sx={{ fontSize: '0.6rem', fontWeight: 900, letterSpacing: 0.6, color: theme.accent, textTransform: 'uppercase' }}>
+                <Box sx={{ flex: 1, minWidth: 0, cursor: 'pointer' }} onClick={() => setSelectedNote(relerNote)}>
+                  <Typography sx={{ fontSize: '0.70rem', fontWeight: 900, letterSpacing: 0.6, color: theme.accent, textTransform: 'uppercase' }}>
                     Pra reler agora
                   </Typography>
                   <Typography sx={{
@@ -653,7 +654,23 @@ export function SimulatedReaderHomePage() {
                     {relerNote.title}
                   </Typography>
                 </Box>
-                <Typography sx={{ fontSize: '1.1rem', color: theme.textOnBgMuted, flexShrink: 0 }}>›</Typography>
+                {ownedItems.length > 1 && (
+                  <Box
+                    onClick={(e) => { e.stopPropagation(); setRelerSeed(Math.random()) }}
+                    sx={{
+                      width: 30, height: 30, borderRadius: '50%', flexShrink: 0, cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      color: theme.textOnBgMuted, transition: 'all 0.16s',
+                      '&:hover': { color: theme.accent, bgcolor: `${theme.accent}12` },
+                      '&:active': { transform: 'rotate(180deg)' },
+                    }}
+                  >
+                    <ShuffleIcon sx={{ fontSize: 16 }} />
+                  </Box>
+                )}
+                <Box onClick={() => setSelectedNote(relerNote)} sx={{ cursor: 'pointer', flexShrink: 0 }}>
+                  <Typography sx={{ fontSize: '1.1rem', color: theme.textOnBgMuted }}>›</Typography>
+                </Box>
               </Stack>
             </Card>
           )}
@@ -811,7 +828,7 @@ export function SimulatedReaderHomePage() {
                     <Typography sx={{ fontFamily: font.serif, fontWeight: 900, fontSize: '1.02rem', color: theme.accent, lineHeight: 1.1 }}>
                       {remainingLabel}
                     </Typography>
-                    <Typography sx={{ fontSize: '0.58rem', fontWeight: 900, color: colors.text.muted, textTransform: 'uppercase', letterSpacing: 0.6 }}>
+                    <Typography sx={{ fontSize: '0.68rem', fontWeight: 900, color: colors.text.muted, textTransform: 'uppercase', letterSpacing: 0.6 }}>
                       restante
                     </Typography>
                   </Stack>
@@ -1000,7 +1017,7 @@ export function SimulatedReaderHomePage() {
                   px: 0.4,
                   boxShadow: '0 1px 4px rgba(0,0,0,0.18)',
                 }}>
-                  <Typography sx={{ fontSize: '0.55rem', fontWeight: 900, color: pack.accent, lineHeight: 1 }}>
+                  <Typography sx={{ fontSize: '0.68rem', fontWeight: 900, color: pack.accent, lineHeight: 1 }}>
                     {play?.packOpens?.[pack.id] ?? 0}
                   </Typography>
                 </Box>

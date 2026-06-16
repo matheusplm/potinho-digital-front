@@ -1,4 +1,4 @@
-import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined'
+﻿import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined'
 import { Box, LinearProgress, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { Card, LoadingState, ScrollablePage } from '../components/ui'
@@ -115,7 +115,7 @@ export function ConquistasPage() {
                         {a.description}
                       </Typography>
                       {a.unlocked && a.unlockedAt && (
-                        <Typography sx={{ fontSize: '0.66rem', fontWeight: 700, color: theme.accent }}>
+                        <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: theme.accent }}>
                           🏆 desbloqueada em {formatDate(a.unlockedAt)}
                         </Typography>
                       )}

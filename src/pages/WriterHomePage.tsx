@@ -67,7 +67,7 @@ export function WriterHomePage() {
             {firstName} 💙
           </Typography>
           <Typography sx={{ fontSize: '0.85rem', color: theme.textOnBgMuted, fontStyle: 'italic', mt: 0.5 }}>
-            suas coleções estão esperando por você
+            {ownedCount > 0 ? 'suas coleções estão esperando por você' : 'que tal criar sua primeira coleção?'}
           </Typography>
         </Stack>
 

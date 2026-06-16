@@ -111,7 +111,7 @@ function NoteCard({ note, rarity, onClick }: { note: CollectionNoteView; rarity?
           {rarity && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <Box sx={{ width: 7, height: 7, borderRadius: radius.full, background: rarity.cardBg, flexShrink: 0, boxShadow: `0 0 5px ${rarity.glowColor ?? rarity.borderColor}` }} />
-              <Typography sx={{ fontSize: '0.58rem', fontWeight: 800, color: rarity.captionColor ?? colors.text.muted, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+              <Typography sx={{ fontSize: '0.68rem', fontWeight: 800, color: rarity.captionColor ?? colors.text.muted, textTransform: 'uppercase', letterSpacing: 0.5 }}>
                 {rarity.emoji} {rarity.label}
               </Typography>
             </Box>
@@ -143,7 +143,7 @@ function NoteRow({ note, rarity, onClick }: { note: CollectionNoteView; rarity?:
               {note.title}
             </Typography>
             {rarity && (
-              <Typography sx={{ fontSize: '0.6rem', fontWeight: 700, color: rarity.captionColor ?? colors.text.muted, textTransform: 'uppercase', letterSpacing: 0.4 }}>
+              <Typography sx={{ fontSize: '0.70rem', fontWeight: 700, color: rarity.captionColor ?? colors.text.muted, textTransform: 'uppercase', letterSpacing: 0.4 }}>
                 {rarity.emoji} {rarity.label}
               </Typography>
             )}
@@ -340,7 +340,7 @@ export function ReaderCollectionPage() {
                     <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.1rem', color: colors.text.primary }}>
                       {s.value}
                     </Typography>
-                    <Typography sx={{ fontSize: '0.6rem', fontWeight: 700, color: colors.text.muted, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                    <Typography sx={{ fontSize: '0.70rem', fontWeight: 700, color: colors.text.muted, textTransform: 'uppercase', letterSpacing: 0.5 }}>
                       {s.label}
                     </Typography>
                   </Box>
@@ -349,7 +349,7 @@ export function ReaderCollectionPage() {
             </Card>
             {bonusPacks.length > 0 && (
               <Card sx={{ p: 2 }}>
-                <Typography sx={{ fontSize: '0.66rem', fontWeight: 800, letterSpacing: 0.8, color: colors.text.muted, textTransform: 'uppercase', mb: 1 }}>
+                <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.8, color: colors.text.muted, textTransform: 'uppercase', mb: 1 }}>
                   🎁 Brindes
                 </Typography>
                 <Stack direction="row" spacing={0.7} sx={{ flexWrap: 'wrap', rowGap: 0.7 }}>
@@ -406,7 +406,7 @@ export function ReaderCollectionPage() {
                   sx={{ p: 0.5, gap: 0.3, borderRadius: radius.sm, '&:hover': { background: 'rgba(0,0,0,0.06)' } }}
                 >
                   <SwapVertIcon sx={{ fontSize: 15, color: colors.text.secondary }} />
-                  <Typography sx={{ fontSize: '0.62rem', fontWeight: 700, color: colors.text.secondary }}>{SORT_LABEL[sort]}</Typography>
+                  <Typography sx={{ fontSize: '0.70rem', fontWeight: 700, color: colors.text.secondary }}>{SORT_LABEL[sort]}</Typography>
                 </IconButton>
                 <IconButton
                   size="small"

@@ -1,4 +1,4 @@
-import HomeIcon from '@mui/icons-material/Home'
+﻿import HomeIcon from '@mui/icons-material/Home'
 import Inventory2Icon from '@mui/icons-material/Inventory2'
 import AutoStoriesOutlinedIcon from '@mui/icons-material/AutoStoriesOutlined'
 import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined'
@@ -179,7 +179,7 @@ export function MobileLayout() {
                   )}
                 </Box>
                 <Typography sx={{
-                  fontSize: '0.62rem',
+                  fontSize: '0.70rem',
                   fontWeight: active || isEnd ? 700 : 500,
                   color: active || isEnd ? (isEnd ? colors.rose.main : theme.accent) : colors.text.muted,
                   lineHeight: 1, letterSpacing: 0.1,

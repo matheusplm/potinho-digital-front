@@ -1,4 +1,4 @@
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+﻿import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import AddIcon from '@mui/icons-material/Add'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
@@ -367,6 +367,7 @@ function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
   open: boolean; editing: NoteRecord | null; rarities: RarityConfig[]; types: NoteTypeConfig[]; cid: string; onClose: () => void
 }) {
   const [form, setForm] = useState<NoteFormData>(EMPTY_NOTE)
+  const [touched, setTouched] = useState({ title: false, message: false, rarity: false, typeId: false })
   const createMutation = useCreateCollectionNoteMutation(cid)
   const updateMutation = useUpdateCollectionNoteMutation(cid)
   const isLoading = createMutation.isPending || updateMutation.isPending
@@ -374,18 +375,26 @@ function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
   useEffect(() => {
     if (!open) return
     setForm(editing ? { title: editing.title, message: editing.message, rarity: editing.rarity, typeId: editing.typeId } : EMPTY_NOTE)
+    setTouched({ title: false, message: false, rarity: false, typeId: false })
   }, [open, editing])
 
   const errors = {
-    title: form.title.trim().length === 0 ? 'Obrigatório' : form.title.length > 60 ? 'Máx 60' : '',
-    message: form.message.trim().length === 0 ? 'Obrigatório' : form.message.length > 500 ? 'Máx 500' : '',
-    rarity: !form.rarity ? 'Selecione' : '',
-    typeId: !form.typeId ? 'Selecione' : '',
+    title: form.title.trim().length === 0 ? 'Obrigatório' : form.title.length > 60 ? 'Máx 60 caracteres' : '',
+    message: form.message.trim().length === 0 ? 'Obrigatório' : form.message.length > 500 ? 'Máx 500 caracteres' : '',
+    rarity: !form.rarity ? 'Selecione uma raridade' : '',
+    typeId: !form.typeId ? 'Selecione um tipo' : '',
   }
   const hasErrors = Object.values(errors).some(Boolean)
 
+  function touch(field: keyof typeof touched) {
+    setTouched((t) => ({ ...t, [field]: true }))
+  }
+
   async function handleSubmit() {
-    if (hasErrors) return
+    if (hasErrors) {
+      setTouched({ title: true, message: true, rarity: true, typeId: true })
+      return
+    }
     try {
       if (editing) { await updateMutation.mutateAsync({ id: editing.id, data: form }); toast.success('Bilhete atualizado!') }
       else { await createMutation.mutateAsync(form); toast.success('Bilhete criado!') }
@@ -402,60 +411,75 @@ function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
         <Stack spacing={2} sx={{ mt: 1 }}>
           <Box>
             <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.5 }}>
-              <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.secondary }}>Título</Typography>
+              <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: touched.title && errors.title ? colors.error.main : colors.text.secondary }}>Título</Typography>
               <Typography sx={{ fontSize: '0.68rem', color: form.title.length > 60 ? colors.error.main : colors.text.muted }}>{form.title.length}/60</Typography>
             </Stack>
-            <Input placeholder="Título especial..." value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} />
+            <Input
+              placeholder="Título especial..." value={form.title}
+              onChange={(e) => { setForm((f) => ({ ...f, title: e.target.value })); touch('title') }}
+              onBlur={() => touch('title')}
+              error={touched.title && !!errors.title}
+              helperText={touched.title && errors.title ? errors.title : undefined}
+            />
           </Box>
           <Box>
             <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.5 }}>
-              <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.secondary }}>Mensagem</Typography>
+              <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: touched.message && errors.message ? colors.error.main : colors.text.secondary }}>Mensagem</Typography>
               <Typography sx={{ fontSize: '0.68rem', color: form.message.length > 500 ? colors.error.main : colors.text.muted }}>{form.message.length}/500</Typography>
             </Stack>
             <TextField multiline rows={4} fullWidth placeholder="Escreva algo especial..." value={form.message}
-              onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
+              onChange={(e) => { setForm((f) => ({ ...f, message: e.target.value })); touch('message') }}
+              onBlur={() => touch('message')}
+              error={touched.message && !!errors.message}
+              helperText={touched.message && errors.message ? errors.message : undefined}
               sx={{ '& .MuiOutlinedInput-root': { borderRadius: radius.md, fontSize: '0.88rem', background: colors.surface.overlay, '& fieldset': { borderColor: colors.border.medium } } }}
             />
           </Box>
           <Box>
-            <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.secondary, mb: 0.8 }}>Raridade</Typography>
+            <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: touched.rarity && errors.rarity ? colors.error.main : colors.text.secondary, mb: 0.8 }}>Raridade</Typography>
             {rarities.length === 0 ? <Typography sx={{ fontSize: '0.8rem', color: colors.text.muted }}>Crie raridades na aba Raridades.</Typography> : (
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
                 {rarities.map((r) => (
-                  <Box key={r.id} onClick={() => setForm((f) => ({ ...f, rarity: r.id }))} sx={{
+                  <Box key={r.id} onClick={() => { setForm((f) => ({ ...f, rarity: r.id })); touch('rarity') }} sx={{
                     px: 1.4, py: 0.6, borderRadius: radius.full, cursor: 'pointer',
                     display: 'flex', alignItems: 'center', gap: 0.5,
                     background: form.rarity === r.id ? r.chipBg : 'rgba(0,0,0,0.04)',
                     color: form.rarity === r.id ? r.chipColor : colors.text.secondary,
-                    border: `1.5px solid ${form.rarity === r.id ? r.borderColor : 'transparent'}`,
+                    border: `1.5px solid ${form.rarity === r.id ? r.borderColor : touched.rarity && errors.rarity ? colors.error.main + '66' : 'transparent'}`,
                     fontWeight: 700, fontSize: '0.78rem', transition: 'all 0.15s',
                   }}>{r.emoji} {r.label}</Box>
                 ))}
               </Box>
             )}
+            {touched.rarity && errors.rarity && (
+              <Typography sx={{ fontSize: '0.68rem', color: colors.error.main, mt: 0.5, pl: 0.5 }}>{errors.rarity}</Typography>
+            )}
           </Box>
           <Box>
-            <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.secondary, mb: 0.8 }}>Tipo</Typography>
+            <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: touched.typeId && errors.typeId ? colors.error.main : colors.text.secondary, mb: 0.8 }}>Tipo</Typography>
             {types.length === 0 ? <Typography sx={{ fontSize: '0.8rem', color: colors.text.muted }}>Crie tipos na aba Tipos.</Typography> : (
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
                 {types.map((t) => (
-                  <Box key={t.id} onClick={() => setForm((f) => ({ ...f, typeId: t.id }))} sx={{
+                  <Box key={t.id} onClick={() => { setForm((f) => ({ ...f, typeId: t.id })); touch('typeId') }} sx={{
                     px: 1.4, py: 0.6, borderRadius: radius.full, cursor: 'pointer',
                     display: 'flex', alignItems: 'center', gap: 0.5,
                     background: form.typeId === t.id ? t.tagBg : 'rgba(0,0,0,0.04)',
                     color: form.typeId === t.id ? t.tagColor : colors.text.secondary,
-                    border: `1.5px solid ${form.typeId === t.id ? t.accentColor + '55' : 'transparent'}`,
+                    border: `1.5px solid ${form.typeId === t.id ? t.accentColor + '55' : touched.typeId && errors.typeId ? colors.error.main + '66' : 'transparent'}`,
                     fontWeight: 700, fontSize: '0.78rem', transition: 'all 0.15s',
                   }}>{t.emoji} {t.label}</Box>
                 ))}
               </Box>
+            )}
+            {touched.typeId && errors.typeId && (
+              <Typography sx={{ fontSize: '0.68rem', color: colors.error.main, mt: 0.5, pl: 0.5 }}>{errors.typeId}</Typography>
             )}
           </Box>
         </Stack>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
         <Button variant="ghost" onClick={onClose} sx={{ flex: 1 }}>Cancelar</Button>
-        <Button variant="primary" loading={isLoading} onClick={handleSubmit} disabled={hasErrors} sx={{ flex: 1 }}>
+        <Button variant="primary" loading={isLoading} onClick={handleSubmit} sx={{ flex: 1 }}>
           {editing ? 'Salvar' : 'Criar'}
         </Button>
       </DialogActions>
@@ -533,8 +557,8 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
                 >
                   <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={0.8}>
                     <Chip label={`${template.emoji} ${template.label}`} size="small"
-                      sx={{ height: 21, fontSize: '0.66rem', fontWeight: 800, background: template.chipBg, color: template.chipColor, '& .MuiChip-label': { px: 0.8 } }} />
-                    <Typography sx={{ fontSize: '0.66rem', fontWeight: 800, color: template.captionColor }}>
+                      sx={{ height: 21, fontSize: '0.72rem', fontWeight: 800, background: template.chipBg, color: template.chipColor, '& .MuiChip-label': { px: 0.8 } }} />
+                    <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: template.captionColor }}>
                       {template.odds}%
                     </Typography>
                   </Stack>
@@ -559,7 +583,7 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
           <Box sx={{ p: 1.5, borderRadius: radius.lg, background: form.cardBg, border: `1.5px solid ${form.borderColor}`, boxShadow: form.shadow }}>
             <Stack direction="row" alignItems="center" spacing={0.8}>
               <Chip label={`${form.emoji} ${form.label.toUpperCase()}`} size="small"
-                sx={{ height: 20, fontSize: '0.66rem', fontWeight: 700, background: form.chipBg, color: form.chipColor, '& .MuiChip-label': { px: 0.9 } }} />
+                sx={{ height: 20, fontSize: '0.72rem', fontWeight: 700, background: form.chipBg, color: form.chipColor, '& .MuiChip-label': { px: 0.9 } }} />
               <Typography sx={{ fontSize: '0.85rem', fontStyle: 'italic', color: form.textColor }}>Pré-visualização</Typography>
             </Stack>
           </Box>
@@ -756,7 +780,7 @@ function PackEditor({ cid, pack, rarities, types, onClose }: {
                       <Typography sx={{ fontSize: '0.72rem', fontWeight: 900, color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {template.name}
                       </Typography>
-                      <Typography sx={{ fontSize: '0.62rem', fontWeight: 800, color: template.accent }}>
+                      <Typography sx={{ fontSize: '0.70rem', fontWeight: 800, color: template.accent }}>
                         {PACK_CATEGORY_LABELS[template.category]}
                       </Typography>
                     </Box>
@@ -996,7 +1020,7 @@ function PackPreviewCard({ pack, view, onEdit, onDelete, onSimulate, onSetPrimar
                 size="small"
                 sx={{
                   height: 19,
-                  fontSize: '0.58rem',
+                  fontSize: '0.68rem',
                   fontWeight: 900,
                   background: isPrimary ? '#fef3c7' : isActive ? '#dcfce7' : 'rgba(255,255,255,0.62)',
                   color: isPrimary ? '#b45309' : isActive ? '#15803d' : colors.text.secondary,
@@ -1039,7 +1063,7 @@ function PackPreviewCard({ pack, view, onEdit, onDelete, onSimulate, onSetPrimar
               justifyContent: 'space-between',
               gap: 1,
             }}>
-              <Typography sx={{ fontSize: '0.56rem', fontWeight: 900, color: colors.text.muted, textTransform: 'uppercase', letterSpacing: 0.5, mb: 0.25 }}>
+              <Typography sx={{ fontSize: '0.68rem', fontWeight: 900, color: colors.text.muted, textTransform: 'uppercase', letterSpacing: 0.5, mb: 0.25 }}>
                 {label}
               </Typography>
               <Typography sx={{
@@ -1063,7 +1087,7 @@ function PackPreviewCard({ pack, view, onEdit, onDelete, onSimulate, onSetPrimar
         </Box>
 
         <Stack spacing={0.75}>
-          <Typography sx={{ fontSize: '0.62rem', fontWeight: 900, color: colors.text.muted, textTransform: 'uppercase', letterSpacing: 0.8 }}>
+          <Typography sx={{ fontSize: '0.70rem', fontWeight: 900, color: colors.text.muted, textTransform: 'uppercase', letterSpacing: 0.8 }}>
             Regras
           </Typography>
           <Box sx={{ display: 'flex', gap: 0.55, flexWrap: 'wrap' }}>
@@ -1075,7 +1099,7 @@ function PackPreviewCard({ pack, view, onEdit, onDelete, onSimulate, onSetPrimar
                 background: 'rgba(0,0,0,0.035)',
                 border: '1px solid rgba(0,0,0,0.045)',
                 color: colors.text.secondary,
-                fontSize: '0.64rem',
+                fontSize: '0.72rem',
                 fontWeight: 750,
                 maxWidth: '100%',
                 overflow: 'hidden',
@@ -1385,12 +1409,12 @@ function PackSimulationDialog({ simulation, rarities, types, onClose, onSimulate
                           </Typography>
                           <Stack direction="row" spacing={0.5} sx={{ mt: 0.75, flexWrap: 'wrap', rowGap: 0.45 }}>
                             {rarity && (
-                              <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.35, px: 0.75, py: 0.25, borderRadius: radius.full, background: rarity.chipBg, color: rarity.chipColor, border: `1px solid ${rarity.borderColor}`, fontSize: '0.62rem', fontWeight: 750 }}>
+                              <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.35, px: 0.75, py: 0.25, borderRadius: radius.full, background: rarity.chipBg, color: rarity.chipColor, border: `1px solid ${rarity.borderColor}`, fontSize: '0.70rem', fontWeight: 750 }}>
                                 {rarity.emoji} {rarity.label}
                               </Box>
                             )}
                             {type && (
-                              <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.35, px: 0.75, py: 0.25, borderRadius: radius.full, background: type.tagBg, color: type.tagColor, border: `1px solid ${type.accentColor}44`, fontSize: '0.62rem', fontWeight: 750 }}>
+                              <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.35, px: 0.75, py: 0.25, borderRadius: radius.full, background: type.tagBg, color: type.tagColor, border: `1px solid ${type.accentColor}44`, fontSize: '0.70rem', fontWeight: 750 }}>
                                 {type.emoji} {type.label}
                               </Box>
                             )}
@@ -1893,12 +1917,12 @@ export function CollectionManagePage() {
                                 {note.title}
                               </Typography>
                               {r && (
-                                <Box sx={{ px: 0.65, py: 0.15, borderRadius: radius.full, background: r.chipBg, color: r.chipColor, border: `1px solid ${r.borderColor}`, fontSize: '0.58rem', fontWeight: 850, flexShrink: 0 }}>
+                                <Box sx={{ px: 0.65, py: 0.15, borderRadius: radius.full, background: r.chipBg, color: r.chipColor, border: `1px solid ${r.borderColor}`, fontSize: '0.68rem', fontWeight: 850, flexShrink: 0 }}>
                                   {r.emoji}
                                 </Box>
                               )}
                               {t && (
-                                <Box sx={{ px: 0.65, py: 0.15, borderRadius: radius.full, background: t.tagBg, color: t.tagColor, border: `1px solid ${t.accentColor}33`, fontSize: '0.58rem', fontWeight: 850, flexShrink: 0 }}>
+                                <Box sx={{ px: 0.65, py: 0.15, borderRadius: radius.full, background: t.tagBg, color: t.tagColor, border: `1px solid ${t.accentColor}33`, fontSize: '0.68rem', fontWeight: 850, flexShrink: 0 }}>
                                   {t.emoji}
                                 </Box>
                               )}
@@ -1913,7 +1937,7 @@ export function CollectionManagePage() {
                             }}>
                               {note.message}
                             </Typography>
-                            <Typography sx={{ mt: 0.35, fontSize: '0.62rem', color: colors.text.muted, fontWeight: 700 }}>
+                            <Typography sx={{ mt: 0.35, fontSize: '0.70rem', color: colors.text.muted, fontWeight: 700 }}>
                               {[r?.label, t?.label].filter(Boolean).join(' · ') || 'Sem categoria'}
                             </Typography>
                           </Box>
@@ -2023,12 +2047,12 @@ export function CollectionManagePage() {
                         {(r || t) && (
                           <Stack direction="row" spacing={0.6} sx={{ mt: 0.9, flexWrap: 'wrap', rowGap: 0.5 }}>
                             {r && (
-                              <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.4, px: 1, py: 0.3, borderRadius: radius.full, background: r.chipBg, color: r.chipColor, border: `1px solid ${r.borderColor}`, fontSize: '0.65rem', fontWeight: 700 }}>
+                              <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.4, px: 1, py: 0.3, borderRadius: radius.full, background: r.chipBg, color: r.chipColor, border: `1px solid ${r.borderColor}`, fontSize: '0.72rem', fontWeight: 700 }}>
                                 {r.emoji} {r.label}
                               </Box>
                             )}
                             {t && (
-                              <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.4, px: 1, py: 0.3, borderRadius: radius.full, background: t.tagBg, color: t.tagColor, border: `1px solid ${t.accentColor}44`, fontSize: '0.65rem', fontWeight: 700 }}>
+                              <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.4, px: 1, py: 0.3, borderRadius: radius.full, background: t.tagBg, color: t.tagColor, border: `1px solid ${t.accentColor}44`, fontSize: '0.72rem', fontWeight: 700 }}>
                                 {t.emoji} {t.label}
                               </Box>
                             )}
@@ -2081,7 +2105,7 @@ export function CollectionManagePage() {
                   <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
                     <Box onClick={() => { setEditingRarity(r); setRarityDialogOpen(true) }} sx={{ flex: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Chip label={`${r.emoji} ${r.label.toUpperCase()}`} size="small"
-                        sx={{ height: 20, fontSize: '0.66rem', fontWeight: 700, background: r.chipBg, color: r.chipColor, '& .MuiChip-label': { px: 0.9 } }} />
+                        sx={{ height: 20, fontSize: '0.72rem', fontWeight: 700, background: r.chipBg, color: r.chipColor, '& .MuiChip-label': { px: 0.9 } }} />
                       <Typography sx={{ fontSize: '0.78rem', color: r.captionColor, fontWeight: 600 }}>{r.odds}% de chance</Typography>
                     </Box>
                     <Stack direction="row" spacing={0.5}>
@@ -2242,7 +2266,7 @@ export function CollectionManagePage() {
             </Stack>
 
             <Box>
-              <Typography sx={{ fontSize: '0.66rem', fontWeight: 800, letterSpacing: 0.5, color: theme.textOnBgMuted, textTransform: 'uppercase', mb: 0.7 }}>
+              <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.5, color: theme.textOnBgMuted, textTransform: 'uppercase', mb: 0.7 }}>
                 Adicionar rápido
               </Typography>
               <Box sx={{ display: 'flex', gap: 0.6, overflowX: 'auto', pb: 0.4, scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
@@ -2343,7 +2367,7 @@ export function CollectionManagePage() {
 
                   {accessBonusPacks.length > 0 && (
                     <Stack spacing={0.8}>
-                      <Typography sx={{ fontSize: '0.66rem', fontWeight: 800, letterSpacing: 0.7, color: colors.text.muted, textTransform: 'uppercase' }}>
+                      <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.7, color: colors.text.muted, textTransform: 'uppercase' }}>
                         Brindes liberados
                       </Typography>
                       <Stack direction="row" spacing={0.7} sx={{ flexWrap: 'wrap', rowGap: 0.7 }}>

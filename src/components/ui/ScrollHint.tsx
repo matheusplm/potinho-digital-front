@@ -1,4 +1,4 @@
-import FavoriteIcon from '@mui/icons-material/Favorite'
+﻿import FavoriteIcon from '@mui/icons-material/Favorite'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import { Box, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
@@ -110,7 +110,7 @@ export function ScrollHint() {
             }} />
           </Box>
           <Typography sx={{
-            fontSize: '0.62rem',
+            fontSize: '0.70rem',
             fontWeight: 700,
             letterSpacing: 0.6,
             color: 'rgba(0,0,0,0.35)',

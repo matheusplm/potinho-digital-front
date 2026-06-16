@@ -1,4 +1,4 @@
-import FavoriteIcon from '@mui/icons-material/Favorite'
+﻿import FavoriteIcon from '@mui/icons-material/Favorite'
 import StarIcon from '@mui/icons-material/Star'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import SettingsIcon from '@mui/icons-material/Settings'
@@ -10,6 +10,7 @@ import GridViewIcon from '@mui/icons-material/GridView'
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined'
 import SwapVertIcon from '@mui/icons-material/SwapVert'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import TuneIcon from '@mui/icons-material/Tune'
 import { Box, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useEffect, useMemo, useState } from 'react'
@@ -279,7 +280,7 @@ export function NoteDetailDialog({ note, rarities, types, onClose }: {
                 </Typography>
               </Box>
               <Stack spacing={0.7}>
-                <Typography sx={{ fontSize: '0.62rem', fontWeight: 900, letterSpacing: 0.8, color: rarity?.captionColor ?? colors.text.muted, textTransform: 'uppercase' }}>
+                <Typography sx={{ fontSize: '0.70rem', fontWeight: 900, letterSpacing: 0.8, color: rarity?.captionColor ?? colors.text.muted, textTransform: 'uppercase' }}>
                   Compartilhar
                 </Typography>
                 <ShareCartinha note={note} r={rarity} t={type} theme={theme} />
@@ -400,7 +401,7 @@ export function PackOpeningDialog({ open, emoji, accent }: { open: boolean; emoj
               background: 'rgba(255,255,255,0.64)',
               border: '1px solid rgba(255,255,255,0.66)',
               color: colors.text.secondary,
-              fontSize: '0.62rem',
+              fontSize: '0.70rem',
               fontWeight: 850,
               boxShadow: '0 6px 18px rgba(15,23,42,0.06)',
             }}>
@@ -582,14 +583,14 @@ export function NoteCard({ note, r, t, unread, variant, onSelect, onToggleFavori
           <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.55, flexWrap: 'wrap', rowGap: 0.4 }}>
             {r && (
               <Chip size="small" label={`${r.emoji} ${r.label}`} sx={{
-                height: 19, fontSize: '0.62rem', fontWeight: 800,
+                height: 19, fontSize: '0.70rem', fontWeight: 800,
                 background: r.chipBg, color: r.chipColor, border: `1px solid ${r.borderColor}`,
                 '& .MuiChip-label': { px: 0.8 },
               }} />
             )}
             {t && !grid && (
               <Chip size="small" label={`${t.emoji} ${t.label}`} sx={{
-                height: 19, fontSize: '0.62rem', fontWeight: 800,
+                height: 19, fontSize: '0.70rem', fontWeight: 800,
                 background: t.tagBg, color: t.tagColor, border: `1px solid ${t.accentColor}44`,
                 '& .MuiChip-label': { px: 0.8 },
               }} />
@@ -658,6 +659,8 @@ function AlbumSection({
   const order = useMemo(() => Object.fromEntries(rarities.map((r) => [r.id, r.order])), [rarities])
   const sorted = useMemo(() => sortNotes(items, sort, order), [items, sort, order])
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false)
+  const activeFilterCount = (rarity !== 'all' ? 1 : 0) + (type !== 'all' ? 1 : 0)
 
   const groups = useMemo(() => {
     if (view !== 'folders') return []
@@ -712,95 +715,46 @@ function AlbumSection({
         )}
       </Box>
 
-      <Box sx={{ display: 'flex', gap: 0.6, overflowX: 'auto', pb: 0.2, scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
-        {[
-          { id: 'all' as AlbumFilter, label: 'Todas' },
-          ...(hasFavorites ? [{ id: 'favorites' as AlbumFilter, label: 'Favoritas' }] : []),
-        ].map((item) => (
+      <Stack direction="row" alignItems="center" spacing={0.6}>
+        <Box sx={{ display: 'flex', gap: 0.6, flex: 1, overflowX: 'auto', pb: 0.2, scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
+          {[
+            { id: 'all' as AlbumFilter, label: 'Todas' },
+            ...(hasFavorites ? [{ id: 'favorites' as AlbumFilter, label: 'Favoritas' }] : []),
+          ].map((item) => (
+            <Box
+              key={item.id}
+              onClick={() => setFilter(item.id)}
+              sx={{
+                px: 1.1, py: 0.52, borderRadius: radius.full, cursor: 'pointer', flexShrink: 0,
+                fontSize: '0.72rem', fontWeight: 800,
+                color: filter === item.id ? '#fff' : theme.textOnBgMuted,
+                background: filter === item.id ? theme.accent : 'rgba(255,255,255,0.48)',
+                border: `1px solid ${filter === item.id ? theme.accent : 'rgba(255,255,255,0.58)'}`,
+                backdropFilter: 'blur(10px)',
+              }}
+            >
+              {item.label}
+            </Box>
+          ))}
+        </Box>
+        {(discoveredRarities.length > 0 || discoveredTypes.length > 0) && (
           <Box
-            key={item.id}
-            onClick={() => setFilter(item.id)}
+            onClick={() => setFilterSheetOpen(true)}
             sx={{
-              px: 1.1, py: 0.52, borderRadius: radius.full, cursor: 'pointer', flexShrink: 0,
+              display: 'flex', alignItems: 'center', gap: 0.4, px: 1, py: 0.52,
+              borderRadius: radius.full, cursor: 'pointer', flexShrink: 0,
               fontSize: '0.72rem', fontWeight: 800,
-              color: filter === item.id ? '#fff' : theme.textOnBgMuted,
-              background: filter === item.id ? theme.accent : 'rgba(255,255,255,0.48)',
-              border: `1px solid ${filter === item.id ? theme.accent : 'rgba(255,255,255,0.58)'}`,
+              color: activeFilterCount > 0 ? '#fff' : theme.textOnBgMuted,
+              background: activeFilterCount > 0 ? theme.accent : 'rgba(255,255,255,0.48)',
+              border: `1px solid ${activeFilterCount > 0 ? theme.accent : 'rgba(255,255,255,0.58)'}`,
               backdropFilter: 'blur(10px)',
             }}
           >
-            {item.label}
+            <TuneIcon sx={{ fontSize: 14 }} />
+            {activeFilterCount > 0 ? `Filtros (${activeFilterCount})` : 'Filtros'}
           </Box>
-        ))}
-      </Box>
-
-      {discoveredRarities.length > 0 && (
-        <Box sx={{ display: 'flex', gap: 0.6, overflowX: 'auto', pb: 0.2, scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
-          <Box
-            onClick={() => setRarity('all')}
-            sx={{
-              px: 1.05, py: 0.48, borderRadius: radius.full, cursor: 'pointer', flexShrink: 0,
-              fontSize: '0.7rem', fontWeight: 800,
-              color: rarity === 'all' ? '#fff' : theme.textOnBgMuted,
-              background: rarity === 'all' ? colors.primary.main : 'rgba(255,255,255,0.42)',
-              border: `1px solid ${rarity === 'all' ? colors.primary.main : 'rgba(255,255,255,0.54)'}`,
-              backdropFilter: 'blur(10px)',
-            }}
-          >
-            Todas raridades
-          </Box>
-          {discoveredRarities.map((r) => (
-            <Box
-              key={r.id}
-              onClick={() => setRarity(r.id)}
-              sx={{
-                px: 1.05, py: 0.48, borderRadius: radius.full, cursor: 'pointer', flexShrink: 0,
-                fontSize: '0.7rem', fontWeight: 800,
-                color: rarity === r.id ? r.chipColor : theme.textOnBgMuted,
-                background: rarity === r.id ? r.chipBg : 'rgba(255,255,255,0.42)',
-                border: `1px solid ${rarity === r.id ? r.borderColor : 'rgba(255,255,255,0.54)'}`,
-                backdropFilter: 'blur(10px)',
-              }}
-            >
-              {r.emoji} {r.label}
-            </Box>
-          ))}
-        </Box>
-      )}
-
-      {discoveredTypes.length > 0 && (
-        <Box sx={{ display: 'flex', gap: 0.6, overflowX: 'auto', pb: 0.2, scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
-          <Box
-            onClick={() => setType('all')}
-            sx={{
-              px: 1.05, py: 0.48, borderRadius: radius.full, cursor: 'pointer', flexShrink: 0,
-              fontSize: '0.7rem', fontWeight: 800,
-              color: type === 'all' ? '#fff' : theme.textOnBgMuted,
-              background: type === 'all' ? colors.purple.main : 'rgba(255,255,255,0.42)',
-              border: `1px solid ${type === 'all' ? colors.purple.main : 'rgba(255,255,255,0.54)'}`,
-              backdropFilter: 'blur(10px)',
-            }}
-          >
-            Todos tipos
-          </Box>
-          {discoveredTypes.map((t) => (
-            <Box
-              key={t.id}
-              onClick={() => setType(t.id)}
-              sx={{
-                px: 1.05, py: 0.48, borderRadius: radius.full, cursor: 'pointer', flexShrink: 0,
-                fontSize: '0.7rem', fontWeight: 800,
-                color: type === t.id ? t.tagColor : theme.textOnBgMuted,
-                background: type === t.id ? t.tagBg : 'rgba(255,255,255,0.42)',
-                border: `1px solid ${type === t.id ? `${t.accentColor}66` : 'rgba(255,255,255,0.54)'}`,
-                backdropFilter: 'blur(10px)',
-              }}
-            >
-              {t.emoji} {t.label}
-            </Box>
-          ))}
-        </Box>
-      )}
+        )}
+      </Stack>
 
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mt: 0.2 }}>
         <Box sx={{ display: 'flex', gap: 0.5 }}>
@@ -842,29 +796,134 @@ function AlbumSection({
         </Box>
       </Stack>
 
-      {view === 'folders' && (
-        <Box sx={{ display: 'flex', gap: 0.5 }}>
-          {([
-            { id: 'rarity' as AlbumGroup, label: 'Por raridade' },
-            { id: 'type' as AlbumGroup, label: 'Por tipo' },
-          ]).map((g) => (
-            <Box
-              key={g.id}
-              onClick={() => setGroup(g.id)}
-              sx={{
-                px: 1.05, py: 0.42, borderRadius: radius.full, cursor: 'pointer', flexShrink: 0,
-                fontSize: '0.68rem', fontWeight: 800,
-                color: group === g.id ? '#fff' : theme.textOnBgMuted,
-                background: group === g.id ? colors.purple.main : 'rgba(255,255,255,0.42)',
-                border: `1px solid ${group === g.id ? colors.purple.main : 'rgba(255,255,255,0.54)'}`,
-                backdropFilter: 'blur(10px)',
-              }}
-            >
-              {g.label}
-            </Box>
-          ))}
-        </Box>
-      )}
+      <Dialog
+        open={filterSheetOpen}
+        onClose={() => setFilterSheetOpen(false)}
+        fullWidth
+        maxWidth="sm"
+        slotProps={{ paper: { sx: { borderRadius: `${radius.xl} ${radius.xl} 0 0`, mx: 0, maxWidth: 480, width: '100%', position: 'fixed', bottom: 0, m: 0 } } }}
+      >
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ px: 2.5, pt: 2, pb: 1 }}>
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.1rem', color: colors.text.primary }}>Filtros</Typography>
+          <Stack direction="row" spacing={1} alignItems="center">
+            {activeFilterCount > 0 && (
+              <Box
+                onClick={() => { setRarity('all'); setType('all') }}
+                sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.rose.main, cursor: 'pointer', px: 0.5 }}
+              >
+                Limpar
+              </Box>
+            )}
+            <IconButton size="small" onClick={() => setFilterSheetOpen(false)}><CloseIcon sx={{ fontSize: 18 }} /></IconButton>
+          </Stack>
+        </Stack>
+
+        <DialogContent sx={{ pt: 0.5, pb: 3 }}>
+          <Stack spacing={2}>
+            {discoveredRarities.length > 0 && (
+              <Box>
+                <Typography sx={{ fontSize: '0.72rem', fontWeight: 900, letterSpacing: 0.6, color: colors.text.secondary, textTransform: 'uppercase', mb: 1 }}>
+                  Raridade
+                </Typography>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.7 }}>
+                  <Box
+                    onClick={() => setRarity('all')}
+                    sx={{
+                      px: 1.2, py: 0.55, borderRadius: radius.full, cursor: 'pointer',
+                      fontSize: '0.78rem', fontWeight: 800,
+                      color: rarity === 'all' ? '#fff' : colors.text.secondary,
+                      background: rarity === 'all' ? colors.primary.main : colors.surface.overlay,
+                      border: `1.5px solid ${rarity === 'all' ? colors.primary.main : colors.border.subtle}`,
+                    }}
+                  >
+                    Todas
+                  </Box>
+                  {discoveredRarities.map((r) => (
+                    <Box
+                      key={r.id}
+                      onClick={() => setRarity(rarity === r.id ? 'all' : r.id)}
+                      sx={{
+                        px: 1.2, py: 0.55, borderRadius: radius.full, cursor: 'pointer',
+                        fontSize: '0.78rem', fontWeight: 800,
+                        color: rarity === r.id ? r.chipColor : colors.text.secondary,
+                        background: rarity === r.id ? r.chipBg : colors.surface.overlay,
+                        border: `1.5px solid ${rarity === r.id ? r.borderColor : colors.border.subtle}`,
+                      }}
+                    >
+                      {r.emoji} {r.label}
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+            )}
+
+            {discoveredTypes.length > 0 && (
+              <Box>
+                <Typography sx={{ fontSize: '0.72rem', fontWeight: 900, letterSpacing: 0.6, color: colors.text.secondary, textTransform: 'uppercase', mb: 1 }}>
+                  Tipo
+                </Typography>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.7 }}>
+                  <Box
+                    onClick={() => setType('all')}
+                    sx={{
+                      px: 1.2, py: 0.55, borderRadius: radius.full, cursor: 'pointer',
+                      fontSize: '0.78rem', fontWeight: 800,
+                      color: type === 'all' ? '#fff' : colors.text.secondary,
+                      background: type === 'all' ? colors.purple.main : colors.surface.overlay,
+                      border: `1.5px solid ${type === 'all' ? colors.purple.main : colors.border.subtle}`,
+                    }}
+                  >
+                    Todos
+                  </Box>
+                  {discoveredTypes.map((t) => (
+                    <Box
+                      key={t.id}
+                      onClick={() => setType(type === t.id ? 'all' : t.id)}
+                      sx={{
+                        px: 1.2, py: 0.55, borderRadius: radius.full, cursor: 'pointer',
+                        fontSize: '0.78rem', fontWeight: 800,
+                        color: type === t.id ? t.tagColor : colors.text.secondary,
+                        background: type === t.id ? t.tagBg : colors.surface.overlay,
+                        border: `1.5px solid ${type === t.id ? `${t.accentColor}66` : colors.border.subtle}`,
+                      }}
+                    >
+                      {t.emoji} {t.label}
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+            )}
+
+            {view === 'folders' && (
+              <Box>
+                <Typography sx={{ fontSize: '0.72rem', fontWeight: 900, letterSpacing: 0.6, color: colors.text.secondary, textTransform: 'uppercase', mb: 1 }}>
+                  Agrupamento
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 0.7 }}>
+                  {([
+                    { id: 'rarity' as AlbumGroup, label: 'Por raridade' },
+                    { id: 'type' as AlbumGroup, label: 'Por tipo' },
+                  ]).map((g) => (
+                    <Box
+                      key={g.id}
+                      onClick={() => setGroup(g.id)}
+                      sx={{
+                        px: 1.2, py: 0.55, borderRadius: radius.full, cursor: 'pointer',
+                        fontSize: '0.78rem', fontWeight: 800,
+                        color: group === g.id ? '#fff' : colors.text.secondary,
+                        background: group === g.id ? colors.purple.main : colors.surface.overlay,
+                        border: `1.5px solid ${group === g.id ? colors.purple.main : colors.border.subtle}`,
+                      }}
+                    >
+                      {g.label}
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+            )}
+          </Stack>
+        </DialogContent>
+      </Dialog>
 
       {items.length === 0 ? (
         <Card sx={{ p: 2, textAlign: 'center' }}>
@@ -909,7 +968,7 @@ function AlbumSection({
         </Stack>
       ) : (
         <Stack spacing={1}>
-          <Typography sx={{ fontSize: '0.65rem', fontWeight: 900, letterSpacing: 1.1, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
+          <Typography sx={{ fontSize: '0.72rem', fontWeight: 900, letterSpacing: 1.1, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
             Cartinhas da coleção — {sorted.length}
           </Typography>
           {view === 'grid' ? (
@@ -1158,7 +1217,7 @@ export function CollectionPlayPage() {
             {!isSimulating && displayPlay.total > 0 && displayPlay.items.filter((n) => !n.owned).length > 0 && (
               <Stack spacing={1}>
                 <Box>
-                  <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: 1.2, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
+                  <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 1.2, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
                     Ainda por descobrir — {displayPlay.items.filter((n) => !n.owned).length}
                   </Typography>
                   <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted, mt: 0.3, fontStyle: 'italic' }}>
