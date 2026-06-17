@@ -618,6 +618,26 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
                 : `Soma: ${totalOdds}% — restam ${remaining}%`}
             </Typography>
           </Stack>
+          <Box sx={{ position: 'relative', borderRadius: radius.xl, background: form.cardBg, border: `2px solid ${form.borderColor}`, boxShadow: `${form.shadow}${form.glowColor ? `, 0 0 28px ${form.glowColor}88` : ''}`, p: 2.5, overflow: 'hidden' }}>
+            {form.glowColor && (
+              <Box sx={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse at 50% -10%, ${form.glowColor}33, transparent 65%)`, pointerEvents: 'none' }} />
+            )}
+            <Stack spacing={1.5} sx={{ position: 'relative', zIndex: 1 }}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Chip label={`${form.emoji} ${form.label.toUpperCase()}`} size="small"
+                  sx={{ height: 22, fontSize: '0.73rem', fontWeight: 800, background: form.chipBg, '& .MuiChip-label': { px: 1, ...gradientTextSx(form.chipColor) } }} />
+                <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: form.captionColor }}>
+                  {form.odds % 1 === 0 ? form.odds : form.odds.toFixed(2)}% de chance
+                </Typography>
+              </Stack>
+              <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.1rem', color: form.textColor, lineHeight: 1.25 }}>
+                Exemplo de bilhete ✨
+              </Typography>
+              <Typography sx={{ fontSize: '0.83rem', fontStyle: 'italic', color: form.captionColor, lineHeight: 1.5 }}>
+                "Aqui vai a mensagem especial que o leitor vai receber quando tirar essa raridade."
+              </Typography>
+            </Stack>
+          </Box>
           <ColorRow label="Fundo do card" field="cardBg" value={form.cardBg} onChange={set} />
           <ColorRow label="Cor do texto" field="textColor" value={form.textColor} onChange={set} />
           <ColorRow label="Cor da legenda" field="captionColor" value={form.captionColor} onChange={set} />
@@ -626,13 +646,6 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
           <ColorRow label="Brilho (vazio = sem)" field="glowColor" value={form.glowColor} onChange={set} />
           <ColorRow label="Fundo do chip" field="chipBg" value={form.chipBg} onChange={set} />
           <ColorRow label="Texto do chip" field="chipColor" value={form.chipColor} onChange={set} />
-          <Box sx={{ p: 1.5, borderRadius: radius.lg, background: form.cardBg, border: `1.5px solid ${form.borderColor}`, boxShadow: form.shadow }}>
-            <Stack direction="row" alignItems="center" spacing={0.8}>
-              <Chip label={`${form.emoji} ${form.label.toUpperCase()}`} size="small"
-                sx={{ height: 20, fontSize: '0.72rem', fontWeight: 700, background: form.chipBg, '& .MuiChip-label': { px: 0.9, ...gradientTextSx(form.chipColor) } }} />
-              <Typography sx={{ fontSize: '0.85rem', fontStyle: 'italic', color: form.textColor }}>Pré-visualização</Typography>
-            </Stack>
-          </Box>
         </Stack>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
