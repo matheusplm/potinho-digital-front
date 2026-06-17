@@ -244,7 +244,7 @@ export const api = {
   createCollectionNote: (cid: string, data: NoteFormData) =>
     request<NoteRecord>(`/api/collections/${cid}/notes`, { method: 'POST', body: JSON.stringify(data) }),
   importCollectionNotes: (cid: string, json: string) =>
-    request<{ created: number; items: NoteRecord[] }>(`/api/collections/${cid}/notes/import`, {
+    request<{ created: number; skipped: number; items: NoteRecord[] }>(`/api/collections/${cid}/notes/import`, {
       method: 'POST',
       body: JSON.stringify({ json }),
     }),

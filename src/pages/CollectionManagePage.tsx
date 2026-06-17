@@ -1629,7 +1629,12 @@ export function CollectionManagePage() {
 
     try {
       const result = await importNotes.mutateAsync(importJson)
-      toast.success(`${result.created} bilhete${result.created !== 1 ? 's' : ''} importado${result.created !== 1 ? 's' : ''}.`)
+      const msg = result.created === 0
+        ? `Nenhum bilhete novo — ${result.skipped} já existia${result.skipped !== 1 ? 'm' : ''}.`
+        : result.skipped > 0
+          ? `${result.created} importado${result.created !== 1 ? 's' : ''}, ${result.skipped} ignorado${result.skipped !== 1 ? 's' : ''} (título duplicado).`
+          : `${result.created} bilhete${result.created !== 1 ? 's' : ''} importado${result.created !== 1 ? 's' : ''}.`
+      toast.success(msg)
       setImportDialogOpen(false)
     } catch (error) {
       toast.error((error as Error).message || 'Erro ao importar bilhetes.')
