@@ -86,7 +86,6 @@ export interface CollectionPack {
   distribution: CollectionPackDistribution
   cardsPerOpen: number
   cooldownHours: number | null
-  maxOpensPerUser: number | null
   allowedTypeIds: string[]
   allowedRarityIds: string[]
   guaranteedRarityId: string | null

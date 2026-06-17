@@ -184,7 +184,6 @@ const PACK_TEMPLATES: CollectionPackFormData[] = [
     description: 'O pacote padrão da coleção, liberado automaticamente por tempo.',
     cardsPerOpen: 1,
     cooldownHours: 24,
-    maxOpensPerUser: null,
     distribution: 'all_with_access',
     status: 'active',
     category: 'daily',
@@ -202,7 +201,6 @@ const PACK_TEMPLATES: CollectionPackFormData[] = [
     description: 'Liberado todo dia no mesmo horário. Slots acumulam se não forem abertos.',
     cardsPerOpen: 1,
     cooldownHours: null,
-    maxOpensPerUser: null,
     distribution: 'all_with_access',
     status: 'active',
     category: 'daily',
@@ -224,7 +222,6 @@ const PACK_TEMPLATES: CollectionPackFormData[] = [
     description: 'Exemplo de pacote temático filtrando apenas um tipo de bilhete.',
     cardsPerOpen: 4,
     cooldownHours: 168,
-    maxOpensPerUser: 1,
     distribution: 'manual_bonus',
     status: 'draft',
     category: 'thematic',
@@ -242,7 +239,6 @@ const PACK_TEMPLATES: CollectionPackFormData[] = [
     description: 'Exemplo de pacote especial para eventos, datas e recompensas raras.',
     cardsPerOpen: 3,
     cooldownHours: null,
-    maxOpensPerUser: 1,
     distribution: 'selected_readers',
     status: 'draft',
     category: 'guaranteed',
@@ -260,7 +256,6 @@ const PACK_TEMPLATES: CollectionPackFormData[] = [
     description: 'Pacotinho emocional para bilhetes de saudade e carinho.',
     cardsPerOpen: 2,
     cooldownHours: 12,
-    maxOpensPerUser: null,
     distribution: 'all_with_access',
     status: 'draft',
     category: 'thematic',
@@ -278,7 +273,6 @@ const PACK_TEMPLATES: CollectionPackFormData[] = [
     description: 'Um bônus rápido liberado manualmente pelo criador.',
     cardsPerOpen: 1,
     cooldownHours: null,
-    maxOpensPerUser: 1,
     distribution: 'manual_bonus',
     status: 'active',
     category: 'bonus',
@@ -296,7 +290,6 @@ const PACK_TEMPLATES: CollectionPackFormData[] = [
     description: 'Template para aniversário, datas especiais ou coleções sazonais.',
     cardsPerOpen: 5,
     cooldownHours: null,
-    maxOpensPerUser: 1,
     distribution: 'all_with_access',
     status: 'draft',
     category: 'bonus',
@@ -808,7 +801,6 @@ function PackEditor({ cid, pack, rarities, types, onClose }: {
     distribution: pack.distribution,
     cardsPerOpen: pack.cardsPerOpen,
     cooldownHours: pack.cooldownHours,
-    maxOpensPerUser: pack.maxOpensPerUser,
     allowedTypeIds: pack.allowedTypeIds,
     allowedRarityIds: pack.allowedRarityIds,
     guaranteedRarityId: pack.guaranteedRarityId,
@@ -918,9 +910,6 @@ function PackEditor({ cid, pack, rarities, types, onClose }: {
 
           <Stack direction="row" spacing={1.5}>
             <Input label="Cartas" type="number" value={form.cardsPerOpen} onChange={(e) => set('cardsPerOpen', Number(e.target.value))} sx={{ flex: 1 }} />
-            {form.distribution === 'all_with_access' && (
-              <Input label="Máx. por pessoa" type="number" value={form.maxOpensPerUser ?? ''} onChange={(e) => set('maxOpensPerUser', e.target.value === '' ? null : Number(e.target.value))} sx={{ flex: 1 }} />
-            )}
           </Stack>
 
           <Box>
@@ -1073,12 +1062,10 @@ function formatCooldown(hours: number | null) {
 }
 
 function buildPackRules(pack: CollectionPack) {
-  const isManual = pack.distribution === 'manual_bonus' || pack.distribution === 'selected_readers'
   return [
     pack.allowedTypeIds.length > 0 ? `${pack.allowedTypeIds.length} tipo${pack.allowedTypeIds.length === 1 ? '' : 's'} permitido${pack.allowedTypeIds.length === 1 ? '' : 's'}` : 'Todos os tipos',
     pack.allowedRarityIds.length > 0 ? `${pack.allowedRarityIds.length} raridade${pack.allowedRarityIds.length === 1 ? '' : 's'} permitida${pack.allowedRarityIds.length === 1 ? '' : 's'}` : 'Todas as raridades',
     pack.guaranteedRarityId ? `Garante ${pack.guaranteedRarityId}` : 'Sem garantia fixa',
-    ...(!isManual ? [pack.maxOpensPerUser ? `${pack.maxOpensPerUser} abertura${pack.maxOpensPerUser === 1 ? '' : 's'} por pessoa` : 'Sem limite por pessoa'] : []),
   ]
 }
 

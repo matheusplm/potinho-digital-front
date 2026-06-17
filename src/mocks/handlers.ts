@@ -129,9 +129,6 @@ function computePackReaderStatus(collection: CollectionState, pack: CollectionPa
       exhausted: false,
     }
   }
-  if (pack.maxOpensPerUser !== null && packOpen && packOpen.totalOpens >= pack.maxOpensPerUser) {
-    return { canOpen: false, availableAt: '', nextAvailableAt: '', exhausted: true }
-  }
   if (pack.cooldownHours && packOpen?.lastOpenAt) {
     const availableAt = new Date(new Date(packOpen.lastOpenAt).getTime() + pack.cooldownHours * 3_600_000)
     if (availableAt > now) {
@@ -411,9 +408,6 @@ const collectionHandlers = [
         const availableAt = new Date(new Date(packOpen.lastOpenAt).getTime() + pack.cooldownHours * 3_600_000).toISOString()
         return HttpResponse.json({ message: 'Pacotinho ainda em cooldown.', availableAt }, { status: 429 })
       }
-    }
-    if (pack.maxOpensPerUser !== null && packOpen && packOpen.totalOpens >= pack.maxOpensPerUser) {
-      return HttpResponse.json({ error: 'PACK_LIMIT_REACHED', message: 'Você já abriu o máximo permitido deste pacotinho.' }, { status: 409 })
     }
     const eligible = collection.notes.filter((note) =>
       (pack.allowedTypeIds.length === 0 || pack.allowedTypeIds.includes(note.typeId)) &&
