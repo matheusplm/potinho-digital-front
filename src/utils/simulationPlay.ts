@@ -7,7 +7,8 @@ function pickRandom<T>(items: T[]) {
 function pickWeightedNote(notes: NoteRecord[], rarities: RarityConfig[]) {
   const availableRarities = rarities
     .filter((rarity) => notes.some((note) => note.rarity === rarity.id))
-    .map((rarity) => ({ ...rarity, weight: rarity.odds > 0 ? rarity.odds * 10 : 1 }))
+    .filter((rarity) => rarity.odds > 0)
+    .map((rarity) => ({ ...rarity, weight: rarity.odds * 10 }))
 
   const totalWeight = availableRarities.reduce((sum, rarity) => sum + rarity.weight, 0)
   if (availableRarities.length === 0 || totalWeight <= 0) return pickRandom(notes)
