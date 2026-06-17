@@ -80,6 +80,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
             ...current,
             name: profile.name,
             role: profile.role as UserRole,
+            email: profile.email,
             token: current.token,
           }
           localStorage.setItem(STORAGE_KEY, JSON.stringify(merged))

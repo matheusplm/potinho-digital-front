@@ -46,7 +46,6 @@ const FRIENDLY_ERROR_MESSAGES: Record<string, string> = {
   PACK_NOT_ALLOWED: 'Este pacotinho não está liberado para você.',
   INVALID_CREDENTIALS: 'Email ou senha incorretos.',
   EMAIL_ALREADY_EXISTS: 'Este email já está cadastrado.',
-  INVALID_INVITE_CODE: 'Código de convite inválido.',
   UNAUTHORIZED: 'Sessão expirada. Faça login novamente.',
   FORBIDDEN: 'Você não tem permissão para esta ação.',
   NOT_FOUND: 'Recurso não encontrado.',
