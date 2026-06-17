@@ -138,91 +138,169 @@ function rarityCardSx(r?: RarityConfig, compact = false) {
   }
 }
 
-export function RewardCard({ reward, rarities, types, onClick }: { reward: CollectionDailyReward; rarities: RarityConfig[]; types: NoteTypeConfig[]; onClick?: () => void }) {
+export type { NoteImageLayout as ImageLayout } from '../types/note'
+import type { NoteImageLayout } from '../types/note'
+
+const IMG_SX = { width: '100%', height: '100%', objectFit: 'cover' as const, display: 'block' }
+
+function CardChips({ r, isNew }: { r?: RarityConfig; isNew: boolean }) {
+  return (
+    <Stack direction="row" justifyContent="space-between" alignItems="center">
+      {r && (
+        <Chip size="small" label={`${r.emoji} ${r.label}`} sx={{
+          fontSize: '0.7rem', fontWeight: 800, height: 22, background: r.chipBg,
+          border: `1px solid ${r.borderColor}`, '& .MuiChip-label': { px: 1, ...gradientTextSx(r.chipColor) },
+        }} />
+      )}
+      {isNew && (
+        <Chip size="small" label="✨ Novo!" sx={{
+          fontSize: '0.68rem', fontWeight: 800, height: 22, bgcolor: '#dcfce7', color: '#15803d',
+          '& .MuiChip-label': { px: 1 },
+        }} />
+      )}
+    </Stack>
+  )
+}
+
+function CardTextBox({ title, message, children }: { title: string; message: string; children?: React.ReactNode }) {
+  return (
+    <Box sx={{ p: 1.15, borderRadius: radius.lg, background: 'rgba(255,255,255,0.68)', border: '1px solid rgba(255,255,255,0.58)', backdropFilter: 'blur(8px)', minWidth: 0 }}>
+      {children}
+      <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.2rem', color: colors.text.primary, lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+        {title}
+      </Typography>
+      <Typography sx={{ mt: 0.75, fontSize: '0.9rem', color: colors.text.secondary, lineHeight: 1.65, fontStyle: 'italic', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+        &ldquo;{message}&rdquo;
+      </Typography>
+    </Box>
+  )
+}
+
+function CardTag({ t }: { t?: NoteTypeConfig }) {
+  if (!t) return null
+  return (
+    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, px: 1, py: 0.3, borderRadius: radius.full, background: t.tagBg, color: t.tagColor, fontSize: '0.68rem', fontWeight: 700, alignSelf: 'flex-start' }}>
+      {t.emoji} {t.label}
+    </Box>
+  )
+}
+
+export function RewardCard({ reward, rarities, types, onClick, imageLayout: imageLayoutProp }: { reward: CollectionDailyReward; rarities: RarityConfig[]; types: NoteTypeConfig[]; onClick?: () => void; imageLayout?: NoteImageLayout }) {
   const r = rarities.find((x) => x.id === reward.rarity)
   const t = types.find((x) => x.id === reward.typeId)
+  const img = reward.imageUrl
+  const imageLayout: NoteImageLayout = imageLayoutProp ?? reward.imageLayout ?? 'banner'
 
-  return (
-    <Box onClick={onClick} sx={{
-      ...rarityCardSx(r),
-      animation: `${cardIn} 0.55s cubic-bezier(0.16,1,0.3,1)`,
-      cursor: onClick ? 'pointer' : 'default',
-    }}>
-      <Stack spacing={1.5} sx={{ position: 'relative', zIndex: 1 }}>
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
-          {r && (
-            <Chip size="small" label={`${r.emoji} ${r.label}`} sx={{
-              fontSize: '0.7rem', fontWeight: 800, height: 22,
-              background: r.chipBg,
-              border: `1px solid ${r.borderColor}`,
-              '& .MuiChip-label': { px: 1, ...gradientTextSx(r.chipColor) },
-            }} />
-          )}
-          {reward.isNew && (
-            <Chip size="small" label="✨ Novo!" sx={{
-              fontSize: '0.68rem', fontWeight: 800, height: 22,
-              bgcolor: '#dcfce7', color: '#15803d',
-              '& .MuiChip-label': { px: 1 },
-            }} />
-          )}
-        </Stack>
+  // ── layouts imersivos que mudam a estrutura toda ──────────────────────────
 
-        {reward.imageUrl ? (
-          <Box sx={{ borderRadius: radius.lg, overflow: 'hidden', width: '100%', aspectRatio: '16/9', background: 'rgba(0,0,0,0.08)' }}>
-            <Box component="img" src={reward.imageUrl} alt={reward.title} sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-          </Box>
-        ) : (
-          <Box sx={{ borderRadius: radius.lg, width: '100%', aspectRatio: '16/9', background: 'rgba(255,255,255,0.32)', border: '2px dashed rgba(0,0,0,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Typography sx={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.25)', fontWeight: 600 }}>sem imagem</Typography>
-          </Box>
-        )}
-
-        <Box sx={{
-          p: 1.15,
-          borderRadius: radius.lg,
-          background: 'rgba(255,255,255,0.68)',
-          border: '1px solid rgba(255,255,255,0.58)',
-          backdropFilter: 'blur(8px)',
-          minWidth: 0,
-        }}>
-          <Typography sx={{
-            fontFamily: font.serif, fontWeight: 700, fontSize: '1.2rem',
-            color: colors.text.primary, lineHeight: 1.3,
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            overflowWrap: 'anywhere',
-            wordBreak: 'break-word',
-          }}>
-            {reward.title}
-          </Typography>
-
-          <Typography sx={{
-            mt: 0.75,
-            fontSize: '0.9rem', color: colors.text.secondary,
-            lineHeight: 1.65, fontStyle: 'italic',
-            display: '-webkit-box',
-            WebkitLineClamp: 3,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            overflowWrap: 'anywhere',
-            wordBreak: 'break-word',
-          }}>
+  if (img && imageLayout === 'hero-overlay') {
+    return (
+      <Box onClick={onClick} sx={{ ...rarityCardSx(r), animation: `${cardIn} 0.55s cubic-bezier(0.16,1,0.3,1)`, cursor: onClick ? 'pointer' : 'default', p: 0, overflow: 'hidden', position: 'relative' }}>
+        <Box sx={{ position: 'relative', width: '100%', height: 220 }}>
+          <Box component="img" src={img} alt={reward.title} sx={{ ...IMG_SX, position: 'absolute', inset: 0 }} />
+          <Box sx={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)' }} />
+          <Stack spacing={0.8} sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, p: 2 }}>
+            <CardChips r={r} isNew={reward.isNew} />
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.25rem', color: '#fff', lineHeight: 1.25, textShadow: '0 1px 6px rgba(0,0,0,0.5)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+              {reward.title}
+            </Typography>
+          </Stack>
+        </Box>
+        <Stack spacing={1} sx={{ p: 2, position: 'relative', zIndex: 1 }}>
+          <Typography sx={{ fontSize: '0.9rem', color: colors.text.secondary, lineHeight: 1.65, fontStyle: 'italic', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
             &ldquo;{reward.message}&rdquo;
           </Typography>
-        </Box>
+          <CardTag t={t} />
+        </Stack>
+      </Box>
+    )
+  }
 
-        {t && (
-          <Box sx={{
-            display: 'inline-flex', alignItems: 'center', gap: 0.5,
-            px: 1, py: 0.3, borderRadius: radius.full,
-            background: t.tagBg, color: t.tagColor,
-            fontSize: '0.68rem', fontWeight: 700, alignSelf: 'flex-start',
-          }}>
-            {t.emoji} {t.label}
+  if (img && imageLayout === 'bg-blur') {
+    return (
+      <Box onClick={onClick} sx={{ ...rarityCardSx(r), animation: `${cardIn} 0.55s cubic-bezier(0.16,1,0.3,1)`, cursor: onClick ? 'pointer' : 'default', position: 'relative', overflow: 'hidden' }}>
+        <Box component="img" src={img} alt={reward.title} sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'blur(18px) brightness(0.55) saturate(1.4)', transform: 'scale(1.1)', zIndex: 0 }} />
+        <Box sx={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.22)', zIndex: 0 }} />
+        <Stack spacing={1.5} sx={{ position: 'relative', zIndex: 1 }}>
+          <CardChips r={r} isNew={reward.isNew} />
+          <Box sx={{ p: 1.15, borderRadius: radius.lg, background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.7)' }}>
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.2rem', color: colors.text.primary, lineHeight: 1.3 }}>{reward.title}</Typography>
+            <Typography sx={{ mt: 0.75, fontSize: '0.9rem', color: colors.text.secondary, lineHeight: 1.65, fontStyle: 'italic' }}>&ldquo;{reward.message}&rdquo;</Typography>
+          </Box>
+          <CardTag t={t} />
+        </Stack>
+      </Box>
+    )
+  }
+
+  if (img && imageLayout === 'split') {
+    return (
+      <Box onClick={onClick} sx={{ ...rarityCardSx(r), animation: `${cardIn} 0.55s cubic-bezier(0.16,1,0.3,1)`, cursor: onClick ? 'pointer' : 'default', p: 0, overflow: 'hidden' }}>
+        <Box sx={{ width: '100%', height: 130, overflow: 'hidden' }}>
+          <Box component="img" src={img} alt={reward.title} sx={{ ...IMG_SX }} />
+        </Box>
+        <Stack spacing={1.5} sx={{ p: 2, position: 'relative', zIndex: 1 }}>
+          <CardChips r={r} isNew={reward.isNew} />
+          <CardTextBox title={reward.title} message={reward.message} />
+          <CardTag t={t} />
+        </Stack>
+      </Box>
+    )
+  }
+
+  if (img && imageLayout === 'stripe-left') {
+    return (
+      <Box onClick={onClick} sx={{ ...rarityCardSx(r), animation: `${cardIn} 0.55s cubic-bezier(0.16,1,0.3,1)`, cursor: onClick ? 'pointer' : 'default', p: 0, overflow: 'hidden' }}>
+        <Stack direction="row" sx={{ minHeight: 140 }}>
+          <Box sx={{ width: 90, flexShrink: 0, overflow: 'hidden' }}>
+            <Box component="img" src={img} alt={reward.title} sx={{ ...IMG_SX, height: '100%' }} />
+          </Box>
+          <Stack spacing={1.2} sx={{ flex: 1, p: 1.8, minWidth: 0 }}>
+            <CardChips r={r} isNew={reward.isNew} />
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.05rem', color: colors.text.primary, lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{reward.title}</Typography>
+            <Typography sx={{ fontSize: '0.82rem', color: colors.text.secondary, lineHeight: 1.55, fontStyle: 'italic', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>&ldquo;{reward.message}&rdquo;</Typography>
+            <CardTag t={t} />
+          </Stack>
+        </Stack>
+      </Box>
+    )
+  }
+
+  // ── banner / thumb / circle (card padrão) ───────────────────────────────
+  const isThumb = imageLayout === 'thumb-left' || imageLayout === 'thumb-right' || imageLayout === 'circle-left' || imageLayout === 'circle-right'
+
+  return (
+    <Box onClick={onClick} sx={{ ...rarityCardSx(r), animation: `${cardIn} 0.55s cubic-bezier(0.16,1,0.3,1)`, cursor: onClick ? 'pointer' : 'default', position: 'relative' }}>
+      <Stack spacing={1.5} sx={{ position: 'relative', zIndex: 1 }}>
+        <CardChips r={r} isNew={reward.isNew} />
+
+        {img && imageLayout === 'banner' && (
+          <Box sx={{ borderRadius: radius.lg, overflow: 'hidden', width: '100%', height: 110 }}>
+            <Box component="img" src={img} alt={reward.title} sx={IMG_SX} />
           </Box>
         )}
+
+        {isThumb && img ? (
+          <Box sx={{ p: 1.15, borderRadius: radius.lg, background: 'rgba(255,255,255,0.68)', border: '1px solid rgba(255,255,255,0.58)', backdropFilter: 'blur(8px)', minWidth: 0 }}>
+            <Stack direction={imageLayout.endsWith('right') ? 'row-reverse' : 'row'} spacing={1.2} alignItems="flex-start">
+              <Box sx={{ flexShrink: 0, width: imageLayout.startsWith('circle') ? 56 : 64, height: imageLayout.startsWith('circle') ? 56 : 64, borderRadius: imageLayout.startsWith('circle') ? '50%' : radius.md, overflow: 'hidden' }}>
+                <Box component="img" src={img} alt={reward.title} sx={IMG_SX} />
+              </Box>
+              <Box sx={{ minWidth: 0, flex: 1 }}>
+                <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.05rem', color: colors.text.primary, lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                  {reward.title}
+                </Typography>
+                <Typography sx={{ mt: 0.5, fontSize: '0.83rem', color: colors.text.secondary, lineHeight: 1.55, fontStyle: 'italic', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                  &ldquo;{reward.message}&rdquo;
+                </Typography>
+              </Box>
+            </Stack>
+          </Box>
+        ) : (
+          <CardTextBox title={reward.title} message={reward.message} />
+        )}
+
+        <CardTag t={t} />
       </Stack>
     </Box>
   )

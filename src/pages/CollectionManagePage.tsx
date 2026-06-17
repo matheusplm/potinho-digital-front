@@ -120,7 +120,19 @@ const ACHIEVEMENT_PRESETS: { emoji: string; label: string; description: string; 
   { emoji: '❤️', label: 'Coração cheio', description: 'Favoritou 5 bilhetes.', conditionType: 'favorite_count', count: 5 },
 ]
 
-const EMPTY_NOTE: NoteFormData = { title: '', message: '', rarity: '', typeId: '', imageUrl: null }
+const EMPTY_NOTE: NoteFormData = { title: '', message: '', rarity: '', typeId: '', imageUrl: null, imageLayout: null }
+
+const IMAGE_LAYOUTS: { value: import('../types/note').NoteImageLayout; label: string }[] = [
+  { value: 'banner', label: 'Banner' },
+  { value: 'thumb-left', label: 'Thumb esq' },
+  { value: 'thumb-right', label: 'Thumb dir' },
+  { value: 'circle-left', label: 'Círculo esq' },
+  { value: 'circle-right', label: 'Círculo dir' },
+  { value: 'split', label: 'Split' },
+  { value: 'stripe-left', label: 'Stripe' },
+  { value: 'hero-overlay', label: 'Hero' },
+  { value: 'bg-blur', label: 'Blur' },
+]
 const DEFAULT_IMPORT_JSON = `[
   {
     "title": "Seu título aqui",
@@ -430,7 +442,7 @@ function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
 
   useEffect(() => {
     if (!open) return
-    setForm(editing ? { title: editing.title, message: editing.message, rarity: editing.rarity, typeId: editing.typeId, imageUrl: editing.imageUrl ?? null } : EMPTY_NOTE)
+    setForm(editing ? { title: editing.title, message: editing.message, rarity: editing.rarity, typeId: editing.typeId, imageUrl: editing.imageUrl ?? null, imageLayout: editing.imageLayout ?? null } : EMPTY_NOTE)
     setTouched({ title: false, message: false, rarity: false, typeId: false })
   }, [open, editing])
 
@@ -537,9 +549,27 @@ function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
             <Input
               placeholder="https://exemplo.com/imagem.jpg"
               value={form.imageUrl ?? ''}
-              onChange={(e) => setForm((f) => ({ ...f, imageUrl: e.target.value.trim() || null }))}
+              onChange={(e) => setForm((f) => ({ ...f, imageUrl: e.target.value.trim() || null, imageLayout: e.target.value.trim() ? (f.imageLayout ?? 'banner') : null }))}
             />
           </Box>
+          {form.imageUrl && (
+            <Box>
+              <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.secondary, mb: 0.8 }}>Layout da imagem</Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
+                {IMAGE_LAYOUTS.map((opt) => (
+                  <Box key={opt.value} onClick={() => setForm((f) => ({ ...f, imageLayout: opt.value }))} sx={{
+                    px: 1.4, py: 0.5, borderRadius: radius.full, cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700,
+                    background: form.imageLayout === opt.value ? colors.primary.main : 'rgba(0,0,0,0.05)',
+                    color: form.imageLayout === opt.value ? '#fff' : colors.text.secondary,
+                    border: `1.5px solid ${form.imageLayout === opt.value ? colors.primary.main : 'transparent'}`,
+                    transition: 'all 0.15s',
+                  }}>
+                    {opt.label}
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+          )}
         </Stack>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
