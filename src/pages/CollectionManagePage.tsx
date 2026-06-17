@@ -172,6 +172,10 @@ const NEW_TYPE: NoteTypeConfig = {
   accentColor: '#6366f1', tagBg: '#eef2ff', tagColor: '#4f46e5',
 }
 
+const PACK_DEFAULT_SCHEDULE: Pick<CollectionPackFormData, 'scheduleMode' | 'scheduleTime' | 'scheduleTimezone' | 'cumulative' | 'maxAccumulated'> = {
+  scheduleMode: 'cooldown', scheduleTime: null, scheduleTimezone: 'America/Sao_Paulo', cumulative: false, maxAccumulated: 3,
+}
+
 const PACK_TEMPLATES: CollectionPackFormData[] = [
   {
     id: 'daily',
@@ -189,6 +193,29 @@ const PACK_TEMPLATES: CollectionPackFormData[] = [
     guaranteedRarityId: null,
     gradient: 'linear-gradient(135deg,#fff1f2,#ffe4e6,#fbcfe8)',
     accent: '#e11d48',
+    ...PACK_DEFAULT_SCHEDULE,
+  },
+  {
+    id: 'daily_fixed',
+    name: 'Diário hora fixa',
+    emoji: '⏰',
+    description: 'Liberado todo dia no mesmo horário. Slots acumulam se não forem abertos.',
+    cardsPerOpen: 1,
+    cooldownHours: null,
+    maxOpensPerUser: null,
+    distribution: 'all_with_access',
+    status: 'active',
+    category: 'daily',
+    allowedTypeIds: [],
+    allowedRarityIds: [],
+    guaranteedRarityId: null,
+    gradient: 'linear-gradient(135deg,#fff1f2,#ffe4e6,#fbcfe8)',
+    accent: '#e11d48',
+    scheduleMode: 'fixed_time',
+    scheduleTime: '06:00',
+    scheduleTimezone: 'America/Sao_Paulo',
+    cumulative: true,
+    maxAccumulated: 3,
   },
   {
     id: 'sentimental',
@@ -206,6 +233,7 @@ const PACK_TEMPLATES: CollectionPackFormData[] = [
     guaranteedRarityId: null,
     gradient: 'linear-gradient(135deg,#eef2ff,#e0e7ff,#f5d0fe)',
     accent: '#6366f1',
+    ...PACK_DEFAULT_SCHEDULE,
   },
   {
     id: 'legendary',
@@ -223,6 +251,7 @@ const PACK_TEMPLATES: CollectionPackFormData[] = [
     guaranteedRarityId: null,
     gradient: 'linear-gradient(135deg,#fff7ed,#fed7aa,#fde68a)',
     accent: '#f97316',
+    ...PACK_DEFAULT_SCHEDULE,
   },
   {
     id: 'saudade',
@@ -240,6 +269,7 @@ const PACK_TEMPLATES: CollectionPackFormData[] = [
     guaranteedRarityId: null,
     gradient: 'linear-gradient(135deg,#eef2ff,#c7d2fe,#e0e7ff)',
     accent: '#4f46e5',
+    ...PACK_DEFAULT_SCHEDULE,
   },
   {
     id: 'surpresa',
@@ -257,6 +287,7 @@ const PACK_TEMPLATES: CollectionPackFormData[] = [
     guaranteedRarityId: null,
     gradient: 'linear-gradient(135deg,#fefce8,#fef3c7,#fde68a)',
     accent: '#eab308',
+    ...PACK_DEFAULT_SCHEDULE,
   },
   {
     id: 'evento',
@@ -274,6 +305,7 @@ const PACK_TEMPLATES: CollectionPackFormData[] = [
     guaranteedRarityId: null,
     gradient: 'linear-gradient(135deg,#ecfeff,#cffafe,#f0abfc)',
     accent: '#06b6d4',
+    ...PACK_DEFAULT_SCHEDULE,
   },
 ]
 
@@ -782,6 +814,11 @@ function PackEditor({ cid, pack, rarities, types, onClose }: {
     guaranteedRarityId: pack.guaranteedRarityId,
     gradient: pack.gradient,
     accent: pack.accent,
+    scheduleMode: pack.scheduleMode ?? 'cooldown',
+    scheduleTime: pack.scheduleTime ?? null,
+    scheduleTimezone: pack.scheduleTimezone ?? 'America/Sao_Paulo',
+    cumulative: pack.cumulative ?? false,
+    maxAccumulated: pack.maxAccumulated ?? 3,
   } : { ...PACK_TEMPLATES[0] })
   const createMutation = useCreateCollectionPackMutation(cid)
   const updateMutation = useUpdateCollectionPackMutation(cid)
@@ -881,11 +918,67 @@ function PackEditor({ cid, pack, rarities, types, onClose }: {
 
           <Stack direction="row" spacing={1.5}>
             <Input label="Cartas" type="number" value={form.cardsPerOpen} onChange={(e) => set('cardsPerOpen', Number(e.target.value))} sx={{ flex: 1 }} />
-            <Input label="Cooldown h" type="number" value={form.cooldownHours ?? ''} onChange={(e) => set('cooldownHours', e.target.value === '' ? null : Number(e.target.value))} sx={{ flex: 1 }} />
             {form.distribution === 'all_with_access' && (
               <Input label="Máx. por pessoa" type="number" value={form.maxOpensPerUser ?? ''} onChange={(e) => set('maxOpensPerUser', e.target.value === '' ? null : Number(e.target.value))} sx={{ flex: 1 }} />
             )}
           </Stack>
+
+          <Box>
+            <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: colors.text.secondary, mb: 0.8 }}>Disponibilidade</Typography>
+            <Stack spacing={1.2}>
+              <Box sx={{ display: 'flex', gap: 0.7 }}>
+                {([['cooldown', '⏱ Cooldown'], ['fixed_time', '🕐 Hora fixa']] as const).map(([mode, label]) => (
+                  <Box key={mode} onClick={() => set('scheduleMode', mode)} sx={{
+                    flex: 1, px: 1, py: 0.85, borderRadius: radius.lg, cursor: 'pointer', textAlign: 'center',
+                    fontSize: '0.75rem', fontWeight: 800,
+                    background: form.scheduleMode === mode ? colors.primary.main : 'rgba(0,0,0,0.04)',
+                    color: form.scheduleMode === mode ? '#fff' : colors.text.secondary,
+                    border: `1.5px solid ${form.scheduleMode === mode ? colors.primary.main : colors.border.subtle}`,
+                    transition: 'all 0.14s',
+                  }}>{label}</Box>
+                ))}
+              </Box>
+              {form.scheduleMode === 'cooldown' && (
+                <Input label="Cooldown (horas)" type="number" value={form.cooldownHours ?? ''} onChange={(e) => set('cooldownHours', e.target.value === '' ? null : Number(e.target.value))} inputProps={{ min: 1, max: 8760 }} />
+              )}
+              {form.scheduleMode === 'fixed_time' && (
+                <Stack spacing={1}>
+                  <Stack direction="row" spacing={1.5}>
+                    <Input
+                      label="Horário (BRT)"
+                      type="time"
+                      value={form.scheduleTime ?? '06:00'}
+                      onChange={(e) => set('scheduleTime', e.target.value || null)}
+                      sx={{ flex: 1 }}
+                      inputProps={{ step: 60 }}
+                    />
+                  </Stack>
+                  <Stack direction="row" spacing={1} alignItems="center" sx={{ px: 0.5, py: 0.5, cursor: 'pointer' }} onClick={() => set('cumulative', !form.cumulative)}>
+                    <Box sx={{
+                      width: 18, height: 18, borderRadius: 4, border: `2px solid ${form.cumulative ? colors.primary.main : colors.border.medium}`,
+                      background: form.cumulative ? colors.primary.main : 'transparent',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.14s',
+                    }}>
+                      {form.cumulative && <Box component="span" sx={{ color: '#fff', fontSize: '0.65rem', lineHeight: 1, fontWeight: 900 }}>✓</Box>}
+                    </Box>
+                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: colors.text.primary, userSelect: 'none' }}>
+                      Acumular slots não abertos
+                    </Typography>
+                  </Stack>
+                  {form.cumulative && (
+                    <Input
+                      label="Máximo acumulado"
+                      type="number"
+                      value={form.maxAccumulated}
+                      onChange={(e) => set('maxAccumulated', Math.max(1, Number(e.target.value) || 1))}
+                      inputProps={{ min: 1, max: 30 }}
+                      sx={{ width: 160 }}
+                    />
+                  )}
+                </Stack>
+              )}
+            </Stack>
+          </Box>
 
           <Box>
             <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: colors.text.secondary, mb: 0.8 }}>Categoria</Typography>
@@ -965,6 +1058,11 @@ function PackEditor({ cid, pack, rarities, types, onClose }: {
       </DialogActions>
     </>
   )
+}
+
+function formatPackSchedule(pack: { scheduleMode?: string; scheduleTime?: string | null; cooldownHours?: number | null; cumulative?: boolean }) {
+  if (pack.scheduleMode === 'fixed_time') return `⏰ ${pack.scheduleTime ?? '06:00'}${pack.cumulative ? ' (acum.)' : ''}`
+  return formatCooldown(pack.cooldownHours ?? null)
 }
 
 function formatCooldown(hours: number | null) {
@@ -1130,7 +1228,7 @@ function PackPreviewCard({ pack, view, onEdit, onDelete, onSimulate, onSetPrimar
         <Box sx={{ display: 'grid', gridTemplateColumns: compact ? '1fr' : 'repeat(3, 1fr)', gap: 0.8, mb: compact ? 1 : 1.2 }}>
           {[
             ['Cartas', `${pack.cardsPerOpen}`],
-            ['Cooldown', formatCooldown(pack.cooldownHours)],
+            ['Disponib.', formatPackSchedule(pack)],
             ['Distribuição', PACK_DISTRIBUTION_LABELS[pack.distribution]],
           ].map(([label, value]) => (
             <Box key={label} sx={{

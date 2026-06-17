@@ -73,6 +73,7 @@ export interface NoteTypeConfig {
 export type CollectionPackCategory = 'daily' | 'bonus' | 'guaranteed' | 'thematic'
 export type CollectionPackDistribution = 'all_with_access' | 'manual_bonus' | 'selected_readers'
 export type CollectionPackStatus = 'active' | 'draft' | 'disabled'
+export type CollectionPackScheduleMode = 'cooldown' | 'fixed_time'
 
 export interface CollectionPack {
   id: string
@@ -91,6 +92,11 @@ export interface CollectionPack {
   guaranteedRarityId: string | null
   gradient: string
   accent: string
+  scheduleMode: CollectionPackScheduleMode
+  scheduleTime: string | null
+  scheduleTimezone: string
+  cumulative: boolean
+  maxAccumulated: number
   createdAt?: string
   updatedAt?: string
   readerStatus?: CollectionPackReaderStatus
@@ -132,7 +138,8 @@ export interface DailyNoteOpenResponse {
 
 export interface PackStatusResponse {
   canOpen: boolean
-  remainingOpensToday: number
+  availableCount: number
+  remainingOpensToday?: number
   nextAvailableAt: string
   serverTime: string
   exhausted?: boolean
@@ -188,6 +195,7 @@ export interface CollectionAccess {
 export interface CollectionDailyStatus {
   canOpen: boolean
   availableAt: string
+  availableCount?: number
   serverTime: string
 }
 
