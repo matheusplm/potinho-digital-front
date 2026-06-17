@@ -597,7 +597,7 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
                     <Chip label={`${template.emoji} ${template.label}`} size="small"
                       sx={{ height: 21, fontSize: '0.72rem', fontWeight: 800, background: template.chipBg, '& .MuiChip-label': { px: 0.8, ...gradientTextSx(template.chipColor) } }} />
                     <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: template.captionColor }}>
-                      {template.odds}%
+                      {template.odds % 1 === 0 ? template.odds : template.odds.toFixed(2)}%
                     </Typography>
                   </Stack>
                 </Box>
@@ -608,7 +608,7 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
           <Stack direction="row" spacing={1.5}>
             <Input label="Nome" value={form.label} onChange={(e) => set('label', e.target.value)} sx={{ flex: 1 }} />
             <EmojiPickerInput label="Emoji" value={form.emoji} onChange={(emoji) => set('emoji', emoji)} />
-            <Input label="Chance %" type="number" value={form.odds} onChange={(e) => set('odds', parseFloat(Number(e.target.value).toFixed(2)))} sx={{ width: 95 }} inputProps={{ step: 0.01, min: 0, max: 100 }} />
+            <Input label="Chance %" type="number" value={form.odds} onChange={(e) => set('odds', e.target.value === '' ? 0 : Number(e.target.value))} onBlur={(e) => set('odds', parseFloat(Math.max(0, Math.min(100, Number(e.target.value) || 0)).toFixed(2)))} sx={{ width: 95 }} inputProps={{ step: 0.01, min: 0, max: 100 }} />
           </Stack>
           <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={0.6} sx={{ mt: -0.5 }}>
             <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: overLimit ? colors.error.main : totalOdds > 95 ? '#f59e0b' : colors.success.main, flexShrink: 0 }} />
@@ -2215,7 +2215,7 @@ export function CollectionManagePage() {
                     <Box onClick={() => { setEditingRarity(r); setRarityDialogOpen(true) }} sx={{ flex: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Chip label={`${r.emoji} ${r.label.toUpperCase()}`} size="small"
                         sx={{ height: 20, fontSize: '0.72rem', fontWeight: 700, background: r.chipBg, '& .MuiChip-label': { px: 0.9, ...gradientTextSx(r.chipColor) } }} />
-                      <Typography sx={{ fontSize: '0.78rem', color: r.captionColor, fontWeight: 600 }}>{r.odds}% de chance</Typography>
+                      <Typography sx={{ fontSize: '0.78rem', color: r.captionColor, fontWeight: 600 }}>{r.odds % 1 === 0 ? r.odds : r.odds.toFixed(2)}% de chance</Typography>
                     </Box>
                     <Stack direction="row" spacing={0.5}>
                       <IconButton size="small" aria-label="editar raridade" onClick={() => { setEditingRarity(r); setRarityDialogOpen(true) }} sx={actionButtonSx('primary')}>
