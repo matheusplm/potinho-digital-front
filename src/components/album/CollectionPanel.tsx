@@ -27,7 +27,7 @@ export function CollectionPanel({ play, rarities }: {
     const ownedRarityIds = new Set(play.items.filter((i) => i.owned).map((i) => i.rarity))
     return [...rarities]
       .filter((r) => ownedRarityIds.has(r.id))
-      .sort((a, b) => b.order - a.order)[0]
+      .sort((a, b) => a.odds - b.odds)[0]
   }, [play.items, rarities])
 
   return (
