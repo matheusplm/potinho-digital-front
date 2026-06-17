@@ -21,9 +21,11 @@ import type {
 const BASE_URL = import.meta.env.VITE_API_URL ?? ''
 const API_SECRET = import.meta.env.VITE_API_SECRET ?? ''
 const ACCESS_PACKS_KEY = 'potinho-access-packs'
+const AUTH_STORAGE_KEY = 'potinho-auth'
 
 let authToken = ''
 let redirectingToLogin = false
+let refreshPromise: Promise<string | null> | null = null
 
 export class ApiRequestError extends Error {
   constructor(message: string, public status: number, public availableAt?: string, public code?: string) {
@@ -106,8 +108,40 @@ function handleUnauthorized() {
   if (redirectingToLogin) return
   redirectingToLogin = true
   authToken = ''
-  localStorage.removeItem('potinho-auth')
+  localStorage.removeItem(AUTH_STORAGE_KEY)
   window.location.href = '/login'
+}
+
+async function tryRefresh(): Promise<string | null> {
+  if (refreshPromise) return refreshPromise
+  refreshPromise = (async () => {
+    try {
+      const raw = localStorage.getItem(AUTH_STORAGE_KEY)
+      if (!raw) return null
+      const session = JSON.parse(raw) as { refreshToken?: string }
+      if (!session.refreshToken) return null
+      const res = await fetch(`${BASE_URL}/auth/refresh`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(API_SECRET ? { 'x-api-key': API_SECRET } : {}),
+        },
+        body: JSON.stringify({ refreshToken: session.refreshToken }),
+      })
+      if (!res.ok) return null
+      const json = await res.json()
+      const data = (json?.data ?? json) as { token?: string; refreshToken?: string }
+      if (!data.token) return null
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ ...session, token: data.token, refreshToken: data.refreshToken }))
+      setAuthToken(data.token)
+      return data.token
+    } catch {
+      return null
+    } finally {
+      refreshPromise = null
+    }
+  })()
+  return refreshPromise
 }
 
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
@@ -123,6 +157,20 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
   })
 
   if (response.status === 401 && !url.startsWith('/auth/')) {
+    const newToken = await tryRefresh()
+    if (newToken) {
+      const retryHeaders: Record<string, string> = {
+        Authorization: `Bearer ${newToken}`,
+        ...(API_SECRET ? { 'x-api-key': API_SECRET } : {}),
+      }
+      if (init?.body) retryHeaders['Content-Type'] = 'application/json'
+      const retryRes = await fetch(`${BASE_URL}${url}`, { ...init, headers: retryHeaders })
+      if (retryRes.ok) {
+        const retryJson = await retryRes.json()
+        if (retryJson !== null && typeof retryJson === 'object' && 'data' in retryJson) return (retryJson as { data: T }).data
+        return retryJson as T
+      }
+    }
     handleUnauthorized()
     throw new Error('Sessão expirada. Faça login novamente.')
   }
@@ -143,10 +191,12 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
 
 export const api = {
   login: (email: string, password: string) =>
-    request<{ token: string; user: { id: string; name: string; role: string; email: string } }>('/auth/login', {
+    request<{ token: string; refreshToken: string; user: { id: string; name: string; role: string; email: string } }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     }),
+  logout: (refreshToken: string) =>
+    request<{ ok: boolean }>('/auth/logout', { method: 'POST', body: JSON.stringify({ refreshToken }) }).catch(() => {}),
   register: (name: string, email: string, password: string) =>
     request<{ id: string; name: string; role: string }>('/auth/register', {
       method: 'POST',

@@ -42,8 +42,8 @@ export function LoginPage() {
     setError('')
     setLoading(true)
     try {
-      const { token, user } = await api.login(email, password)
-      setUser({ id: user.id, name: user.name, email: user.email, role: user.role as 'writer' | 'reader', token })
+      const { token, refreshToken, user } = await api.login(email, password)
+      setUser({ id: user.id, name: user.name, email: user.email, role: user.role as 'writer' | 'reader', token, refreshToken })
       toast.success(`Bem-vindo, ${user.name.split(' ')[0]}! 💙`)
       navigate('/home')
     } catch (err) {

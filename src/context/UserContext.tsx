@@ -9,6 +9,7 @@ export interface AuthUser {
   email?: string
   role: UserRole
   token: string
+  refreshToken?: string
 }
 
 interface UserContextValue {
@@ -64,7 +65,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const markPersonaReady = () => setPersonaReady(true)
 
-  const logout = () => setUser(null)
+  const logout = () => {
+    if (user?.refreshToken) api.logout(user.refreshToken)
+    setUser(null)
+  }
 
   useEffect(() => {
     const token = user?.token
