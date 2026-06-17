@@ -29,6 +29,7 @@ import {
 import { colors, font, radius } from '../design-system'
 import { slugify } from '../utils/slug'
 import { isCollectionOwner } from '../utils/collectionAccess'
+import { gradientTextSx } from '../utils/colorUtils'
 import { NoteDetailDialog } from './CollectionPlayPage'
 import type { CollectionNoteView, CollectionPack, RarityConfig } from '../types/note'
 
@@ -454,8 +455,8 @@ export function ReaderCollectionPage() {
                         sx={{
                           height: 26, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer',
                           background: active ? r.chipBg : 'rgba(255,255,255,0.5)',
-                          color: active ? r.chipColor : theme.textOnBgMuted,
                           border: `1.5px solid ${active ? r.borderColor : 'transparent'}`,
+                          '& .MuiChip-label': active ? gradientTextSx(r.chipColor) : { color: theme.textOnBgMuted },
                         }}
                       />
                     )

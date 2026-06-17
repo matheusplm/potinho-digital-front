@@ -34,6 +34,7 @@ import { useUser } from '../context/UserContext'
 import { colors, font, radius } from '../design-system'
 import { isCollectionOwner } from '../utils/collectionAccess'
 import { isHexColor, slugify, uniqueConfigId } from '../utils/slug'
+import { gradientTextSx } from '../utils/colorUtils'
 import type {
   AchievementConditionType,
   CollectionAchievement,
@@ -472,12 +473,13 @@ function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
                 {rarities.map((r) => (
                   <Box key={r.id} onClick={() => { setForm((f) => ({ ...f, rarity: r.id })); touch('rarity') }} sx={{
                     px: 1.4, py: 0.6, borderRadius: radius.full, cursor: 'pointer',
-                    display: 'flex', alignItems: 'center', gap: 0.5,
+                    display: 'flex', alignItems: 'center',
                     background: form.rarity === r.id ? r.chipBg : 'rgba(0,0,0,0.04)',
-                    color: form.rarity === r.id ? r.chipColor : colors.text.secondary,
                     border: `1.5px solid ${form.rarity === r.id ? r.borderColor : touched.rarity && errors.rarity ? colors.error.main + '66' : 'transparent'}`,
                     fontWeight: 700, fontSize: '0.78rem', transition: 'all 0.15s',
-                  }}>{r.emoji} {r.label}</Box>
+                  }}>
+                    <Box component="span" sx={form.rarity === r.id ? gradientTextSx(r.chipColor) : { color: colors.text.secondary }}>{r.emoji} {r.label}</Box>
+                  </Box>
                 ))}
               </Box>
             )}
@@ -587,7 +589,7 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
                 >
                   <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={0.8}>
                     <Chip label={`${template.emoji} ${template.label}`} size="small"
-                      sx={{ height: 21, fontSize: '0.72rem', fontWeight: 800, background: template.chipBg, color: template.chipColor, '& .MuiChip-label': { px: 0.8 } }} />
+                      sx={{ height: 21, fontSize: '0.72rem', fontWeight: 800, background: template.chipBg, '& .MuiChip-label': { px: 0.8, ...gradientTextSx(template.chipColor) } }} />
                     <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: template.captionColor }}>
                       {template.odds}%
                     </Typography>
@@ -613,7 +615,7 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
           <Box sx={{ p: 1.5, borderRadius: radius.lg, background: form.cardBg, border: `1.5px solid ${form.borderColor}`, boxShadow: form.shadow }}>
             <Stack direction="row" alignItems="center" spacing={0.8}>
               <Chip label={`${form.emoji} ${form.label.toUpperCase()}`} size="small"
-                sx={{ height: 20, fontSize: '0.72rem', fontWeight: 700, background: form.chipBg, color: form.chipColor, '& .MuiChip-label': { px: 0.9 } }} />
+                sx={{ height: 20, fontSize: '0.72rem', fontWeight: 700, background: form.chipBg, '& .MuiChip-label': { px: 0.9, ...gradientTextSx(form.chipColor) } }} />
               <Typography sx={{ fontSize: '0.85rem', fontStyle: 'italic', color: form.textColor }}>Pré-visualização</Typography>
             </Stack>
           </Box>
@@ -886,7 +888,7 @@ function PackEditor({ cid, pack, rarities, types, onClose }: {
                 sx={{ cursor: 'pointer', fontWeight: 800, background: form.allowedRarityIds.length === 0 ? colors.primary.main : 'rgba(0,0,0,0.05)', color: form.allowedRarityIds.length === 0 ? '#fff' : colors.text.secondary }} />
               {rarities.map((rarity) => (
                 <Chip key={rarity.id} label={`${rarity.emoji} ${rarity.label}`} size="small" onClick={() => toggle('allowedRarityIds', rarity.id)}
-                  sx={{ cursor: 'pointer', fontWeight: 800, background: form.allowedRarityIds.includes(rarity.id) ? rarity.chipBg : 'rgba(0,0,0,0.05)', color: form.allowedRarityIds.includes(rarity.id) ? rarity.chipColor : colors.text.secondary, border: `1px solid ${form.allowedRarityIds.includes(rarity.id) ? rarity.borderColor : 'transparent'}` }} />
+                  sx={{ cursor: 'pointer', fontWeight: 800, background: form.allowedRarityIds.includes(rarity.id) ? rarity.chipBg : 'rgba(0,0,0,0.05)', border: `1px solid ${form.allowedRarityIds.includes(rarity.id) ? rarity.borderColor : 'transparent'}`, '& .MuiChip-label': form.allowedRarityIds.includes(rarity.id) ? gradientTextSx(rarity.chipColor) : { color: colors.text.secondary } }} />
               ))}
             </Box>
           </Box>
@@ -898,7 +900,7 @@ function PackEditor({ cid, pack, rarities, types, onClose }: {
                 sx={{ cursor: 'pointer', fontWeight: 800, background: form.guaranteedRarityId === null ? colors.primary.main : 'rgba(0,0,0,0.05)', color: form.guaranteedRarityId === null ? '#fff' : colors.text.secondary }} />
               {rarities.map((rarity) => (
                 <Chip key={rarity.id} label={`${rarity.emoji} ${rarity.label}`} size="small" onClick={() => set('guaranteedRarityId', rarity.id)}
-                  sx={{ cursor: 'pointer', fontWeight: 800, background: form.guaranteedRarityId === rarity.id ? rarity.chipBg : 'rgba(0,0,0,0.05)', color: form.guaranteedRarityId === rarity.id ? rarity.chipColor : colors.text.secondary, border: `1px solid ${form.guaranteedRarityId === rarity.id ? rarity.borderColor : 'transparent'}` }} />
+                  sx={{ cursor: 'pointer', fontWeight: 800, background: form.guaranteedRarityId === rarity.id ? rarity.chipBg : 'rgba(0,0,0,0.05)', border: `1px solid ${form.guaranteedRarityId === rarity.id ? rarity.borderColor : 'transparent'}`, '& .MuiChip-label': form.guaranteedRarityId === rarity.id ? gradientTextSx(rarity.chipColor) : { color: colors.text.secondary } }} />
               ))}
             </Box>
           </Box>
@@ -1439,8 +1441,8 @@ function PackSimulationDialog({ simulation, rarities, types, onClose, onSimulate
                           </Typography>
                           <Stack direction="row" spacing={0.5} sx={{ mt: 0.75, flexWrap: 'wrap', rowGap: 0.45 }}>
                             {rarity && (
-                              <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.35, px: 0.75, py: 0.25, borderRadius: radius.full, background: rarity.chipBg, color: rarity.chipColor, border: `1px solid ${rarity.borderColor}`, fontSize: '0.70rem', fontWeight: 750 }}>
-                                {rarity.emoji} {rarity.label}
+                              <Box sx={{ display: 'inline-flex', alignItems: 'center', px: 0.75, py: 0.25, borderRadius: radius.full, background: rarity.chipBg, border: `1px solid ${rarity.borderColor}`, fontSize: '0.70rem', fontWeight: 750 }}>
+                                <Box component="span" sx={gradientTextSx(rarity.chipColor)}>{rarity.emoji} {rarity.label}</Box>
                               </Box>
                             )}
                             {type && (
@@ -1860,8 +1862,9 @@ export function CollectionManagePage() {
                       <Chip key={r.id} label={`${r.emoji} ${r.label}`} size="small" onClick={() => setRarityFilter(r.id)}
                         sx={{ height: 26, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer',
                           background: rarityFilter === r.id ? r.chipBg : 'rgba(255,255,255,0.5)',
-                          color: rarityFilter === r.id ? r.chipColor : theme.textOnBgMuted,
-                          border: `1.5px solid ${rarityFilter === r.id ? r.borderColor : 'transparent'}` }} />
+                          border: `1.5px solid ${rarityFilter === r.id ? r.borderColor : 'transparent'}`,
+                          '& .MuiChip-label': rarityFilter === r.id ? gradientTextSx(r.chipColor) : { color: theme.textOnBgMuted },
+                        }} />
                     ))}
                   </Box>
                 )}
@@ -2004,8 +2007,8 @@ export function CollectionManagePage() {
                                 {note.title}
                               </Typography>
                               {r && (
-                                <Box sx={{ px: 0.65, py: 0.15, borderRadius: radius.full, background: r.chipBg, color: r.chipColor, border: `1px solid ${r.borderColor}`, fontSize: '0.68rem', fontWeight: 850, flexShrink: 0 }}>
-                                  {r.emoji}
+                                <Box sx={{ px: 0.65, py: 0.15, borderRadius: radius.full, background: r.chipBg, border: `1px solid ${r.borderColor}`, fontSize: '0.68rem', fontWeight: 850, flexShrink: 0 }}>
+                                  <Box component="span" sx={gradientTextSx(r.chipColor)}>{r.emoji}</Box>
                                 </Box>
                               )}
                               {t && (
@@ -2134,8 +2137,8 @@ export function CollectionManagePage() {
                         {(r || t) && (
                           <Stack direction="row" spacing={0.6} sx={{ mt: 0.9, flexWrap: 'wrap', rowGap: 0.5 }}>
                             {r && (
-                              <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.4, px: 1, py: 0.3, borderRadius: radius.full, background: r.chipBg, color: r.chipColor, border: `1px solid ${r.borderColor}`, fontSize: '0.72rem', fontWeight: 700 }}>
-                                {r.emoji} {r.label}
+                              <Box sx={{ display: 'inline-flex', alignItems: 'center', px: 1, py: 0.3, borderRadius: radius.full, background: r.chipBg, border: `1px solid ${r.borderColor}`, fontSize: '0.72rem', fontWeight: 700 }}>
+                                <Box component="span" sx={gradientTextSx(r.chipColor)}>{r.emoji} {r.label}</Box>
                               </Box>
                             )}
                             {t && (
@@ -2197,7 +2200,7 @@ export function CollectionManagePage() {
                   <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
                     <Box onClick={() => { setEditingRarity(r); setRarityDialogOpen(true) }} sx={{ flex: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Chip label={`${r.emoji} ${r.label.toUpperCase()}`} size="small"
-                        sx={{ height: 20, fontSize: '0.72rem', fontWeight: 700, background: r.chipBg, color: r.chipColor, '& .MuiChip-label': { px: 0.9 } }} />
+                        sx={{ height: 20, fontSize: '0.72rem', fontWeight: 700, background: r.chipBg, '& .MuiChip-label': { px: 0.9, ...gradientTextSx(r.chipColor) } }} />
                       <Typography sx={{ fontSize: '0.78rem', color: r.captionColor, fontWeight: 600 }}>{r.odds}% de chance</Typography>
                     </Box>
                     <Stack direction="row" spacing={0.5}>

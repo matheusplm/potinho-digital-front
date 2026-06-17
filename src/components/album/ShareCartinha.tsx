@@ -6,6 +6,7 @@ import { Button, toast } from '../ui'
 import { colors, font, radius } from '../../design-system'
 import type { BackgroundTheme } from '../../design-system'
 import type { RarityConfig, NoteTypeConfig } from '../../types/note'
+import { gradientTextSx } from '../../utils/colorUtils'
 
 interface ShareNote { title: string; message: string; rarity: string; typeId: string }
 
@@ -73,9 +74,9 @@ export function ShareCartinha({ note, r, t, theme }: {
           <Box sx={{
             px: 1.4, py: 0.5, borderRadius: radius.full, fontWeight: 800,
             fontSize: story ? '0.95rem' : '0.82rem',
-            background: r.chipBg, color: r.chipColor, border: `1px solid ${r.borderColor}`,
+            background: r.chipBg, border: `1px solid ${r.borderColor}`,
           }}>
-            {r.emoji} {r.label}
+            <Box component="span" sx={gradientTextSx(r.chipColor)}>{r.emoji} {r.label}</Box>
           </Box>
         )}
         <Typography sx={{

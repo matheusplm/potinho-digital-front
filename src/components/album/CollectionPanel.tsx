@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import { Card } from '../ui'
 import { colors, font, radius } from '../../design-system'
 import type { CollectionPlayView, RarityConfig } from '../../types/note'
+import { gradientTextSx } from '../../utils/colorUtils'
 
 export function CollectionPanel({ play, rarities }: {
   play: CollectionPlayView
@@ -59,12 +60,12 @@ export function CollectionPanel({ play, rarities }: {
 
         {rarest && (
           <Box sx={{
-            alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 0.6,
+            alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center',
             px: 1, py: 0.4, borderRadius: radius.full,
-            background: rarest.chipBg, color: rarest.chipColor, border: `1px solid ${rarest.borderColor}`,
+            background: rarest.chipBg, border: `1px solid ${rarest.borderColor}`,
             fontSize: '0.68rem', fontWeight: 800,
           }}>
-            ⭐ mais rara: {rarest.emoji} {rarest.label}
+            <Box component="span" sx={gradientTextSx(rarest.chipColor)}>⭐ mais rara: {rarest.emoji} {rarest.label}</Box>
           </Box>
         )}
 

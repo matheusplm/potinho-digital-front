@@ -24,6 +24,7 @@ import { useReader } from '../context/ReaderContext'
 import { colors, font, radius } from '../design-system'
 import type { BackgroundTheme } from '../design-system'
 import { slugify } from '../utils/slug'
+import { gradientTextSx } from '../utils/colorUtils'
 import { isCollectionOwner } from '../utils/collectionAccess'
 import { CollectionPanel } from '../components/album/CollectionPanel'
 import { ShareCartinha } from '../components/album/ShareCartinha'
@@ -152,9 +153,9 @@ export function RewardCard({ reward, rarities, types, onClick }: { reward: Colle
           {r && (
             <Chip size="small" label={`${r.emoji} ${r.label}`} sx={{
               fontSize: '0.7rem', fontWeight: 800, height: 22,
-              background: r.chipBg, color: r.chipColor,
+              background: r.chipBg,
               border: `1px solid ${r.borderColor}`,
-              '& .MuiChip-label': { px: 1 },
+              '& .MuiChip-label': { px: 1, ...gradientTextSx(r.chipColor) },
             }} />
           )}
           {reward.isNew && (
@@ -243,9 +244,8 @@ export function NoteDetailDialog({ note, rarities, types, onClose }: {
                     fontSize: '0.68rem',
                     fontWeight: 800,
                     background: rarity.chipBg,
-                    color: rarity.chipColor,
                     border: `1px solid ${rarity.borderColor}`,
-                    '& .MuiChip-label': { px: 0.9 },
+                    '& .MuiChip-label': { px: 0.9, ...gradientTextSx(rarity.chipColor) },
                   }} />
                 )}
                 {type && (
@@ -584,8 +584,8 @@ export function NoteCard({ note, r, t, unread, variant, onSelect, onToggleFavori
             {r && (
               <Chip size="small" label={`${r.emoji} ${r.label}`} sx={{
                 height: 19, fontSize: '0.70rem', fontWeight: 800,
-                background: r.chipBg, color: r.chipColor, border: `1px solid ${r.borderColor}`,
-                '& .MuiChip-label': { px: 0.8 },
+                background: r.chipBg, border: `1px solid ${r.borderColor}`,
+                '& .MuiChip-label': { px: 0.8, ...gradientTextSx(r.chipColor) },
               }} />
             )}
             {t && !grid && (
@@ -845,12 +845,11 @@ function AlbumSection({
                       sx={{
                         px: 1.2, py: 0.55, borderRadius: radius.full, cursor: 'pointer',
                         fontSize: '0.78rem', fontWeight: 800,
-                        color: rarity === r.id ? r.chipColor : colors.text.secondary,
                         background: rarity === r.id ? r.chipBg : colors.surface.overlay,
                         border: `1.5px solid ${rarity === r.id ? r.borderColor : colors.border.subtle}`,
                       }}
                     >
-                      {r.emoji} {r.label}
+                      <Box component="span" sx={rarity === r.id ? gradientTextSx(r.chipColor) : { color: colors.text.secondary }}>{r.emoji} {r.label}</Box>
                     </Box>
                   ))}
                 </Box>
