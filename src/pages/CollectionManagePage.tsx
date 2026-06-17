@@ -523,6 +523,7 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
   const isNew = !rarity
   const { data: existingRarities = [] } = useCollectionRaritiesQuery(cid)
   const [form, setForm] = useState<RarityConfig>(rarity ? { ...rarity } : { ...NEW_RARITY, order: existingRarities.length + 1 })
+  const [appliedTemplateId, setAppliedTemplateId] = useState<string | null>(null)
   const createMutation = useCreateCollectionRarityMutation(cid)
   const updateMutation = useUpdateCollectionRarityMutation(cid)
   const isPending = createMutation.isPending || updateMutation.isPending
@@ -534,6 +535,7 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
   const remaining = parseFloat((100 - totalOdds).toFixed(2))
 
   const applyTemplate = (template: RarityConfig) => {
+    setAppliedTemplateId(template.id)
     setForm((current) => ({
       ...template,
       id: current.id,
@@ -574,34 +576,36 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
       <DialogContent>
         <Stack spacing={2} sx={{ pt: 1 }}>
           <Box>
-            <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: colors.text.secondary, mb: 0.8 }}>
-              Templates D&D
-            </Typography>
-            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 0.8 }}>
-              {RARITY_TEMPLATES.map((template) => (
-                <Box
-                  key={template.id}
-                  onClick={() => applyTemplate(template)}
-                  sx={{
-                    p: 1,
-                    borderRadius: radius.lg,
-                    cursor: 'pointer',
-                    background: template.cardBg,
-                    border: `1.5px solid ${form.label === template.label ? template.borderColor : 'rgba(255,255,255,0.65)'}`,
-                    boxShadow: form.label === template.label ? `0 0 22px ${template.glowColor}` : template.shadow,
-                    transition: 'transform 0.16s ease, box-shadow 0.16s ease',
-                    '&:hover': { transform: 'translateY(-1px)', boxShadow: `0 0 24px ${template.glowColor}` },
-                  }}
-                >
-                  <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={0.8}>
+            <Stack direction="row" alignItems="baseline" spacing={1} sx={{ mb: 1 }}>
+              <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: colors.text.secondary, textTransform: 'uppercase', letterSpacing: 0.6 }}>
+                Modelos prontos
+              </Typography>
+              <Typography sx={{ fontSize: '0.68rem', color: colors.text.muted }}>
+                clique para preencher automaticamente
+              </Typography>
+            </Stack>
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 0.7 }}>
+              {RARITY_TEMPLATES.map((template) => {
+                const isApplied = appliedTemplateId === template.id
+                return (
+                  <Box
+                    key={template.id}
+                    onClick={() => applyTemplate(template)}
+                    sx={{
+                      p: 1, borderRadius: radius.lg, cursor: 'pointer',
+                      background: template.cardBg,
+                      border: `1.5px solid ${isApplied ? template.borderColor : 'rgba(0,0,0,0.07)'}`,
+                      boxShadow: isApplied ? `0 0 16px ${template.glowColor}99` : 'none',
+                      outline: isApplied ? `2px solid ${template.borderColor}55` : 'none',
+                      transition: 'all 0.15s ease',
+                      '&:hover': { transform: 'translateY(-1px)', boxShadow: `0 0 14px ${template.glowColor}66`, border: `1.5px solid ${template.borderColor}` },
+                    }}
+                  >
                     <Chip label={`${template.emoji} ${template.label}`} size="small"
-                      sx={{ height: 21, fontSize: '0.72rem', fontWeight: 800, background: template.chipBg, '& .MuiChip-label': { px: 0.8, ...gradientTextSx(template.chipColor) } }} />
-                    <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: template.captionColor }}>
-                      {template.odds % 1 === 0 ? template.odds : template.odds.toFixed(2)}%
-                    </Typography>
-                  </Stack>
-                </Box>
-              ))}
+                      sx={{ height: 20, fontSize: '0.68rem', fontWeight: 800, background: template.chipBg, '& .MuiChip-label': { px: 0.7, ...gradientTextSx(template.chipColor) } }} />
+                  </Box>
+                )
+              })}
             </Box>
           </Box>
 
@@ -610,14 +614,31 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
             <EmojiPickerInput label="Emoji" value={form.emoji} onChange={(emoji) => set('emoji', emoji)} />
             <Input label="Chance %" type="number" value={form.odds} onChange={(e) => set('odds', e.target.value === '' ? 0 : Number(e.target.value))} onBlur={(e) => set('odds', parseFloat(Math.max(0, Math.min(100, Number(e.target.value) || 0)).toFixed(2)))} sx={{ width: 95 }} inputProps={{ step: 0.01, min: 0, max: 100 }} />
           </Stack>
-          <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={0.6} sx={{ mt: -0.5 }}>
-            <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: overLimit ? colors.error.main : totalOdds > 95 ? '#f59e0b' : colors.success.main, flexShrink: 0 }} />
-            <Typography sx={{ fontSize: '0.71rem', fontWeight: 700, color: overLimit ? colors.error.main : colors.text.muted }}>
-              {overLimit
-                ? `Soma: ${totalOdds}% — excede em ${(totalOdds - 100).toFixed(2)}%`
-                : `Soma: ${totalOdds}% — restam ${remaining}%`}
+          <Box sx={{
+            borderRadius: radius.lg, px: 1.5, py: 1.1,
+            bgcolor: overLimit ? `${colors.error.main}12` : totalOdds > 95 ? '#f59e0b12' : `${colors.success.main}10`,
+            border: `1px solid ${overLimit ? colors.error.main + '40' : totalOdds > 95 ? '#f59e0b40' : colors.success.main + '35'}`,
+          }}>
+            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.8 }}>
+              <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: overLimit ? colors.error.main : totalOdds > 95 ? '#f59e0b' : colors.success.main, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                {overLimit ? '⚠ Soma ultrapassa 100%' : 'Distribuição de chances'}
+              </Typography>
+              <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: overLimit ? colors.error.main : colors.text.secondary }}>
+                {totalOdds.toFixed(2)}%
+              </Typography>
+            </Stack>
+            <Box sx={{ height: 5, borderRadius: radius.full, bgcolor: 'rgba(0,0,0,0.07)', overflow: 'hidden' }}>
+              <Box sx={{
+                height: '100%', borderRadius: radius.full,
+                width: `${Math.min(totalOdds, 100)}%`,
+                bgcolor: overLimit ? colors.error.main : totalOdds > 95 ? '#f59e0b' : colors.success.main,
+                transition: 'width 0.2s ease, background-color 0.2s ease',
+              }} />
+            </Box>
+            <Typography sx={{ fontSize: '0.66rem', color: overLimit ? colors.error.main : colors.text.muted, mt: 0.7, textAlign: 'right' }}>
+              {overLimit ? `excede em ${(totalOdds - 100).toFixed(2)}%` : `${remaining.toFixed(2)}% livres`}
             </Typography>
-          </Stack>
+          </Box>
           <Box sx={{ position: 'relative', borderRadius: radius.xl, background: form.cardBg, border: `2px solid ${form.borderColor}`, boxShadow: `${form.shadow}${form.glowColor ? `, 0 0 28px ${form.glowColor}88` : ''}`, p: 2.5, overflow: 'hidden' }}>
             {form.glowColor && (
               <Box sx={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse at 50% -10%, ${form.glowColor}33, transparent 65%)`, pointerEvents: 'none' }} />
