@@ -1473,7 +1473,7 @@ function PackSimulationDialog({ simulation, rarities, types, onClose, onSimulate
                           alignItems: 'center',
                           justifyContent: 'center',
                           background: rarity?.chipBg ?? 'rgba(0,0,0,0.04)',
-                          color: rarity?.chipColor ?? colors.text.secondary,
+                          color: rarity ? colors.text.primary : colors.text.secondary,
                           fontSize: '0.78rem',
                           fontWeight: 900,
                           flexShrink: 0,

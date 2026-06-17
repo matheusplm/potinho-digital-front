@@ -8,6 +8,7 @@ import {
 } from '../../hooks/useNotes'
 import { colors, font, radius } from '../../design-system'
 import { uniqueConfigId } from '../../utils/slug'
+import { gradientTextSx } from '../../utils/colorUtils'
 import type {
   AchievementConditionType,
   CollectionAchievement,
@@ -150,7 +151,7 @@ export function AchievementEditor({ cid, achievement, rarities, types, onClose }
               ) : (
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6 }}>
                   {rarities.map((r) => (
-                    <Box key={r.id} onClick={() => setForm((f) => ({ ...f, rarityId: r.id }))} sx={pickerChip(form.rarityId === r.id, r.chipColor || colors.primary.main)}>
+                    <Box key={r.id} onClick={() => setForm((f) => ({ ...f, rarityId: r.id }))} sx={form.rarityId === r.id ? { ...pickerChip(true, r.chipBg || colors.primary.main), ...gradientTextSx(r.chipColor) } : pickerChip(false, '')}>
                       {r.emoji} {r.label}
                     </Box>
                   ))}
