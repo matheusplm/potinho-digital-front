@@ -527,6 +527,12 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
   const updateMutation = useUpdateCollectionRarityMutation(cid)
   const isPending = createMutation.isPending || updateMutation.isPending
   const set = (field: string, value: string | number) => setForm((f) => ({ ...f, [field]: value }))
+
+  const otherOdds = existingRarities.filter((r) => r.id !== form.id).reduce((sum, r) => sum + r.odds, 0)
+  const totalOdds = parseFloat((otherOdds + form.odds).toFixed(2))
+  const overLimit = totalOdds > 100
+  const remaining = parseFloat((100 - totalOdds).toFixed(2))
+
   const applyTemplate = (template: RarityConfig) => {
     setForm((current) => ({
       ...template,
@@ -603,6 +609,14 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
             <Input label="Nome" value={form.label} onChange={(e) => set('label', e.target.value)} sx={{ flex: 1 }} />
             <EmojiPickerInput label="Emoji" value={form.emoji} onChange={(emoji) => set('emoji', emoji)} />
             <Input label="Chance %" type="number" value={form.odds} onChange={(e) => set('odds', parseFloat(Number(e.target.value).toFixed(2)))} sx={{ width: 95 }} inputProps={{ step: 0.01, min: 0, max: 100 }} />
+          </Stack>
+          <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={0.6} sx={{ mt: -0.5 }}>
+            <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: overLimit ? colors.error.main : totalOdds > 95 ? '#f59e0b' : colors.success.main, flexShrink: 0 }} />
+            <Typography sx={{ fontSize: '0.71rem', fontWeight: 700, color: overLimit ? colors.error.main : colors.text.muted }}>
+              {overLimit
+                ? `Soma: ${totalOdds}% — excede em ${(totalOdds - 100).toFixed(2)}%`
+                : `Soma: ${totalOdds}% — restam ${remaining}%`}
+            </Typography>
           </Stack>
           <ColorRow label="Fundo do card" field="cardBg" value={form.cardBg} onChange={set} />
           <ColorRow label="Cor do texto" field="textColor" value={form.textColor} onChange={set} />
