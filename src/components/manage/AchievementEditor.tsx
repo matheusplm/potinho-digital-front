@@ -1,6 +1,6 @@
 import { Box, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material'
 import { useState } from 'react'
-import { Button, Input, toast } from '../ui'
+import { Button, Input, toast, EmojiPickerInput } from '../ui'
 import {
   useCollectionAchievementsQuery,
   useCreateCollectionAchievementMutation,
@@ -117,7 +117,7 @@ export function AchievementEditor({ cid, achievement, rarities, types, onClose }
         <Stack spacing={2} sx={{ pt: 1 }}>
           <Stack direction="row" spacing={1.5}>
             <Input label="Nome" value={form.label} onChange={(e) => setForm((f) => ({ ...f, label: e.target.value }))} sx={{ flex: 1 }} />
-            <Input label="Emoji" value={form.emoji} onChange={(e) => setForm((f) => ({ ...f, emoji: e.target.value }))} sx={{ width: 80 }} />
+            <EmojiPickerInput label="Emoji" value={form.emoji} onChange={(emoji) => setForm((f) => ({ ...f, emoji }))} />
           </Stack>
           <Input label="Descrição" value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
 

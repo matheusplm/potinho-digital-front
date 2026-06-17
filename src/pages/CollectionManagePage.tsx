@@ -17,7 +17,7 @@ import { Box, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButto
 import { keyframes } from '@emotion/react'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Button, Card, Input, LoadingState, PageTitle, ScrollablePage, SegmentedControl, toast } from '../components/ui'
+import { Button, Card, Input, LoadingState, PageTitle, ScrollablePage, SegmentedControl, toast, EmojiPickerInput } from '../components/ui'
 import { NoteDetailDialog, type ReadableNote } from './CollectionPlayPage'
 import {
   useCollectionsQuery,
@@ -599,7 +599,7 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
 
           <Stack direction="row" spacing={1.5}>
             <Input label="Nome" value={form.label} onChange={(e) => set('label', e.target.value)} sx={{ flex: 1 }} />
-            <Input label="Emoji" value={form.emoji} onChange={(e) => set('emoji', e.target.value)} sx={{ width: 80 }} />
+            <EmojiPickerInput label="Emoji" value={form.emoji} onChange={(emoji) => set('emoji', emoji)} />
             <Input label="Chance %" type="number" value={form.odds} onChange={(e) => set('odds', Number(e.target.value))} sx={{ width: 95 }} />
           </Stack>
           <ColorRow label="Fundo do card" field="cardBg" value={form.cardBg} onChange={set} />
@@ -670,7 +670,7 @@ function TypeEditor({ cid, type, onClose }: { cid: string; type: NoteTypeConfig 
         <Stack spacing={2} sx={{ pt: 1 }}>
           <Stack direction="row" spacing={1.5}>
             <Input label="Nome" value={form.label} onChange={(e) => set('label', e.target.value)} sx={{ flex: 1 }} />
-            <Input label="Emoji" value={form.emoji} onChange={(e) => set('emoji', e.target.value)} sx={{ width: 80 }} />
+            <EmojiPickerInput label="Emoji" value={form.emoji} onChange={(emoji) => set('emoji', emoji)} />
           </Stack>
           <ColorRow label="Cor de destaque" field="accentColor" value={form.accentColor} onChange={set} />
           <ColorRow label="Fundo da tag" field="tagBg" value={form.tagBg} onChange={set} />
@@ -822,7 +822,7 @@ function PackEditor({ cid, pack, rarities, types, onClose }: {
 
           <Stack direction="row" spacing={1.5}>
             <Input label="Nome" value={form.name} onChange={(e) => set('name', e.target.value)} sx={{ flex: 1 }} />
-            <Input label="Emoji" value={form.emoji} onChange={(e) => set('emoji', e.target.value)} sx={{ width: 80 }} />
+            <EmojiPickerInput label="Emoji" value={form.emoji} onChange={(emoji) => set('emoji', emoji)} />
           </Stack>
           <TextField multiline rows={2} fullWidth placeholder="Descrição do pacotinho..." value={form.description}
             onChange={(e) => set('description', e.target.value)}
