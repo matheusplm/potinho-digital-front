@@ -2047,7 +2047,7 @@ export function CollectionManagePage() {
                                 fontFamily: font.serif,
                                 fontWeight: 800,
                                 fontSize: '0.92rem',
-                                color: r?.textColor ?? colors.text.primary,
+                                color: colors.text.primary,
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
                                 whiteSpace: 'nowrap',
@@ -2068,7 +2068,7 @@ export function CollectionManagePage() {
                             <Typography sx={{
                               mt: 0.25,
                               fontSize: '0.74rem',
-                              color: r?.captionColor ?? colors.text.secondary,
+                              color: colors.text.secondary,
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
                               whiteSpace: 'nowrap',

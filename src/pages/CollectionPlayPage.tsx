@@ -177,7 +177,7 @@ export function RewardCard({ reward, rarities, types, onClick }: { reward: Colle
         }}>
           <Typography sx={{
             fontFamily: font.serif, fontWeight: 700, fontSize: '1.2rem',
-            color: r?.textColor ?? colors.text.primary, lineHeight: 1.3,
+            color: colors.text.primary, lineHeight: 1.3,
             display: '-webkit-box',
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
@@ -190,7 +190,7 @@ export function RewardCard({ reward, rarities, types, onClick }: { reward: Colle
 
           <Typography sx={{
             mt: 0.75,
-            fontSize: '0.9rem', color: r?.captionColor ?? colors.text.secondary,
+            fontSize: '0.9rem', color: colors.text.secondary,
             lineHeight: 1.65, fontStyle: 'italic',
             display: '-webkit-box',
             WebkitLineClamp: 3,
@@ -269,7 +269,7 @@ export function NoteDetailDialog({ note, rarities, types, onClose }: {
               }}>
                 <Typography sx={{
                   fontSize: '0.92rem',
-                  color: rarity?.captionColor ?? colors.text.secondary,
+                  color: colors.text.secondary,
                   lineHeight: 1.7,
                   fontStyle: 'italic',
                   whiteSpace: 'pre-wrap',
@@ -598,14 +598,14 @@ export function NoteCard({ note, r, t, unread, variant, onSelect, onToggleFavori
           </Stack>
           <Typography sx={{
             fontFamily: font.serif, fontWeight: 800, fontSize: grid ? '0.9rem' : '0.98rem',
-            color: r?.textColor ?? colors.text.primary, mb: 0.3,
+            color: colors.text.primary, mb: 0.3,
             display: '-webkit-box', WebkitLineClamp: grid ? 2 : 1, WebkitBoxOrient: 'vertical', overflow: 'hidden',
             overflowWrap: 'anywhere', wordBreak: 'break-word',
           }}>
             {note.title}
           </Typography>
           <Typography sx={{
-            fontSize: grid ? '0.74rem' : '0.8rem', color: r?.captionColor ?? colors.text.secondary, lineHeight: 1.5,
+            fontSize: grid ? '0.74rem' : '0.8rem', color: colors.text.secondary, lineHeight: 1.5,
             display: '-webkit-box', WebkitLineClamp: grid ? 3 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
             overflowWrap: 'anywhere', wordBreak: 'break-word',
           }}>
