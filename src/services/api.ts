@@ -40,7 +40,6 @@ const FRIENDLY_ERROR_MESSAGES: Record<string, string> = {
   VALIDATION_ERROR: 'Dados inválidos. Verifique os campos e tente novamente.',
   INVALID_JSON: 'JSON inválido. Revise o formato e tente novamente.',
   INVALID_NOTE_CONFIG: 'Algum bilhete usa raridade ou tipo que não existe nessa coleção.',
-  PACK_LIMIT_REACHED: 'Você já abriu este pacotinho o máximo de vezes permitido.',
   PACK_ON_COOLDOWN: 'Pacotinho ainda em cooldown.',
   DAILY_ALREADY_OPENED: 'O pacotinho do dia já foi aberto. Volte amanhã!',
   NO_ELIGIBLE_NOTES: 'Esse pacotinho não tem bilhetes compatíveis agora.',

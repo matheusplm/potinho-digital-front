@@ -141,14 +141,12 @@ export interface PackStatusResponse {
   remainingOpensToday?: number
   nextAvailableAt: string
   serverTime: string
-  exhausted?: boolean
 }
 
 export interface CollectionPackReaderStatus {
   canOpen: boolean
   availableAt?: string
   nextAvailableAt?: string
-  exhausted?: boolean
 }
 
 export interface StatsResponse {

@@ -1,6 +1,5 @@
 ﻿import FavoriteIcon from '@mui/icons-material/Favorite'
 import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded'
-import LockRoundedIcon from '@mui/icons-material/LockRounded'
 import ShuffleIcon from '@mui/icons-material/Shuffle'
 import { Box, Dialog, DialogActions, DialogContent, DialogTitle, LinearProgress, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
@@ -63,32 +62,6 @@ function savePackCooldowns(cid: string, cooldowns: Record<string, string>) {
   }
 }
 
-const PACK_EXHAUSTED_KEY = 'potinho-pack-exhausted'
-
-function readExhaustedStore(): Record<string, string[]> {
-  try {
-    return JSON.parse(localStorage.getItem(PACK_EXHAUSTED_KEY) ?? '{}') as Record<string, string[]>
-  } catch {
-    return {}
-  }
-}
-
-function loadExhaustedPacks(cid: string): string[] {
-  if (!cid) return []
-  return readExhaustedStore()[cid] ?? []
-}
-
-function saveExhaustedPacks(cid: string, ids: string[]) {
-  if (!cid) return
-  const store = readExhaustedStore()
-  if (ids.length > 0) store[cid] = [...new Set(ids)]
-  else delete store[cid]
-  try {
-    localStorage.setItem(PACK_EXHAUSTED_KEY, JSON.stringify(store))
-  } catch {
-    void 0
-  }
-}
 
 const PACK_STATUS_ENDPOINT_KEY = 'potinho-pack-status-missing'
 
@@ -191,7 +164,6 @@ export function SimulatedReaderHomePage() {
 
   useEffect(() => {
     setPackCooldowns(isRealReader ? loadPackCooldowns(cid) : {})
-    setExhaustedPackIds(isRealReader ? loadExhaustedPacks(cid) : [])
     setOpenedBonusPackIds([])
     setPackStatusEndpointMissing(isRealReader ? loadPackStatusEndpointMissing(cid) : false)
   }, [cid, isRealReader])
@@ -259,9 +231,6 @@ export function SimulatedReaderHomePage() {
   const [packCooldowns, setPackCooldowns] = useState<Record<string, string>>(
     () => (cid ? loadPackCooldowns(cid) : {}),
   )
-  const [exhaustedPackIds, setExhaustedPackIds] = useState<string[]>(
-    () => (cid ? loadExhaustedPacks(cid) : []),
-  )
   const [packAvailableCounts, setPackAvailableCounts] = useState<Record<string, number>>({})
   const [now, setNow] = useState(() => Date.now())
 
@@ -269,16 +238,10 @@ export function SimulatedReaderHomePage() {
     if (!isRealReader || !cid || activePacks.length === 0) return
 
     const cooldowns: Record<string, string> = { ...loadPackCooldowns(cid) }
-    const exhausted = new Set(loadExhaustedPacks(cid))
     const counts: Record<string, number> = {}
     const ts = Date.now()
 
-    const apply = (packId: string, canOpen?: boolean, availableAt?: string, isExhausted?: boolean, availableCount?: number) => {
-      if (isExhausted) {
-        exhausted.add(packId)
-        delete cooldowns[packId]
-        return
-      }
+    const apply = (packId: string, canOpen?: boolean, availableAt?: string, availableCount?: number) => {
       if (canOpen === false) {
         if (availableAt && Date.parse(availableAt) > ts) {
           cooldowns[packId] = availableAt
@@ -288,11 +251,8 @@ export function SimulatedReaderHomePage() {
         }
         return
       }
-      if (canOpen === true) {
-        if (!cooldowns[packId]) {
-          exhausted.delete(packId)
-        }
-        if (availableCount !== undefined && availableCount > 1) counts[packId] = availableCount
+      if (canOpen === true && availableCount !== undefined && availableCount > 1) {
+        counts[packId] = availableCount
       }
     }
 
@@ -302,7 +262,6 @@ export function SimulatedReaderHomePage() {
           pack.id,
           pack.readerStatus.canOpen,
           pack.readerStatus.availableAt ?? pack.readerStatus.nextAvailableAt,
-          pack.readerStatus.exhausted,
         )
       }
     }
@@ -310,7 +269,7 @@ export function SimulatedReaderHomePage() {
     if (packStatuses) {
       for (const [packId, status] of Object.entries(packStatuses)) {
         if (!status) continue
-        apply(packId, status.canOpen, status.nextAvailableAt, status.exhausted, status.availableCount)
+        apply(packId, status.canOpen, status.nextAvailableAt, status.availableCount)
       }
     }
 
@@ -322,12 +281,9 @@ export function SimulatedReaderHomePage() {
     const nextCooldowns = Object.fromEntries(
       Object.entries(cooldowns).filter(([, availableAt]) => Date.parse(availableAt) > ts),
     )
-    const nextExhausted = [...exhausted]
     setPackCooldowns(nextCooldowns)
-    setExhaustedPackIds(nextExhausted)
     setPackAvailableCounts(counts)
     savePackCooldowns(cid, nextCooldowns)
-    saveExhaustedPacks(cid, nextExhausted)
   }, [
     isRealReader,
     cid,
@@ -374,18 +330,7 @@ export function SimulatedReaderHomePage() {
     return Math.max(0, Date.parse(availableAt) - now)
   }
 
-  function isPackExhausted(packId: string) {
-    return exhaustedPackIds.includes(packId)
-  }
-
-  function bonusPackBlock(pack: CollectionPack): 'exhausted' | 'cooldown' | null {
-    if (pack.distribution !== 'all_with_access') {
-      const opens = play?.packOpens?.[pack.id] ?? 0
-      if (opens <= 0) return 'exhausted'
-      if (getBonusPackCooldownMs(pack.id) > 0) return 'cooldown'
-      return null
-    }
-    if (isPackExhausted(pack.id)) return 'exhausted'
+  function bonusPackBlock(pack: CollectionPack): 'cooldown' | null {
     if (getBonusPackCooldownMs(pack.id) > 0) return 'cooldown'
     return null
   }
@@ -395,15 +340,6 @@ export function SimulatedReaderHomePage() {
   }
 
   const mainCanOpen = Boolean(play?.daily.canOpen) && (mainPack ? bonusPackBlock(mainPack) === null : true)
-
-  function markPackExhausted(packId: string) {
-    setExhaustedPackIds((current) => {
-      if (current.includes(packId)) return current
-      const next = [...current, packId]
-      saveExhaustedPacks(cid, next)
-      return next
-    })
-  }
   const nextMainPackAt = Date.parse(play?.daily.availableAt ?? '')
   const mainCooldownMs = Math.max(1, mainPack?.cooldownHours ?? 24) * 60 * 60 * 1000
   const dailyRemainingMs = !play || play.daily.canOpen || !Number.isFinite(nextMainPackAt)
@@ -423,7 +359,7 @@ export function SimulatedReaderHomePage() {
     if (!mainOnCooldown && !bonusOnCooldown) return
     const interval = window.setInterval(() => setNow(Date.now()), 1000)
     return () => window.clearInterval(interval)
-  }, [mainCanOpen, bonusPacks, packCooldowns, exhaustedPackIds])
+  }, [mainCanOpen, bonusPacks, packCooldowns])
 
   async function handleOpenPack(pack: CollectionPack | undefined, isMain: boolean, count = 1) {
     if (!activeSession || !play || isOpeningPack || !pack) return
@@ -491,8 +427,7 @@ export function SimulatedReaderHomePage() {
           description: newCount > 0 ? `${newCount} novo${newCount !== 1 ? 's' : ''} na coleção ✨` : `${pack.name} aberto!`,
         })
       } catch (error) {
-        if (error instanceof ApiRequestError && (error.code === 'PACK_LIMIT_REACHED' || error.code === 'PACK_COUNT_EXCEEDED')) {
-          if (!isMain) markPackExhausted(pack.id)
+        if (error instanceof ApiRequestError && error.code === 'PACK_COUNT_EXCEEDED') {
           await queryClient.invalidateQueries({ queryKey: ['col-play', cid] })
           setNow(Date.now())
           toast.info(error.message)
@@ -1012,11 +947,9 @@ export function SimulatedReaderHomePage() {
                   gap: 0.1,
                   color: '#fff',
                 }}>
-                  {block === 'exhausted'
-                    ? <LockRoundedIcon sx={{ fontSize: 18, filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.4))' }} />
-                    : <AccessTimeRoundedIcon sx={{ fontSize: 17, filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.4))' }} />}
+                  <AccessTimeRoundedIcon sx={{ fontSize: 17, filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.4))' }} />
                   <Typography sx={{ fontSize: '0.5rem', fontWeight: 800, lineHeight: 1, textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
-                    {block === 'exhausted' ? 'esgotado' : formatCooldownBadge(getBonusPackCooldownMs(pack.id))}
+                    {formatCooldownBadge(getBonusPackCooldownMs(pack.id))}
                   </Typography>
                 </Box>
               )}
@@ -1182,9 +1115,7 @@ export function SimulatedReaderHomePage() {
                 {selectedBonusPack.emoji} {selectedBonusPack.name}
               </DialogTitle>
               <Typography sx={{ mt: 0.45, fontSize: '0.78rem', color: colors.text.secondary, fontWeight: 700 }}>
-                {isRealReader && bonusPackBlock(selectedBonusPack) === 'exhausted'
-                  ? 'Você já abriu o máximo deste pacotinho'
-                  : isRealReader && bonusPackBlock(selectedBonusPack) === 'cooldown'
+                {isRealReader && bonusPackBlock(selectedBonusPack) === 'cooldown'
                     ? `Disponível em ${formatRemainingTime(getBonusPackCooldownMs(selectedBonusPack.id))}`
                     : isRealReader && selectedBonusPack.cumulative && (packAvailableCounts[selectedBonusPack.id] ?? 0) > 1
                       ? `${packAvailableCounts[selectedBonusPack.id]} aberturas acumuladas`
@@ -1275,7 +1206,7 @@ export function SimulatedReaderHomePage() {
                         onClick={() => handleOpenPack(selectedBonusPack, false)}
                         sx={{ flex: 1, whiteSpace: 'nowrap' }}
                       >
-                        {block === 'exhausted' ? 'Esgotado' : block === 'cooldown' ? 'Em cooldown' : opens > 1 ? 'Abrir 1' : 'Abrir bônus'}
+                        {block === 'cooldown' ? 'Em cooldown' : opens > 1 ? 'Abrir 1' : 'Abrir bônus'}
                       </Button>
                     </Stack>
                   </>
