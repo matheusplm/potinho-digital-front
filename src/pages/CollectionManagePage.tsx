@@ -120,7 +120,7 @@ const ACHIEVEMENT_PRESETS: { emoji: string; label: string; description: string; 
   { emoji: '❤️', label: 'Coração cheio', description: 'Favoritou 5 bilhetes.', conditionType: 'favorite_count', count: 5 },
 ]
 
-const EMPTY_NOTE: NoteFormData = { title: '', message: '', rarity: '', typeId: '' }
+const EMPTY_NOTE: NoteFormData = { title: '', message: '', rarity: '', typeId: '', imageUrl: null }
 const DEFAULT_IMPORT_JSON = `[
   {
     "title": "Seu título aqui",
@@ -430,7 +430,7 @@ function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
 
   useEffect(() => {
     if (!open) return
-    setForm(editing ? { title: editing.title, message: editing.message, rarity: editing.rarity, typeId: editing.typeId } : EMPTY_NOTE)
+    setForm(editing ? { title: editing.title, message: editing.message, rarity: editing.rarity, typeId: editing.typeId, imageUrl: editing.imageUrl ?? null } : EMPTY_NOTE)
     setTouched({ title: false, message: false, rarity: false, typeId: false })
   }, [open, editing])
 
@@ -531,6 +531,14 @@ function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
             {touched.typeId && errors.typeId && (
               <Typography sx={{ fontSize: '0.68rem', color: colors.error.main, mt: 0.5, pl: 0.5 }}>{errors.typeId}</Typography>
             )}
+          </Box>
+          <Box>
+            <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.secondary, mb: 0.5 }}>Imagem <Typography component="span" sx={{ fontSize: '0.68rem', fontWeight: 400, color: colors.text.muted }}>(opcional)</Typography></Typography>
+            <Input
+              placeholder="https://exemplo.com/imagem.jpg"
+              value={form.imageUrl ?? ''}
+              onChange={(e) => setForm((f) => ({ ...f, imageUrl: e.target.value.trim() || null }))}
+            />
           </Box>
         </Stack>
       </DialogContent>

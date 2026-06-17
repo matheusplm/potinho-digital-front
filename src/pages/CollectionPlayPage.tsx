@@ -167,6 +167,16 @@ export function RewardCard({ reward, rarities, types, onClick }: { reward: Colle
           )}
         </Stack>
 
+        {reward.imageUrl ? (
+          <Box sx={{ borderRadius: radius.lg, overflow: 'hidden', width: '100%', aspectRatio: '16/9', background: 'rgba(0,0,0,0.08)' }}>
+            <Box component="img" src={reward.imageUrl} alt={reward.title} sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          </Box>
+        ) : (
+          <Box sx={{ borderRadius: radius.lg, width: '100%', aspectRatio: '16/9', background: 'rgba(255,255,255,0.32)', border: '2px dashed rgba(0,0,0,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Typography sx={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.25)', fontWeight: 600 }}>sem imagem</Typography>
+          </Box>
+        )}
+
         <Box sx={{
           p: 1.15,
           borderRadius: radius.lg,
@@ -260,6 +270,11 @@ export function NoteDetailDialog({ note, rarities, types, onClose }: {
                   }} />
                 )}
               </Stack>
+              {note.imageUrl ? (
+                <Box sx={{ borderRadius: radius.lg, overflow: 'hidden', width: '100%', aspectRatio: '16/9', background: 'rgba(0,0,0,0.08)' }}>
+                  <Box component="img" src={note.imageUrl} alt={note.title} sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                </Box>
+              ) : null}
               <Box sx={{
                 p: 1.35,
                 borderRadius: radius.lg,

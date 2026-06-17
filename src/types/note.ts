@@ -7,6 +7,7 @@ export interface NoteRecord {
   message: string
   rarity: string
   typeId: string
+  imageUrl?: string | null
   createdAt: string
 }
 
@@ -15,6 +16,7 @@ export interface NoteFormData {
   message: string
   rarity: string
   typeId: string
+  imageUrl: string | null
 }
 
 export interface PartnerReader {
@@ -35,6 +37,7 @@ export interface Note {
   message: string
   rarity: string
   typeId: string
+  imageUrl?: string | null
   owned: boolean
   favorite: boolean
   obtainedAt: string | null
@@ -214,6 +217,7 @@ export interface CollectionDailyReward {
   message: string
   rarity: string
   typeId: string
+  imageUrl?: string | null
   isNew: boolean
 }
 
