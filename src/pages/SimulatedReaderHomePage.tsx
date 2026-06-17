@@ -592,10 +592,10 @@ export function SimulatedReaderHomePage() {
               background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.6)', backdropFilter: 'blur(12px)',
             }}>
               <Typography sx={{ fontSize: '1rem', lineHeight: 1 }}>{s.emoji}</Typography>
-              <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.05rem', color: theme.textOnBg, lineHeight: 1.2, mt: 0.25 }}>
+              <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.05rem', color: colors.text.primary, lineHeight: 1.2, mt: 0.25 }}>
                 {s.value}
               </Typography>
-              <Typography sx={{ fontSize: '0.70rem', fontWeight: 700, color: theme.textOnBgMuted }}>
+              <Typography sx={{ fontSize: '0.70rem', fontWeight: 700, color: colors.text.secondary }}>
                 {s.label}
               </Typography>
             </Box>
@@ -610,7 +610,7 @@ export function SimulatedReaderHomePage() {
               ) : (
                 <>
                   <Stack direction="row" justifyContent="space-between" alignItems="center">
-                    <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: theme.textOnBgMuted }}>
+                    <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: colors.text.secondary }}>
                       Coleção
                     </Typography>
                     <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.05rem', color: theme.accent }}>
@@ -623,7 +623,7 @@ export function SimulatedReaderHomePage() {
                     bgcolor: 'rgba(0,0,0,0.06)',
                     '& .MuiLinearProgress-bar': { borderRadius: radius.full, background: `linear-gradient(90deg, ${colors.rose.main}, ${theme.accent})` },
                   }} />
-                  <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted }}>
+                  <Typography sx={{ fontSize: '0.72rem', color: colors.text.secondary }}>
                     {play.owned} de {play.total} bilhetes coletados
                   </Typography>
                 </>
@@ -648,7 +648,7 @@ export function SimulatedReaderHomePage() {
                     Pra reler agora
                   </Typography>
                   <Typography sx={{
-                    fontFamily: font.serif, fontWeight: 800, fontSize: '0.92rem', color: theme.textOnBg, lineHeight: 1.25,
+                    fontFamily: font.serif, fontWeight: 800, fontSize: '0.92rem', color: colors.text.primary, lineHeight: 1.25,
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   }}>
                     {relerNote.title}
@@ -660,7 +660,7 @@ export function SimulatedReaderHomePage() {
                     sx={{
                       width: 30, height: 30, borderRadius: '50%', flexShrink: 0, cursor: 'pointer',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      color: theme.textOnBgMuted, transition: 'all 0.16s',
+                      color: colors.text.muted, transition: 'all 0.16s',
                       '&:hover': { color: theme.accent, bgcolor: `${theme.accent}12` },
                       '&:active': { transform: 'rotate(180deg)' },
                     }}
@@ -669,7 +669,7 @@ export function SimulatedReaderHomePage() {
                   </Box>
                 )}
                 <Box onClick={() => setSelectedNote(relerNote)} sx={{ cursor: 'pointer', flexShrink: 0 }}>
-                  <Typography sx={{ fontSize: '1.1rem', color: theme.textOnBgMuted }}>›</Typography>
+                  <Typography sx={{ fontSize: '1.1rem', color: colors.text.muted }}>›</Typography>
                 </Box>
               </Stack>
             </Card>
@@ -846,10 +846,10 @@ export function SimulatedReaderHomePage() {
                 backdropFilter: 'blur(12px)',
                 boxShadow: '0 8px 20px rgba(15,23,42,0.08)',
               }}>
-                <Typography sx={{ color: theme.textOnBg, fontFamily: font.serif, fontSize: '1rem', fontWeight: 850, lineHeight: 1.1 }}>
+                <Typography sx={{ color: colors.text.primary, fontFamily: font.serif, fontSize: '1rem', fontWeight: 850, lineHeight: 1.1 }}>
                   Pacotinho disponível
                 </Typography>
-                <Typography sx={{ color: theme.textOnBgMuted, fontSize: '0.72rem', fontWeight: 750, lineHeight: 1.2 }}>
+                <Typography sx={{ color: colors.text.secondary, fontSize: '0.72rem', fontWeight: 750, lineHeight: 1.2 }}>
                   toque no coração
                 </Typography>
               </Stack>
@@ -867,7 +867,7 @@ export function SimulatedReaderHomePage() {
                   fontFamily: font.serif,
                   fontWeight: 850,
                   fontSize: '1rem',
-                  color: theme.textOnBg,
+                  color: colors.text.primary,
                   textAlign: 'center',
                   maxWidth: 280,
                   display: '-webkit-box',
@@ -879,7 +879,7 @@ export function SimulatedReaderHomePage() {
                 }}>
                   Novo pacotinho em
                 </Typography>
-                <Typography sx={{ fontSize: '0.78rem', color: theme.textOnBgMuted, textAlign: 'center', maxWidth: 280, lineHeight: 1.45 }}>
+                <Typography sx={{ fontSize: '0.78rem', color: colors.text.secondary, textAlign: 'center', maxWidth: 280, lineHeight: 1.45 }}>
                   {remainingLabel}
                 </Typography>
                 {!isRealReader && (
@@ -896,7 +896,7 @@ export function SimulatedReaderHomePage() {
                       px: 1.25,
                       fontSize: '0.72rem',
                       background: 'rgba(255,255,255,0.42)',
-                      color: theme.textOnBg,
+                      color: colors.text.primary,
                       border: '1px solid rgba(255,255,255,0.48)',
                       '&:hover': { background: 'rgba(255,255,255,0.56)' },
                     }}
