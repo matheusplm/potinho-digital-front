@@ -16,7 +16,7 @@ import {
 import { keyframes } from '@emotion/react'
 import { useState, useEffect, useMemo, type ElementType } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button, Card, Input, LoadingState, PageTitle, ScrollablePage, toast } from '../components/ui'
+import { Button, Card, Input, LoadingState, PageTitle, ScrollablePage, toast, EmojiPickerInput } from '../components/ui'
 import {
   useCollectionsQuery, useCreateCollectionMutation,
   useUpdateCollectionMutation, useDeleteCollectionMutation,
@@ -136,7 +136,6 @@ function CollectionsFilterBar({
   )
 }
 
-const EMOJIS = ['💙', '💗', '✨', '🌸', '🌙', '🌊', '🌿', '🔥', '⭐', '🎁', '🦋', '🍀']
 const DEFAULT_FORM: CollectionFormData = { name: '', emoji: '💙', description: '', theme: 'romance' }
 
 function CollectionFormDialog({
@@ -181,22 +180,7 @@ function CollectionFormDialog({
             {form.emoji || '💙'}
           </Box>
 
-          <Box>
-            <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.text.secondary, mb: 0.8 }}>Emoji</Typography>
-            <Box sx={{ display: 'flex', gap: 0.7, flexWrap: 'wrap' }}>
-              {EMOJIS.map((e) => (
-                <Box key={e} onClick={() => setForm((f) => ({ ...f, emoji: e }))} sx={{
-                  width: 36, height: 36, borderRadius: radius.md, cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem',
-                  border: `2px solid ${form.emoji === e ? colors.primary.main : 'transparent'}`,
-                  background: form.emoji === e ? `${colors.primary.main}12` : 'rgba(0,0,0,0.04)',
-                  transition: 'all 0.15s',
-                }}>
-                  {e}
-                </Box>
-              ))}
-            </Box>
-          </Box>
+          <EmojiPickerInput label="Emoji" value={form.emoji} onChange={(emoji) => setForm((f) => ({ ...f, emoji }))} />
 
           <Box>
             <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
