@@ -602,7 +602,7 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
           <Stack direction="row" spacing={1.5}>
             <Input label="Nome" value={form.label} onChange={(e) => set('label', e.target.value)} sx={{ flex: 1 }} />
             <EmojiPickerInput label="Emoji" value={form.emoji} onChange={(emoji) => set('emoji', emoji)} />
-            <Input label="Chance %" type="number" value={form.odds} onChange={(e) => set('odds', Number(e.target.value))} sx={{ width: 95 }} />
+            <Input label="Chance %" type="number" value={form.odds} onChange={(e) => set('odds', parseFloat(Number(e.target.value).toFixed(2)))} sx={{ width: 95 }} inputProps={{ step: 0.01, min: 0, max: 100 }} />
           </Stack>
           <ColorRow label="Fundo do card" field="cardBg" value={form.cardBg} onChange={set} />
           <ColorRow label="Cor do texto" field="textColor" value={form.textColor} onChange={set} />
@@ -943,7 +943,7 @@ function pickRandomNote(notes: NoteRecord[]) {
 function pickWeightedNote(notes: NoteRecord[], rarities: RarityConfig[]) {
   const availableRarities = rarities
     .filter((rarity) => notes.some((note) => note.rarity === rarity.id))
-    .map((rarity) => ({ ...rarity, weight: rarity.odds > 0 ? rarity.odds : 1 }))
+    .map((rarity) => ({ ...rarity, weight: rarity.odds > 0 ? rarity.odds * 10 : 1 }))
 
   const totalWeight = availableRarities.reduce((sum, rarity) => sum + rarity.weight, 0)
   if (availableRarities.length === 0 || totalWeight <= 0) return pickRandomNote(notes)
