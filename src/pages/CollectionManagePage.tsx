@@ -22,8 +22,8 @@ import { NoteDetailDialog, type ReadableNote } from './CollectionPlayPage'
 import {
   useCollectionsQuery,
   useCollectionNotesQuery, useCreateCollectionNoteMutation, useImportCollectionNotesMutation, useUpdateCollectionNoteMutation, useDeleteCollectionNoteMutation,
-  useCollectionRaritiesQuery, useCreateCollectionRarityMutation, useUpdateCollectionRarityMutation, useDeleteCollectionRarityMutation,
-  useCollectionTypesQuery, useCreateCollectionTypeMutation, useUpdateCollectionTypeMutation, useDeleteCollectionTypeMutation,
+  useCollectionRaritiesQuery, useCreateCollectionRarityMutation, useUpdateCollectionRarityMutation, useDeleteCollectionRarityMutation, useImportCollectionRaritiesMutation,
+  useCollectionTypesQuery, useCreateCollectionTypeMutation, useUpdateCollectionTypeMutation, useDeleteCollectionTypeMutation, useImportCollectionTypesMutation,
   useCollectionPacksQuery, useCreateCollectionPackMutation, useUpdateCollectionPackMutation, useDeleteCollectionPackMutation,
   useCollectionAchievementsQuery, useCreateCollectionAchievementMutation, useDeleteCollectionAchievementMutation,
   useCollectionAccessQuery, useGrantAccessMutation, useAddPackOpensMutation,
@@ -126,6 +126,36 @@ const DEFAULT_IMPORT_JSON = `[
     "message": "Seu bilhetinho aqui",
     "rarity": "comum",
     "typeId": "alegria"
+  }
+]`
+
+const DEFAULT_IMPORT_RARITIES_JSON = `[
+  {
+    "id": "comum",
+    "label": "Comum",
+    "emoji": "⚪",
+    "odds": 60,
+    "order": 1,
+    "cardBg": "#ffffff",
+    "textColor": "#334155",
+    "captionColor": "#94a3b8",
+    "borderColor": "#cbd5e1",
+    "shadow": "0 4px 16px rgba(15,23,42,0.06)",
+    "glowColor": "",
+    "chipBg": "#f1f5f9",
+    "chipColor": "#64748b"
+  }
+]`
+
+const DEFAULT_IMPORT_TYPES_JSON = `[
+  {
+    "id": "alegria",
+    "label": "Alegria",
+    "emoji": "😊",
+    "order": 1,
+    "accentColor": "#6366f1",
+    "tagBg": "#eef2ff",
+    "tagColor": "#4f46e5"
   }
 ]`
 
@@ -1484,10 +1514,14 @@ export function CollectionManagePage() {
   const [rarityDialogOpen, setRarityDialogOpen] = useState(false)
   const [editingRarity, setEditingRarity] = useState<RarityConfig | null>(null)
   const [deletingRarity, setDeletingRarity] = useState<RarityConfig | null>(null)
+  const [rarityImportDialogOpen, setRarityImportDialogOpen] = useState(false)
+  const [rarityImportJson, setRarityImportJson] = useState(DEFAULT_IMPORT_RARITIES_JSON)
 
   const [typeDialogOpen, setTypeDialogOpen] = useState(false)
   const [editingType, setEditingType] = useState<NoteTypeConfig | null>(null)
   const [deletingType, setDeletingType] = useState<NoteTypeConfig | null>(null)
+  const [typeImportDialogOpen, setTypeImportDialogOpen] = useState(false)
+  const [typeImportJson, setTypeImportJson] = useState(DEFAULT_IMPORT_TYPES_JSON)
 
   const [achievementDialogOpen, setAchievementDialogOpen] = useState(false)
   const [editingAchievement, setEditingAchievement] = useState<CollectionAchievement | null>(null)
@@ -1506,7 +1540,9 @@ export function CollectionManagePage() {
   const deleteNote = useDeleteCollectionNoteMutation(cid)
   const importNotes = useImportCollectionNotesMutation(cid)
   const deleteRarity = useDeleteCollectionRarityMutation(cid)
+  const importRarities = useImportCollectionRaritiesMutation(cid)
   const deleteType = useDeleteCollectionTypeMutation(cid)
+  const importTypes = useImportCollectionTypesMutation(cid)
   const updatePack = useUpdateCollectionPackMutation(cid)
   const deletePack = useDeleteCollectionPackMutation(cid)
   const createAchievement = useCreateCollectionAchievementMutation(cid)
@@ -1640,6 +1676,48 @@ export function CollectionManagePage() {
       toast.error((error as Error).message || 'Erro ao importar bilhetes.')
     }
   }
+  async function handleImportRarities() {
+    try {
+      JSON.parse(rarityImportJson)
+    } catch {
+      toast.error('JSON inválido. Revise vírgulas, aspas e colchetes.')
+      return
+    }
+    try {
+      const result = await importRarities.mutateAsync(rarityImportJson)
+      const msg = result.created === 0
+        ? `Nenhuma raridade nova — ${result.skipped} já existia${result.skipped !== 1 ? 'm' : ''}.`
+        : result.skipped > 0
+          ? `${result.created} importada${result.created !== 1 ? 's' : ''}, ${result.skipped} ignorada${result.skipped !== 1 ? 's' : ''} (id duplicado).`
+          : `${result.created} raridade${result.created !== 1 ? 's' : ''} importada${result.created !== 1 ? 's' : ''}.`
+      toast.success(msg)
+      setRarityImportDialogOpen(false)
+    } catch (error) {
+      toast.error((error as Error).message || 'Erro ao importar raridades.')
+    }
+  }
+
+  async function handleImportTypes() {
+    try {
+      JSON.parse(typeImportJson)
+    } catch {
+      toast.error('JSON inválido. Revise vírgulas, aspas e colchetes.')
+      return
+    }
+    try {
+      const result = await importTypes.mutateAsync(typeImportJson)
+      const msg = result.created === 0
+        ? `Nenhum tipo novo — ${result.skipped} já existia${result.skipped !== 1 ? 'm' : ''}.`
+        : result.skipped > 0
+          ? `${result.created} importado${result.created !== 1 ? 's' : ''}, ${result.skipped} ignorado${result.skipped !== 1 ? 's' : ''} (id duplicado).`
+          : `${result.created} tipo${result.created !== 1 ? 's' : ''} importado${result.created !== 1 ? 's' : ''}.`
+      toast.success(msg)
+      setTypeImportDialogOpen(false)
+    } catch (error) {
+      toast.error((error as Error).message || 'Erro ao importar tipos.')
+    }
+  }
+
   const confirmDeleteRarity = () => {
     if (!deletingRarity) return
     deleteRarity.mutate(deletingRarity.id, {
@@ -2095,13 +2173,18 @@ export function CollectionManagePage() {
 
         {tab === 'rarities' && (
           <Stack spacing={1.4}>
-            <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Stack spacing={1}>
               <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted, fontWeight: 600 }}>
                 {rarities.length} raridade{rarities.length !== 1 ? 's' : ''}
               </Typography>
-              <Button variant="primary" onClick={() => { setEditingRarity(null); setRarityDialogOpen(true) }} sx={{ py: 0.7, px: 1.4, fontSize: '0.78rem' }}>
-                <AddIcon sx={{ fontSize: 15, mr: 0.4 }} /> Nova
-              </Button>
+              <Stack direction="row" spacing={0.8} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.8 }}>
+                <Button variant="ghost" onClick={() => setRarityImportDialogOpen(true)} sx={{ flex: '1 1 132px', py: 0.7, px: 1.2, fontSize: '0.76rem', background: 'rgba(255,255,255,0.44)' }}>
+                  Importar JSON
+                </Button>
+                <Button variant="primary" onClick={() => { setEditingRarity(null); setRarityDialogOpen(true) }} sx={{ flex: '1 1 94px', py: 0.7, px: 1.4, fontSize: '0.78rem' }}>
+                  <AddIcon sx={{ fontSize: 15, mr: 0.4 }} /> Nova
+                </Button>
+              </Stack>
             </Stack>
             {rarities.length === 0 && (
               <Typography sx={{ fontSize: '0.85rem', color: theme.textOnBgMuted, textAlign: 'center', py: 3 }}>
@@ -2134,13 +2217,18 @@ export function CollectionManagePage() {
 
         {tab === 'types' && (
           <Stack spacing={1.4}>
-            <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Stack spacing={1}>
               <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted, fontWeight: 600 }}>
                 {types.length} tipo{types.length !== 1 ? 's' : ''}
               </Typography>
-              <Button variant="primary" onClick={() => { setEditingType(null); setTypeDialogOpen(true) }} sx={{ py: 0.7, px: 1.4, fontSize: '0.78rem' }}>
-                <AddIcon sx={{ fontSize: 15, mr: 0.4 }} /> Novo
-              </Button>
+              <Stack direction="row" spacing={0.8} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.8 }}>
+                <Button variant="ghost" onClick={() => setTypeImportDialogOpen(true)} sx={{ flex: '1 1 132px', py: 0.7, px: 1.2, fontSize: '0.76rem', background: 'rgba(255,255,255,0.44)' }}>
+                  Importar JSON
+                </Button>
+                <Button variant="primary" onClick={() => { setEditingType(null); setTypeDialogOpen(true) }} sx={{ flex: '1 1 94px', py: 0.7, px: 1.4, fontSize: '0.78rem' }}>
+                  <AddIcon sx={{ fontSize: 15, mr: 0.4 }} /> Novo
+                </Button>
+              </Stack>
             </Stack>
             {types.length === 0 && (
               <Typography sx={{ fontSize: '0.85rem', color: theme.textOnBgMuted, textAlign: 'center', py: 3 }}>
@@ -2477,6 +2565,106 @@ export function CollectionManagePage() {
             loading={importNotes.isPending}
             disabled={!importJson.trim() || importNotes.isPending}
             onClick={handleImportNotes}
+            sx={{ flex: 1 }}
+          >
+            Importar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={rarityImportDialogOpen}
+        onClose={() => setRarityImportDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'rgba(255,253,251,0.98)' } } }}
+      >
+        <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, pb: 0.5 }}>
+          Importar raridades por JSON
+        </DialogTitle>
+        <DialogContent sx={{ pt: 1 }}>
+          <Stack spacing={1.3}>
+            <Typography sx={{ fontSize: '0.82rem', color: colors.text.secondary, lineHeight: 1.5 }}>
+              Cole uma lista de raridades. Cada item precisa ter <strong>id</strong>, <strong>label</strong>, <strong>emoji</strong>, <strong>odds</strong>, <strong>order</strong> e as cores. Raridades com id já existente serão ignoradas.
+            </Typography>
+            <TextField
+              multiline
+              minRows={10}
+              value={rarityImportJson}
+              onChange={(event) => setRarityImportJson(event.target.value)}
+              fullWidth
+              spellCheck={false}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: radius.lg,
+                  background: colors.surface.base,
+                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                  fontSize: '0.75rem',
+                  alignItems: 'flex-start',
+                },
+              }}
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
+          <Button variant="ghost" onClick={() => setRarityImportDialogOpen(false)} sx={{ flex: 1 }}>
+            Cancelar
+          </Button>
+          <Button
+            variant="primary"
+            loading={importRarities.isPending}
+            disabled={!rarityImportJson.trim() || importRarities.isPending}
+            onClick={handleImportRarities}
+            sx={{ flex: 1 }}
+          >
+            Importar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={typeImportDialogOpen}
+        onClose={() => setTypeImportDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'rgba(255,253,251,0.98)' } } }}
+      >
+        <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, pb: 0.5 }}>
+          Importar tipos por JSON
+        </DialogTitle>
+        <DialogContent sx={{ pt: 1 }}>
+          <Stack spacing={1.3}>
+            <Typography sx={{ fontSize: '0.82rem', color: colors.text.secondary, lineHeight: 1.5 }}>
+              Cole uma lista de tipos. Cada item precisa ter <strong>id</strong>, <strong>label</strong>, <strong>emoji</strong>, <strong>order</strong>, <strong>accentColor</strong>, <strong>tagBg</strong> e <strong>tagColor</strong>. Tipos com id já existente serão ignorados.
+            </Typography>
+            <TextField
+              multiline
+              minRows={10}
+              value={typeImportJson}
+              onChange={(event) => setTypeImportJson(event.target.value)}
+              fullWidth
+              spellCheck={false}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: radius.lg,
+                  background: colors.surface.base,
+                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                  fontSize: '0.75rem',
+                  alignItems: 'flex-start',
+                },
+              }}
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
+          <Button variant="ghost" onClick={() => setTypeImportDialogOpen(false)} sx={{ flex: 1 }}>
+            Cancelar
+          </Button>
+          <Button
+            variant="primary"
+            loading={importTypes.isPending}
+            disabled={!typeImportJson.trim() || importTypes.isPending}
+            onClick={handleImportTypes}
             sx={{ flex: 1 }}
           >
             Importar

@@ -105,6 +105,14 @@ export function useDeleteCollectionRarityMutation(cid: string) {
   })
 }
 
+export function useImportCollectionRaritiesMutation(cid: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (json: string) => api.importCollectionRarities(cid, json),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['col-rarities', cid] }) },
+  })
+}
+
 export function useCollectionTypesQuery(cid: string) {
   return useQuery({ queryKey: ['col-types', cid], queryFn: () => api.getCollectionTypes(cid), enabled: !!cid })
 }
@@ -130,6 +138,14 @@ export function useDeleteCollectionTypeMutation(cid: string) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => api.deleteCollectionType(cid, id),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['col-types', cid] }) },
+  })
+}
+
+export function useImportCollectionTypesMutation(cid: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (json: string) => api.importCollectionTypes(cid, json),
     onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['col-types', cid] }) },
   })
 }

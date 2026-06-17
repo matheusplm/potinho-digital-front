@@ -254,6 +254,10 @@ export const api = {
     request<{ deleted: boolean }>(`/api/collections/${cid}/notes/${id}`, { method: 'DELETE' }),
 
   getCollectionRarities: (cid: string) => request<RarityConfig[]>(`/api/collections/${cid}/rarities`),
+  importCollectionRarities: (cid: string, json: string) =>
+    request<{ created: number; skipped: number; items: RarityConfig[] }>(`/api/collections/${cid}/rarities/import`, {
+      method: 'POST', body: JSON.stringify({ json }),
+    }),
   createCollectionRarity: (cid: string, data: Omit<RarityConfig, 'createdAt' | 'updatedAt'>) =>
     request<RarityConfig>(`/api/collections/${cid}/rarities`, { method: 'POST', body: JSON.stringify(data) }),
   updateCollectionRarity: (cid: string, id: string, data: Partial<RarityConfig>) =>
@@ -262,6 +266,10 @@ export const api = {
     request<{ deleted: boolean }>(`/api/collections/${cid}/rarities/${id}`, { method: 'DELETE' }),
 
   getCollectionTypes: (cid: string) => request<NoteTypeConfig[]>(`/api/collections/${cid}/types`),
+  importCollectionTypes: (cid: string, json: string) =>
+    request<{ created: number; skipped: number; items: NoteTypeConfig[] }>(`/api/collections/${cid}/types/import`, {
+      method: 'POST', body: JSON.stringify({ json }),
+    }),
   createCollectionType: (cid: string, data: Omit<NoteTypeConfig, 'createdAt' | 'updatedAt'>) =>
     request<NoteTypeConfig>(`/api/collections/${cid}/types`, { method: 'POST', body: JSON.stringify(data) }),
   updateCollectionType: (cid: string, id: string, data: Partial<NoteTypeConfig>) =>
