@@ -18,6 +18,7 @@ import { keyframes } from '@emotion/react'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Button, Card, Input, LoadingState, PageTitle, ScrollablePage, SegmentedControl, toast, EmojiPickerInput } from '../components/ui'
+import { ImagePicker } from '../components/ImagePicker'
 import { NoteDetailDialog, type ReadableNote } from './CollectionPlayPage'
 import {
   useCollectionsQuery,
@@ -544,14 +545,10 @@ function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
               <Typography sx={{ fontSize: '0.68rem', color: colors.error.main, mt: 0.5, pl: 0.5 }}>{errors.typeId}</Typography>
             )}
           </Box>
-          <Box>
-            <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.secondary, mb: 0.5 }}>Imagem <Typography component="span" sx={{ fontSize: '0.68rem', fontWeight: 400, color: colors.text.muted }}>(opcional)</Typography></Typography>
-            <Input
-              placeholder="https://exemplo.com/imagem.jpg"
-              value={form.imageUrl ?? ''}
-              onChange={(e) => setForm((f) => ({ ...f, imageUrl: e.target.value.trim() || null, imageLayout: e.target.value.trim() ? (f.imageLayout ?? 'banner') : null }))}
-            />
-          </Box>
+          <ImagePicker
+            value={form.imageUrl}
+            onChange={(url) => setForm((f) => ({ ...f, imageUrl: url, imageLayout: url ? (f.imageLayout ?? 'banner') : null }))}
+          />
           {form.imageUrl && (
             <Box>
               <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.secondary, mb: 0.8 }}>Layout da imagem</Typography>
