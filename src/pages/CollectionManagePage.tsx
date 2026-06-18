@@ -139,7 +139,9 @@ const DEFAULT_IMPORT_JSON = `[
     "title": "Seu título aqui",
     "message": "Seu bilhetinho aqui",
     "rarity": "comum",
-    "typeId": "alegria"
+    "typeId": "alegria",
+    "imageUrl": "https://exemplo.com/imagem.gif",
+    "imageLayout": "thumb-left"
   }
 ]`
 
