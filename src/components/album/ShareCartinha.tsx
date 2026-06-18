@@ -226,25 +226,22 @@ export function ShareCartinha({ note, r, t, theme }: {
   const caption = r?.captionColor || colors.text.secondary
 
   const inner = (story: boolean) => {
-    const tc = isImmersive ? '#fff' : textColor
-    const cc = isImmersive ? 'rgba(255,255,255,0.82)' : caption
     const thumbSize = layout.startsWith('circle') ? 56 : 64
     const thumbRight = layout === 'thumb-right' || layout === 'circle-right'
 
-    const emojiSz   = story ? 76 : 62     // output: 152 / 124px
-    const emojiFsz  = story ? '2.2rem' : '1.8rem'
-    const titleFsz  = story ? '3.8rem' : '3.1rem'  // output: ~122 / ~99px
-    const msgFsz    = story ? '2.2rem' : '1.7rem'   // output: ~70 / ~54px
-    const chipFsz   = story ? '1.1rem' : '0.96rem'
-    const chipTypFsz = story ? '1rem'  : '0.88rem'
-    const gapMain   = story ? 3 : 2.5
-    const padX      = story ? 3.5 : 2.5
-    const padY      = story ? 5 : 2.5
-    const footerBot = story ? 32 : 18
-    const footerFsz = story ? '1rem' : '0.88rem'
+    const emojiSz    = story ? 52 : 42
+    const emojiFsz   = story ? '1.8rem' : '1.5rem'
+    const titleFsz   = story ? '3.8rem' : '3.1rem'
+    const msgFsz     = story ? '2.2rem' : '1.7rem'
+    const chipFsz    = story ? '1.1rem' : '0.96rem'
+    const chipTypFsz = story ? '1rem'   : '0.88rem'
+    const padX       = story ? 3.5 : 2.5
+    const padY       = story ? 4   : 3
+    const footerFsz  = story ? '1rem' : '0.88rem'
+    const midPy      = story ? 2.5 : 1.5
 
     const emojiCircle = (
-      <Box sx={{ width: emojiSz, height: emojiSz, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: emojiFsz, background: isImmersive ? 'rgba(0,0,0,0.35)' : 'rgba(255,255,255,0.7)', border: `2px solid ${isImmersive ? 'rgba(255,255,255,0.4)' : `${accent}66`}` }}>
+      <Box sx={{ width: emojiSz, height: emojiSz, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: emojiFsz, flexShrink: 0, background: isImmersive ? 'rgba(0,0,0,0.35)' : 'rgba(255,255,255,0.7)', border: `2px solid ${isImmersive ? 'rgba(255,255,255,0.4)' : `${accent}66`}` }}>
         {r?.emoji || '💌'}
       </Box>
     )
@@ -258,13 +255,13 @@ export function ShareCartinha({ note, r, t, theme }: {
         {t.emoji} {t.label}
       </Box>
     )
-    const footer = (
-      <Typography sx={{ position: 'absolute', bottom: footerBot, left: 0, right: 0, zIndex: 2, fontFamily: font.serif, fontWeight: 700, color: isImmersive ? 'rgba(255,255,255,0.7)' : accent, opacity: 0.75, fontSize: footerFsz, textAlign: 'center' }}>
-        Potinho Digital 💌
-      </Typography>
-    )
     const radialBg = (
       <Box sx={{ position: 'absolute', inset: 0, background: `radial-gradient(circle at 20% 0%, rgba(255,255,255,0.6), transparent 42%), radial-gradient(circle at 90% 100%, ${accent}33, transparent 46%)`, pointerEvents: 'none' }} />
+    )
+    const brand = (
+      <Typography sx={{ fontFamily: font.serif, fontWeight: 700, color: isImmersive ? 'rgba(255,255,255,0.7)' : accent, opacity: 0.75, fontSize: footerFsz }}>
+        Potinho Digital 💌
+      </Typography>
     )
 
     if (isImmersive) {
@@ -272,15 +269,19 @@ export function ShareCartinha({ note, r, t, theme }: {
         <Box sx={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}>
           <Box data-img-slot="true" sx={{ position: 'absolute', inset: 0 }} />
           <Box sx={{ position: 'absolute', inset: 0, background: layout === 'bg-blur' ? 'rgba(0,0,0,0.28)' : 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.08) 100%)' }} />
-          <Box sx={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', px: padX, py: padY, boxSizing: 'border-box' }}>
-            <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: gapMain, maxWidth: '100%' }}>
+          <Box sx={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', px: padX, pt: padY, pb: padY, boxSizing: 'border-box' }}>
+            <Stack direction="row" alignItems="center" spacing={1.5} sx={{ flexShrink: 0 }}>
               {emojiCircle}{rarityChip}
-              <Typography sx={{ fontFamily: font.serif, fontWeight: 850, color: tc, lineHeight: 1.18, fontSize: titleFsz, overflowWrap: 'anywhere', wordBreak: 'break-word', textShadow: '0 1px 8px rgba(0,0,0,0.6)' }}>{note.title}</Typography>
-              <Typography sx={{ fontStyle: 'italic', color: cc, lineHeight: 1.5, fontSize: msgFsz, overflowWrap: 'anywhere', wordBreak: 'break-word', textShadow: '0 1px 6px rgba(0,0,0,0.5)' }}>&ldquo;{note.message}&rdquo;</Typography>
-              {typeChip}
+            </Stack>
+            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', py: midPy, minHeight: 0 }}>
+              <Typography sx={{ fontFamily: font.serif, fontWeight: 850, color: '#fff', lineHeight: 1.18, fontSize: titleFsz, overflowWrap: 'anywhere', wordBreak: 'break-word', textShadow: '0 1px 8px rgba(0,0,0,0.6)' }}>{note.title}</Typography>
+              <Typography sx={{ mt: story ? 2 : 1.5, fontStyle: 'italic', color: 'rgba(255,255,255,0.82)', lineHeight: 1.5, fontSize: msgFsz, overflowWrap: 'anywhere', wordBreak: 'break-word', textShadow: '0 1px 6px rgba(0,0,0,0.5)' }}>&ldquo;{note.message}&rdquo;</Typography>
             </Box>
+            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ flexShrink: 0 }}>
+              {typeChip ?? <Box />}
+              {brand}
+            </Stack>
           </Box>
-          {footer}
         </Box>
       )
     }
@@ -289,27 +290,33 @@ export function ShareCartinha({ note, r, t, theme }: {
       return (
         <Box sx={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: bg, display: 'flex', flexDirection: 'row', boxSizing: 'border-box' }}>
           <Box data-img-slot="true" sx={{ width: 90, flexShrink: 0, alignSelf: 'stretch' }} />
-          <Stack sx={{ flex: 1, p: story ? 2.5 : 1.8, justifyContent: 'center', position: 'relative', minWidth: 0 }}>
+          <Box sx={{ flex: 1, position: 'relative', display: 'flex', flexDirection: 'column', px: 2, pt: story ? 2.5 : 1.8, pb: story ? 2.5 : 1.8, minWidth: 0, boxSizing: 'border-box' }}>
             {radialBg}
-            <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: story ? 2.5 : 1.8 }}>
+            <Stack direction="row" alignItems="center" spacing={1.5} sx={{ flexShrink: 0, zIndex: 1 }}>
               {emojiCircle}{rarityChip}
+            </Stack>
+            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', zIndex: 1, py: story ? 2 : 1.2, minHeight: 0 }}>
               <Typography sx={{ fontFamily: font.serif, fontWeight: 850, color: textColor, lineHeight: 1.18, fontSize: story ? '3rem' : '2rem', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{note.title}</Typography>
-              <Typography sx={{ fontStyle: 'italic', color: caption, lineHeight: 1.5, fontSize: story ? '1.8rem' : '1.3rem', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>&ldquo;{note.message}&rdquo;</Typography>
-              {typeChip}
+              <Typography sx={{ mt: story ? 1.8 : 1.2, fontStyle: 'italic', color: caption, lineHeight: 1.5, fontSize: story ? '1.8rem' : '1.3rem', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>&ldquo;{note.message}&rdquo;</Typography>
             </Box>
-          </Stack>
-          {footer}
+            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ flexShrink: 0, zIndex: 1 }}>
+              {typeChip ?? <Box />}
+              {brand}
+            </Stack>
+          </Box>
         </Box>
       )
     }
 
     if (isThumbLayout) {
       return (
-        <Box sx={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', px: padX, py: padY, boxSizing: 'border-box' }}>
+        <Box sx={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: bg, display: 'flex', flexDirection: 'column', px: padX, pt: padY, pb: padY, boxSizing: 'border-box' }}>
           {radialBg}
-          <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: gapMain, maxWidth: '100%' }}>
+          <Stack direction="row" alignItems="center" spacing={1.5} sx={{ flexShrink: 0, zIndex: 1 }}>
             {emojiCircle}{rarityChip}
-            <Box sx={{ p: 1.15, borderRadius: radius.lg, background: 'rgba(255,255,255,0.68)', border: '1px solid rgba(255,255,255,0.58)', backdropFilter: 'blur(8px)', width: '100%', minWidth: 0 }}>
+          </Stack>
+          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', zIndex: 1, py: midPy, minHeight: 0 }}>
+            <Box sx={{ p: 1.15, borderRadius: radius.lg, background: 'rgba(255,255,255,0.68)', border: '1px solid rgba(255,255,255,0.58)', backdropFilter: 'blur(8px)' }}>
               <Stack direction={thumbRight ? 'row-reverse' : 'row'} spacing={1.2} alignItems="flex-start">
                 <Box data-img-slot="true" sx={{ flexShrink: 0, width: thumbSize, height: thumbSize, borderRadius: layout.startsWith('circle') ? '50%' : radius.md }} />
                 <Box sx={{ minWidth: 0, flex: 1, textAlign: 'left' }}>
@@ -318,26 +325,37 @@ export function ShareCartinha({ note, r, t, theme }: {
                 </Box>
               </Stack>
             </Box>
-            {typeChip}
           </Box>
-          {footer}
+          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ flexShrink: 0, zIndex: 1 }}>
+            {typeChip ?? <Box />}
+            {brand}
+          </Stack>
         </Box>
       )
     }
 
     return (
-      <Box sx={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: bg, display: 'flex', flexDirection: 'column', ...(showBannerImg ? {} : { alignItems: 'center', justifyContent: 'center', textAlign: 'center' }), boxSizing: 'border-box' }}>
+      <Box sx={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: bg, display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
         {showBannerImg && <Box data-img-slot="true" sx={{ width: '100%', height: story ? 300 : 195, flexShrink: 0 }} />}
-        <Box sx={{ flex: 1, position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', px: padX, py: story ? (showBannerImg ? 3 : padY) : (showBannerImg ? 2 : padY), boxSizing: 'border-box' }}>
-          {radialBg}
-          <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: gapMain, maxWidth: '100%' }}>
-            {emojiCircle}{rarityChip}
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 850, color: textColor, lineHeight: 1.18, fontSize: titleFsz, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{note.title}</Typography>
-            <Typography sx={{ fontStyle: 'italic', color: caption, lineHeight: 1.5, fontSize: msgFsz, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>&ldquo;{note.message}&rdquo;</Typography>
-            {typeChip}
+        {radialBg}
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', px: padX, pt: showBannerImg ? 1.5 : padY, pb: padY, boxSizing: 'border-box', minHeight: 0 }}>
+          <Stack direction="row" alignItems="center" spacing={1.5} sx={{ flexShrink: 0, zIndex: 1 }}>
+            {!showBannerImg && emojiCircle}
+            {rarityChip}
+          </Stack>
+          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', zIndex: 1, py: midPy, minHeight: 0 }}>
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 850, color: textColor, lineHeight: 1.18, fontSize: titleFsz, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+              {note.title}
+            </Typography>
+            <Typography sx={{ mt: story ? 2 : 1.5, fontStyle: 'italic', color: caption, lineHeight: 1.5, fontSize: msgFsz, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+              &ldquo;{note.message}&rdquo;
+            </Typography>
           </Box>
+          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ flexShrink: 0, zIndex: 1 }}>
+            {typeChip ?? <Box />}
+            {brand}
+          </Stack>
         </Box>
-        {footer}
       </Box>
     )
   }
