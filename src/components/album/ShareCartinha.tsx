@@ -72,32 +72,66 @@ export function ShareCartinha({ note, r, t, theme }: {
   const layout = (note.imageLayout ?? 'banner') as NoteImageLayout
   const isImmersive = hasImg && (layout === 'hero-overlay' || layout === 'bg-blur')
   const showBannerImg = hasImg && !isImmersive
+  const isCircleLayout = layout.startsWith('circle')
+  const isThumbLayout = layout === 'thumb-left' || layout === 'thumb-right' || layout === 'circle-left' || layout === 'circle-right'
+  const isStripeLayout = layout === 'stripe-left'
+
+  function measureSlot(baseNode: HTMLElement, W: number, H: number) {
+    const slotEl = baseNode.querySelector('[data-img-slot]') as HTMLElement | null
+    if (!slotEl || !hasImg) return { x: 0, y: 0, w: W, h: H }
+    const cardRect = baseNode.getBoundingClientRect()
+    const slotRect = slotEl.getBoundingClientRect()
+    return {
+      x: slotRect.left - cardRect.left,
+      y: slotRect.top - cardRect.top,
+      w: slotRect.width,
+      h: slotRect.height,
+    }
+  }
+
+  function drawAtSlot(
+    ctx: CanvasRenderingContext2D,
+    src: HTMLImageElement | HTMLCanvasElement,
+    slot: { x: number; y: number; w: number; h: number }
+  ) {
+    const { x, y, w, h } = slot
+    if (layout === 'bg-blur') {
+      ctx.filter = 'blur(20px) brightness(0.5) saturate(1.4)'
+      ctx.drawImage(src, x - BLUR_PAD, y - BLUR_PAD, w + BLUR_PAD * 2, h + BLUR_PAD * 2)
+      ctx.filter = 'none'
+    } else if (isCircleLayout) {
+      ctx.save()
+      ctx.beginPath()
+      ctx.arc(x + w / 2, y + h / 2, Math.min(w, h) / 2, 0, Math.PI * 2)
+      ctx.clip()
+      ctx.drawImage(src, x, y, w, h)
+      ctx.restore()
+    } else {
+      ctx.drawImage(src, x, y, w, h)
+    }
+  }
 
   async function share(format: 'card' | 'story') {
     const baseNode = format === 'card' ? cardRef.current : storyRef.current
     if (!baseNode || busy) return
     setBusy(format)
-
     try {
       const W = 540
       const H = format === 'story' ? 960 : 540
+      const slot = measureSlot(baseNode, W, H)
 
-      // Capture base card (no image element – avoids SVG size limits in Chrome)
       const baseDataUrl = await toPng(baseNode, { pixelRatio: 2, cacheBust: true })
 
       let blob: Blob
       let filename: string
 
       if (hasImg && isGif && imgDataUrl) {
-        // ── Animated GIF output ──────────────────────────────────────────
         const parsedGif = parseGIF(dataUrlToBuffer(imgDataUrl))
         const frames = decompressFrames(parsedGif, true)
         const gifW = parsedGif.lsd.width
         const gifH = parsedGif.lsd.height
 
         const baseImg = await loadImgEl(baseDataUrl)
-
-        // Canvas that accumulates the current GIF state (handles partial frames)
         const gifStateCanvas = document.createElement('canvas')
         gifStateCanvas.width = gifW
         gifStateCanvas.height = gifH
@@ -110,7 +144,6 @@ export function ShareCartinha({ note, r, t, theme }: {
         const outCtx = outCanvas.getContext('2d')!
 
         for (const frame of frames) {
-          // Patch the GIF state canvas with this frame
           const patchCanvas = document.createElement('canvas')
           patchCanvas.width = frame.dims.width
           patchCanvas.height = frame.dims.height
@@ -119,29 +152,20 @@ export function ShareCartinha({ note, r, t, theme }: {
           )
           gifStateCtx.drawImage(patchCanvas, frame.dims.left, frame.dims.top)
 
-          // Composite: GIF state → base card overlay
           outCtx.clearRect(0, 0, W, H)
           if (isImmersive) {
-            if (layout === 'bg-blur') {
-              outCtx.filter = 'blur(20px) brightness(0.5) saturate(1.4)'
-              outCtx.drawImage(gifStateCanvas, -BLUR_PAD, -BLUR_PAD, W + BLUR_PAD * 2, H + BLUR_PAD * 2)
-              outCtx.filter = 'none'
-            } else {
-              outCtx.drawImage(gifStateCanvas, 0, 0, W, H)
-            }
+            drawAtSlot(outCtx, gifStateCanvas, slot)
             outCtx.drawImage(baseImg, 0, 0, W, H)
           } else {
-            const bannerH = format === 'story' ? 300 : 195
             outCtx.drawImage(baseImg, 0, 0, W, H)
-            outCtx.drawImage(gifStateCanvas, 0, 0, W, bannerH)
+            drawAtSlot(outCtx, gifStateCanvas, slot)
           }
 
           const { data } = outCtx.getImageData(0, 0, W, H)
           const palette = quantize(data, 256)
           const index = applyPalette(data, palette)
-          gif.writeFrame(index, W, H, { palette, delay: Math.max((frame.delay ?? 10) * 10, 20) })
+          gif.writeFrame(index, W, H, { palette, delay: Math.max(frame.delay ?? 10, 2) })
 
-          // Handle disposal
           if (frame.disposalType === 2) {
             gifStateCtx.clearRect(frame.dims.left, frame.dims.top, frame.dims.width, frame.dims.height)
           }
@@ -152,10 +176,8 @@ export function ShareCartinha({ note, r, t, theme }: {
         filename = `cartinha-${format}.gif`
 
       } else if (hasImg) {
-        // ── Static image card ────────────────────────────────────────────
         const srcImg = await loadImgEl(note.imageUrl!, true)
         const baseImg = await loadImgEl(baseDataUrl)
-
         const canvas = document.createElement('canvas')
         canvas.width = W * 2
         canvas.height = H * 2
@@ -163,26 +185,17 @@ export function ShareCartinha({ note, r, t, theme }: {
         ctx.scale(2, 2)
 
         if (isImmersive) {
-          if (layout === 'bg-blur') {
-            ctx.filter = 'blur(20px) brightness(0.5) saturate(1.4)'
-            ctx.drawImage(srcImg, -BLUR_PAD, -BLUR_PAD, W + BLUR_PAD * 2, H + BLUR_PAD * 2)
-            ctx.filter = 'none'
-          } else {
-            ctx.drawImage(srcImg, 0, 0, W, H)
-          }
+          drawAtSlot(ctx, srcImg, slot)
           ctx.drawImage(baseImg, 0, 0, W, H)
         } else {
-          const bannerH = format === 'story' ? 300 : 195
           ctx.drawImage(baseImg, 0, 0, W, H)
-          ctx.drawImage(srcImg, 0, 0, W, bannerH)
+          drawAtSlot(ctx, srcImg, slot)
         }
 
-        const compositeUrl = canvas.toDataURL('image/png')
-        blob = await (await fetch(compositeUrl)).blob()
+        blob = await new Promise<Blob>((res) => canvas.toBlob((b) => res(b!), 'image/png'))
         filename = `cartinha-${format}.png`
 
       } else {
-        // ── No image ─────────────────────────────────────────────────────
         blob = await (await fetch(baseDataUrl)).blob()
         filename = `cartinha-${format}.png`
       }
@@ -213,116 +226,104 @@ export function ShareCartinha({ note, r, t, theme }: {
   const caption = r?.captionColor || colors.text.secondary
 
   const inner = (story: boolean) => {
-    // Renders WITHOUT the image — image is composited on canvas separately
     const tc = isImmersive ? '#fff' : textColor
     const cc = isImmersive ? 'rgba(255,255,255,0.82)' : caption
+    const thumbSize = layout.startsWith('circle') ? 56 : 64
+    const thumbRight = layout === 'thumb-right' || layout === 'circle-right'
 
-    const textBlock = (
-      <Box sx={{
-        position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column',
-        alignItems: 'center', gap: story ? 2.4 : 1.6, maxWidth: '100%',
-      }}>
-        <Box sx={{
-          width: story ? 96 : 72, height: story ? 96 : 72, borderRadius: '50%',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: story ? '2.8rem' : '2.1rem',
-          background: isImmersive ? 'rgba(0,0,0,0.35)' : 'rgba(255,255,255,0.7)',
-          border: `2px solid ${isImmersive ? 'rgba(255,255,255,0.4)' : `${accent}66`}`,
-        }}>
-          {r?.emoji || '💌'}
-        </Box>
-        {r && (
-          <Box sx={{
-            px: 1.4, py: 0.5, borderRadius: radius.full, fontWeight: 800,
-            fontSize: story ? '0.95rem' : '0.82rem',
-            background: isImmersive ? 'rgba(0,0,0,0.4)' : r.chipBg,
-            border: `1px solid ${isImmersive ? 'rgba(255,255,255,0.35)' : r.borderColor}`,
-          }}>
-            <Box component="span" sx={isImmersive ? { color: '#fff' } : gradientTextSx(r.chipColor)}>
-              {r.emoji} {r.label}
-            </Box>
-          </Box>
-        )}
-        <Typography sx={{
-          fontFamily: font.serif, fontWeight: 850, color: tc, lineHeight: 1.2,
-          fontSize: story ? '2rem' : '1.6rem', overflowWrap: 'anywhere', wordBreak: 'break-word',
-          ...(isImmersive ? { textShadow: '0 1px 8px rgba(0,0,0,0.6)' } : {}),
-        }}>
-          {note.title}
-        </Typography>
-        <Typography sx={{
-          fontStyle: 'italic', color: cc, lineHeight: 1.55,
-          fontSize: story ? '1.25rem' : '1.05rem', overflowWrap: 'anywhere', wordBreak: 'break-word',
-          ...(isImmersive ? { textShadow: '0 1px 6px rgba(0,0,0,0.5)' } : {}),
-        }}>
-          &ldquo;{note.message}&rdquo;
-        </Typography>
-        {t && (
-          <Box sx={{
-            px: 1.2, py: 0.4, borderRadius: radius.full, fontWeight: 700,
-            fontSize: story ? '0.85rem' : '0.74rem',
-            background: isImmersive ? 'rgba(0,0,0,0.35)' : t.tagBg,
-            color: isImmersive ? '#fff' : t.tagColor,
-          }}>
-            {t.emoji} {t.label}
-          </Box>
-        )}
+    const emojiCircle = (
+      <Box sx={{ width: story ? 96 : 72, height: story ? 96 : 72, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: story ? '2.8rem' : '2.1rem', background: isImmersive ? 'rgba(0,0,0,0.35)' : 'rgba(255,255,255,0.7)', border: `2px solid ${isImmersive ? 'rgba(255,255,255,0.4)' : `${accent}66`}` }}>
+        {r?.emoji || '💌'}
       </Box>
     )
-
+    const rarityChip = r && (
+      <Box sx={{ px: 1.4, py: 0.5, borderRadius: radius.full, fontWeight: 800, fontSize: story ? '0.95rem' : '0.82rem', background: isImmersive ? 'rgba(0,0,0,0.4)' : r.chipBg, border: `1px solid ${isImmersive ? 'rgba(255,255,255,0.35)' : r.borderColor}` }}>
+        <Box component="span" sx={isImmersive ? { color: '#fff' } : gradientTextSx(r.chipColor)}>{r.emoji} {r.label}</Box>
+      </Box>
+    )
+    const typeChip = t && (
+      <Box sx={{ px: 1.2, py: 0.4, borderRadius: radius.full, fontWeight: 700, fontSize: story ? '0.85rem' : '0.74rem', background: isImmersive ? 'rgba(0,0,0,0.35)' : t.tagBg, color: isImmersive ? '#fff' : t.tagColor }}>
+        {t.emoji} {t.label}
+      </Box>
+    )
     const footer = (
-      <Typography sx={{
-        position: 'absolute', bottom: story ? 32 : 20, left: 0, right: 0, zIndex: 2,
-        fontFamily: font.serif, fontWeight: 700,
-        color: isImmersive ? 'rgba(255,255,255,0.7)' : accent,
-        opacity: 0.75, fontSize: story ? '1rem' : '0.85rem', textAlign: 'center',
-      }}>
+      <Typography sx={{ position: 'absolute', bottom: story ? 32 : 20, left: 0, right: 0, zIndex: 2, fontFamily: font.serif, fontWeight: 700, color: isImmersive ? 'rgba(255,255,255,0.7)' : accent, opacity: 0.75, fontSize: story ? '1rem' : '0.85rem', textAlign: 'center' }}>
         Potinho Digital 💌
       </Typography>
     )
+    const radialBg = (
+      <Box sx={{ position: 'absolute', inset: 0, background: `radial-gradient(circle at 20% 0%, rgba(255,255,255,0.6), transparent 42%), radial-gradient(circle at 90% 100%, ${accent}33, transparent 46%)`, pointerEvents: 'none' }} />
+    )
 
-    // Immersive: transparent bg + dark overlay + text (image goes behind in canvas step)
     if (isImmersive) {
       return (
         <Box sx={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}>
-          <Box sx={{
-            position: 'absolute', inset: 0,
-            background: layout === 'bg-blur'
-              ? 'rgba(0,0,0,0.28)'
-              : 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.08) 100%)',
-          }} />
-          <Box sx={{
-            position: 'relative', zIndex: 1, width: '100%', height: '100%',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-            px: story ? 5 : 4, py: story ? 8 : 5, boxSizing: 'border-box',
-          }}>
-            {textBlock}
+          <Box data-img-slot="true" sx={{ position: 'absolute', inset: 0 }} />
+          <Box sx={{ position: 'absolute', inset: 0, background: layout === 'bg-blur' ? 'rgba(0,0,0,0.28)' : 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.08) 100%)' }} />
+          <Box sx={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', px: story ? 5 : 4, py: story ? 8 : 5, boxSizing: 'border-box' }}>
+            <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: story ? 2.4 : 1.6, maxWidth: '100%' }}>
+              {emojiCircle}{rarityChip}
+              <Typography sx={{ fontFamily: font.serif, fontWeight: 850, color: tc, lineHeight: 1.2, fontSize: story ? '2rem' : '1.6rem', overflowWrap: 'anywhere', wordBreak: 'break-word', textShadow: '0 1px 8px rgba(0,0,0,0.6)' }}>{note.title}</Typography>
+              <Typography sx={{ fontStyle: 'italic', color: cc, lineHeight: 1.55, fontSize: story ? '1.25rem' : '1.05rem', overflowWrap: 'anywhere', wordBreak: 'break-word', textShadow: '0 1px 6px rgba(0,0,0,0.5)' }}>&ldquo;{note.message}&rdquo;</Typography>
+              {typeChip}
+            </Box>
           </Box>
           {footer}
         </Box>
       )
     }
 
-    // Banner / other: card bg + empty image slot (image drawn on canvas) + text below
+    if (isStripeLayout) {
+      return (
+        <Box sx={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: bg, display: 'flex', flexDirection: 'row', boxSizing: 'border-box' }}>
+          <Box data-img-slot="true" sx={{ width: 90, flexShrink: 0, alignSelf: 'stretch' }} />
+          <Stack spacing={story ? 2 : 1.2} sx={{ flex: 1, p: story ? 3 : 1.8, justifyContent: 'center', position: 'relative', minWidth: 0 }}>
+            {radialBg}
+            <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: story ? 2 : 1.2 }}>
+              {emojiCircle}{rarityChip}
+              <Typography sx={{ fontFamily: font.serif, fontWeight: 850, color: textColor, lineHeight: 1.2, fontSize: story ? '1.8rem' : '1.05rem', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{note.title}</Typography>
+              <Typography sx={{ fontStyle: 'italic', color: caption, lineHeight: 1.55, fontSize: story ? '1.1rem' : '0.82rem', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>&ldquo;{note.message}&rdquo;</Typography>
+              {typeChip}
+            </Box>
+          </Stack>
+          {footer}
+        </Box>
+      )
+    }
+
+    if (isThumbLayout) {
+      return (
+        <Box sx={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', px: story ? 5 : 4, py: story ? 8 : 5, boxSizing: 'border-box' }}>
+          {radialBg}
+          <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: story ? 2.4 : 1.6, maxWidth: '100%' }}>
+            {emojiCircle}{rarityChip}
+            <Box sx={{ p: 1.15, borderRadius: radius.lg, background: 'rgba(255,255,255,0.68)', border: '1px solid rgba(255,255,255,0.58)', backdropFilter: 'blur(8px)', width: '100%', minWidth: 0 }}>
+              <Stack direction={thumbRight ? 'row-reverse' : 'row'} spacing={1.2} alignItems="flex-start">
+                <Box data-img-slot="true" sx={{ flexShrink: 0, width: thumbSize, height: thumbSize, borderRadius: layout.startsWith('circle') ? '50%' : radius.md }} />
+                <Box sx={{ minWidth: 0, flex: 1, textAlign: 'left' }}>
+                  <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: story ? '1.4rem' : '1.05rem', color: textColor, lineHeight: 1.3, overflowWrap: 'anywhere', wordBreak: 'break-word', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{note.title}</Typography>
+                  <Typography sx={{ mt: 0.5, fontSize: story ? '1rem' : '0.83rem', color: caption, lineHeight: 1.55, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>&ldquo;{note.message}&rdquo;</Typography>
+                </Box>
+              </Stack>
+            </Box>
+            {typeChip}
+          </Box>
+          {footer}
+        </Box>
+      )
+    }
+
     return (
-      <Box sx={{
-        width: '100%', height: '100%', position: 'relative', overflow: 'hidden',
-        background: bg, display: 'flex', flexDirection: 'column',
-        ...(showBannerImg ? {} : { alignItems: 'center', justifyContent: 'center', textAlign: 'center' }),
-        boxSizing: 'border-box',
-      }}>
-        {showBannerImg && (
-          <Box sx={{ width: '100%', height: story ? 300 : 195, flexShrink: 0 }} />
-        )}
-        <Box sx={{
-          flex: 1, position: 'relative', overflow: 'hidden',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-          px: story ? 5 : 4,
-          py: story ? (showBannerImg ? 4 : 8) : (showBannerImg ? 3 : 5),
-          boxSizing: 'border-box',
-        }}>
-          <Box sx={{ position: 'absolute', inset: 0, background: `radial-gradient(circle at 20% 0%, rgba(255,255,255,0.6), transparent 42%), radial-gradient(circle at 90% 100%, ${accent}33, transparent 46%)`, pointerEvents: 'none' }} />
-          {textBlock}
+      <Box sx={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: bg, display: 'flex', flexDirection: 'column', ...(showBannerImg ? {} : { alignItems: 'center', justifyContent: 'center', textAlign: 'center' }), boxSizing: 'border-box' }}>
+        {showBannerImg && <Box data-img-slot="true" sx={{ width: '100%', height: story ? 300 : 195, flexShrink: 0 }} />}
+        <Box sx={{ flex: 1, position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', px: story ? 5 : 4, py: story ? (showBannerImg ? 4 : 8) : (showBannerImg ? 3 : 5), boxSizing: 'border-box' }}>
+          {radialBg}
+          <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: story ? 2.4 : 1.6, maxWidth: '100%' }}>
+            {emojiCircle}{rarityChip}
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 850, color: textColor, lineHeight: 1.2, fontSize: story ? '2rem' : '1.6rem', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{note.title}</Typography>
+            <Typography sx={{ fontStyle: 'italic', color: caption, lineHeight: 1.55, fontSize: story ? '1.25rem' : '1.05rem', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>&ldquo;{note.message}&rdquo;</Typography>
+            {typeChip}
+          </Box>
         </Box>
         {footer}
       </Box>
