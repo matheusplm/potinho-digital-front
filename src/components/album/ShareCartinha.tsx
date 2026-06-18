@@ -2,6 +2,7 @@ import { Box, Stack, Typography } from '@mui/material'
 import IosShareIcon from '@mui/icons-material/IosShare'
 import { useRef, useState, useEffect } from 'react'
 import { toPng } from 'html-to-image'
+import { parseGIF, decompressFrames } from 'gifuct-js'
 import { GIFEncoder, quantize, applyPalette } from 'gifenc'
 import { Button, toast } from '../ui'
 import { colors, font, radius } from '../../design-system'
@@ -9,34 +10,32 @@ import type { BackgroundTheme } from '../../design-system'
 import type { RarityConfig, NoteTypeConfig, NoteImageLayout } from '../../types/note'
 import { gradientTextSx } from '../../utils/colorUtils'
 
-interface ShareNote { title: string | null; message: string | null; rarity: string; typeId: string; imageUrl?: string | null; imageLayout?: NoteImageLayout | null }
+interface ShareNote {
+  title: string | null
+  message: string | null
+  rarity: string
+  typeId: string
+  imageUrl?: string | null
+  imageLayout?: NoteImageLayout | null
+}
 
-const GIF_FRAMES = 12
-const GIF_DELAY_MS = 120
+const BLUR_PAD = 32
 
-async function captureAsGif(node: HTMLElement, w: number, h: number): Promise<Blob> {
-  const gif = GIFEncoder()
-  const tempCanvas = document.createElement('canvas')
-  tempCanvas.width = w
-  tempCanvas.height = h
-  const ctx = tempCanvas.getContext('2d')!
+function loadImgEl(src: string, cors?: boolean): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const el = new Image()
+    if (cors) el.crossOrigin = 'anonymous'
+    el.onload = () => resolve(el)
+    el.onerror = reject
+    el.src = src
+  })
+}
 
-  for (let i = 0; i < GIF_FRAMES; i++) {
-    if (i > 0) await new Promise<void>((r) => setTimeout(r, GIF_DELAY_MS))
-    const dataUrl = await toPng(node, { pixelRatio: 1 })
-    await new Promise<void>((resolve) => {
-      const img = new Image()
-      img.onload = () => { ctx.drawImage(img, 0, 0, w, h); resolve() }
-      img.src = dataUrl
-    })
-    const { data } = ctx.getImageData(0, 0, w, h)
-    const palette = quantize(data, 256)
-    const index = applyPalette(data, palette)
-    gif.writeFrame(index, w, h, { palette, delay: GIF_DELAY_MS })
-  }
-
-  gif.finish()
-  return new Blob([gif.bytesView().buffer as ArrayBuffer], { type: 'image/gif' })
+function dataUrlToBuffer(dataUrl: string): ArrayBuffer {
+  const binary = atob(dataUrl.split(',')[1])
+  const buf = new Uint8Array(binary.length)
+  for (let i = 0; i < binary.length; i++) buf[i] = binary.charCodeAt(i)
+  return buf.buffer
 }
 
 export function ShareCartinha({ note, r, t, theme }: {
@@ -63,31 +62,128 @@ export function ShareCartinha({ note, r, t, theme }: {
         reader.readAsDataURL(blob)
       }))
       .then((url) => {
-        if (!cancelled) {
-          setImgDataUrl(url)
-          setIsGif(url.startsWith('data:image/gif'))
-        }
+        if (!cancelled) { setImgDataUrl(url); setIsGif(url.startsWith('data:image/gif')) }
       })
       .catch(() => { if (!cancelled) { setImgDataUrl(null); setIsGif(false) } })
     return () => { cancelled = true }
   }, [note.imageUrl])
 
+  const hasImg = !!(note.imageUrl && note.imageLayout)
+  const layout = (note.imageLayout ?? 'banner') as NoteImageLayout
+  const isImmersive = hasImg && (layout === 'hero-overlay' || layout === 'bg-blur')
+  const showBannerImg = hasImg && !isImmersive
+
   async function share(format: 'card' | 'story') {
-    const node = format === 'card' ? cardRef.current : storyRef.current
-    if (!node || busy) return
+    const baseNode = format === 'card' ? cardRef.current : storyRef.current
+    if (!baseNode || busy) return
     setBusy(format)
+
     try {
-      const w = 540
-      const h = format === 'card' ? 540 : 960
+      const W = 540
+      const H = format === 'story' ? 960 : 540
+
+      // Capture base card (no image element – avoids SVG size limits in Chrome)
+      const baseDataUrl = await toPng(baseNode, { pixelRatio: 2, cacheBust: true })
+
       let blob: Blob
       let filename: string
 
-      if (isGif) {
-        blob = await captureAsGif(node, w, h)
+      if (hasImg && isGif && imgDataUrl) {
+        // ── Animated GIF output ──────────────────────────────────────────
+        const parsedGif = parseGIF(dataUrlToBuffer(imgDataUrl))
+        const frames = decompressFrames(parsedGif, true)
+        const gifW = parsedGif.lsd.width
+        const gifH = parsedGif.lsd.height
+
+        const baseImg = await loadImgEl(baseDataUrl)
+
+        // Canvas that accumulates the current GIF state (handles partial frames)
+        const gifStateCanvas = document.createElement('canvas')
+        gifStateCanvas.width = gifW
+        gifStateCanvas.height = gifH
+        const gifStateCtx = gifStateCanvas.getContext('2d')!
+
+        const gif = GIFEncoder()
+        const outCanvas = document.createElement('canvas')
+        outCanvas.width = W
+        outCanvas.height = H
+        const outCtx = outCanvas.getContext('2d')!
+
+        for (const frame of frames) {
+          // Patch the GIF state canvas with this frame
+          const patchCanvas = document.createElement('canvas')
+          patchCanvas.width = frame.dims.width
+          patchCanvas.height = frame.dims.height
+          patchCanvas.getContext('2d')!.putImageData(
+            new ImageData(new Uint8ClampedArray(frame.patch), frame.dims.width, frame.dims.height), 0, 0
+          )
+          gifStateCtx.drawImage(patchCanvas, frame.dims.left, frame.dims.top)
+
+          // Composite: GIF state → base card overlay
+          outCtx.clearRect(0, 0, W, H)
+          if (isImmersive) {
+            if (layout === 'bg-blur') {
+              outCtx.filter = 'blur(20px) brightness(0.5) saturate(1.4)'
+              outCtx.drawImage(gifStateCanvas, -BLUR_PAD, -BLUR_PAD, W + BLUR_PAD * 2, H + BLUR_PAD * 2)
+              outCtx.filter = 'none'
+            } else {
+              outCtx.drawImage(gifStateCanvas, 0, 0, W, H)
+            }
+            outCtx.drawImage(baseImg, 0, 0, W, H)
+          } else {
+            const bannerH = format === 'story' ? 300 : 195
+            outCtx.drawImage(baseImg, 0, 0, W, H)
+            outCtx.drawImage(gifStateCanvas, 0, 0, W, bannerH)
+          }
+
+          const { data } = outCtx.getImageData(0, 0, W, H)
+          const palette = quantize(data, 256)
+          const index = applyPalette(data, palette)
+          gif.writeFrame(index, W, H, { palette, delay: Math.max((frame.delay ?? 10) * 10, 20) })
+
+          // Handle disposal
+          if (frame.disposalType === 2) {
+            gifStateCtx.clearRect(frame.dims.left, frame.dims.top, frame.dims.width, frame.dims.height)
+          }
+        }
+
+        gif.finish()
+        blob = new Blob([gif.bytesView().buffer as ArrayBuffer], { type: 'image/gif' })
         filename = `cartinha-${format}.gif`
+
+      } else if (hasImg) {
+        // ── Static image card ────────────────────────────────────────────
+        const srcImg = await loadImgEl(note.imageUrl!, true)
+        const baseImg = await loadImgEl(baseDataUrl)
+
+        const canvas = document.createElement('canvas')
+        canvas.width = W * 2
+        canvas.height = H * 2
+        const ctx = canvas.getContext('2d')!
+        ctx.scale(2, 2)
+
+        if (isImmersive) {
+          if (layout === 'bg-blur') {
+            ctx.filter = 'blur(20px) brightness(0.5) saturate(1.4)'
+            ctx.drawImage(srcImg, -BLUR_PAD, -BLUR_PAD, W + BLUR_PAD * 2, H + BLUR_PAD * 2)
+            ctx.filter = 'none'
+          } else {
+            ctx.drawImage(srcImg, 0, 0, W, H)
+          }
+          ctx.drawImage(baseImg, 0, 0, W, H)
+        } else {
+          const bannerH = format === 'story' ? 300 : 195
+          ctx.drawImage(baseImg, 0, 0, W, H)
+          ctx.drawImage(srcImg, 0, 0, W, bannerH)
+        }
+
+        const compositeUrl = canvas.toDataURL('image/png')
+        blob = await (await fetch(compositeUrl)).blob()
+        filename = `cartinha-${format}.png`
+
       } else {
-        const dataUrl = await toPng(node, { pixelRatio: 2, cacheBust: true })
-        blob = await (await fetch(dataUrl)).blob()
+        // ── No image ─────────────────────────────────────────────────────
+        blob = await (await fetch(baseDataUrl)).blob()
         filename = `cartinha-${format}.png`
       }
 
@@ -104,6 +200,7 @@ export function ShareCartinha({ note, r, t, theme }: {
         toast.success('Imagem baixada! 💌')
       }
     } catch (error) {
+      console.error('[ShareCartinha]', error)
       if ((error as Error).name !== 'AbortError') toast.error('Não consegui gerar a imagem.')
     } finally {
       setBusy(null)
@@ -115,10 +212,8 @@ export function ShareCartinha({ note, r, t, theme }: {
   const textColor = r?.textColor || colors.text.primary
   const caption = r?.captionColor || colors.text.secondary
 
-  const isImmersive = !!(imgDataUrl && (note.imageLayout === 'hero-overlay' || note.imageLayout === 'bg-blur'))
-  const showBannerImg = !!(imgDataUrl && note.imageLayout && !isImmersive)
-
   const inner = (story: boolean) => {
+    // Renders WITHOUT the image — image is composited on canvas separately
     const tc = isImmersive ? '#fff' : textColor
     const cc = isImmersive ? 'rgba(255,255,255,0.82)' : caption
 
@@ -143,7 +238,9 @@ export function ShareCartinha({ note, r, t, theme }: {
             background: isImmersive ? 'rgba(0,0,0,0.4)' : r.chipBg,
             border: `1px solid ${isImmersive ? 'rgba(255,255,255,0.35)' : r.borderColor}`,
           }}>
-            <Box component="span" sx={isImmersive ? { color: '#fff' } : gradientTextSx(r.chipColor)}>{r.emoji} {r.label}</Box>
+            <Box component="span" sx={isImmersive ? { color: '#fff' } : gradientTextSx(r.chipColor)}>
+              {r.emoji} {r.label}
+            </Box>
           </Box>
         )}
         <Typography sx={{
@@ -184,18 +281,13 @@ export function ShareCartinha({ note, r, t, theme }: {
       </Typography>
     )
 
+    // Immersive: transparent bg + dark overlay + text (image goes behind in canvas step)
     if (isImmersive) {
-      const isBlur = note.imageLayout === 'bg-blur'
       return (
         <Box sx={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}>
-          <Box component="img" src={imgDataUrl!} alt="" sx={{
-            position: 'absolute', inset: 0, width: '100%', height: '100%',
-            objectFit: 'cover', display: 'block',
-            ...(isBlur ? { filter: 'blur(20px) brightness(0.5) saturate(1.4)', transform: 'scale(1.12)' } : {}),
-          }} />
           <Box sx={{
             position: 'absolute', inset: 0,
-            background: isBlur
+            background: layout === 'bg-blur'
               ? 'rgba(0,0,0,0.28)'
               : 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.08) 100%)',
           }} />
@@ -211,6 +303,7 @@ export function ShareCartinha({ note, r, t, theme }: {
       )
     }
 
+    // Banner / other: card bg + empty image slot (image drawn on canvas) + text below
     return (
       <Box sx={{
         width: '100%', height: '100%', position: 'relative', overflow: 'hidden',
@@ -219,9 +312,7 @@ export function ShareCartinha({ note, r, t, theme }: {
         boxSizing: 'border-box',
       }}>
         {showBannerImg && (
-          <Box sx={{ width: '100%', height: story ? 300 : 195, flexShrink: 0, overflow: 'hidden' }}>
-            <Box component="img" src={imgDataUrl!} alt="" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-          </Box>
+          <Box sx={{ width: '100%', height: story ? 300 : 195, flexShrink: 0 }} />
         )}
         <Box sx={{
           flex: 1, position: 'relative', overflow: 'hidden',
@@ -230,9 +321,7 @@ export function ShareCartinha({ note, r, t, theme }: {
           py: story ? (showBannerImg ? 4 : 8) : (showBannerImg ? 3 : 5),
           boxSizing: 'border-box',
         }}>
-          {!showBannerImg && (
-            <Box sx={{ position: 'absolute', inset: 0, background: `radial-gradient(circle at 20% 0%, rgba(255,255,255,0.6), transparent 42%), radial-gradient(circle at 90% 100%, ${accent}33, transparent 46%)`, pointerEvents: 'none' }} />
-          )}
+          <Box sx={{ position: 'absolute', inset: 0, background: `radial-gradient(circle at 20% 0%, rgba(255,255,255,0.6), transparent 42%), radial-gradient(circle at 90% 100%, ${accent}33, transparent 46%)`, pointerEvents: 'none' }} />
           {textBlock}
         </Box>
         {footer}
