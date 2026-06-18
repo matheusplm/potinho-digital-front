@@ -2145,6 +2145,11 @@ export function CollectionManagePage() {
                   }}>
                     <Stack direction="row" alignItems="center" spacing={0.8} sx={{ minHeight: 38, px: 1, py: 0.35 }}>
                       <Box sx={{ width: 6, height: 22, borderRadius: radius.full, background: r?.borderColor ?? colors.border.subtle, flexShrink: 0 }} />
+                      {note.imageUrl && (
+                        <Box sx={{ width: 28, height: 28, flexShrink: 0, borderRadius: radius.sm, overflow: 'hidden', border: `1px solid ${r?.borderColor ?? colors.border.subtle}22` }}>
+                          <Box component="img" src={note.imageUrl} alt="" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                        </Box>
+                      )}
                       <Typography sx={{
                         flex: 1,
                         minWidth: 0,
@@ -2196,7 +2201,13 @@ export function CollectionManagePage() {
                     },
                   }}>
                     <Stack direction="row" alignItems="stretch" sx={{ minHeight: 74 }}>
-                      <Box sx={{ width: 5, flexShrink: 0, background: r ? `linear-gradient(180deg,${r.borderColor},${r.glowColor || r.borderColor})` : colors.border.subtle }} />
+                      {note.imageUrl ? (
+                        <Box sx={{ width: 72, flexShrink: 0, overflow: 'hidden' }}>
+                          <Box component="img" src={note.imageUrl} alt="" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                        </Box>
+                      ) : (
+                        <Box sx={{ width: 5, flexShrink: 0, background: r ? `linear-gradient(180deg,${r.borderColor},${r.glowColor || r.borderColor})` : colors.border.subtle }} />
+                      )}
                       <Box sx={{ flex: 1, minWidth: 0, px: 1.25, py: 1 }}>
                         <Stack direction="row" alignItems="center" spacing={1}>
                           <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -2259,6 +2270,35 @@ export function CollectionManagePage() {
                       </Box>
                     </Stack>
                   </Card>
+                )
+              }
+              if (note.imageUrl && note.imageLayout) {
+                return (
+                  <Box key={note.id} sx={{ position: 'relative', cursor: 'pointer' }} onClick={() => setViewingNote(note)}>
+                    <RewardCard
+                      reward={{ id: note.id, title: note.title, message: note.message, rarity: note.rarity, typeId: note.typeId, imageUrl: note.imageUrl, imageLayout: note.imageLayout, isNew: false }}
+                      rarities={r ? [r] : []}
+                      types={t ? [t] : []}
+                    />
+                    <Stack direction="row" spacing={0.4} sx={{ position: 'absolute', top: 8, right: 8, zIndex: 5 }}>
+                      <IconButton
+                        size="small"
+                        aria-label="editar bilhete"
+                        onClick={(event) => { event.stopPropagation(); setEditingNote(note); setNoteDialog(true) }}
+                        sx={{ ...actionButtonSx('primary'), backdropFilter: 'blur(8px)' }}
+                      >
+                        <EditOutlinedIcon sx={{ fontSize: 16 }} />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        aria-label="excluir bilhete"
+                        onClick={(event) => { event.stopPropagation(); setDeletingNote(note) }}
+                        sx={{ ...actionButtonSx('danger'), backdropFilter: 'blur(8px)' }}
+                      >
+                        <DeleteForeverOutlinedIcon sx={{ fontSize: 16 }} />
+                      </IconButton>
+                    </Stack>
+                  </Box>
                 )
               }
               return (
@@ -2575,8 +2615,8 @@ export function CollectionManagePage() {
               <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.5, color: theme.textOnBgMuted, textTransform: 'uppercase', mb: 0.7 }}>
                 Adicionar rápido
               </Typography>
-              <Box sx={{ display: 'flex', gap: 0.6, overflowX: 'auto', pb: 0.4, scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
-                {ACHIEVEMENT_PRESETS.filter((p) => !achievements.some((a) => a.label === p.label)).map((p) => (
+              <Box sx={{ display: 'flex', gap: 0.6, flexWrap: 'wrap' }}>
+                {ACHIEVEMENT_PRESETS.filter((p) => !achievements.some((a) => a.label === p.label)).slice(0, 3).map((p) => (
                   <Box
                     key={p.label}
                     onClick={() => addAchievementPreset(p)}
