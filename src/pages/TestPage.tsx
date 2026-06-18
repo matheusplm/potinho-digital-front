@@ -5,6 +5,42 @@ import { Box, Divider, Stack, Typography } from '@mui/material'
 import { useState } from 'react'
 import { Button, Card, Input, LoadingState, SegmentedControl, toast } from '../components/ui'
 import { colors, font, gradients, radius, shadow } from '../design-system'
+import { RewardCard } from './CollectionPlayPage'
+import type { ImageLayout } from './CollectionPlayPage'
+import type { CollectionDailyReward, RarityConfig, NoteTypeConfig, NoteImageLayout } from '../types/note'
+
+const IMAGE_LAYOUTS: { value: NoteImageLayout; label: string }[] = [
+  { value: 'banner', label: 'Banner' },
+  { value: 'thumb-left', label: 'Thumb esq' },
+  { value: 'thumb-right', label: 'Thumb dir' },
+  { value: 'circle-left', label: 'Círculo esq' },
+  { value: 'circle-right', label: 'Círculo dir' },
+  { value: 'split', label: 'Split' },
+  { value: 'stripe-left', label: 'Stripe' },
+  { value: 'hero-overlay', label: 'Hero' },
+  { value: 'bg-blur', label: 'Blur' },
+]
+
+const MOCK_RARITY: RarityConfig = {
+  id: 'r1', label: 'Raro', emoji: '💜', odds: 20, order: 1,
+  cardBg: 'linear-gradient(135deg, #f3e8ff 0%, #ede9fe 100%)',
+  textColor: '#6b21a8', captionColor: '#9333ea', borderColor: '#c084fc',
+  shadow: '0 4px 24px #a855f740', glowColor: '#a855f7',
+  chipBg: 'linear-gradient(90deg,#f3e8ff,#ede9fe)', chipColor: '#7c3aed',
+}
+
+const MOCK_TYPE: NoteTypeConfig = {
+  id: 't1', label: 'Especial', emoji: '✨', order: 1,
+  accentColor: '#a855f7', tagBg: '#f3e8ff', tagColor: '#7c3aed',
+}
+
+const REWARD_COM_IMAGEM: CollectionDailyReward = {
+  id: '1', title: 'Você é incrível', isNew: true,
+  message: 'Cada dia ao seu lado é um presente. Obrigado por existir na minha vida.',
+  rarity: 'r1', typeId: 't1',
+  imageUrl: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=600&q=80',
+}
+
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -14,6 +50,43 @@ function Section({ title, children }: { title: string; children: React.ReactNode
       </Typography>
       {children}
       <Divider sx={{ opacity: 0.3, mt: 0.5 }} />
+    </Stack>
+  )
+}
+
+function LayoutSelectorPreview() {
+  const [imageUrl, setImageUrl] = useState('https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=600&q=80')
+  const [selected, setSelected] = useState<NoteImageLayout>('banner')
+
+  return (
+    <Stack spacing={2} sx={{ background: 'rgba(255,255,255,0.6)', borderRadius: radius.xl, p: 2.5, backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.5)' }}>
+      <Typography sx={{ fontSize: '0.66rem', fontWeight: 900, letterSpacing: 1.4, color: colors.text.muted, textTransform: 'uppercase' }}>Seletor de layout</Typography>
+
+      <Stack spacing={0.5}>
+        <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.secondary }}>
+          Imagem <Typography component="span" sx={{ fontSize: '0.68rem', fontWeight: 400, color: colors.text.muted }}>(opcional)</Typography>
+        </Typography>
+        <Input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://exemplo.com/imagem.jpg" />
+      </Stack>
+
+      {imageUrl && (
+        <Stack spacing={0.8}>
+          <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.secondary }}>Layout da imagem</Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
+            {IMAGE_LAYOUTS.map((opt) => (
+              <Box key={opt.value} onClick={() => setSelected(opt.value)} sx={{
+                px: 1.4, py: 0.5, borderRadius: radius.full, cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700,
+                background: selected === opt.value ? colors.primary.main : 'rgba(0,0,0,0.05)',
+                color: selected === opt.value ? '#fff' : colors.text.secondary,
+                border: `1.5px solid ${selected === opt.value ? colors.primary.main : 'transparent'}`,
+                transition: 'all 0.15s',
+              }}>
+                {opt.label}
+              </Box>
+            ))}
+          </Box>
+        </Stack>
+      )}
     </Stack>
   )
 }
@@ -216,6 +289,44 @@ export function TestPage() {
         </Section>
 
       </Stack>
+
+      <Box sx={{ height: 48 }} />
+
+      {/* ── Preview: seletor de layout ── */}
+      <Box sx={{ background: gradients.brand, px: 3, py: 4, maxWidth: 480, mx: 'auto' }}>
+        <Stack spacing={3}>
+          <LayoutSelectorPreview />
+        </Stack>
+      </Box>
+
+      <Box sx={{ height: 48 }} />
+
+        {([
+          ['1 — banner', 'banner'],
+          ['2 — banner fino', 'banner-slim'],
+          ['3 — banner base', 'banner-bottom'],
+          ['4 — gradient fade', 'gradient-fade'],
+          ['5 — thumb esquerda', 'thumb-left'],
+          ['6 — thumb direita', 'thumb-right'],
+          ['7 — círculo esquerda', 'circle-left'],
+          ['8 — círculo direita', 'circle-right'],
+          ['9 — corner sup dir', 'corner-tr'],
+          ['10 — corner sup esq', 'corner-tl'],
+          ['11 — corner inf dir', 'corner-br'],
+          ['12 — corner inf esq', 'corner-bl'],
+          ['13 — círculo topo', 'circle-top'],
+          ['14 — polaroid', 'polaroid'],
+          ['15 — centralizado', 'centered'],
+          ['16 — stamp', 'stamp'],
+          ['17 — split', 'split'],
+          ['18 — stripe lateral', 'stripe-left'],
+          ['19 — hero overlay', 'hero-overlay'],
+          ['20 — bg blur', 'bg-blur'],
+        ] as [string, ImageLayout][]).map(([label, layout]) => (
+          <Section key={layout} title={`Bilhete — ${label}`}>
+            <RewardCard reward={REWARD_COM_IMAGEM} rarities={[MOCK_RARITY]} types={[MOCK_TYPE]} imageLayout={layout} />
+          </Section>
+        ))}
 
       <Box sx={{ height: 48 }} />
     </Box>
