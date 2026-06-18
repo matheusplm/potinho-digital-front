@@ -19,7 +19,7 @@ interface ShareNote {
   imageLayout?: NoteImageLayout | null
 }
 
-const BLUR_PAD = 64
+const BLUR_PAD = 32
 
 function loadImgEl(src: string, cors?: boolean): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -116,11 +116,11 @@ export function ShareCartinha({ note, r, t, theme }: {
     if (!baseNode || busy) return
     setBusy(format)
     try {
-      const W = 1080
-      const H = format === 'story' ? 1920 : 1080
+      const W = 540
+      const H = format === 'story' ? 960 : 540
       const slot = measureSlot(baseNode, W, H)
 
-      const baseDataUrl = await toPng(baseNode, { pixelRatio: 1, cacheBust: true })
+      const baseDataUrl = await toPng(baseNode, { pixelRatio: 2, cacheBust: true })
 
       let blob: Blob
       let filename: string
@@ -179,9 +179,10 @@ export function ShareCartinha({ note, r, t, theme }: {
         const srcImg = await loadImgEl(note.imageUrl!, true)
         const baseImg = await loadImgEl(baseDataUrl)
         const canvas = document.createElement('canvas')
-        canvas.width = W
-        canvas.height = H
+        canvas.width = W * 2
+        canvas.height = H * 2
         const ctx = canvas.getContext('2d')!
+        ctx.scale(2, 2)
 
         if (isImmersive) {
           drawAtSlot(ctx, srcImg, slot)
@@ -354,16 +355,8 @@ export function ShareCartinha({ note, r, t, theme }: {
       </Stack>
 
       <Box aria-hidden sx={{ position: 'fixed', left: -99999, top: 0, pointerEvents: 'none', opacity: 0 }}>
-        <Box ref={cardRef} sx={{ width: 1080, height: 1080, overflow: 'hidden' }}>
-          <Box sx={{ width: 540, height: 540, transform: 'scale(2)', transformOrigin: '0 0' }}>
-            {inner(false)}
-          </Box>
-        </Box>
-        <Box ref={storyRef} sx={{ width: 1080, height: 1920, overflow: 'hidden' }}>
-          <Box sx={{ width: 540, height: 960, transform: 'scale(2)', transformOrigin: '0 0' }}>
-            {inner(true)}
-          </Box>
-        </Box>
+        <Box ref={cardRef} sx={{ width: 540, height: 540 }}>{inner(false)}</Box>
+        <Box ref={storyRef} sx={{ width: 540, height: 960 }}>{inner(true)}</Box>
       </Box>
     </>
   )
