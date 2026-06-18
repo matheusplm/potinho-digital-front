@@ -124,12 +124,12 @@ const ACHIEVEMENT_PRESETS: { emoji: string; label: string; description: string; 
 const EMPTY_NOTE: NoteFormData = { title: '', message: '', rarity: '', typeId: '', imageUrl: null, imageLayout: null }
 
 const IMAGE_LAYOUTS: { value: import('../types/note').NoteImageLayout; label: string }[] = [
-  { value: 'banner', label: 'Banner' },
+  // { value: 'banner', label: 'Banner' },
   { value: 'thumb-left', label: 'Thumb esq' },
   { value: 'thumb-right', label: 'Thumb dir' },
   { value: 'circle-left', label: 'Círculo esq' },
   { value: 'circle-right', label: 'Círculo dir' },
-  { value: 'split', label: 'Split' },
+  // { value: 'split', label: 'Split' },
   { value: 'stripe-left', label: 'Stripe' },
   { value: 'hero-overlay', label: 'Hero' },
   { value: 'bg-blur', label: 'Blur' },
