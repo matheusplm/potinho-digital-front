@@ -231,9 +231,8 @@ export function ShareCartinha({ note, r, t, theme }: {
     const thumbSize = layout.startsWith('circle') ? 56 : 64
     const thumbRight = layout === 'thumb-right' || layout === 'circle-right'
 
-    // sizes at 540px design space; CSS scale(2) doubles everything at output
-    const emojiSz   = story ? 130 : 115   // output: 260 / 230px
-    const emojiFsz  = story ? '3.8rem' : '3.3rem'
+    const emojiSz   = story ? 76 : 62     // output: 152 / 124px
+    const emojiFsz  = story ? '2.2rem' : '1.8rem'
     const titleFsz  = story ? '3.8rem' : '3.1rem'  // output: ~122 / ~99px
     const msgFsz    = story ? '2.2rem' : '1.7rem'   // output: ~70 / ~54px
     const chipFsz   = story ? '1.1rem' : '0.96rem'
@@ -314,8 +313,8 @@ export function ShareCartinha({ note, r, t, theme }: {
               <Stack direction={thumbRight ? 'row-reverse' : 'row'} spacing={1.2} alignItems="flex-start">
                 <Box data-img-slot="true" sx={{ flexShrink: 0, width: thumbSize, height: thumbSize, borderRadius: layout.startsWith('circle') ? '50%' : radius.md }} />
                 <Box sx={{ minWidth: 0, flex: 1, textAlign: 'left' }}>
-                  <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: story ? '2rem' : '1.5rem', color: textColor, lineHeight: 1.25, overflowWrap: 'anywhere', wordBreak: 'break-word', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{note.title}</Typography>
-                  <Typography sx={{ mt: 0.5, fontSize: story ? '1.4rem' : '1.1rem', color: caption, lineHeight: 1.5, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>&ldquo;{note.message}&rdquo;</Typography>
+                  <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: story ? '2rem' : '1.5rem', color: textColor, lineHeight: 1.25, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{note.title}</Typography>
+                  <Typography sx={{ mt: 0.5, fontSize: story ? '1.4rem' : '1.1rem', color: caption, lineHeight: 1.5, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>&ldquo;{note.message}&rdquo;</Typography>
                 </Box>
               </Stack>
             </Box>

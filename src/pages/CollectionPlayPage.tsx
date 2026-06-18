@@ -162,14 +162,16 @@ function CardChips({ r, isNew }: { r?: RarityConfig; isNew: boolean }) {
   )
 }
 
-function CardTextBox({ title, message, children }: { title: string; message: string; children?: React.ReactNode }) {
+function CardTextBox({ title, message, children, expanded }: { title: string; message: string; children?: React.ReactNode; expanded?: boolean }) {
+  const clampTitle = expanded ? {} : { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }
+  const clampMsg   = expanded ? {} : { display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }
   return (
     <Box sx={{ p: 1.15, borderRadius: radius.lg, background: 'rgba(255,255,255,0.68)', border: '1px solid rgba(255,255,255,0.58)', backdropFilter: 'blur(8px)', minWidth: 0 }}>
       {children}
-      <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.2rem', color: colors.text.primary, lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+      <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.2rem', color: colors.text.primary, lineHeight: 1.3, overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampTitle }}>
         {title}
       </Typography>
-      <Typography sx={{ mt: 0.75, fontSize: '0.9rem', color: colors.text.secondary, lineHeight: 1.65, fontStyle: 'italic', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+      <Typography sx={{ mt: 0.75, fontSize: '0.9rem', color: colors.text.secondary, lineHeight: 1.65, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampMsg }}>
         &ldquo;{message}&rdquo;
       </Typography>
     </Box>
@@ -195,12 +197,15 @@ function ImgArea({ src, alt, previewMode, sx }: { src?: string | null; alt: stri
   return null
 }
 
-export function RewardCard({ reward, rarities, types, onClick, imageLayout: imageLayoutProp, previewMode }: { reward: CollectionDailyReward; rarities: RarityConfig[]; types: NoteTypeConfig[]; onClick?: () => void; imageLayout?: NoteImageLayout; previewMode?: boolean }) {
+export function RewardCard({ reward, rarities, types, onClick, imageLayout: imageLayoutProp, previewMode, expanded }: { reward: CollectionDailyReward; rarities: RarityConfig[]; types: NoteTypeConfig[]; onClick?: () => void; imageLayout?: NoteImageLayout; previewMode?: boolean; expanded?: boolean }) {
   const r = rarities.find((x) => x.id === reward.rarity)
   const t = types.find((x) => x.id === reward.typeId)
   const img = reward.imageUrl
   const imageLayout: NoteImageLayout = imageLayoutProp ?? reward.imageLayout ?? 'banner'
   const showImg = !!(img || (previewMode && (imageLayoutProp ?? reward.imageLayout)))
+
+  const clampT = expanded ? {} : { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }
+  const clampM = expanded ? {} : { display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }
 
   if (showImg && imageLayout === 'hero-overlay') {
     return (
@@ -210,13 +215,13 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
           <Box sx={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)' }} />
           <Stack spacing={0.8} sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, p: 2 }}>
             <CardChips r={r} isNew={reward.isNew} />
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.25rem', color: '#fff', lineHeight: 1.25, textShadow: '0 1px 6px rgba(0,0,0,0.5)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.25rem', color: '#fff', lineHeight: 1.25, textShadow: '0 1px 6px rgba(0,0,0,0.5)', ...clampT }}>
               {reward.title}
             </Typography>
           </Stack>
         </Box>
         <Stack spacing={1} sx={{ p: 2, position: 'relative', zIndex: 1 }}>
-          <Typography sx={{ fontSize: '0.9rem', color: colors.text.secondary, lineHeight: 1.65, fontStyle: 'italic', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+          <Typography sx={{ fontSize: '0.9rem', color: colors.text.secondary, lineHeight: 1.65, fontStyle: 'italic', ...clampM }}>
             &ldquo;{reward.message}&rdquo;
           </Typography>
           <CardTag t={t} />
@@ -253,7 +258,7 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
         </Box>
         <Stack spacing={1.5} sx={{ p: 2, position: 'relative', zIndex: 1 }}>
           <CardChips r={r} isNew={reward.isNew} />
-          <CardTextBox title={reward.title} message={reward.message} />
+          <CardTextBox title={reward.title} message={reward.message} expanded={expanded} />
           <CardTag t={t} />
         </Stack>
       </Box>
@@ -269,8 +274,8 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
           </Box>
           <Stack spacing={1.2} sx={{ flex: 1, p: 1.8, minWidth: 0 }}>
             <CardChips r={r} isNew={reward.isNew} />
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.05rem', color: colors.text.primary, lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{reward.title}</Typography>
-            <Typography sx={{ fontSize: '0.82rem', color: colors.text.secondary, lineHeight: 1.55, fontStyle: 'italic', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>&ldquo;{reward.message}&rdquo;</Typography>
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.05rem', color: colors.text.primary, lineHeight: 1.3, overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampT }}>{reward.title}</Typography>
+            <Typography sx={{ fontSize: '0.82rem', color: colors.text.secondary, lineHeight: 1.55, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampM }}>&ldquo;{reward.message}&rdquo;</Typography>
             <CardTag t={t} />
           </Stack>
         </Stack>
@@ -298,17 +303,17 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
                 <ImgArea src={img} alt={reward.title} previewMode={previewMode} />
               </Box>
               <Box sx={{ minWidth: 0, flex: 1 }}>
-                <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.05rem', color: colors.text.primary, lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.05rem', color: colors.text.primary, lineHeight: 1.3, overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampT }}>
                   {reward.title}
                 </Typography>
-                <Typography sx={{ mt: 0.5, fontSize: '0.83rem', color: colors.text.secondary, lineHeight: 1.55, fontStyle: 'italic', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                <Typography sx={{ mt: 0.5, fontSize: '0.83rem', color: colors.text.secondary, lineHeight: 1.55, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampM }}>
                   &ldquo;{reward.message}&rdquo;
                 </Typography>
               </Box>
             </Stack>
           </Box>
         ) : (
-          <CardTextBox title={reward.title} message={reward.message} />
+          <CardTextBox title={reward.title} message={reward.message} expanded={expanded} />
         )}
 
         <CardTag t={t} />
@@ -346,6 +351,7 @@ export function NoteDetailDialog({ note, rarities, types, onClose }: {
                 }}
                 rarities={rarities}
                 types={types}
+                expanded
               />
               <Stack spacing={0.7}>
                 <Typography sx={{ fontSize: '0.70rem', fontWeight: 900, letterSpacing: 0.8, color: rarity?.captionColor ?? colors.text.muted, textTransform: 'uppercase' }}>
