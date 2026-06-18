@@ -207,7 +207,7 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
   if (showImg && imageLayout === 'hero-overlay') {
     return (
       <Box onClick={onClick} sx={{ ...rarityCardSx(r), animation: `${cardIn} 0.55s cubic-bezier(0.16,1,0.3,1)`, cursor: onClick ? 'pointer' : 'default', p: 0, overflow: 'hidden', position: 'relative' }}>
-        <Box sx={{ position: 'relative', width: '100%', height: 148 }}>
+        <Box sx={{ position: 'relative', width: '100%', height: 74 }}>
           <ImgArea src={img} alt={reward.title} previewMode={previewMode} sx={{ position: 'absolute', inset: 0 }} />
           <Box sx={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)' }} />
           <Stack spacing={0.8} sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, p: 2 }}>
