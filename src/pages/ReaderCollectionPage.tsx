@@ -93,8 +93,8 @@ function rarityCardSx(r?: RarityConfig, compact = false) {
 
 function sortNotes(notes: CollectionNoteView[], sort: SortKey, rarityOrder: Record<string, number>) {
   const arr = [...notes]
-  if (sort === 'az') return arr.sort((a, b) => a.title.localeCompare(b.title, 'pt-BR'))
-  if (sort === 'rarity') return arr.sort((a, b) => (rarityOrder[b.rarity] ?? 0) - (rarityOrder[a.rarity] ?? 0) || a.title.localeCompare(b.title, 'pt-BR'))
+  if (sort === 'az') return arr.sort((a, b) => (a.title ?? '').localeCompare(b.title ?? '', 'pt-BR'))
+  if (sort === 'rarity') return arr.sort((a, b) => (rarityOrder[b.rarity] ?? 0) - (rarityOrder[a.rarity] ?? 0) || (a.title ?? '').localeCompare(b.title ?? '', 'pt-BR'))
   return arr.sort((a, b) => (b.obtainedAt ?? '').localeCompare(a.obtainedAt ?? ''))
 }
 
@@ -227,7 +227,7 @@ export function ReaderCollectionPage() {
     if (favFilter) notes = notes.filter((n) => n.favorite)
     if (search) {
       const q = search.toLowerCase()
-      notes = notes.filter((n) => n.title.toLowerCase().includes(q) || n.message?.toLowerCase().includes(q))
+      notes = notes.filter((n) => n.title?.toLowerCase().includes(q) || n.message?.toLowerCase().includes(q))
     }
     return sortNotes(notes, sort, rarityOrder)
   }, [ownedNotes, rarityFilter, favFilter, search, sort, rarityOrder])

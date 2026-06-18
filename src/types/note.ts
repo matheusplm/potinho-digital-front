@@ -37,8 +37,8 @@ export interface PartnerReader {
 
 export interface Note {
   id: string
-  title: string
-  message: string
+  title: string | null
+  message: string | null
   rarity: string
   typeId: string
   imageUrl?: string | null

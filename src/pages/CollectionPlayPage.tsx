@@ -85,8 +85,8 @@ export type ReadableNote = CollectionDailyReward | CollectionNoteView | NoteReco
 
 function sortNotes(items: CollectionNoteView[], sort: AlbumSort, order: Record<string, number>) {
   const arr = [...items]
-  if (sort === 'az') arr.sort((a, b) => a.title.localeCompare(b.title, 'pt-BR'))
-  else if (sort === 'rarity') arr.sort((a, b) => (order[b.rarity] ?? 0) - (order[a.rarity] ?? 0) || a.title.localeCompare(b.title, 'pt-BR'))
+  if (sort === 'az') arr.sort((a, b) => (a.title ?? '').localeCompare(b.title ?? '', 'pt-BR'))
+  else if (sort === 'rarity') arr.sort((a, b) => (order[b.rarity] ?? 0) - (order[a.rarity] ?? 0) || (a.title ?? '').localeCompare(b.title ?? '', 'pt-BR'))
   else arr.sort((a, b) => (b.obtainedAt ?? '').localeCompare(a.obtainedAt ?? ''))
   return arr
 }
@@ -336,8 +336,8 @@ export function NoteDetailDialog({ note, rarities, types, onClose }: {
               <RewardCard
                 reward={{
                   id: note.id,
-                  title: note.title,
-                  message: note.message,
+                  title: note.title ?? '',
+                  message: note.message ?? '',
                   rarity: note.rarity,
                   typeId: note.typeId,
                   imageUrl: note.imageUrl ?? null,
@@ -633,11 +633,26 @@ export function NoteCard({ note, r, t, unread, variant, onSelect, onToggleFavori
 }) {
   const grid = variant === 'grid'
 
+  if (!note.owned) {
+    return (
+      <Card accent={r?.borderColor} sx={{ ...(rarityCardSx(r, true) as object), height: grid ? '100%' : undefined, opacity: 0.72, cursor: 'default' }}>
+        <Box sx={{ position: 'relative', minWidth: 0, height: '100%', p: 1, borderRadius: radius.lg, background: 'rgba(255,255,255,0.68)', border: '1px solid rgba(255,255,255,0.58)', backdropFilter: 'blur(8px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: 52 }}>
+          <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.4, flexWrap: 'wrap', rowGap: 0.4 }}>
+            {r && <Chip size="small" label={`${r.emoji} ${r.label}`} sx={{ height: 19, fontSize: '0.70rem', fontWeight: 800, background: r.chipBg, border: `1px solid ${r.borderColor}`, '& .MuiChip-label': { px: 0.8, ...gradientTextSx(r.chipColor) } }} />}
+          </Stack>
+          <Typography sx={{ fontSize: grid ? '0.74rem' : '0.8rem', color: colors.text.muted, fontStyle: 'italic' }}>
+            🔒 Ainda não coletado
+          </Typography>
+        </Box>
+      </Card>
+    )
+  }
+
   if (note.imageUrl && note.imageLayout) {
     return (
       <Box sx={{ position: 'relative', cursor: 'pointer', height: grid ? '100%' : undefined }} onClick={() => onSelect(note)}>
         <RewardCard
-          reward={{ id: note.id, title: note.title, message: note.message, rarity: note.rarity, typeId: note.typeId, imageUrl: note.imageUrl, imageLayout: note.imageLayout, isNew: false }}
+          reward={{ id: note.id, title: note.title ?? '', message: note.message ?? '', rarity: note.rarity, typeId: note.typeId, imageUrl: note.imageUrl, imageLayout: note.imageLayout, isNew: false }}
           rarities={r ? [r] : []}
           types={t ? [t] : []}
         />
@@ -705,14 +720,14 @@ export function NoteCard({ note, r, t, unread, variant, onSelect, onToggleFavori
             display: '-webkit-box', WebkitLineClamp: grid ? 2 : 1, WebkitBoxOrient: 'vertical', overflow: 'hidden',
             overflowWrap: 'anywhere', wordBreak: 'break-word',
           }}>
-            {note.title}
+            {note.title ?? ''}
           </Typography>
           <Typography sx={{
             fontSize: grid ? '0.74rem' : '0.8rem', color: colors.text.secondary, lineHeight: 1.5,
             display: '-webkit-box', WebkitLineClamp: grid ? 3 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
             overflowWrap: 'anywhere', wordBreak: 'break-word',
           }}>
-            {note.message}
+            {note.message ?? ''}
           </Typography>
           <IconButton
             size="small"
@@ -1170,8 +1185,8 @@ export function CollectionPlayPage() {
       const matchesType = albumType === 'all' || item.typeId === albumType
       const matchesSearch =
         q === '' ||
-        item.title.toLowerCase().includes(q) ||
-        item.message.toLowerCase().includes(q)
+        (item.title?.toLowerCase().includes(q) ?? false) ||
+        (item.message?.toLowerCase().includes(q) ?? false)
       return matchesStatus && matchesRarity && matchesType && matchesSearch
     })
   }, [albumFilter, albumRarity, albumSearch, albumType, discoveredItems])

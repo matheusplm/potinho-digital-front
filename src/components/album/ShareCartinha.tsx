@@ -8,7 +8,7 @@ import type { BackgroundTheme } from '../../design-system'
 import type { RarityConfig, NoteTypeConfig } from '../../types/note'
 import { gradientTextSx } from '../../utils/colorUtils'
 
-interface ShareNote { title: string; message: string; rarity: string; typeId: string }
+interface ShareNote { title: string | null; message: string | null; rarity: string; typeId: string }
 
 export function ShareCartinha({ note, r, t, theme }: {
   note: ShareNote
