@@ -11,7 +11,7 @@ import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined'
 import SwapVertIcon from '@mui/icons-material/SwapVert'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import TuneIcon from '@mui/icons-material/Tune'
-import { Box, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, Typography } from '@mui/material'
+import { Box, Chip, Dialog, DialogActions, DialogContent, IconButton, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -331,61 +331,25 @@ export function NoteDetailDialog({ note, rarities, types, onClose }: {
   const type = note ? types.find((item) => item.id === note.typeId) : undefined
 
   return (
-    <Dialog open={!!note} onClose={onClose} maxWidth="sm" fullWidth slotProps={{ paper: { sx: { mx: 2, borderRadius: radius.xl, overflow: 'hidden', background: rarity?.cardBg ?? 'rgba(255,250,247,0.98)' } } }}>
+    <Dialog open={!!note} onClose={onClose} maxWidth="sm" fullWidth slotProps={{ paper: { sx: { mx: 2, borderRadius: radius.xl, overflow: 'hidden' } } }}>
       {note && (
         <>
-          <DialogTitle sx={{ pb: 1, fontFamily: font.serif, fontWeight: 850, color: rarity?.textColor ?? colors.text.primary, lineHeight: 1.25, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
-            {note.title}
-          </DialogTitle>
-          <DialogContent sx={{ pt: 0 }}>
+          <DialogContent sx={{ pt: 2 }}>
             <Stack spacing={1.4}>
-              <Stack direction="row" spacing={0.6} sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
-                {rarity && (
-                  <Chip size="small" label={`${rarity.emoji} ${rarity.label}`} sx={{
-                    height: 22,
-                    fontSize: '0.68rem',
-                    fontWeight: 800,
-                    background: rarity.chipBg,
-                    border: `1px solid ${rarity.borderColor}`,
-                    '& .MuiChip-label': { px: 0.9, ...gradientTextSx(rarity.chipColor) },
-                  }} />
-                )}
-                {type && (
-                  <Chip size="small" label={`${type.emoji} ${type.label}`} sx={{
-                    height: 22,
-                    fontSize: '0.68rem',
-                    fontWeight: 800,
-                    background: type.tagBg,
-                    color: type.tagColor,
-                    border: `1px solid ${type.accentColor}44`,
-                    '& .MuiChip-label': { px: 0.9 },
-                  }} />
-                )}
-              </Stack>
-              {note.imageUrl ? (
-                <Box sx={{ borderRadius: radius.lg, overflow: 'hidden', width: '100%', aspectRatio: '16/9', background: 'rgba(0,0,0,0.08)' }}>
-                  <Box component="img" src={note.imageUrl} alt={note.title} sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                </Box>
-              ) : null}
-              <Box sx={{
-                p: 1.35,
-                borderRadius: radius.lg,
-                background: 'rgba(255,255,255,0.72)',
-                border: '1px solid rgba(255,255,255,0.62)',
-                backdropFilter: 'blur(8px)',
-              }}>
-                <Typography sx={{
-                  fontSize: '0.92rem',
-                  color: colors.text.secondary,
-                  lineHeight: 1.7,
-                  fontStyle: 'italic',
-                  whiteSpace: 'pre-wrap',
-                  overflowWrap: 'anywhere',
-                  wordBreak: 'break-word',
-                }}>
-                  &ldquo;{note.message}&rdquo;
-                </Typography>
-              </Box>
+              <RewardCard
+                reward={{
+                  id: note.id,
+                  title: note.title,
+                  message: note.message,
+                  rarity: note.rarity,
+                  typeId: note.typeId,
+                  imageUrl: note.imageUrl ?? null,
+                  imageLayout: note.imageLayout,
+                  isNew: 'isNew' in note ? note.isNew : false,
+                }}
+                rarities={rarities}
+                types={types}
+              />
               <Stack spacing={0.7}>
                 <Typography sx={{ fontSize: '0.70rem', fontWeight: 900, letterSpacing: 0.8, color: rarity?.captionColor ?? colors.text.muted, textTransform: 'uppercase' }}>
                   Compartilhar
@@ -671,6 +635,41 @@ export function NoteCard({ note, r, t, unread, variant, onSelect, onToggleFavori
   onToggleFavorite: (note: CollectionNoteView) => void
 }) {
   const grid = variant === 'grid'
+
+  if (note.imageUrl && note.imageLayout) {
+    return (
+      <Box sx={{ position: 'relative', cursor: 'pointer', height: grid ? '100%' : undefined }} onClick={() => onSelect(note)}>
+        <RewardCard
+          reward={{ id: note.id, title: note.title, message: note.message, rarity: note.rarity, typeId: note.typeId, imageUrl: note.imageUrl, imageLayout: note.imageLayout, isNew: false }}
+          rarities={r ? [r] : []}
+          types={t ? [t] : []}
+        />
+        {unread && (
+          <Box sx={{
+            position: 'absolute', top: 2, left: 2, width: 11, height: 11, zIndex: 5,
+            borderRadius: radius.full, background: colors.rose.main,
+            boxShadow: `0 0 0 3px rgba(255,255,255,0.82), 0 0 14px ${colors.rose.glow}`,
+            pointerEvents: 'none',
+          }} />
+        )}
+        <IconButton
+          size="small"
+          aria-label="favoritar bilhete"
+          onClick={(event) => { event.stopPropagation(); onToggleFavorite(note) }}
+          sx={{
+            position: 'absolute', top: 8, right: 8, p: 0.5, borderRadius: radius.md, zIndex: 5,
+            color: note.favorite ? colors.rose.main : (r?.captionColor ?? colors.text.muted),
+            background: note.favorite ? 'rgba(254,243,199,0.92)' : 'rgba(255,255,255,0.74)',
+            border: `1px solid ${note.favorite ? 'rgba(234,179,8,0.38)' : 'rgba(255,255,255,0.68)'}`,
+            backdropFilter: 'blur(8px)', boxShadow: '0 4px 12px rgba(15,23,42,0.08)',
+          }}
+        >
+          {note.favorite ? <StarIcon sx={{ fontSize: 16, color: '#eab308' }} /> : <StarBorderIcon sx={{ fontSize: 16 }} />}
+        </IconButton>
+      </Box>
+    )
+  }
+
   return (
     <Card accent={r?.borderColor} onClick={() => onSelect(note)} sx={{ ...(rarityCardSx(r, true) as object), cursor: 'pointer', height: grid ? '100%' : undefined }}>
       <Box sx={{ position: 'relative', zIndex: 1, height: '100%' }}>
