@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { Box, Stack, Typography } from '@mui/material'
 import { Grid } from '@giphy/react-components'
 import { GiphyFetch } from '@giphy/js-fetch-api'
@@ -31,7 +31,6 @@ export function validateImageUrl(raw: string): string | null {
 
   if (parsed.protocol !== 'https:') return 'Use apenas URLs HTTPS'
 
-  // bloqueia esquemas perigosos que podem escapar via encoding
   const lower = url.toLowerCase()
   if (['javascript', 'data:', 'vbscript', 'file:'].some((d) => lower.includes(d))) {
     return 'URL inválida'
@@ -64,12 +63,21 @@ export function ImagePicker({ value, onChange }: Props) {
   const [urlInput, setUrlInput] = useState(value ?? '')
   const [urlError, setUrlError] = useState<string | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const gridRef = useRef<HTMLDivElement>(null)
+  const [gridWidth, setGridWidth] = useState(0)
+
+  useEffect(() => {
+    if (!gridRef.current) return
+    const ro = new ResizeObserver((entries) => setGridWidth(entries[0].contentRect.width))
+    ro.observe(gridRef.current)
+    return () => ro.disconnect()
+  }, [mode]) // re-run when mode opens the grid
 
   const fetchGifs = useCallback(
     (offset: number) =>
       debouncedSearch
-        ? gf.search(debouncedSearch, { offset, limit: 9, rating: 'g' })
-        : gf.trending({ offset, limit: 9, rating: 'g' }),
+        ? gf.search(debouncedSearch, { offset, limit: 12, rating: 'g' })
+        : gf.trending({ offset, limit: 12, rating: 'g' }),
     [debouncedSearch],
   )
 
@@ -97,78 +105,122 @@ export function ImagePicker({ value, onChange }: Props) {
     if (urlError) onChange(null)
   }
 
-  function switchMode(m: Mode) {
+  function toggleMode(m: Mode) {
     setMode((prev) => (prev === m ? null : m))
     if (m === 'url') setUrlInput(value ?? '')
   }
 
-  const tabSx = (active: boolean) => ({
-    px: 1.4, py: 0.5, borderRadius: radius.full, cursor: 'pointer',
-    fontSize: '0.75rem', fontWeight: 700, transition: 'all 0.15s',
-    background: active ? colors.primary.main : 'rgba(0,0,0,0.05)',
-    color: active ? '#fff' : colors.text.secondary,
-    border: `1.5px solid ${active ? colors.primary.main : 'transparent'}`,
+  function handleClear() {
+    onChange(null)
+    setUrlInput('')
+    setUrlError(null)
+    setMode(null)
+  }
+
+  const btnSx = (active: boolean) => ({
+    flex: 1,
+    py: 0.9,
+    px: 1,
+    borderRadius: radius.md,
+    cursor: 'pointer',
+    textAlign: 'center' as const,
+    fontSize: '0.78rem',
+    fontWeight: 700,
+    transition: 'all 0.15s',
     userSelect: 'none' as const,
+    background: active ? colors.primary.main : 'rgba(0,0,0,0.04)',
+    color: active ? '#fff' : colors.text.secondary,
+    border: `1.5px solid ${active ? colors.primary.main : colors.border.subtle}`,
+    '&:hover': {
+      background: active ? colors.primary.light : 'rgba(0,0,0,0.08)',
+      borderColor: active ? colors.primary.light : colors.border.medium,
+    },
   })
 
   return (
-    <Stack spacing={1.2}>
-      <Stack direction="row" alignItems="center" justifyContent="space-between">
-        <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.secondary }}>
-          Imagem{' '}
-          <Typography component="span" sx={{ fontSize: '0.68rem', fontWeight: 400, color: colors.text.muted }}>
-            (opcional)
-          </Typography>
+    <Stack spacing={1.5}>
+      <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.secondary }}>
+        Imagem{' '}
+        <Typography component="span" sx={{ fontSize: '0.68rem', fontWeight: 400, color: colors.text.muted }}>
+          (opcional)
         </Typography>
-        <Stack direction="row" spacing={0.6}>
-          <Box onClick={() => switchMode('giphy')} sx={tabSx(mode === 'giphy')}>🔍 GIF</Box>
-          <Box onClick={() => switchMode('url')} sx={tabSx(mode === 'url')}>🔗 URL</Box>
-          {value && (
-            <Box onClick={() => { onChange(null); setUrlInput(''); setMode(null) }}
-              sx={{ ...tabSx(false), color: colors.error?.main ?? '#ef4444' }}>
-              ✕
-            </Box>
-          )}
-        </Stack>
-      </Stack>
+      </Typography>
 
-      {/* preview da imagem selecionada */}
+      {/* Preview */}
       {value && (
-        <Box sx={{ borderRadius: radius.lg, overflow: 'hidden', width: '100%', height: 80, background: 'rgba(0,0,0,0.06)' }}>
-          <Box component="img" src={value} alt="preview" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        <Box sx={{ position: 'relative', borderRadius: radius.lg, overflow: 'hidden', height: 88 }}>
+          <Box
+            component="img"
+            src={value}
+            alt="preview"
+            sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
+          <Box
+            onClick={handleClear}
+            title="Remover imagem"
+            sx={{
+              position: 'absolute', top: 6, right: 6,
+              width: 24, height: 24, borderRadius: '50%',
+              background: 'rgba(0,0,0,0.55)', color: '#fff',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', fontSize: '0.65rem', fontWeight: 800,
+              backdropFilter: 'blur(4px)',
+              '&:hover': { background: 'rgba(0,0,0,0.8)' },
+              transition: 'background 0.15s',
+            }}
+          >
+            ✕
+          </Box>
         </Box>
       )}
 
-      {/* Giphy */}
+      {/* Toggle buttons */}
+      <Stack direction="row" alignItems="center" spacing={1}>
+        <Box onClick={() => toggleMode('giphy')} sx={btnSx(mode === 'giphy')}>
+          🔍 GIF
+        </Box>
+        <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: colors.text.muted, flexShrink: 0 }}>
+          ou
+        </Typography>
+        <Box onClick={() => toggleMode('url')} sx={btnSx(mode === 'url')}>
+          🔗 URL
+        </Box>
+      </Stack>
+
+      {/* GIF panel */}
       {mode === 'giphy' && (
         <Stack spacing={1}>
           <Input
-            placeholder="Buscar GIF..."
+            placeholder="Pesquise um GIF..."
             value={search}
             onChange={(e) => handleSearchChange(e.target.value)}
             autoFocus
           />
-          {!import.meta.env.VITE_GIPHY_API_KEY ? (
-            <Typography sx={{ fontSize: '0.75rem', color: colors.text.muted, p: 1 }}>
-              Adicione VITE_GIPHY_API_KEY no .env para ativar a busca de GIFs.
-            </Typography>
-          ) : (
-            <Box sx={{ borderRadius: radius.lg, overflow: 'hidden', '& .giphy-grid': { gap: '4px' } }}>
+          <Box
+            ref={gridRef}
+            sx={{
+              borderRadius: radius.md,
+              overflow: 'hidden',
+              background: 'rgba(0,0,0,0.03)',
+              '& *': { boxSizing: 'border-box' },
+            }}
+          >
+            {gridWidth > 0 && (
               <Grid
                 key={debouncedSearch}
-                width={312}
-                columns={3}
+                width={gridWidth}
+                columns={4}
                 fetchGifs={fetchGifs}
                 onGifClick={handleGifClick}
                 noLink
                 hideAttribution
               />
-            </Box>
-          )}
+            )}
+          </Box>
         </Stack>
       )}
 
-      {/* URL manual */}
+      {/* URL panel */}
       {mode === 'url' && (
         <Stack spacing={0.5}>
           <Input
@@ -180,8 +232,8 @@ export function ImagePicker({ value, onChange }: Props) {
             helperText={urlError ?? undefined}
             autoFocus
           />
-          <Typography sx={{ fontSize: '0.65rem', color: colors.text.muted, pl: 0.5 }}>
-            Aceito: .jpg .png .gif .webp .avif — apenas HTTPS
+          <Typography sx={{ fontSize: '0.62rem', color: colors.text.muted, pl: 0.5 }}>
+            .jpg · .png · .gif · .webp · .avif — apenas HTTPS
           </Typography>
         </Stack>
       )}

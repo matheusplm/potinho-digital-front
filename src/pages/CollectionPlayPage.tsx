@@ -185,19 +185,30 @@ function CardTag({ t }: { t?: NoteTypeConfig }) {
   )
 }
 
-export function RewardCard({ reward, rarities, types, onClick, imageLayout: imageLayoutProp }: { reward: CollectionDailyReward; rarities: RarityConfig[]; types: NoteTypeConfig[]; onClick?: () => void; imageLayout?: NoteImageLayout }) {
+function ImgArea({ src, alt, previewMode, sx }: { src?: string | null; alt: string; previewMode?: boolean; sx?: object }) {
+  if (src) return <Box component="img" src={src} alt={alt} sx={{ ...IMG_SX, ...sx }} />
+  if (previewMode) return (
+    <Box sx={{ ...IMG_SX, background: 'rgba(0,0,0,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', ...sx }}>
+      <Typography sx={{ fontSize: '1.8rem', opacity: 0.18, userSelect: 'none' }}>🖼️</Typography>
+    </Box>
+  )
+  return null
+}
+
+export function RewardCard({ reward, rarities, types, onClick, imageLayout: imageLayoutProp, previewMode }: { reward: CollectionDailyReward; rarities: RarityConfig[]; types: NoteTypeConfig[]; onClick?: () => void; imageLayout?: NoteImageLayout; previewMode?: boolean }) {
   const r = rarities.find((x) => x.id === reward.rarity)
   const t = types.find((x) => x.id === reward.typeId)
   const img = reward.imageUrl
   const imageLayout: NoteImageLayout = imageLayoutProp ?? reward.imageLayout ?? 'banner'
+  const showImg = !!(img || (previewMode && (imageLayoutProp ?? reward.imageLayout)))
 
   // ── layouts imersivos que mudam a estrutura toda ──────────────────────────
 
-  if (img && imageLayout === 'hero-overlay') {
+  if (showImg && imageLayout === 'hero-overlay') {
     return (
       <Box onClick={onClick} sx={{ ...rarityCardSx(r), animation: `${cardIn} 0.55s cubic-bezier(0.16,1,0.3,1)`, cursor: onClick ? 'pointer' : 'default', p: 0, overflow: 'hidden', position: 'relative' }}>
         <Box sx={{ position: 'relative', width: '100%', height: 220 }}>
-          <Box component="img" src={img} alt={reward.title} sx={{ ...IMG_SX, position: 'absolute', inset: 0 }} />
+          <ImgArea src={img} alt={reward.title} previewMode={previewMode} sx={{ position: 'absolute', inset: 0 }} />
           <Box sx={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)' }} />
           <Stack spacing={0.8} sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, p: 2 }}>
             <CardChips r={r} isNew={reward.isNew} />
@@ -216,10 +227,13 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
     )
   }
 
-  if (img && imageLayout === 'bg-blur') {
+  if (showImg && imageLayout === 'bg-blur') {
     return (
       <Box onClick={onClick} sx={{ ...rarityCardSx(r), animation: `${cardIn} 0.55s cubic-bezier(0.16,1,0.3,1)`, cursor: onClick ? 'pointer' : 'default', position: 'relative', overflow: 'hidden' }}>
-        <Box component="img" src={img} alt={reward.title} sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'blur(18px) brightness(0.55) saturate(1.4)', transform: 'scale(1.1)', zIndex: 0 }} />
+        {img
+          ? <Box component="img" src={img} alt={reward.title} sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'blur(18px) brightness(0.55) saturate(1.4)', transform: 'scale(1.1)', zIndex: 0 }} />
+          : <Box sx={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.08)', zIndex: 0 }} />
+        }
         <Box sx={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.22)', zIndex: 0 }} />
         <Stack spacing={1.5} sx={{ position: 'relative', zIndex: 1 }}>
           <CardChips r={r} isNew={reward.isNew} />
@@ -233,11 +247,11 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
     )
   }
 
-  if (img && imageLayout === 'split') {
+  if (showImg && imageLayout === 'split') {
     return (
       <Box onClick={onClick} sx={{ ...rarityCardSx(r), animation: `${cardIn} 0.55s cubic-bezier(0.16,1,0.3,1)`, cursor: onClick ? 'pointer' : 'default', p: 0, overflow: 'hidden' }}>
         <Box sx={{ width: '100%', height: 130, overflow: 'hidden' }}>
-          <Box component="img" src={img} alt={reward.title} sx={{ ...IMG_SX }} />
+          <ImgArea src={img} alt={reward.title} previewMode={previewMode} />
         </Box>
         <Stack spacing={1.5} sx={{ p: 2, position: 'relative', zIndex: 1 }}>
           <CardChips r={r} isNew={reward.isNew} />
@@ -248,12 +262,12 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
     )
   }
 
-  if (img && imageLayout === 'stripe-left') {
+  if (showImg && imageLayout === 'stripe-left') {
     return (
       <Box onClick={onClick} sx={{ ...rarityCardSx(r), animation: `${cardIn} 0.55s cubic-bezier(0.16,1,0.3,1)`, cursor: onClick ? 'pointer' : 'default', p: 0, overflow: 'hidden' }}>
         <Stack direction="row" sx={{ minHeight: 140 }}>
           <Box sx={{ width: 90, flexShrink: 0, overflow: 'hidden' }}>
-            <Box component="img" src={img} alt={reward.title} sx={{ ...IMG_SX, height: '100%' }} />
+            <ImgArea src={img} alt={reward.title} previewMode={previewMode} sx={{ height: '100%' }} />
           </Box>
           <Stack spacing={1.2} sx={{ flex: 1, p: 1.8, minWidth: 0 }}>
             <CardChips r={r} isNew={reward.isNew} />
@@ -274,17 +288,17 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
       <Stack spacing={1.5} sx={{ position: 'relative', zIndex: 1 }}>
         <CardChips r={r} isNew={reward.isNew} />
 
-        {img && imageLayout === 'banner' && (
+        {showImg && imageLayout === 'banner' && (
           <Box sx={{ borderRadius: radius.lg, overflow: 'hidden', width: '100%', height: 110 }}>
-            <Box component="img" src={img} alt={reward.title} sx={IMG_SX} />
+            <ImgArea src={img} alt={reward.title} previewMode={previewMode} />
           </Box>
         )}
 
-        {isThumb && img ? (
+        {isThumb && showImg ? (
           <Box sx={{ p: 1.15, borderRadius: radius.lg, background: 'rgba(255,255,255,0.68)', border: '1px solid rgba(255,255,255,0.58)', backdropFilter: 'blur(8px)', minWidth: 0 }}>
             <Stack direction={imageLayout.endsWith('right') ? 'row-reverse' : 'row'} spacing={1.2} alignItems="flex-start">
               <Box sx={{ flexShrink: 0, width: imageLayout.startsWith('circle') ? 56 : 64, height: imageLayout.startsWith('circle') ? 56 : 64, borderRadius: imageLayout.startsWith('circle') ? '50%' : radius.md, overflow: 'hidden' }}>
-                <Box component="img" src={img} alt={reward.title} sx={IMG_SX} />
+                <ImgArea src={img} alt={reward.title} previewMode={previewMode} />
               </Box>
               <Box sx={{ minWidth: 0, flex: 1 }}>
                 <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.05rem', color: colors.text.primary, lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
