@@ -1,12 +1,16 @@
 export type Rarity = string
 export type NoteType = string
 
+export type NoteImageLayout = 'banner' | 'thumb-left' | 'thumb-right' | 'circle-left' | 'circle-right' | 'split' | 'stripe-left' | 'hero-overlay' | 'bg-blur'
+
 export interface NoteRecord {
   id: string
   title: string
   message: string
   rarity: string
   typeId: string
+  imageUrl?: string | null
+  imageLayout?: NoteImageLayout | null
   createdAt: string
 }
 
@@ -15,6 +19,8 @@ export interface NoteFormData {
   message: string
   rarity: string
   typeId: string
+  imageUrl: string | null
+  imageLayout: NoteImageLayout | null
 }
 
 export interface PartnerReader {
@@ -35,6 +41,8 @@ export interface Note {
   message: string
   rarity: string
   typeId: string
+  imageUrl?: string | null
+  imageLayout?: NoteImageLayout | null
   owned: boolean
   favorite: boolean
   obtainedAt: string | null
@@ -214,6 +222,8 @@ export interface CollectionDailyReward {
   message: string
   rarity: string
   typeId: string
+  imageUrl?: string | null
+  imageLayout?: NoteImageLayout | null
   isNew: boolean
 }
 

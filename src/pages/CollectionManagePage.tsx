@@ -18,7 +18,8 @@ import { keyframes } from '@emotion/react'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Button, Card, Input, LoadingState, PageTitle, ScrollablePage, SegmentedControl, toast, EmojiPickerInput } from '../components/ui'
-import { NoteDetailDialog, type ReadableNote } from './CollectionPlayPage'
+import { ImagePicker } from '../components/ImagePicker'
+import { NoteDetailDialog, RewardCard, type ReadableNote } from './CollectionPlayPage'
 import {
   useCollectionsQuery,
   useCollectionNotesQuery, useCreateCollectionNoteMutation, useImportCollectionNotesMutation, useUpdateCollectionNoteMutation, useDeleteCollectionNoteMutation,
@@ -120,7 +121,19 @@ const ACHIEVEMENT_PRESETS: { emoji: string; label: string; description: string; 
   { emoji: '❤️', label: 'Coração cheio', description: 'Favoritou 5 bilhetes.', conditionType: 'favorite_count', count: 5 },
 ]
 
-const EMPTY_NOTE: NoteFormData = { title: '', message: '', rarity: '', typeId: '' }
+const EMPTY_NOTE: NoteFormData = { title: '', message: '', rarity: '', typeId: '', imageUrl: null, imageLayout: null }
+
+const IMAGE_LAYOUTS: { value: import('../types/note').NoteImageLayout; label: string }[] = [
+  // { value: 'banner', label: 'Banner' },
+  { value: 'thumb-left', label: 'Thumb esq' },
+  { value: 'thumb-right', label: 'Thumb dir' },
+  { value: 'circle-left', label: 'Círculo esq' },
+  { value: 'circle-right', label: 'Círculo dir' },
+  // { value: 'split', label: 'Split' },
+  { value: 'stripe-left', label: 'Stripe' },
+  { value: 'hero-overlay', label: 'Hero' },
+  { value: 'bg-blur', label: 'Blur' },
+]
 const DEFAULT_IMPORT_JSON = `[
   {
     "title": "Seu título aqui",
@@ -423,15 +436,15 @@ function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
   open: boolean; editing: NoteRecord | null; rarities: RarityConfig[]; types: NoteTypeConfig[]; cid: string; onClose: () => void
 }) {
   const [form, setForm] = useState<NoteFormData>(EMPTY_NOTE)
-  const [touched, setTouched] = useState({ title: false, message: false, rarity: false, typeId: false })
+  const [touched, setTouched] = useState({ title: false, message: false, rarity: false, typeId: false, imageUrl: false })
   const createMutation = useCreateCollectionNoteMutation(cid)
   const updateMutation = useUpdateCollectionNoteMutation(cid)
   const isLoading = createMutation.isPending || updateMutation.isPending
 
   useEffect(() => {
     if (!open) return
-    setForm(editing ? { title: editing.title, message: editing.message, rarity: editing.rarity, typeId: editing.typeId } : EMPTY_NOTE)
-    setTouched({ title: false, message: false, rarity: false, typeId: false })
+    setForm(editing ? { title: editing.title, message: editing.message, rarity: editing.rarity, typeId: editing.typeId, imageUrl: editing.imageUrl ?? null, imageLayout: editing.imageLayout ?? null } : EMPTY_NOTE)
+    setTouched({ title: false, message: false, rarity: false, typeId: false, imageUrl: false })
   }, [open, editing])
 
   const errors = {
@@ -439,6 +452,7 @@ function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
     message: form.message.trim().length === 0 ? 'Obrigatório' : form.message.length > 500 ? 'Máx 500 caracteres' : '',
     rarity: !form.rarity ? 'Selecione uma raridade' : '',
     typeId: !form.typeId ? 'Selecione um tipo' : '',
+    imageUrl: form.imageLayout && !form.imageUrl ? 'Selecione um GIF ou cole uma URL de imagem' : '',
   }
   const hasErrors = Object.values(errors).some(Boolean)
 
@@ -448,7 +462,7 @@ function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
 
   async function handleSubmit() {
     if (hasErrors) {
-      setTouched({ title: true, message: true, rarity: true, typeId: true })
+      setTouched({ title: true, message: true, rarity: true, typeId: true, imageUrl: true })
       return
     }
     try {
@@ -531,6 +545,65 @@ function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
             {touched.typeId && errors.typeId && (
               <Typography sx={{ fontSize: '0.68rem', color: colors.error.main, mt: 0.5, pl: 0.5 }}>{errors.typeId}</Typography>
             )}
+          </Box>
+          <Box>
+            <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.secondary, mb: 0.8 }}>
+              Posição da imagem{' '}
+              <Typography component="span" sx={{ fontSize: '0.68rem', fontWeight: 400, color: colors.text.muted }}>(opcional)</Typography>
+            </Typography>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
+              {IMAGE_LAYOUTS.map((opt) => (
+                <Box key={opt.value} onClick={() => setForm((f) => ({
+                  ...f,
+                  imageLayout: f.imageLayout === opt.value ? null : opt.value,
+                  imageUrl: f.imageLayout === opt.value ? null : f.imageUrl,
+                }))} sx={{
+                  px: 1.4, py: 0.5, borderRadius: radius.full, cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700,
+                  background: form.imageLayout === opt.value ? colors.primary.main : 'rgba(0,0,0,0.05)',
+                  color: form.imageLayout === opt.value ? '#fff' : colors.text.secondary,
+                  border: `1.5px solid ${form.imageLayout === opt.value ? colors.primary.main : 'transparent'}`,
+                  transition: 'all 0.15s',
+                }}>
+                  {opt.label}
+                </Box>
+              ))}
+            </Box>
+          </Box>
+          {form.imageLayout && (
+            <Stack spacing={0.5}>
+              <ImagePicker
+                value={form.imageUrl}
+                onChange={(url) => {
+                  setForm((f) => ({ ...f, imageUrl: url }))
+                  if (!url) setTouched((t) => ({ ...t, imageUrl: true }))
+                }}
+              />
+              {touched.imageUrl && errors.imageUrl && (
+                <Typography sx={{ fontSize: '0.7rem', color: colors.error.main, pl: 0.5 }}>
+                  {errors.imageUrl}
+                </Typography>
+              )}
+            </Stack>
+          )}
+          <Box>
+              <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.secondary, mb: 1 }}>
+                Prévia
+              </Typography>
+              <RewardCard
+                previewMode
+                reward={{
+                  id: '__preview__',
+                  title: form.title || 'Título do bilhete',
+                  message: form.message || 'Mensagem especial que vai aparecer no cartãozinho...',
+                  rarity: form.rarity || rarities[0]?.id || '',
+                  typeId: form.typeId || types[0]?.id || '',
+                  imageUrl: form.imageUrl,
+                  imageLayout: form.imageLayout,
+                  isNew: false,
+                }}
+                rarities={rarities}
+                types={types}
+              />
           </Box>
         </Stack>
       </DialogContent>
@@ -2072,6 +2145,11 @@ export function CollectionManagePage() {
                   }}>
                     <Stack direction="row" alignItems="center" spacing={0.8} sx={{ minHeight: 38, px: 1, py: 0.35 }}>
                       <Box sx={{ width: 6, height: 22, borderRadius: radius.full, background: r?.borderColor ?? colors.border.subtle, flexShrink: 0 }} />
+                      {note.imageUrl && (
+                        <Box sx={{ width: 28, height: 28, flexShrink: 0, borderRadius: radius.sm, overflow: 'hidden', border: `1px solid ${r?.borderColor ?? colors.border.subtle}22` }}>
+                          <Box component="img" src={note.imageUrl} alt="" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                        </Box>
+                      )}
                       <Typography sx={{
                         flex: 1,
                         minWidth: 0,
@@ -2123,7 +2201,13 @@ export function CollectionManagePage() {
                     },
                   }}>
                     <Stack direction="row" alignItems="stretch" sx={{ minHeight: 74 }}>
-                      <Box sx={{ width: 5, flexShrink: 0, background: r ? `linear-gradient(180deg,${r.borderColor},${r.glowColor || r.borderColor})` : colors.border.subtle }} />
+                      {note.imageUrl ? (
+                        <Box sx={{ width: 72, flexShrink: 0, overflow: 'hidden' }}>
+                          <Box component="img" src={note.imageUrl} alt="" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                        </Box>
+                      ) : (
+                        <Box sx={{ width: 5, flexShrink: 0, background: r ? `linear-gradient(180deg,${r.borderColor},${r.glowColor || r.borderColor})` : colors.border.subtle }} />
+                      )}
                       <Box sx={{ flex: 1, minWidth: 0, px: 1.25, py: 1 }}>
                         <Stack direction="row" alignItems="center" spacing={1}>
                           <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -2186,6 +2270,35 @@ export function CollectionManagePage() {
                       </Box>
                     </Stack>
                   </Card>
+                )
+              }
+              if (note.imageUrl && note.imageLayout) {
+                return (
+                  <Box key={note.id} sx={{ position: 'relative', cursor: 'pointer' }} onClick={() => setViewingNote(note)}>
+                    <RewardCard
+                      reward={{ id: note.id, title: note.title, message: note.message, rarity: note.rarity, typeId: note.typeId, imageUrl: note.imageUrl, imageLayout: note.imageLayout, isNew: false }}
+                      rarities={r ? [r] : []}
+                      types={t ? [t] : []}
+                    />
+                    <Stack direction="row" spacing={0.4} sx={{ position: 'absolute', top: 8, right: 8, zIndex: 5 }}>
+                      <IconButton
+                        size="small"
+                        aria-label="editar bilhete"
+                        onClick={(event) => { event.stopPropagation(); setEditingNote(note); setNoteDialog(true) }}
+                        sx={{ ...actionButtonSx('primary'), backdropFilter: 'blur(8px)' }}
+                      >
+                        <EditOutlinedIcon sx={{ fontSize: 16 }} />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        aria-label="excluir bilhete"
+                        onClick={(event) => { event.stopPropagation(); setDeletingNote(note) }}
+                        sx={{ ...actionButtonSx('danger'), backdropFilter: 'blur(8px)' }}
+                      >
+                        <DeleteForeverOutlinedIcon sx={{ fontSize: 16 }} />
+                      </IconButton>
+                    </Stack>
+                  </Box>
                 )
               }
               return (
@@ -2502,8 +2615,8 @@ export function CollectionManagePage() {
               <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.5, color: theme.textOnBgMuted, textTransform: 'uppercase', mb: 0.7 }}>
                 Adicionar rápido
               </Typography>
-              <Box sx={{ display: 'flex', gap: 0.6, overflowX: 'auto', pb: 0.4, scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
-                {ACHIEVEMENT_PRESETS.filter((p) => !achievements.some((a) => a.label === p.label)).map((p) => (
+              <Box sx={{ display: 'flex', gap: 0.6, flexWrap: 'wrap' }}>
+                {ACHIEVEMENT_PRESETS.filter((p) => !achievements.some((a) => a.label === p.label)).slice(0, 3).map((p) => (
                   <Box
                     key={p.label}
                     onClick={() => addAchievementPreset(p)}
