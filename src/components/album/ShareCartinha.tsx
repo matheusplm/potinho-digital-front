@@ -19,7 +19,7 @@ interface ShareNote {
   imageLayout?: NoteImageLayout | null
 }
 
-const BLUR_PAD = 32
+const BLUR_PAD = 64
 
 function loadImgEl(src: string, cors?: boolean): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -116,11 +116,11 @@ export function ShareCartinha({ note, r, t, theme }: {
     if (!baseNode || busy) return
     setBusy(format)
     try {
-      const W = 540
-      const H = format === 'story' ? 960 : 540
+      const W = 1080
+      const H = format === 'story' ? 1920 : 1080
       const slot = measureSlot(baseNode, W, H)
 
-      const baseDataUrl = await toPng(baseNode, { pixelRatio: 2, cacheBust: true })
+      const baseDataUrl = await toPng(baseNode, { pixelRatio: 1, cacheBust: true })
 
       let blob: Blob
       let filename: string
@@ -179,10 +179,9 @@ export function ShareCartinha({ note, r, t, theme }: {
         const srcImg = await loadImgEl(note.imageUrl!, true)
         const baseImg = await loadImgEl(baseDataUrl)
         const canvas = document.createElement('canvas')
-        canvas.width = W * 2
-        canvas.height = H * 2
+        canvas.width = W
+        canvas.height = H
         const ctx = canvas.getContext('2d')!
-        ctx.scale(2, 2)
 
         if (isImmersive) {
           drawAtSlot(ctx, srcImg, slot)
@@ -225,6 +224,8 @@ export function ShareCartinha({ note, r, t, theme }: {
   const textColor = r?.textColor || colors.text.primary
   const caption = r?.captionColor || colors.text.secondary
 
+  // inner() is designed for 540px but rendered inside a 2x CSS scale wrapper
+  // → output is 1080px with native-resolution text rendering
   const inner = (story: boolean) => {
     const tc = isImmersive ? '#fff' : textColor
     const cc = isImmersive ? 'rgba(255,255,255,0.82)' : caption
@@ -232,22 +233,22 @@ export function ShareCartinha({ note, r, t, theme }: {
     const thumbRight = layout === 'thumb-right' || layout === 'circle-right'
 
     const emojiCircle = (
-      <Box sx={{ width: story ? 96 : 72, height: story ? 96 : 72, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: story ? '2.8rem' : '2.1rem', background: isImmersive ? 'rgba(0,0,0,0.35)' : 'rgba(255,255,255,0.7)', border: `2px solid ${isImmersive ? 'rgba(255,255,255,0.4)' : `${accent}66`}` }}>
+      <Box sx={{ width: story ? 104 : 80, height: story ? 104 : 80, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: story ? '3rem' : '2.4rem', background: isImmersive ? 'rgba(0,0,0,0.35)' : 'rgba(255,255,255,0.7)', border: `2px solid ${isImmersive ? 'rgba(255,255,255,0.4)' : `${accent}66`}` }}>
         {r?.emoji || '💌'}
       </Box>
     )
     const rarityChip = r && (
-      <Box sx={{ px: 1.4, py: 0.5, borderRadius: radius.full, fontWeight: 800, fontSize: story ? '0.95rem' : '0.82rem', background: isImmersive ? 'rgba(0,0,0,0.4)' : r.chipBg, border: `1px solid ${isImmersive ? 'rgba(255,255,255,0.35)' : r.borderColor}` }}>
+      <Box sx={{ px: 1.6, py: 0.6, borderRadius: radius.full, fontWeight: 800, fontSize: story ? '1.05rem' : '0.92rem', background: isImmersive ? 'rgba(0,0,0,0.4)' : r.chipBg, border: `1px solid ${isImmersive ? 'rgba(255,255,255,0.35)' : r.borderColor}` }}>
         <Box component="span" sx={isImmersive ? { color: '#fff' } : gradientTextSx(r.chipColor)}>{r.emoji} {r.label}</Box>
       </Box>
     )
     const typeChip = t && (
-      <Box sx={{ px: 1.2, py: 0.4, borderRadius: radius.full, fontWeight: 700, fontSize: story ? '0.85rem' : '0.74rem', background: isImmersive ? 'rgba(0,0,0,0.35)' : t.tagBg, color: isImmersive ? '#fff' : t.tagColor }}>
+      <Box sx={{ px: 1.4, py: 0.5, borderRadius: radius.full, fontWeight: 700, fontSize: story ? '0.95rem' : '0.82rem', background: isImmersive ? 'rgba(0,0,0,0.35)' : t.tagBg, color: isImmersive ? '#fff' : t.tagColor }}>
         {t.emoji} {t.label}
       </Box>
     )
     const footer = (
-      <Typography sx={{ position: 'absolute', bottom: story ? 32 : 20, left: 0, right: 0, zIndex: 2, fontFamily: font.serif, fontWeight: 700, color: isImmersive ? 'rgba(255,255,255,0.7)' : accent, opacity: 0.75, fontSize: story ? '1rem' : '0.85rem', textAlign: 'center' }}>
+      <Typography sx={{ position: 'absolute', bottom: story ? 36 : 22, left: 0, right: 0, zIndex: 2, fontFamily: font.serif, fontWeight: 700, color: isImmersive ? 'rgba(255,255,255,0.7)' : accent, opacity: 0.75, fontSize: story ? '1.1rem' : '0.95rem', textAlign: 'center' }}>
         Potinho Digital 💌
       </Typography>
     )
@@ -260,11 +261,11 @@ export function ShareCartinha({ note, r, t, theme }: {
         <Box sx={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}>
           <Box data-img-slot="true" sx={{ position: 'absolute', inset: 0 }} />
           <Box sx={{ position: 'absolute', inset: 0, background: layout === 'bg-blur' ? 'rgba(0,0,0,0.28)' : 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.08) 100%)' }} />
-          <Box sx={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', px: story ? 5 : 4, py: story ? 8 : 5, boxSizing: 'border-box' }}>
-            <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: story ? 2.4 : 1.6, maxWidth: '100%' }}>
+          <Box sx={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', px: story ? 4 : 3, py: story ? 7 : 4, boxSizing: 'border-box' }}>
+            <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: story ? 2.8 : 2, maxWidth: '100%' }}>
               {emojiCircle}{rarityChip}
-              <Typography sx={{ fontFamily: font.serif, fontWeight: 850, color: tc, lineHeight: 1.2, fontSize: story ? '2rem' : '1.6rem', overflowWrap: 'anywhere', wordBreak: 'break-word', textShadow: '0 1px 8px rgba(0,0,0,0.6)' }}>{note.title}</Typography>
-              <Typography sx={{ fontStyle: 'italic', color: cc, lineHeight: 1.55, fontSize: story ? '1.25rem' : '1.05rem', overflowWrap: 'anywhere', wordBreak: 'break-word', textShadow: '0 1px 6px rgba(0,0,0,0.5)' }}>&ldquo;{note.message}&rdquo;</Typography>
+              <Typography sx={{ fontFamily: font.serif, fontWeight: 850, color: tc, lineHeight: 1.2, fontSize: story ? '2.3rem' : '1.85rem', overflowWrap: 'anywhere', wordBreak: 'break-word', textShadow: '0 1px 8px rgba(0,0,0,0.6)' }}>{note.title}</Typography>
+              <Typography sx={{ fontStyle: 'italic', color: cc, lineHeight: 1.55, fontSize: story ? '1.4rem' : '1.15rem', overflowWrap: 'anywhere', wordBreak: 'break-word', textShadow: '0 1px 6px rgba(0,0,0,0.5)' }}>&ldquo;{note.message}&rdquo;</Typography>
               {typeChip}
             </Box>
           </Box>
@@ -277,12 +278,12 @@ export function ShareCartinha({ note, r, t, theme }: {
       return (
         <Box sx={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: bg, display: 'flex', flexDirection: 'row', boxSizing: 'border-box' }}>
           <Box data-img-slot="true" sx={{ width: 90, flexShrink: 0, alignSelf: 'stretch' }} />
-          <Stack spacing={story ? 2 : 1.2} sx={{ flex: 1, p: story ? 3 : 1.8, justifyContent: 'center', position: 'relative', minWidth: 0 }}>
+          <Stack spacing={story ? 2 : 1.2} sx={{ flex: 1, p: story ? 2.5 : 1.6, justifyContent: 'center', position: 'relative', minWidth: 0 }}>
             {radialBg}
-            <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: story ? 2 : 1.2 }}>
+            <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: story ? 2.2 : 1.4 }}>
               {emojiCircle}{rarityChip}
-              <Typography sx={{ fontFamily: font.serif, fontWeight: 850, color: textColor, lineHeight: 1.2, fontSize: story ? '1.8rem' : '1.05rem', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{note.title}</Typography>
-              <Typography sx={{ fontStyle: 'italic', color: caption, lineHeight: 1.55, fontSize: story ? '1.1rem' : '0.82rem', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>&ldquo;{note.message}&rdquo;</Typography>
+              <Typography sx={{ fontFamily: font.serif, fontWeight: 850, color: textColor, lineHeight: 1.2, fontSize: story ? '2rem' : '1.2rem', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{note.title}</Typography>
+              <Typography sx={{ fontStyle: 'italic', color: caption, lineHeight: 1.55, fontSize: story ? '1.2rem' : '0.92rem', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>&ldquo;{note.message}&rdquo;</Typography>
               {typeChip}
             </Box>
           </Stack>
@@ -293,16 +294,16 @@ export function ShareCartinha({ note, r, t, theme }: {
 
     if (isThumbLayout) {
       return (
-        <Box sx={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', px: story ? 5 : 4, py: story ? 8 : 5, boxSizing: 'border-box' }}>
+        <Box sx={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', px: story ? 4 : 3, py: story ? 7 : 4, boxSizing: 'border-box' }}>
           {radialBg}
-          <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: story ? 2.4 : 1.6, maxWidth: '100%' }}>
+          <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: story ? 2.8 : 2, maxWidth: '100%' }}>
             {emojiCircle}{rarityChip}
             <Box sx={{ p: 1.15, borderRadius: radius.lg, background: 'rgba(255,255,255,0.68)', border: '1px solid rgba(255,255,255,0.58)', backdropFilter: 'blur(8px)', width: '100%', minWidth: 0 }}>
               <Stack direction={thumbRight ? 'row-reverse' : 'row'} spacing={1.2} alignItems="flex-start">
                 <Box data-img-slot="true" sx={{ flexShrink: 0, width: thumbSize, height: thumbSize, borderRadius: layout.startsWith('circle') ? '50%' : radius.md }} />
                 <Box sx={{ minWidth: 0, flex: 1, textAlign: 'left' }}>
-                  <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: story ? '1.4rem' : '1.05rem', color: textColor, lineHeight: 1.3, overflowWrap: 'anywhere', wordBreak: 'break-word', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{note.title}</Typography>
-                  <Typography sx={{ mt: 0.5, fontSize: story ? '1rem' : '0.83rem', color: caption, lineHeight: 1.55, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>&ldquo;{note.message}&rdquo;</Typography>
+                  <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: story ? '1.55rem' : '1.18rem', color: textColor, lineHeight: 1.3, overflowWrap: 'anywhere', wordBreak: 'break-word', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{note.title}</Typography>
+                  <Typography sx={{ mt: 0.5, fontSize: story ? '1.1rem' : '0.9rem', color: caption, lineHeight: 1.55, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>&ldquo;{note.message}&rdquo;</Typography>
                 </Box>
               </Stack>
             </Box>
@@ -316,12 +317,12 @@ export function ShareCartinha({ note, r, t, theme }: {
     return (
       <Box sx={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: bg, display: 'flex', flexDirection: 'column', ...(showBannerImg ? {} : { alignItems: 'center', justifyContent: 'center', textAlign: 'center' }), boxSizing: 'border-box' }}>
         {showBannerImg && <Box data-img-slot="true" sx={{ width: '100%', height: story ? 300 : 195, flexShrink: 0 }} />}
-        <Box sx={{ flex: 1, position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', px: story ? 5 : 4, py: story ? (showBannerImg ? 4 : 8) : (showBannerImg ? 3 : 5), boxSizing: 'border-box' }}>
+        <Box sx={{ flex: 1, position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', px: story ? 4 : 3, py: story ? (showBannerImg ? 3.5 : 7) : (showBannerImg ? 2.5 : 4), boxSizing: 'border-box' }}>
           {radialBg}
-          <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: story ? 2.4 : 1.6, maxWidth: '100%' }}>
+          <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: story ? 2.8 : 2, maxWidth: '100%' }}>
             {emojiCircle}{rarityChip}
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 850, color: textColor, lineHeight: 1.2, fontSize: story ? '2rem' : '1.6rem', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{note.title}</Typography>
-            <Typography sx={{ fontStyle: 'italic', color: caption, lineHeight: 1.55, fontSize: story ? '1.25rem' : '1.05rem', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>&ldquo;{note.message}&rdquo;</Typography>
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 850, color: textColor, lineHeight: 1.2, fontSize: story ? '2.3rem' : '1.85rem', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{note.title}</Typography>
+            <Typography sx={{ fontStyle: 'italic', color: caption, lineHeight: 1.55, fontSize: story ? '1.4rem' : '1.15rem', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>&ldquo;{note.message}&rdquo;</Typography>
             {typeChip}
           </Box>
         </Box>
@@ -342,8 +343,16 @@ export function ShareCartinha({ note, r, t, theme }: {
       </Stack>
 
       <Box aria-hidden sx={{ position: 'fixed', left: -99999, top: 0, pointerEvents: 'none', opacity: 0 }}>
-        <Box ref={cardRef} sx={{ width: 540, height: 540 }}>{inner(false)}</Box>
-        <Box ref={storyRef} sx={{ width: 540, height: 960 }}>{inner(true)}</Box>
+        <Box ref={cardRef} sx={{ width: 1080, height: 1080, overflow: 'hidden' }}>
+          <Box sx={{ width: 540, height: 540, transform: 'scale(2)', transformOrigin: '0 0' }}>
+            {inner(false)}
+          </Box>
+        </Box>
+        <Box ref={storyRef} sx={{ width: 1080, height: 1920, overflow: 'hidden' }}>
+          <Box sx={{ width: 540, height: 960, transform: 'scale(2)', transformOrigin: '0 0' }}>
+            {inner(true)}
+          </Box>
+        </Box>
       </Box>
     </>
   )
