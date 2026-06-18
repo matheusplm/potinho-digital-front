@@ -74,6 +74,8 @@ export function simulatePackOpen(pack: CollectionPack, notes: NoteRecord[], rari
       message: note.message,
       rarity: note.rarity,
       typeId: note.typeId,
+      imageUrl: note.imageUrl ?? null,
+      imageLayout: note.imageLayout ?? null,
       isNew: true,
     })
   }
