@@ -8,8 +8,6 @@ import { Input } from './ui'
 
 const gf = new GiphyFetch(import.meta.env.VITE_GIPHY_API_KEY ?? '')
 
-// ── URL validation ────────────────────────────────────────────────────────────
-
 const IMAGE_EXTS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'bmp', 'svg']
 const SAFE_HOSTS = [
   'images.unsplash.com', 'plus.unsplash.com',
@@ -46,8 +44,6 @@ export function validateImageUrl(raw: string): string | null {
 
   return null
 }
-
-// ── ImagePicker ───────────────────────────────────────────────────────────────
 
 type Mode = 'giphy' | 'url'
 

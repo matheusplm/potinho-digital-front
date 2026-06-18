@@ -202,8 +202,6 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
   const imageLayout: NoteImageLayout = imageLayoutProp ?? reward.imageLayout ?? 'banner'
   const showImg = !!(img || (previewMode && (imageLayoutProp ?? reward.imageLayout)))
 
-  // ── layouts imersivos que mudam a estrutura toda ──────────────────────────
-
   if (showImg && imageLayout === 'hero-overlay') {
     return (
       <Box onClick={onClick} sx={{ ...rarityCardSx(r), animation: `${cardIn} 0.55s cubic-bezier(0.16,1,0.3,1)`, cursor: onClick ? 'pointer' : 'default', p: 0, overflow: 'hidden', position: 'relative' }}>
@@ -280,7 +278,6 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
     )
   }
 
-  // ── banner / thumb / circle (card padrão) ───────────────────────────────
   const isThumb = imageLayout === 'thumb-left' || imageLayout === 'thumb-right' || imageLayout === 'circle-left' || imageLayout === 'circle-right'
 
   return (

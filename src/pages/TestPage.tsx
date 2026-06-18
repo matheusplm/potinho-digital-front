@@ -292,7 +292,6 @@ export function TestPage() {
 
       <Box sx={{ height: 48 }} />
 
-      {/* ── Preview: seletor de layout ── */}
       <Box sx={{ background: gradients.brand, px: 3, py: 4, maxWidth: 480, mx: 'auto' }}>
         <Stack spacing={3}>
           <LayoutSelectorPreview />
