@@ -101,15 +101,16 @@ export function MobileLayout() {
 
   return (
     <Box sx={{ background: theme.gradient, minHeight: '100dvh' }}>
-    <Box sx={{ width: '100%', maxWidth: 480, height: '100dvh', mx: 'auto', overflow: 'hidden' }}>
+    <Box sx={{ width: '100%', maxWidth: 480, height: '100dvh', mx: 'auto', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <FloatingMenu />
       <SimulationBanner />
       {location.pathname === '/home' && !isActive && <PushPrompt />}
 
       <Box component="main" sx={{
-        height: `calc(100% - 64px - env(safe-area-inset-bottom, 0px) - ${bannerOffset})`,
+        flex: 1,
+        overflow: 'hidden',
         mt: bannerOffset,
-        transition: 'margin-top 0.22s ease, height 0.22s ease',
+        transition: 'margin-top 0.22s ease',
       }}>
         <Outlet />
       </Box>
@@ -117,8 +118,8 @@ export function MobileLayout() {
       <ScrollHint />
 
       <Box sx={{
-        position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)',
-        width: '100%', maxWidth: 480, zIndex: 100,
+        flexShrink: 0,
+        zIndex: 100,
         background: theme.surfaceBg, backdropFilter: 'blur(20px)',
         borderTop: `1px solid ${theme.surfaceBorder}`,
         pb: 'env(safe-area-inset-bottom, 0px)',
