@@ -3,7 +3,7 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import { Box, Divider, Stack, Typography } from '@mui/material'
 import { useState } from 'react'
-import { Button, Card, Input, LoadingState, SegmentedControl, toast } from '../components/ui'
+import { Button, Card, Input, LoadingState, OnboardingOverlay, SegmentedControl, toast } from '../components/ui'
 import { colors, font, gradients, radius, shadow } from '../design-system'
 import { RewardCard } from './CollectionPlayPage'
 import type { ImageLayout } from './CollectionPlayPage'
@@ -103,6 +103,7 @@ const SWATCHES = [
 export function TestPage() {
   const [seg, setSeg] = useState('a')
   const [seg2, setSeg2] = useState('create')
+  const [onboardingKey, setOnboardingKey] = useState(0)
   const [inputVal, setInputVal] = useState('')
   const [passVal, setPassVal] = useState('')
   const [errorVal, setErrorVal] = useState('valor inválido')
@@ -261,6 +262,13 @@ export function TestPage() {
               ]}
             />
           </Stack>
+        </Section>
+
+        <Section title="Onboarding">
+          <Button variant="primary" onClick={() => setOnboardingKey((k) => k + 1)}>
+            Abrir Onboarding
+          </Button>
+          {onboardingKey > 0 && <OnboardingOverlay key={onboardingKey} userId="test-preview" forceShow />}
         </Section>
 
         <Section title="Toast">
