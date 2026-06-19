@@ -10,6 +10,7 @@ export interface AuthUser {
   role: UserRole
   token: string
   refreshToken?: string
+  onboardingDone?: boolean | null
 }
 
 interface UserContextValue {
@@ -17,6 +18,7 @@ interface UserContextValue {
   persona: UserRole
   personaReady: boolean
   setUser: (user: AuthUser | null) => void
+  patchUser: (patch: Partial<AuthUser>) => void
   setPersona: (role: UserRole) => void
   markPersonaReady: () => void
   logout: () => void
@@ -63,6 +65,15 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const patchUser = (patch: Partial<AuthUser>) => {
+    setUserState((current) => {
+      if (!current) return current
+      const updated = { ...current, ...patch }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+      return updated
+    })
+  }
+
   const markPersonaReady = () => setPersonaReady(true)
 
   const logout = () => {
@@ -85,6 +96,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
             name: profile.name,
             role: profile.role as UserRole,
             email: profile.email,
+            onboardingDone: profile.onboardingDone,
             token: current.token,
           }
           localStorage.setItem(STORAGE_KEY, JSON.stringify(merged))
@@ -98,7 +110,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <UserContext.Provider value={{ user, persona, personaReady, setUser, setPersona, markPersonaReady, logout }}>
+    <UserContext.Provider value={{ user, persona, personaReady, setUser, patchUser, setPersona, markPersonaReady, logout }}>
       {children}
     </UserContext.Provider>
   )

@@ -349,9 +349,11 @@ export function LandingPage() {
       background: 'linear-gradient(160deg,#dbeafe 0%,#fce7f3 55%,#ede9fe 100%)',
       overflowX: 'hidden', overflowY: 'auto', position: 'relative',
     }}>
-      <Box sx={{ position: 'fixed', top: -100, right: -100, width: 420, height: 420, borderRadius: '50%', background: 'radial-gradient(circle,rgba(29,78,216,0.09) 0%,transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
-      <Box sx={{ position: 'fixed', bottom: 80, left: -80, width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle,rgba(225,29,72,0.07) 0%,transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
-      <Box sx={{ position: 'fixed', top: '40%', right: -60, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle,rgba(124,58,237,0.06) 0%,transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
+      <Box sx={{ position: 'fixed', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}>
+        <Box sx={{ position: 'absolute', top: -100, right: -100, width: 420, height: 420, borderRadius: '50%', background: 'radial-gradient(circle,rgba(29,78,216,0.09) 0%,transparent 70%)' }} />
+        <Box sx={{ position: 'absolute', bottom: 80, left: -80, width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle,rgba(225,29,72,0.07) 0%,transparent 70%)' }} />
+        <Box sx={{ position: 'absolute', top: '40%', right: -60, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle,rgba(124,58,237,0.06) 0%,transparent 70%)' }} />
+      </Box>
 
       {/* Navbar */}
       <Box component="nav" sx={{

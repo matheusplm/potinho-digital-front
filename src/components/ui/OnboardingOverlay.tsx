@@ -55,13 +55,11 @@ const SLIDES = [
 ]
 
 interface Props {
-  userId: string
-  forceShow?: boolean
+  onDismiss?: () => void
 }
 
-export function OnboardingOverlay({ userId, forceShow = false }: Props) {
-  const KEY = `potinho-onboarded-${userId}`
-  const [open, setOpen] = useState(() => forceShow || localStorage.getItem(KEY) !== '1')
+export function OnboardingOverlay({ onDismiss }: Props) {
+  const [open, setOpen] = useState(true)
   const [step, setStep] = useState(0)
   const [dir, setDir] = useState(1)
   const touchX = useRef(0)
@@ -69,8 +67,8 @@ export function OnboardingOverlay({ userId, forceShow = false }: Props) {
   if (!open) return null
 
   function dismiss() {
-    if (!forceShow) localStorage.setItem(KEY, '1')
     setOpen(false)
+    onDismiss?.()
   }
 
   function goTo(i: number) {

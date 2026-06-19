@@ -5,7 +5,7 @@ import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import StopCircleOutlinedIcon from '@mui/icons-material/StopCircleOutlined'
-import { Box, Typography } from '@mui/material'
+import { Box, Tooltip, Typography } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { FloatingMenu } from './FloatingMenu'
@@ -129,7 +129,7 @@ export function MobileLayout() {
             const isEnd = item.action === 'end-simulation'
             const showUnreadDot =
               item.label === 'Coleção' && ((isActive && hasUnreadNotes) || (isReader && readerHasUnread))
-            return (
+            const navBox = (
               <Box
                 key={item.path + item.label}
                 onClick={() => {
@@ -191,6 +191,21 @@ export function MobileLayout() {
                 </Typography>
               </Box>
             )
+            if (item.action === 'simulate') {
+              return (
+                <Tooltip
+                  key={item.path + item.label}
+                  title="Veja como o leitor vai enxergar a coleção"
+                  enterTouchDelay={700}
+                  leaveTouchDelay={1500}
+                  arrow
+                  placement="top"
+                >
+                  {navBox}
+                </Tooltip>
+              )
+            }
+            return navBox
           })}
         </Box>
       </Box>

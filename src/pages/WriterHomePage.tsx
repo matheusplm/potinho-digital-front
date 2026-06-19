@@ -5,8 +5,10 @@ import { Box, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
+import { useCallback } from 'react'
 import { useCollectionsQuery } from '../hooks/useNotes'
 import { Card, ScrollablePage, OnboardingOverlay } from '../components/ui'
+import { api } from '../services/api'
 import { colors, font } from '../design-system'
 import { useBackground } from '../context/BackgroundContext'
 import { isCollectionOwner } from '../utils/collectionAccess'
@@ -24,8 +26,13 @@ const FLOATING = [
 ]
 
 export function WriterHomePage() {
-  const { user } = useUser()
+  const { user, patchUser } = useUser()
   const { theme } = useBackground()
+
+  const handleOnboardingDismiss = useCallback(async () => {
+    patchUser({ onboardingDone: true })
+    api.markOnboardingDone().catch(() => {})
+  }, [patchUser])
   const navigate = useNavigate()
   const { data: collections = [] } = useCollectionsQuery()
 
@@ -36,7 +43,7 @@ export function WriterHomePage() {
 
   return (
     <Box sx={{ height: '100%', position: 'relative', overflow: 'hidden', background: theme.gradient }}>
-      {user && <OnboardingOverlay userId={user.id} />}
+      {user?.onboardingDone === false && <OnboardingOverlay onDismiss={handleOnboardingDismiss} />}
       <FavoriteIcon sx={{
         position: 'absolute', bottom: -80, right: -80,
         fontSize: 500, color: 'rgba(29,78,216,0.05)', pointerEvents: 'none',

@@ -54,7 +54,16 @@ export function EmojiPickerInput({ label, value, onChange }: EmojiPickerInputPro
         onClose={() => setAnchorEl(null)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-        slotProps={{ paper: { sx: { borderRadius: radius.xl, overflow: 'hidden', boxShadow: '0 8px 32px rgba(15,23,42,0.14)', mt: 0.5 } } }}
+        marginThreshold={8}
+        slotProps={{
+          paper: {
+            sx: {
+              borderRadius: radius.xl, overflow: 'hidden',
+              boxShadow: '0 8px 32px rgba(15,23,42,0.14)', mt: 0.5,
+              maxWidth: 'min(352px, calc(100vw - 16px))',
+            },
+          },
+        }}
       >
         <Picker
           data={data}
@@ -66,6 +75,7 @@ export function EmojiPickerInput({ label, value, onChange }: EmojiPickerInputPro
           theme="light"
           previewPosition="none"
           skinTonePosition="search"
+          perLine={8}
         />
       </Popover>
     </Stack>

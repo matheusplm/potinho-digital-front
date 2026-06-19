@@ -190,7 +190,7 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
 
 export const api = {
   login: (email: string, password: string) =>
-    request<{ token: string; refreshToken: string; user: { id: string; name: string; role: string; email: string } }>('/auth/login', {
+    request<{ token: string; refreshToken: string; user: { id: string; name: string; role: string; email: string; onboardingDone: boolean | null } }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     }),
@@ -201,7 +201,8 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ name, email, password }),
     }),
-  me: () => request<{ id: string; name: string; role: string; email: string }>('/auth/me'),
+  me: () => request<{ id: string; name: string; role: string; email: string; onboardingDone: boolean | null }>('/auth/me'),
+  markOnboardingDone: () => request<{ ok: boolean }>('/auth/onboarding-done', { method: 'PATCH' }),
 
   listCollections: () => request<Collection[]>('/api/collections'),
   createCollection: (data: CollectionFormData) =>

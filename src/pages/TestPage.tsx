@@ -268,7 +268,7 @@ export function TestPage() {
           <Button variant="primary" onClick={() => setOnboardingKey((k) => k + 1)}>
             Abrir Onboarding
           </Button>
-          {onboardingKey > 0 && <OnboardingOverlay key={onboardingKey} userId="test-preview" forceShow />}
+          {onboardingKey > 0 && <OnboardingOverlay key={onboardingKey} />}
         </Section>
 
         <Section title="Toast">
