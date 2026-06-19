@@ -1,5 +1,6 @@
 ﻿import LogoutIcon from '@mui/icons-material/Logout'
 import FavoriteIcon from '@mui/icons-material/Favorite'
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
 import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined'
 import CheckIcon from '@mui/icons-material/Check'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
@@ -11,6 +12,7 @@ import BlockIcon from '@mui/icons-material/Block'
 import { Box, Stack, Typography, Backdrop, IconButton, Tooltip } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useMemo, useState } from 'react'
+import { OnboardingOverlay } from './ui'
 import { useNavigate } from 'react-router-dom'
 import { useUser, type UserRole } from '../context/UserContext'
 import { isCollectionReader, personaCapabilities } from '../utils/collectionAccess'
@@ -27,6 +29,7 @@ const menuIn = keyframes`
 
 export function FloatingMenu() {
   const [open, setOpen] = useState(false)
+  const [showTutorial, setShowTutorial] = useState(false)
   const { user, persona, setPersona, logout } = useUser()
   const { themeKey, setThemeKey, theme } = useBackground()
   const { activeCollectionId, setActiveCollectionId, unreadFor } = useReader()
@@ -327,6 +330,31 @@ export function FloatingMenu() {
             <Box sx={{ p: 1 }}>
               <Stack
                 direction="row" spacing={1.4}
+                onClick={() => { setOpen(false); setShowTutorial(true) }}
+                sx={{
+                  alignItems: 'center', px: 1.4, py: 1, cursor: 'pointer', borderRadius: radius.md,
+                  transition: 'background 0.12s',
+                  '&:hover': { bgcolor: `${theme.accent}0e` },
+                }}
+              >
+                <Box sx={{
+                  width: 30, height: 30, borderRadius: radius.sm, flexShrink: 0,
+                  background: `${theme.accent}14`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <PlayCircleOutlineIcon sx={{ fontSize: 16, color: theme.accent }} />
+                </Box>
+                <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: theme.textOnBg }}>
+                  Ver tutorial
+                </Typography>
+              </Stack>
+            </Box>
+
+            <Box sx={{ height: '1px', bgcolor: theme.surfaceBorder, mx: 1.5 }} />
+
+            <Box sx={{ p: 1 }}>
+              <Stack
+                direction="row" spacing={1.4}
                 onClick={() => { setOpen(false); logout() }}
                 sx={{ alignItems: 'center',
                   px: 1.4, py: 1, cursor: 'pointer', borderRadius: radius.md,
@@ -349,6 +377,8 @@ export function FloatingMenu() {
           </Box>
         )}
       </Box>
+
+      {showTutorial && <OnboardingOverlay onDismiss={() => setShowTutorial(false)} />}
     </>
   )
 }
