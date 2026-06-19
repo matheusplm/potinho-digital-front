@@ -1,15 +1,13 @@
 ﻿import FavoriteIcon from '@mui/icons-material/Favorite'
 import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded'
 import ShuffleIcon from '@mui/icons-material/Shuffle'
-import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined'
-import { Box, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, LinearProgress, Stack, Typography } from '@mui/material'
+import { Box, Dialog, DialogActions, DialogContent, DialogTitle, LinearProgress, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Card, LoadingState, ScrollablePage, toast } from '../components/ui'
 import { useBackground } from '../context/BackgroundContext'
-import { backgroundThemes } from '../design-system'
 import { useSimulation } from '../context/SimulationContext'
 import { useUser } from '../context/UserContext'
 import { useReader } from '../context/ReaderContext'
@@ -128,8 +126,7 @@ function formatCooldownBadge(ms: number) {
 export function SimulatedReaderHomePage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const { theme, themeKey, setThemeKey } = useBackground()
-  const [showThemePicker, setShowThemePicker] = useState(false)
+  const { theme } = useBackground()
   const { user, persona } = useUser()
   const simulation = useSimulation()
   const { session } = simulation
@@ -542,44 +539,7 @@ export function SimulatedReaderHomePage() {
               seu potinho chegou 💌
             </Typography>
           </Stack>
-          <IconButton
-            size="small"
-            onClick={() => setShowThemePicker((v) => !v)}
-            sx={{
-              mt: 0.5, p: 0.7, borderRadius: radius.lg, flexShrink: 0,
-              color: showThemePicker ? theme.accent : theme.textOnBgMuted,
-              background: showThemePicker ? `${theme.accent}18` : 'rgba(255,255,255,0.28)',
-              border: `1px solid ${showThemePicker ? `${theme.accent}44` : 'rgba(255,255,255,0.42)'}`,
-              backdropFilter: 'blur(8px)',
-              transition: 'all 0.15s',
-            }}
-          >
-            <PaletteOutlinedIcon sx={{ fontSize: 18 }} />
-          </IconButton>
         </Stack>
-
-        {showThemePicker && (
-          <Box sx={{ mb: 1.35, py: 2, overflowX: 'auto', scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
-            <Stack direction="row" spacing={1}>
-              {backgroundThemes.map((t) => (
-                <Box
-                  key={t.key}
-                  onClick={() => { setThemeKey(t.key); setShowThemePicker(false) }}
-                  title={`${t.emoji} ${t.label}`}
-                  sx={{
-                    flexShrink: 0, width: 36, height: 36, borderRadius: '50%', cursor: 'pointer',
-                    background: t.gradient,
-                    border: themeKey === t.key ? `3px solid ${t.accent}` : '2.5px solid rgba(255,255,255,0.7)',
-                    boxShadow: themeKey === t.key ? `0 0 0 2px ${t.accent}66, 0 4px 12px ${t.accent}44` : '0 2px 8px rgba(0,0,0,0.12)',
-                    transform: themeKey === t.key ? 'scale(1.15)' : 'scale(1)',
-                    transition: 'transform 0.15s, box-shadow 0.15s',
-                    '&:hover': { transform: 'scale(1.12)' },
-                  }}
-                />
-              ))}
-            </Stack>
-          </Box>
-        )}
 
 
         <Stack direction="row" spacing={0.8} sx={{ mb: 1.35 }}>
