@@ -7,7 +7,7 @@ import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined'
 import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined'
 import { Box, Chip, Stack, Typography, useMediaQuery } from '@mui/material'
 import { keyframes } from '@emotion/react'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, ScrollHint } from '../components/ui'
 import { backgroundThemes, colors, font, radius, shadow } from '../design-system'
@@ -24,17 +24,18 @@ const shimmer = keyframes`
   0%   { background-position: -200% center; }
   100% { background-position: 200% center; }
 `
-const float = keyframes`
-  0%, 100% { transform: translateY(0px) rotate(4deg); }
-  50%       { transform: translateY(-10px) rotate(4deg); }
+
+const hintWiggle = keyframes`
+  0%   { transform: rotate(2deg) translateX(0px); }
+  30%  { transform: rotate(-1deg) translateX(-20px); }
+  55%  { transform: rotate(-3deg) translateX(-28px); }
+  75%  { transform: rotate(-1deg) translateX(-14px); }
+  100% { transform: rotate(2deg) translateX(0px); }
 `
-const floatMid = keyframes`
-  0%, 100% { transform: translateY(0px) rotate(-4deg); }
-  50%       { transform: translateY(-7px) rotate(-4deg); }
-`
-const floatBack = keyframes`
-  0%, 100% { transform: translateY(0px) rotate(-10deg); }
-  50%       { transform: translateY(-5px) rotate(-10deg); }
+const sway = keyframes`
+  0%, 100% { transform: rotate(2deg) translateX(0px); }
+  28%       { transform: rotate(-2deg) translateX(-9px); }
+  72%       { transform: rotate(5deg) translateX(9px); }
 `
 
 interface DemoNote {
@@ -152,61 +153,185 @@ function DemoNoteCard({ note }: { note: DemoNote }) {
 }
 
 function HeroCardStack() {
+  const [topIdx, setTopIdx] = useState(0)
+  const [dragX, setDragX] = useState(0)
+  const [dragY, setDragY] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
+  const [exitDir, setExitDir] = useState<null | 1 | -1>(null)
+  const [hinting, setHinting] = useState(false)
+  const [isSnapping, setIsSnapping] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
+  const dragStartRef = useRef({ x: 0, y: 0 })
+  const interactedRef = useRef(false)
+
+  useEffect(() => {
+    const t = setTimeout(() => { if (!interactedRef.current) setHinting(true) }, 1200)
+    return () => clearTimeout(t)
+  }, [])
+
+  useEffect(() => {
+    if (!hinting) return
+    const t = setTimeout(() => setHinting(false), 900)
+    return () => clearTimeout(t)
+  }, [hinting])
+
+  function handleStart(clientX: number, clientY: number) {
+    interactedRef.current = true
+    setHinting(false)
+    setIsHovered(false)
+    setIsDragging(true)
+    dragStartRef.current = { x: clientX, y: clientY }
+  }
+
+  function handleMove(clientX: number, clientY: number) {
+    if (!isDragging) return
+    setDragX(clientX - dragStartRef.current.x)
+    setDragY(clientY - dragStartRef.current.y)
+  }
+
+  function handleEnd() {
+    if (!isDragging) return
+    setIsDragging(false)
+    if (Math.abs(dragX) > 80) {
+      const dir: 1 | -1 = dragX > 0 ? 1 : -1
+      setExitDir(dir)
+      setTimeout(() => {
+        setTopIdx((i) => (i + 1) % DEMO_NOTES.length)
+        setExitDir(null)
+        setDragX(0)
+        setDragY(0)
+      }, 350)
+    } else {
+      setIsSnapping(true)
+      setDragX(0)
+      setDragY(0)
+      setTimeout(() => setIsSnapping(false), 460)
+    }
+  }
+
+  const n0 = DEMO_NOTES[topIdx % DEMO_NOTES.length]
+  const n1 = DEMO_NOTES[(topIdx + 1) % DEMO_NOTES.length]
+  const n2 = DEMO_NOTES[(topIdx + 2) % DEMO_NOTES.length]
+
+  let topTransform: string
+  let topTransition: string
+  let topOpacity = 1
+  if (exitDir !== null) {
+    topTransform = `rotate(${exitDir * 25}deg) translateX(${exitDir * 140}%)`
+    topTransition = 'transform 0.35s ease-in, opacity 0.35s ease-in'
+    topOpacity = 0
+  } else if (isDragging) {
+    topTransform = `rotate(${2 + dragX * 0.05}deg) translateX(${dragX}px) translateY(${dragY * 0.3}px)`
+    topTransition = 'none'
+  } else if (isHovered) {
+    topTransform = 'rotate(8deg) translateX(14px) scale(1.02)'
+    topTransition = 'transform 0.28s ease, box-shadow 0.28s ease'
+  } else {
+    topTransform = 'rotate(2deg)'
+    topTransition = 'transform 0.45s cubic-bezier(0.34,1.56,0.64,1)'
+  }
+
+  function cardContent(note: DemoNote) {
+    return (
+      <>
+        {note.legendary && (
+          <Box sx={{
+            position: 'absolute', inset: 0, borderRadius: radius.xl,
+            background: 'linear-gradient(90deg,transparent 20%,rgba(253,230,138,0.35) 50%,transparent 80%)',
+            backgroundSize: '200% auto', animation: `${shimmer} 2.5s linear infinite`,
+            pointerEvents: 'none',
+          }} />
+        )}
+        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ flexShrink: 0, mb: 1 }}>
+          <Box sx={{
+            display: 'inline-flex', alignItems: 'center', gap: 0.4,
+            px: 0.7, py: 0.3, borderRadius: radius.full,
+            background: `${note.rarityColor}15`, border: `1px solid ${note.rarityColor}30`,
+          }}>
+            <Typography sx={{ fontSize: '0.58rem', fontWeight: 800, letterSpacing: 0.8, textTransform: 'uppercase', color: note.rarityColor }}>
+              {note.legendary ? '★' : '◆'} {note.rarity}
+            </Typography>
+          </Box>
+          <Typography sx={{ fontSize: '0.7rem', opacity: 0.4, lineHeight: 1 }}>💌</Typography>
+        </Stack>
+        <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', py: 0.5 }}>
+          <Typography sx={{ fontFamily: font.serif, fontSize: '0.84rem', color: note.rarityColor, lineHeight: 1.65, opacity: 0.88 }}>
+            {note.content}
+          </Typography>
+        </Box>
+        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ flexShrink: 0, mt: 1 }}>
+          <Box sx={{
+            display: 'inline-flex', alignItems: 'center', px: 0.7, py: 0.25,
+            borderRadius: radius.full, background: `${note.rarityColor}10`, border: `1px solid ${note.rarityColor}20`,
+          }}>
+            <Typography sx={{ fontSize: '0.6rem', fontWeight: 700, color: note.rarityColor }}>{note.type}</Typography>
+          </Box>
+          <Typography sx={{ fontSize: '0.52rem', fontWeight: 600, fontFamily: font.serif, color: note.rarityColor, opacity: 0.4, letterSpacing: 0.3 }}>
+            Potinho Digital
+          </Typography>
+        </Stack>
+      </>
+    )
+  }
+
   return (
-    <Box sx={{ position: 'relative', width: 300, height: 380, flexShrink: 0 }}>
-      <Box sx={{
-        position: 'absolute', top: 40, left: 40, right: 0, bottom: 0,
-        background: 'linear-gradient(135deg,#f8fafc,#f1f5f9)',
-        borderRadius: radius.xl, border: '1.5px solid rgba(100,116,139,0.22)',
-        boxShadow: shadow.md, p: 2.5,
-        animation: `${floatBack} 4.5s ease-in-out infinite`,
-      }}>
-        <Typography sx={{ fontSize: '0.58rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>· Comum</Typography>
-        <Typography sx={{ fontFamily: font.serif, fontSize: '0.84rem', color: '#475569', lineHeight: 1.65 }}>
-          Pensei em você hoje sem motivo nenhum. Só porque sim.
-        </Typography>
-        <Box sx={{ mt: 1.5, display: 'inline-flex', px: 0.9, py: 0.25, borderRadius: radius.full, background: 'rgba(100,116,139,0.1)', border: '1px solid rgba(100,116,139,0.2)' }}>
-          <Typography sx={{ fontSize: '0.62rem', fontWeight: 700, color: '#64748b' }}>🤍 Carinho</Typography>
-        </Box>
-      </Box>
-
-      <Box sx={{
-        position: 'absolute', top: 20, left: 20, right: 0, bottom: 0,
-        background: 'linear-gradient(135deg,#eff6ff,#dbeafe)',
-        borderRadius: radius.xl, border: '1.5px solid rgba(29,78,216,0.28)',
-        boxShadow: '0 8px 32px rgba(29,78,216,0.15)', p: 2.5,
-        animation: `${floatMid} 4s ease-in-out infinite`,
-      }}>
-        <Typography sx={{ fontSize: '0.58rem', fontWeight: 800, color: '#1d4ed8', textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>◆◆ Raro</Typography>
-        <Typography sx={{ fontFamily: font.serif, fontSize: '0.84rem', color: '#1e40af', lineHeight: 1.65 }}>
-          Seus olhos guardam mares que nunca vi, mas já naveguei mil vezes.
-        </Typography>
-        <Box sx={{ mt: 1.5, display: 'inline-flex', px: 0.9, py: 0.25, borderRadius: radius.full, background: 'rgba(29,78,216,0.1)', border: '1px solid rgba(29,78,216,0.2)' }}>
-          <Typography sx={{ fontSize: '0.62rem', fontWeight: 700, color: '#1d4ed8' }}>✍️ Poesia</Typography>
-        </Box>
-      </Box>
-
-      <Box sx={{
-        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-        background: 'linear-gradient(135deg,#fffbeb,#fef3c7,#fde68a)',
-        borderRadius: radius.xl, border: '2px solid rgba(245,158,11,0.5)',
-        boxShadow: '0 12px 40px rgba(245,158,11,0.25)', p: 2.5, overflow: 'hidden',
-        animation: `${float} 3.5s ease-in-out infinite`,
-      }}>
+    <Box sx={{ flexShrink: 0 }}>
+      <Box
+        sx={{ position: 'relative', width: 248, height: 328, userSelect: 'none', touchAction: 'pan-y' }}
+        onMouseMove={(e) => handleMove(e.clientX, e.clientY)}
+        onMouseUp={handleEnd}
+        onMouseLeave={handleEnd}
+      >
         <Box sx={{
-          position: 'absolute', inset: 0,
-          background: 'linear-gradient(90deg,transparent 20%,rgba(253,230,138,0.38) 50%,transparent 80%)',
-          backgroundSize: '200% auto', animation: `${shimmer} 2.5s linear infinite`,
-          pointerEvents: 'none',
-        }} />
-        <Typography sx={{ fontSize: '0.58rem', fontWeight: 800, color: '#92400e', textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>★ Lendário</Typography>
-        <Typography sx={{ fontFamily: font.serif, fontSize: '0.84rem', color: '#78350f', lineHeight: 1.65 }}>
-          Você é o motivo de eu acordar feliz todo dia. Não precisaria de mais nada.
-        </Typography>
-        <Box sx={{ mt: 1.5, display: 'inline-flex', px: 0.9, py: 0.25, borderRadius: radius.full, background: 'rgba(146,64,14,0.12)', border: '1px solid rgba(146,64,14,0.2)' }}>
-          <Typography sx={{ fontSize: '0.62rem', fontWeight: 700, color: '#92400e' }}>💕 Declaração</Typography>
+          position: 'absolute', inset: 0, zIndex: 1,
+          transform: 'translateY(16px) scale(0.9) rotate(6deg)',
+          transition: 'transform 0.3s ease',
+          background: n2.rarityBg, borderRadius: radius.xl,
+          border: `1.5px solid ${n2.border}`, boxShadow: n2.glow || shadow.sm,
+          display: 'flex', flexDirection: 'column', p: 1.75, overflow: 'hidden',
+        }}>
+          {cardContent(n2)}
+        </Box>
+        <Box sx={{
+          position: 'absolute', inset: 0, zIndex: 5,
+          transform: 'translateY(8px) scale(0.95) rotate(-2deg)',
+          transition: 'transform 0.3s ease',
+          background: n1.rarityBg, borderRadius: radius.xl,
+          border: `1.5px solid ${n1.border}`, boxShadow: n1.glow || shadow.sm,
+          display: 'flex', flexDirection: 'column', p: 1.75, overflow: 'hidden',
+        }}>
+          {cardContent(n1)}
+        </Box>
+        <Box
+          key={topIdx}
+          onMouseDown={(e) => { e.preventDefault(); handleStart(e.clientX, e.clientY) }}
+          onMouseEnter={() => { if (!isDragging && !isSnapping && exitDir === null) setIsHovered(true) }}
+          onMouseLeave={() => setIsHovered(false)}
+          onTouchStart={(e) => handleStart(e.touches[0].clientX, e.touches[0].clientY)}
+          onTouchMove={(e) => handleMove(e.touches[0].clientX, e.touches[0].clientY)}
+          onTouchEnd={handleEnd}
+          sx={{
+            position: 'absolute', inset: 0, zIndex: 10,
+            transform: topTransform,
+            transition: topTransition,
+            opacity: topOpacity,
+            animation: exitDir !== null || isDragging || isSnapping || isHovered
+              ? 'none'
+              : hinting
+              ? `${hintWiggle} 0.85s ease-in-out`
+              : `${sway} 3s ease-in-out infinite`,
+            cursor: isDragging ? 'grabbing' : 'grab',
+            background: n0.rarityBg, borderRadius: radius.xl,
+            border: `1.5px solid ${n0.border}`, boxShadow: n0.glow || shadow.sm,
+            display: 'flex', flexDirection: 'column', p: 1.75, overflow: 'hidden',
+          }}
+        >
+          {cardContent(n0)}
         </Box>
       </Box>
+      <Typography sx={{ mt: 1.5, textAlign: 'center', fontSize: '0.62rem', color: colors.text.muted, letterSpacing: 0.3 }}>
+        ← arraste para descobrir →
+      </Typography>
     </Box>
   )
 }
@@ -549,7 +674,7 @@ export function LandingPage() {
             {`${backgroundThemes.length} temas visuais`}
           </SectionTitle>
           {isDesktop ? (
-            <Box sx={{ overflowX: 'auto', pb: 1, '&::-webkit-scrollbar': { display: 'none' } }}>
+            <Box sx={{ overflowX: 'auto', pt: 2.5, pb: 1, '&::-webkit-scrollbar': { display: 'none' } }}>
               <Box sx={{ display: 'flex', gap: 1.5, width: 'max-content' }}>
                 {backgroundThemes.map((t) => (
                   <Stack key={t.key} spacing={0.8} alignItems="center">
