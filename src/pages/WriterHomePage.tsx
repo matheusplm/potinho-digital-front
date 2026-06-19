@@ -6,7 +6,7 @@ import { keyframes } from '@emotion/react'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { useCollectionsQuery } from '../hooks/useNotes'
-import { Card, ScrollablePage } from '../components/ui'
+import { Card, ScrollablePage, OnboardingOverlay } from '../components/ui'
 import { colors, font } from '../design-system'
 import { useBackground } from '../context/BackgroundContext'
 import { isCollectionOwner } from '../utils/collectionAccess'
@@ -36,6 +36,7 @@ export function WriterHomePage() {
 
   return (
     <Box sx={{ height: '100%', position: 'relative', overflow: 'hidden', background: theme.gradient }}>
+      {user && <OnboardingOverlay userId={user.id} />}
       <FavoriteIcon sx={{
         position: 'absolute', bottom: -80, right: -80,
         fontSize: 500, color: 'rgba(29,78,216,0.05)', pointerEvents: 'none',
