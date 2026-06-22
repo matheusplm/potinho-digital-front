@@ -1,7 +1,9 @@
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { Turnstile } from '@marsidev/react-turnstile'
+import type { TurnstileInstance } from '@marsidev/react-turnstile'
 import { useNavigate, Link } from 'react-router-dom'
 import { api } from '../services/api'
 import { Button, Input, toast } from '../components/ui'
@@ -32,6 +34,8 @@ export function RegisterPage() {
   const [form, setForm] = useState({ name: '', email: '', password: '' })
   const [passwordTouched, setPasswordTouched] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const turnstileRef = useRef<TurnstileInstance>(null)
 
   const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [field]: e.target.value }))
@@ -44,14 +48,17 @@ export function RegisterPage() {
       setPasswordTouched(true)
       return
     }
+    if (!captchaToken) return
     setLoading(true)
     try {
-      await api.register(form.name, form.email, form.password)
+      await api.register(form.name, form.email, form.password, captchaToken)
       toast.success('Conta criada!', { description: 'Agora é só entrar.' })
       navigate('/login')
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erro ao criar conta.'
       toast.error(msg)
+      turnstileRef.current?.reset()
+      setCaptchaToken(null)
     } finally {
       setLoading(false)
     }
@@ -110,9 +117,19 @@ export function RegisterPage() {
                 error={passwordError}
                 helperText={passwordError ? 'Mínimo de 6 caracteres' : undefined}
               />
+              <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                <Turnstile
+                  ref={turnstileRef}
+                  siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY as string}
+                  onSuccess={setCaptchaToken}
+                  onError={() => setCaptchaToken(null)}
+                  onExpire={() => setCaptchaToken(null)}
+                  options={{ theme: 'light', language: 'pt-BR', size: 'normal' }}
+                />
+              </Box>
               <Button
                 variant="primary"
-                type="submit" fullWidth loading={loading} sx={{ mt: 0.5 }}
+                type="submit" fullWidth loading={loading} disabled={!captchaToken} sx={{ mt: 0.5 }}
               >
                 Criar conta
               </Button>

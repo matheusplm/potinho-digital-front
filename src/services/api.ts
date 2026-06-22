@@ -45,6 +45,7 @@ const FRIENDLY_ERROR_MESSAGES: Record<string, string> = {
   NO_ELIGIBLE_NOTES: 'Esse pacotinho não tem bilhetes compatíveis agora.',
   PACK_NOT_ACTIVE: 'Este pacotinho não está disponível.',
   PACK_NOT_ALLOWED: 'Este pacotinho não está liberado para você.',
+  CAPTCHA_FAILED: 'Verificação de segurança falhou. Tente novamente.',
   INVALID_CREDENTIALS: 'Email ou senha incorretos.',
   EMAIL_ALREADY_EXISTS: 'Este email já está cadastrado.',
   UNAUTHORIZED: 'Sessão expirada. Faça login novamente.',
@@ -189,17 +190,17 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  login: (email: string, password: string) =>
+  login: (email: string, password: string, captchaToken: string) =>
     request<{ token: string; refreshToken: string; user: { id: string; name: string; role: string; email: string; onboardingDone: boolean | null } }>('/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, captchaToken }),
     }),
   logout: (refreshToken: string) =>
     request<{ ok: boolean }>('/auth/logout', { method: 'POST', body: JSON.stringify({ refreshToken }) }).catch(() => {}),
-  register: (name: string, email: string, password: string) =>
+  register: (name: string, email: string, password: string, captchaToken: string) =>
     request<{ id: string; name: string; role: string }>('/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name, email, password, captchaToken }),
     }),
   me: () => request<{ id: string; name: string; role: string; email: string; onboardingDone: boolean | null }>('/auth/me'),
   markOnboardingDone: () => request<{ ok: boolean }>('/auth/onboarding-done', { method: 'PATCH' }),

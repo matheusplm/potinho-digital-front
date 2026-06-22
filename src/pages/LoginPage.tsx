@@ -1,7 +1,9 @@
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { Turnstile } from '@marsidev/react-turnstile'
+import type { TurnstileInstance } from '@marsidev/react-turnstile'
 import { Link, useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { api } from '../services/api'
@@ -36,19 +38,24 @@ export function LoginPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const turnstileRef = useRef<TurnstileInstance>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!captchaToken) return
     setError('')
     setLoading(true)
     try {
-      const { token, refreshToken, user } = await api.login(email, password)
+      const { token, refreshToken, user } = await api.login(email, password, captchaToken)
       setUser({ id: user.id, name: user.name, email: user.email, role: user.role as 'writer' | 'reader', token, refreshToken, onboardingDone: user.onboardingDone })
       toast.success(`Bem-vindo, ${user.name.split(' ')[0]}! 💙`)
       navigate('/home')
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Erro ao fazer login.'
       setError(msg)
+      turnstileRef.current?.reset()
+      setCaptchaToken(null)
     } finally {
       setLoading(false)
     }
@@ -99,7 +106,17 @@ export function LoginPage() {
           <Stack spacing={2}>
             <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" fullWidth required />
             <Input label="Senha" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" fullWidth required />
-            <Button variant="primary" type="submit" fullWidth loading={loading} sx={{ mt: 0.5 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+              <Turnstile
+                ref={turnstileRef}
+                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY as string}
+                onSuccess={setCaptchaToken}
+                onError={() => setCaptchaToken(null)}
+                onExpire={() => setCaptchaToken(null)}
+                options={{ theme: 'light', language: 'pt-BR', size: 'normal' }}
+              />
+            </Box>
+            <Button variant="primary" type="submit" fullWidth loading={loading} disabled={!captchaToken} sx={{ mt: 0.5 }}>
               Entrar
             </Button>
             {error && (
