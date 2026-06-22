@@ -30,8 +30,9 @@ const HEARTS = [
 
 export function RegisterPage() {
   const navigate = useNavigate()
-  const [form, setForm] = useState({ name: '', email: '', password: '' })
+  const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' })
   const [passwordTouched, setPasswordTouched] = useState(false)
+  const [confirmTouched, setConfirmTouched] = useState(false)
   const [loading, setLoading] = useState(false)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaStatus, setCaptchaStatus] = useState<'pending' | 'verified' | 'error'>('pending')
@@ -41,13 +42,12 @@ export function RegisterPage() {
     setForm((f) => ({ ...f, [field]: e.target.value }))
 
   const passwordError = passwordTouched && form.password.length < 6
+  const confirmError = confirmTouched && form.confirm !== form.password
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (form.password.length < 6) {
-      setPasswordTouched(true)
-      return
-    }
+    if (form.password.length < 6) { setPasswordTouched(true); return }
+    if (form.confirm !== form.password) { setConfirmTouched(true); return }
     if (!captchaToken) return
     setLoading(true)
     try {
@@ -117,6 +117,13 @@ export function RegisterPage() {
                 placeholder="••••••••" fullWidth required
                 error={passwordError}
                 helperText={passwordError ? 'Mínimo de 6 caracteres' : undefined}
+              />
+              <Input
+                label="Confirmar senha" type="password" value={form.confirm}
+                onChange={set('confirm')} onBlur={() => setConfirmTouched(true)}
+                placeholder="••••••••" fullWidth required
+                error={confirmError}
+                helperText={confirmError ? 'As senhas não coincidem' : undefined}
               />
               <TurnstileWidget
                 ref={turnstileRef}
