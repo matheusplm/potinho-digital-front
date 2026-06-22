@@ -2,12 +2,11 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useRef, useState } from 'react'
-import { Turnstile } from '@marsidev/react-turnstile'
 import type { TurnstileInstance } from '@marsidev/react-turnstile'
 import { Link, useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { api } from '../services/api'
-import { Button, Input, toast } from '../components/ui'
+import { Button, Input, TurnstileWidget, toast } from '../components/ui'
 import { ScrollHint } from '../components/ui/ScrollHint'
 import { font } from '../design-system'
 
@@ -39,6 +38,7 @@ export function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const [captchaStatus, setCaptchaStatus] = useState<'pending' | 'verified' | 'error'>('pending')
   const turnstileRef = useRef<TurnstileInstance>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -56,6 +56,7 @@ export function LoginPage() {
       setError(msg)
       turnstileRef.current?.reset()
       setCaptchaToken(null)
+      setCaptchaStatus('pending')
     } finally {
       setLoading(false)
     }
@@ -106,16 +107,13 @@ export function LoginPage() {
           <Stack spacing={2}>
             <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" fullWidth required />
             <Input label="Senha" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" fullWidth required />
-            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-              <Turnstile
-                ref={turnstileRef}
-                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY as string}
-                onSuccess={setCaptchaToken}
-                onError={() => setCaptchaToken(null)}
-                onExpire={() => setCaptchaToken(null)}
-                options={{ theme: 'light', language: 'pt-BR', size: 'normal' }}
-              />
-            </Box>
+            <TurnstileWidget
+              ref={turnstileRef}
+              status={captchaStatus}
+              onSuccess={(t) => { setCaptchaToken(t); setCaptchaStatus('verified') }}
+              onError={() => { setCaptchaToken(null); setCaptchaStatus('error') }}
+              onExpire={() => { setCaptchaToken(null); setCaptchaStatus('pending') }}
+            />
             <Button variant="primary" type="submit" fullWidth loading={loading} disabled={!captchaToken} sx={{ mt: 0.5 }}>
               Entrar
             </Button>
