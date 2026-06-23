@@ -32,7 +32,7 @@ import {
 import { AchievementEditor } from '../components/manage/AchievementEditor'
 import { useBackground } from '../context/BackgroundContext'
 import { useUser } from '../context/UserContext'
-import { colors, font, radius } from '../design-system'
+import { colors, fadeIn, font, radius, shineSweep } from '../design-system'
 import { isCollectionOwner } from '../utils/collectionAccess'
 import { isHexColor, slugify, uniqueConfigId } from '../utils/slug'
 import { gradientTextSx } from '../utils/colorUtils'
@@ -50,7 +50,6 @@ import type {
   NoteTypeConfig,
 } from '../types/note'
 
-const fadeIn = keyframes`from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}`
 const packOpening = keyframes`
   0%{transform:translate3d(0,0,0) rotate(-3deg) scale(0.98);}
   30%{transform:translate3d(0,-7px,0) rotate(4deg) scale(1.035);}
@@ -77,7 +76,6 @@ const cardEject = keyframes`
   66%,100%{opacity:1;transform:translate3d(calc(-50% + var(--x)),calc(-1 * var(--y)),0) rotate(var(--r)) scale(1);}
 `
 const burstRing = keyframes`from{opacity:0.48;transform:translate3d(-50%,-50%,0) scale(0.54);}to{opacity:0;transform:translate3d(-50%,-50%,0) scale(1.55);}`
-const shineSweep = keyframes`from{transform:translate3d(-130%,0,0) rotate(16deg);}to{transform:translate3d(130%,0,0) rotate(16deg);}`
 const openingSceneFade = keyframes`from{opacity:0;transform:translate3d(0,8px,0) scale(0.98);}to{opacity:1;transform:translate3d(0,0,0) scale(1);}`
 
 type Tab = 'notes' | 'rarities' | 'types' | 'packs' | 'achievements' | 'access'

@@ -1,28 +1,9 @@
 ﻿import FavoriteIcon from '@mui/icons-material/Favorite'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import { Box, Typography } from '@mui/material'
-import { keyframes } from '@emotion/react'
 import { useState, useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
-import { colors } from '../../design-system'
-
-const dropFade = keyframes`
-  0%   { opacity: 0; transform: translateY(0);    }
-  16%  { opacity: 1; transform: translateY(0);    }
-  80%  { opacity: 0; transform: translateY(54vh); }
-  100% { opacity: 0; transform: translateY(0);    }
-`
-
-const heartBeat = keyframes`
-  0%,100% { transform: scale(1);    }
-  30%     { transform: scale(1.22); }
-  60%     { transform: scale(0.94); }
-`
-
-const chevronPulse = keyframes`
-  0%,100% { opacity: 0.5; transform: translateY(0);   }
-  50%     { opacity: 1;   transform: translateY(4px); }
-`
+import { chevronPulse, colors, dropFade, heartBeat } from '../../design-system'
 
 function hasScrollableContent(): boolean {
   const main = document.querySelector('main')

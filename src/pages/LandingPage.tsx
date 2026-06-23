@@ -6,37 +6,10 @@ import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined'
 import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined'
 import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined'
 import { Box, Chip, Stack, Typography, useMediaQuery } from '@mui/material'
-import { keyframes } from '@emotion/react'
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, ScrollHint } from '../components/ui'
-import { backgroundThemes, colors, font, radius, shadow } from '../design-system'
-
-const fadeIn = keyframes`
-  from { opacity: 0; transform: translateY(22px); }
-  to   { opacity: 1; transform: translateY(0); }
-`
-const fadeInRight = keyframes`
-  from { opacity: 0; transform: translateX(28px); }
-  to   { opacity: 1; transform: translateX(0); }
-`
-const shimmer = keyframes`
-  0%   { background-position: -200% center; }
-  100% { background-position: 200% center; }
-`
-
-const hintWiggle = keyframes`
-  0%   { transform: rotate(2deg) translateX(0px); }
-  30%  { transform: rotate(-1deg) translateX(-20px); }
-  55%  { transform: rotate(-3deg) translateX(-28px); }
-  75%  { transform: rotate(-1deg) translateX(-14px); }
-  100% { transform: rotate(2deg) translateX(0px); }
-`
-const sway = keyframes`
-  0%, 100% { transform: rotate(2deg) translateX(0px); }
-  28%       { transform: rotate(-2deg) translateX(-9px); }
-  72%       { transform: rotate(5deg) translateX(9px); }
-`
+import { backgroundThemes, colors, fadeInHero, fadeInRight, font, hintWiggle, radius, shadow, shimmer, sway } from '../design-system'
 
 interface DemoNote {
   id: number
@@ -392,7 +365,7 @@ export function LandingPage() {
         <Box sx={{ px: isDesktop ? 5 : 2.5, pt: isDesktop ? 8 : 5, pb: isDesktop ? 9 : 6, maxWidth: isDesktop ? 1200 : 480, mx: 'auto' }}>
           {isDesktop ? (
             <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, alignItems: 'center' }}>
-              <Box sx={{ animation: `${fadeIn} 0.6s ease both` }}>
+              <Box sx={{ animation: `${fadeInHero} 0.6s ease both` }}>
                 <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.8, px: 1.4, py: 0.5, mb: 2.5, borderRadius: radius.full, background: 'rgba(29,78,216,0.08)', border: '1px solid rgba(29,78,216,0.18)' }}>
                   <AutoStoriesOutlinedIcon sx={{ fontSize: 13, color: colors.primary.main }} />
                   <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.primary.main, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
@@ -426,7 +399,7 @@ export function LandingPage() {
               </Box>
             </Box>
           ) : (
-            <Stack alignItems="center" sx={{ animation: `${fadeIn} 0.6s ease both` }}>
+            <Stack alignItems="center" sx={{ animation: `${fadeInHero} 0.6s ease both` }}>
               <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.8, px: 1.4, py: 0.5, mb: 2.5, borderRadius: radius.full, background: 'rgba(29,78,216,0.08)', border: '1px solid rgba(29,78,216,0.18)' }}>
                 <AutoStoriesOutlinedIcon sx={{ fontSize: 13, color: colors.primary.main }} />
                 <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.primary.main, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
@@ -466,7 +439,7 @@ export function LandingPage() {
 
         {/* Concept pitch */}
         <Box sx={{ background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(255,255,255,0.8)', borderBottom: '1px solid rgba(255,255,255,0.8)', py: isDesktop ? 7 : 5, px: isDesktop ? 5 : 2.5 }}>
-          <Box sx={{ maxWidth: isDesktop ? 760 : 480, mx: 'auto', textAlign: 'center', animation: `${fadeIn} 0.6s 0.1s ease both` }}>
+          <Box sx={{ maxWidth: isDesktop ? 760 : 480, mx: 'auto', textAlign: 'center', animation: `${fadeInHero} 0.6s 0.1s ease both` }}>
             <Typography sx={{ fontSize: isDesktop ? '2rem' : '1.5rem', fontFamily: font.serif, fontWeight: 800, color: '#1e3a5f', lineHeight: 1.3, mb: 2 }}>
               Pense num álbum de figurinhas.
             </Typography>

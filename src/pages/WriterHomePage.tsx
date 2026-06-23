@@ -2,21 +2,15 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import Inventory2Icon from '@mui/icons-material/Inventory2'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import { Box, Stack, Typography } from '@mui/material'
-import { keyframes } from '@emotion/react'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { useCallback } from 'react'
 import { useCollectionsQuery } from '../hooks/useNotes'
 import { Card, ScrollablePage, OnboardingOverlay } from '../components/ui'
 import { api } from '../services/api'
-import { colors, font } from '../design-system'
+import { colors, fadeIn, font } from '../design-system'
 import { useBackground } from '../context/BackgroundContext'
 import { isCollectionOwner } from '../utils/collectionAccess'
-
-const fadeIn = keyframes`
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-`
 
 const FLOATING = [
   { size: 14, left: '7%',  delay: '0s',   dur: '10s', opacity: 0.12 },

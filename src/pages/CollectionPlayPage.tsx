@@ -21,7 +21,7 @@ import { useBackground } from '../context/BackgroundContext'
 import { useUser } from '../context/UserContext'
 import { useSimulation } from '../context/SimulationContext'
 import { useReader } from '../context/ReaderContext'
-import { colors, font, radius } from '../design-system'
+import { cardIn, colors, fadeIn, font, radius, shineSweep } from '../design-system'
 import type { BackgroundTheme } from '../design-system'
 import { slugify } from '../utils/slug'
 import { gradientTextSx } from '../utils/colorUtils'
@@ -32,8 +32,6 @@ import type { CollectionDailyReward, CollectionNoteView, NoteRecord, RarityConfi
 
 export const PACK_OPEN_ANIMATION_MS = 2200
 
-const fadeIn = keyframes`from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); }`
-const cardIn = keyframes`from { opacity:0; transform:translateY(20px) scale(0.96); } to { opacity:1; transform:translateY(0) scale(1); }`
 const rarityShine = keyframes`0%{transform:translateX(-140%) rotate(18deg);opacity:0}20%{opacity:.55}55%,100%{transform:translateX(160%) rotate(18deg);opacity:0}`
 const packOpening = keyframes`
   0%{transform:translate3d(-50%,18px,0) rotate(-8deg) scale(0.86);filter:drop-shadow(0 18px 26px rgba(15,23,42,0.1));}
@@ -63,7 +61,6 @@ const sparkleFloat = keyframes`
   56%{opacity:1;}
   100%{opacity:0;transform:translate3d(var(--ex),-58px,0) scale(1.18);}
 `
-const shineSweep = keyframes`from{transform:translate3d(-130%,0,0) rotate(16deg);}to{transform:translate3d(130%,0,0) rotate(16deg);}`
 const stageDot = keyframes`
   0%,100%{opacity:0.38;transform:scale(0.92);}
   45%{opacity:1;transform:scale(1.08);}

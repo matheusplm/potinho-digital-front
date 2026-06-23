@@ -40,3 +40,33 @@ export const font = {
   serif: '"Playfair Display", "Georgia", serif',
   sans:  '"Nunito", "Roboto", sans-serif',
 }
+
+export const typography = {
+  hero:     { fontSize: '2.8rem', fontWeight: 700, lineHeight: 1,   letterSpacing: '-0.5px' },
+  title:    { fontSize: '1.5rem', fontWeight: 700, lineHeight: 1.2 },
+  subtitle: { fontSize: '1.1rem', fontWeight: 600, lineHeight: 1.4 },
+  body:     { fontSize: '0.95rem', fontWeight: 400, lineHeight: 1.5 },
+  caption:  { fontSize: '0.85rem', fontWeight: 400, lineHeight: 1.4 },
+  label:    { fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.5px' },
+}
+
+export const zIndex = {
+  base:    0,
+  card:    1,
+  dropdown: 10,
+  header:  100,
+  footer:  100,
+  overlay: 200,
+  modal:   300,
+  toast:   400,
+}
+
+export const spacing = {
+  xs:  4,
+  sm:  8,
+  md:  16,
+  lg:  24,
+  xl:  32,
+  '2xl': 48,
+  '3xl': 64,
+}

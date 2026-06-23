@@ -2,7 +2,6 @@
 import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded'
 import ShuffleIcon from '@mui/icons-material/Shuffle'
 import { Box, Dialog, DialogActions, DialogContent, DialogTitle, LinearProgress, Stack, Typography } from '@mui/material'
-import { keyframes } from '@emotion/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -22,7 +21,7 @@ import {
   useOpenCollectionPackMutation,
   useReaderAchievementsQuery,
 } from '../hooks/useNotes'
-import { colors, font, radius } from '../design-system'
+import { colors, fadeIn, font, heartPulseAura, packCtaFloat, radius } from '../design-system'
 import { isCollectionReader } from '../utils/collectionAccess'
 import { ApiRequestError } from '../services/api'
 import { simulatePackOpen } from '../utils/simulationPlay'
@@ -91,18 +90,6 @@ import { NoteDetailDialog, PACK_OPEN_ANIMATION_MS, PackOpeningDialog, RewardCard
 import type { CollectionDailyReward, CollectionPack } from '../types/note'
 import { slugify } from '../utils/slug'
 
-const fadeIn = keyframes`
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
-`
-const packCtaFloat = keyframes`
-  0%,100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-4px) scale(1.055); }
-`
-const heartPulseAura = keyframes`
-  from { opacity: 0.42; transform: scale(0.88); }
-  to { opacity: 0; transform: scale(1.3); }
-`
 
 function formatRemainingTime(ms: number) {
   if (ms <= 0) return 'disponível agora'

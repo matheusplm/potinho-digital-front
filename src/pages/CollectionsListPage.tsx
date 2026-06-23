@@ -24,22 +24,14 @@ import {
 import { useBackground } from '../context/BackgroundContext'
 import { useSimulation } from '../context/SimulationContext'
 import { useUser } from '../context/UserContext'
-import { backgroundThemes, colors, font, radius } from '../design-system'
+import { backgroundThemes, colors, fadeIn, font, ghostPulse, radius } from '../design-system'
 import { slugify } from '../utils/slug'
 import { isCollectionOwner } from '../utils/collectionAccess'
 import type { Collection, CollectionFormData } from '../types/note'
 
-const fadeIn = keyframes`
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
-`
 const cardIn = (i: number) => keyframes`
   from { opacity: 0; transform: translateY(${14 + i * 4}px); }
   to   { opacity: 1; transform: translateY(0); }
-`
-const ghostPulse = keyframes`
-  0%, 100% { transform: scale(1);   box-shadow: 0 0 0 0 rgba(0,0,0,0.12); }
-  50%       { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(0,0,0,0); }
 `
 
 type ViewMode = 'cards' | 'grid' | 'list'

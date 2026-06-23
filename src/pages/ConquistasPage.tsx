@@ -1,14 +1,11 @@
 ﻿import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined'
 import { Box, LinearProgress, Stack, Typography } from '@mui/material'
-import { keyframes } from '@emotion/react'
 import { Card, LoadingState, ScrollablePage } from '../components/ui'
 import { CollectionPanel } from '../components/album/CollectionPanel'
 import { useBackground } from '../context/BackgroundContext'
 import { useActiveReaderCollection } from '../hooks/useActiveReaderCollection'
 import { useCollectionPlayQuery, useCollectionRaritiesQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
-import { colors, font, radius } from '../design-system'
-
-const fadeIn = keyframes`from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); }`
+import { colors, fadeIn, font, radius } from '../design-system'
 
 function formatDate(iso: string | null) {
   if (!iso) return ''
