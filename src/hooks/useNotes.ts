@@ -2,6 +2,20 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api, ApiRequestError } from '../services/api'
 import type { CollectionAchievementFormData, CollectionPackFormData, NoteFormData, PackStatusResponse, RarityConfig, NoteTypeConfig } from '../types/note'
 
+export const queryKeys = {
+  collections: () => ['collections'] as const,
+  notes: (cid: string) => ['col-notes', cid] as const,
+  rarities: (cid: string) => ['col-rarities', cid] as const,
+  types: (cid: string) => ['col-types', cid] as const,
+  packs: (cid: string) => ['col-packs', cid] as const,
+  packStatuses: (cid: string, packIds: string[]) => ['col-pack-statuses', cid, packIds.join(',')] as const,
+  access: (cid: string) => ['col-access', cid] as const,
+  readerView: (cid: string, email: string) => ['reader-view', cid, email] as const,
+  play: (cid: string) => ['col-play', cid] as const,
+  achievements: (cid: string) => ['col-achievements', cid] as const,
+  readerAchievements: (cid: string) => ['reader-achievements', cid] as const,
+}
+
 export function useCollectionsQuery(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['collections'],

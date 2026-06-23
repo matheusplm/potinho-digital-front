@@ -32,6 +32,8 @@ import {
 import { AchievementEditor } from '../components/manage/AchievementEditor'
 import { useBackground } from '../context/BackgroundContext'
 import { useUser } from '../context/UserContext'
+import { useConfirmDelete } from '../hooks/useConfirmDelete'
+import { useJsonImport } from '../hooks/useJsonImport'
 import { colors, fadeIn, font, radius, shineSweep } from '../design-system'
 import { isCollectionOwner } from '../utils/collectionAccess'
 import { isHexColor, slugify, uniqueConfigId } from '../utils/slug'
@@ -1693,31 +1695,23 @@ export function CollectionManagePage() {
   const [packView, setPackView] = useState<PackView>('cards')
   const [packDialogOpen, setPackDialogOpen] = useState(false)
   const [editingPack, setEditingPack] = useState<CollectionPack | null>(null)
-  const [deletingPack, setDeletingPack] = useState<CollectionPack | null>(null)
   const [packSimulation, setPackSimulation] = useState<PackSimulation | null>(null)
 
   const [noteDialog, setNoteDialog] = useState(false)
   const [editingNote, setEditingNote] = useState<NoteRecord | null>(null)
-  const [deletingNote, setDeletingNote] = useState<NoteRecord | null>(null)
   const [viewingNote, setViewingNote] = useState<ReadableNote | null>(null)
   const [importDialogOpen, setImportDialogOpen] = useState(false)
-  const [importJson, setImportJson] = useState(DEFAULT_IMPORT_JSON)
 
   const [rarityDialogOpen, setRarityDialogOpen] = useState(false)
   const [editingRarity, setEditingRarity] = useState<RarityConfig | null>(null)
-  const [deletingRarity, setDeletingRarity] = useState<RarityConfig | null>(null)
   const [rarityImportDialogOpen, setRarityImportDialogOpen] = useState(false)
-  const [rarityImportJson, setRarityImportJson] = useState(DEFAULT_IMPORT_RARITIES_JSON)
 
   const [typeDialogOpen, setTypeDialogOpen] = useState(false)
   const [editingType, setEditingType] = useState<NoteTypeConfig | null>(null)
-  const [deletingType, setDeletingType] = useState<NoteTypeConfig | null>(null)
   const [typeImportDialogOpen, setTypeImportDialogOpen] = useState(false)
-  const [typeImportJson, setTypeImportJson] = useState(DEFAULT_IMPORT_TYPES_JSON)
 
   const [achievementDialogOpen, setAchievementDialogOpen] = useState(false)
   const [editingAchievement, setEditingAchievement] = useState<CollectionAchievement | null>(null)
-  const [deletingAchievement, setDeletingAchievement] = useState<CollectionAchievement | null>(null)
 
   const [emailInput, setEmailInput] = useState('')
   const [packOpensDialog, setPackOpensDialog] = useState<{ email: string; pack: CollectionPack; currentOpens: number | undefined } | null>(null)
@@ -1742,6 +1736,43 @@ export function CollectionManagePage() {
   const grantMutation = useGrantAccessMutation(cid)
   const addPackOpensMutation = useAddPackOpensMutation(cid)
 
+  const noteDelete = useConfirmDelete<NoteRecord>(deleteNote, { success: 'Bilhete removido.', error: 'Erro ao remover bilhete.' })
+  const rarityDelete = useConfirmDelete<RarityConfig>(deleteRarity, { success: 'Raridade excluída.', error: 'Erro ao excluir raridade.' })
+  const typeDelete = useConfirmDelete<NoteTypeConfig>(deleteType, { success: 'Tipo excluído.', error: 'Erro ao excluir tipo.' })
+  const packDelete = useConfirmDelete<CollectionPack>(deletePack, { success: 'Pacotinho excluído.', error: 'Erro ao excluir pacotinho.' })
+  const achievementDelete = useConfirmDelete<CollectionAchievement>(deleteAchievement, { success: 'Conquista excluída.' })
+
+  const noteImport = useJsonImport(
+    importNotes,
+    (r) => r.created === 0
+      ? `Nenhum bilhete novo — ${r.skipped} já existia${r.skipped !== 1 ? 'm' : ''}.`
+      : r.skipped > 0
+        ? `${r.created} importado${r.created !== 1 ? 's' : ''}, ${r.skipped} ignorado${r.skipped !== 1 ? 's' : ''} (título duplicado).`
+        : `${r.created} bilhete${r.created !== 1 ? 's' : ''} importado${r.created !== 1 ? 's' : ''}.`,
+    () => setImportDialogOpen(false),
+    DEFAULT_IMPORT_JSON,
+  )
+  const rarityImport = useJsonImport(
+    importRarities,
+    (r) => r.created === 0
+      ? `Nenhuma raridade nova — ${r.skipped} já existia${r.skipped !== 1 ? 'm' : ''}.`
+      : r.skipped > 0
+        ? `${r.created} importada${r.created !== 1 ? 's' : ''}, ${r.skipped} ignorada${r.skipped !== 1 ? 's' : ''} (id duplicado).`
+        : `${r.created} raridade${r.created !== 1 ? 's' : ''} importada${r.created !== 1 ? 's' : ''}.`,
+    () => setRarityImportDialogOpen(false),
+    DEFAULT_IMPORT_RARITIES_JSON,
+  )
+  const typeImport = useJsonImport(
+    importTypes,
+    (r) => r.created === 0
+      ? `Nenhum tipo novo — ${r.skipped} já existia${r.skipped !== 1 ? 'm' : ''}.`
+      : r.skipped > 0
+        ? `${r.created} importado${r.created !== 1 ? 's' : ''}, ${r.skipped} ignorado${r.skipped !== 1 ? 's' : ''} (id duplicado).`
+        : `${r.created} tipo${r.created !== 1 ? 's' : ''} importado${r.created !== 1 ? 's' : ''}.`,
+    () => setTypeImportDialogOpen(false),
+    DEFAULT_IMPORT_TYPES_JSON,
+  )
+
   function addAchievementPreset(preset: typeof ACHIEVEMENT_PRESETS[number]) {
     const id = uniqueConfigId(preset.label, achievements.map((a) => a.id))
     createAchievement.mutate(
@@ -1750,13 +1781,6 @@ export function CollectionManagePage() {
     )
   }
 
-  function confirmDeleteAchievement() {
-    if (!deletingAchievement) return
-    deleteAchievement.mutate(deletingAchievement.id, {
-      onSuccess: () => { toast.success('Conquista excluída.'); setDeletingAchievement(null) },
-      onError: (e: Error) => toast.error(e.message || 'Erro ao excluir.'),
-    })
-  }
 
   const filteredNotes = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -1839,98 +1863,6 @@ export function CollectionManagePage() {
     }
   }
 
-  const confirmDeleteNote = () => {
-    if (!deletingNote) return
-    deleteNote.mutate(deletingNote.id, {
-      onSuccess: () => { toast.success('Bilhete removido.'); setDeletingNote(null) },
-      onError: (e: Error) => toast.error(e.message || 'Erro ao remover bilhete.'),
-    })
-  }
-
-  async function handleImportNotes() {
-    try {
-      JSON.parse(importJson)
-    } catch {
-      toast.error('JSON inválido. Revise vírgulas, aspas e colchetes.')
-      return
-    }
-
-    try {
-      const result = await importNotes.mutateAsync(importJson)
-      const msg = result.created === 0
-        ? `Nenhum bilhete novo — ${result.skipped} já existia${result.skipped !== 1 ? 'm' : ''}.`
-        : result.skipped > 0
-          ? `${result.created} importado${result.created !== 1 ? 's' : ''}, ${result.skipped} ignorado${result.skipped !== 1 ? 's' : ''} (título duplicado).`
-          : `${result.created} bilhete${result.created !== 1 ? 's' : ''} importado${result.created !== 1 ? 's' : ''}.`
-      toast.success(msg)
-      setImportDialogOpen(false)
-    } catch (error) {
-      toast.error((error as Error).message || 'Erro ao importar bilhetes.')
-    }
-  }
-  async function handleImportRarities() {
-    try {
-      JSON.parse(rarityImportJson)
-    } catch {
-      toast.error('JSON inválido. Revise vírgulas, aspas e colchetes.')
-      return
-    }
-    try {
-      const result = await importRarities.mutateAsync(rarityImportJson)
-      const msg = result.created === 0
-        ? `Nenhuma raridade nova — ${result.skipped} já existia${result.skipped !== 1 ? 'm' : ''}.`
-        : result.skipped > 0
-          ? `${result.created} importada${result.created !== 1 ? 's' : ''}, ${result.skipped} ignorada${result.skipped !== 1 ? 's' : ''} (id duplicado).`
-          : `${result.created} raridade${result.created !== 1 ? 's' : ''} importada${result.created !== 1 ? 's' : ''}.`
-      toast.success(msg)
-      setRarityImportDialogOpen(false)
-    } catch (error) {
-      toast.error((error as Error).message || 'Erro ao importar raridades.')
-    }
-  }
-
-  async function handleImportTypes() {
-    try {
-      JSON.parse(typeImportJson)
-    } catch {
-      toast.error('JSON inválido. Revise vírgulas, aspas e colchetes.')
-      return
-    }
-    try {
-      const result = await importTypes.mutateAsync(typeImportJson)
-      const msg = result.created === 0
-        ? `Nenhum tipo novo — ${result.skipped} já existia${result.skipped !== 1 ? 'm' : ''}.`
-        : result.skipped > 0
-          ? `${result.created} importado${result.created !== 1 ? 's' : ''}, ${result.skipped} ignorado${result.skipped !== 1 ? 's' : ''} (id duplicado).`
-          : `${result.created} tipo${result.created !== 1 ? 's' : ''} importado${result.created !== 1 ? 's' : ''}.`
-      toast.success(msg)
-      setTypeImportDialogOpen(false)
-    } catch (error) {
-      toast.error((error as Error).message || 'Erro ao importar tipos.')
-    }
-  }
-
-  const confirmDeleteRarity = () => {
-    if (!deletingRarity) return
-    deleteRarity.mutate(deletingRarity.id, {
-      onSuccess: () => { toast.success('Raridade excluída.'); setDeletingRarity(null) },
-      onError: (e: Error) => toast.error(e.message || 'Erro ao excluir raridade.'),
-    })
-  }
-  const confirmDeleteType = () => {
-    if (!deletingType) return
-    deleteType.mutate(deletingType.id, {
-      onSuccess: () => { toast.success('Tipo excluído.'); setDeletingType(null) },
-      onError: (e: Error) => toast.error(e.message || 'Erro ao excluir tipo.'),
-    })
-  }
-  const confirmDeletePack = () => {
-    if (!deletingPack) return
-    deletePack.mutate(deletingPack.id, {
-      onSuccess: () => { toast.success('Pacotinho excluído.'); setDeletingPack(null) },
-      onError: (error) => toast.error((error as Error).message || 'Erro ao excluir pacotinho.'),
-    })
-  }
 
   const handleSimulatePack = (pack: CollectionPack) => {
     const simulation = simulatePackOpening(pack, notes, rarities)
@@ -2159,7 +2091,7 @@ export function CollectionManagePage() {
                         <IconButton
                           size="small"
                           aria-label="excluir bilhete"
-                          onClick={(event) => { event.stopPropagation(); setDeletingNote(note) }}
+                          onClick={(event) => { event.stopPropagation(); noteDelete.setTarget(note) }}
                           sx={{ ...actionButtonSx('danger'), width: 28, height: 28 }}
                         >
                           <DeleteForeverOutlinedIcon sx={{ fontSize: 14 }} />
@@ -2244,7 +2176,7 @@ export function CollectionManagePage() {
                             <IconButton
                               size="small"
                               aria-label="excluir bilhete"
-                              onClick={(event) => { event.stopPropagation(); setDeletingNote(note) }}
+                              onClick={(event) => { event.stopPropagation(); noteDelete.setTarget(note) }}
                               sx={actionButtonSx('danger')}
                             >
                               <DeleteForeverOutlinedIcon sx={{ fontSize: 16 }} />
@@ -2276,7 +2208,7 @@ export function CollectionManagePage() {
                       <IconButton
                         size="small"
                         aria-label="excluir bilhete"
-                        onClick={(event) => { event.stopPropagation(); setDeletingNote(note) }}
+                        onClick={(event) => { event.stopPropagation(); noteDelete.setTarget(note) }}
                         sx={{ ...actionButtonSx('danger'), backdropFilter: 'blur(8px)' }}
                       >
                         <DeleteForeverOutlinedIcon sx={{ fontSize: 16 }} />
@@ -2321,7 +2253,7 @@ export function CollectionManagePage() {
                         <IconButton
                           size="small"
                           aria-label="excluir bilhete"
-                          onClick={(event) => { event.stopPropagation(); setDeletingNote(note) }}
+                          onClick={(event) => { event.stopPropagation(); noteDelete.setTarget(note) }}
                           sx={actionButtonSx('danger')}
                         >
                           <DeleteForeverOutlinedIcon sx={{ fontSize: 16 }} />
@@ -2437,7 +2369,7 @@ export function CollectionManagePage() {
                       <IconButton size="small" aria-label="editar raridade" onClick={() => { setEditingRarity(r); setRarityDialogOpen(true) }} sx={actionButtonSx('primary')}>
                         <EditOutlinedIcon sx={{ fontSize: 16 }} />
                       </IconButton>
-                      <IconButton size="small" aria-label="excluir raridade" onClick={() => setDeletingRarity(r)} sx={actionButtonSx('danger')}>
+                      <IconButton size="small" aria-label="excluir raridade" onClick={() => rarityDelete.setTarget(r)} sx={actionButtonSx('danger')}>
                         <DeleteForeverOutlinedIcon sx={{ fontSize: 16 }} />
                       </IconButton>
                     </Stack>
@@ -2483,7 +2415,7 @@ export function CollectionManagePage() {
                       <IconButton size="small" aria-label="editar tipo" onClick={() => { setEditingType(t); setTypeDialogOpen(true) }} sx={actionButtonSx('primary')}>
                         <EditOutlinedIcon sx={{ fontSize: 16 }} />
                       </IconButton>
-                      <IconButton size="small" aria-label="excluir tipo" onClick={() => setDeletingType(t)} sx={actionButtonSx('danger')}>
+                      <IconButton size="small" aria-label="excluir tipo" onClick={() => typeDelete.setTarget(t)} sx={actionButtonSx('danger')}>
                         <DeleteForeverOutlinedIcon sx={{ fontSize: 16 }} />
                       </IconButton>
                     </Stack>
@@ -2574,7 +2506,7 @@ export function CollectionManagePage() {
                   pack={pack}
                   view={packView}
                   onEdit={(item) => { setEditingPack(item); setPackDialogOpen(true) }}
-                  onDelete={setDeletingPack}
+                  onDelete={packDelete.setTarget}
                   onSimulate={handleSimulatePack}
                   onSetPrimary={handleSetPrimaryPack}
                 />
@@ -2642,7 +2574,7 @@ export function CollectionManagePage() {
                       <IconButton size="small" aria-label="editar conquista" onClick={() => { setEditingAchievement(a); setAchievementDialogOpen(true) }} sx={actionButtonSx('primary')}>
                         <EditOutlinedIcon sx={{ fontSize: 16 }} />
                       </IconButton>
-                      <IconButton size="small" aria-label="excluir conquista" onClick={() => setDeletingAchievement(a)} sx={actionButtonSx('danger')}>
+                      <IconButton size="small" aria-label="excluir conquista" onClick={() => achievementDelete.setTarget(a)} sx={actionButtonSx('danger')}>
                         <DeleteForeverOutlinedIcon sx={{ fontSize: 16 }} />
                       </IconButton>
                     </Stack>
@@ -2762,8 +2694,8 @@ export function CollectionManagePage() {
             <TextField
               multiline
               minRows={10}
-              value={importJson}
-              onChange={(event) => setImportJson(event.target.value)}
+              value={noteImport.json}
+              onChange={(event) => noteImport.setJson(event.target.value)}
               fullWidth
               spellCheck={false}
               sx={{
@@ -2796,8 +2728,8 @@ export function CollectionManagePage() {
           <Button
             variant="primary"
             loading={importNotes.isPending}
-            disabled={!importJson.trim() || importNotes.isPending}
-            onClick={handleImportNotes}
+            disabled={!noteImport.json.trim() || importNotes.isPending}
+            onClick={noteImport.execute}
             sx={{ flex: 1 }}
           >
             Importar
@@ -2823,8 +2755,8 @@ export function CollectionManagePage() {
             <TextField
               multiline
               minRows={10}
-              value={rarityImportJson}
-              onChange={(event) => setRarityImportJson(event.target.value)}
+              value={rarityImport.json}
+              onChange={(event) => rarityImport.setJson(event.target.value)}
               fullWidth
               spellCheck={false}
               sx={{
@@ -2846,8 +2778,8 @@ export function CollectionManagePage() {
           <Button
             variant="primary"
             loading={importRarities.isPending}
-            disabled={!rarityImportJson.trim() || importRarities.isPending}
-            onClick={handleImportRarities}
+            disabled={!rarityImport.json.trim() || importRarities.isPending}
+            onClick={rarityImport.execute}
             sx={{ flex: 1 }}
           >
             Importar
@@ -2873,8 +2805,8 @@ export function CollectionManagePage() {
             <TextField
               multiline
               minRows={10}
-              value={typeImportJson}
-              onChange={(event) => setTypeImportJson(event.target.value)}
+              value={typeImport.json}
+              onChange={(event) => typeImport.setJson(event.target.value)}
               fullWidth
               spellCheck={false}
               sx={{
@@ -2896,8 +2828,8 @@ export function CollectionManagePage() {
           <Button
             variant="primary"
             loading={importTypes.isPending}
-            disabled={!typeImportJson.trim() || importTypes.isPending}
-            onClick={handleImportTypes}
+            disabled={!typeImport.json.trim() || importTypes.isPending}
+            onClick={typeImport.execute}
             sx={{ flex: 1 }}
           >
             Importar
@@ -2996,11 +2928,11 @@ export function CollectionManagePage() {
         )}
       </Dialog>
 
-      <ConfirmDeleteDialog open={!!deletingNote} title={`Excluir o bilhete “${deletingNote?.title ?? ''}”?`} isPending={deleteNote.isPending} onConfirm={confirmDeleteNote} onClose={() => setDeletingNote(null)} />
-      <ConfirmDeleteDialog open={!!deletingRarity} title={`Excluir a raridade “${deletingRarity?.label ?? ''}”?`} isPending={deleteRarity.isPending} onConfirm={confirmDeleteRarity} onClose={() => setDeletingRarity(null)} />
-      <ConfirmDeleteDialog open={!!deletingType} title={`Excluir o tipo “${deletingType?.label ?? ''}”?`} isPending={deleteType.isPending} onConfirm={confirmDeleteType} onClose={() => setDeletingType(null)} />
-      <ConfirmDeleteDialog open={!!deletingPack} title={`Excluir o pacotinho “${deletingPack?.name ?? ''}”?`} isPending={deletePack.isPending} onConfirm={confirmDeletePack} onClose={() => setDeletingPack(null)} />
-      <ConfirmDeleteDialog open={!!deletingAchievement} title={`Excluir a conquista “${deletingAchievement?.label ?? ''}”?`} isPending={deleteAchievement.isPending} onConfirm={confirmDeleteAchievement} onClose={() => setDeletingAchievement(null)} />
+      <ConfirmDeleteDialog open={noteDelete.isOpen} title={`Excluir o bilhete “${noteDelete.target?.title ?? ''}”?`} isPending={noteDelete.isPending} onConfirm={noteDelete.confirm} onClose={noteDelete.close} />
+      <ConfirmDeleteDialog open={rarityDelete.isOpen} title={`Excluir a raridade “${rarityDelete.target?.label ?? ''}”?`} isPending={rarityDelete.isPending} onConfirm={rarityDelete.confirm} onClose={rarityDelete.close} />
+      <ConfirmDeleteDialog open={typeDelete.isOpen} title={`Excluir o tipo “${typeDelete.target?.label ?? ''}”?`} isPending={typeDelete.isPending} onConfirm={typeDelete.confirm} onClose={typeDelete.close} />
+      <ConfirmDeleteDialog open={packDelete.isOpen} title={`Excluir o pacotinho “${packDelete.target?.name ?? ''}”?`} isPending={packDelete.isPending} onConfirm={packDelete.confirm} onClose={packDelete.close} />
+      <ConfirmDeleteDialog open={achievementDelete.isOpen} title={`Excluir a conquista “${achievementDelete.target?.label ?? ''}”?`} isPending={achievementDelete.isPending} onConfirm={achievementDelete.confirm} onClose={achievementDelete.close} />
       <NoteDetailDialog note={viewingNote} rarities={rarities} types={types} onClose={() => setViewingNote(null)} />
       <PackSimulationDialog
         simulation={packSimulation}
