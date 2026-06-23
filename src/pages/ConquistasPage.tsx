@@ -1,6 +1,6 @@
 ﻿import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined'
 import { Box, LinearProgress, Stack, Typography } from '@mui/material'
-import { Card, LoadingState, ScrollablePage } from '../components/ui'
+import { Card, EmptyState, LoadingState, ScrollablePage } from '../components/ui'
 import { CollectionPanel } from '../components/album/CollectionPanel'
 import { useBackground } from '../context/BackgroundContext'
 import { useActiveReaderCollection } from '../hooks/useActiveReaderCollection'
@@ -72,15 +72,11 @@ export function ConquistasPage() {
             {play && <CollectionPanel play={play} rarities={rarities} />}
 
             {achData && achievements.length === 0 && (
-              <Card sx={{ p: 2.5, textAlign: 'center' }}>
-                <Typography sx={{ fontSize: '2rem', mb: 0.5 }}>🏅</Typography>
-                <Typography sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, mb: 0.3 }}>
-                  Sem conquistas por aqui
-                </Typography>
-                <Typography sx={{ fontSize: '0.8rem', color: colors.text.secondary }}>
-                  Esta coleção ainda não tem conquistas definidas.
-                </Typography>
-              </Card>
+              <EmptyState
+                emoji="🏅"
+                title="Sem conquistas por aqui"
+                description="Esta coleção ainda não tem conquistas definidas."
+              />
             )}
 
             <Stack spacing={1}>

@@ -16,7 +16,7 @@ import {
 import { keyframes } from '@emotion/react'
 import { useState, useEffect, useMemo, type ElementType } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button, Card, Input, LoadingState, PageTitle, ScrollablePage, toast, EmojiPickerInput } from '../components/ui'
+import { Button, Card, ConfirmDeleteDialog, Input, LoadingState, PageTitle, ScrollablePage, toast, EmojiPickerInput } from '../components/ui'
 import {
   useCollectionsQuery, useCreateCollectionMutation,
   useUpdateCollectionMutation, useDeleteCollectionMutation,
@@ -722,24 +722,14 @@ export function CollectionsListPage() {
         onSubmit={handleUpdate}
       />
 
-      <Dialog open={!!deleting} onClose={() => setDeleting(null)} slotProps={{
-        paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'rgba(255,253,251,0.98)', backdropFilter: 'blur(24px)' } }
-      }}>
-        <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 700, color: colors.text.primary, pb: 1 }}>
-          Excluir coleção
-        </DialogTitle>
-        <DialogContent>
-          <Typography sx={{ fontSize: '0.88rem', color: colors.text.secondary, lineHeight: 1.55 }}>
-            Tem certeza que deseja excluir <strong style={{ color: colors.text.primary }}>{deleting?.name}</strong>? Todos os bilhetes, raridades e tipos serão removidos.
-          </Typography>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
-          <Button variant="ghost" onClick={() => setDeleting(null)} sx={{ flex: 1 }}>Cancelar</Button>
-          <Button variant="rose" loading={deleteMutation.isPending} onClick={handleDelete} sx={{ flex: 1 }}>
-            Excluir
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <ConfirmDeleteDialog
+        open={!!deleting}
+        title="Excluir coleção"
+        description={<>Tem certeza que deseja excluir <strong style={{ color: colors.text.primary }}>{deleting?.name}</strong>? Todos os bilhetes, raridades e tipos serão removidos.</>}
+        isPending={deleteMutation.isPending}
+        onConfirm={handleDelete}
+        onClose={() => setDeleting(null)}
+      />
     </Box>
   )
 }

@@ -17,7 +17,7 @@ import { Box, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButto
 import { keyframes } from '@emotion/react'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Button, Card, Input, LoadingState, PageTitle, ScrollablePage, SegmentedControl, toast, EmojiPickerInput } from '../components/ui'
+import { Button, Card, ConfirmDeleteDialog, Input, LoadingState, PageTitle, ScrollablePage, SegmentedControl, toast, EmojiPickerInput } from '../components/ui'
 import { ImagePicker } from '../components/ImagePicker'
 import { NoteDetailDialog, RewardCard, type ReadableNote } from './CollectionPlayPage'
 import {
@@ -839,22 +839,6 @@ function TypeEditor({ cid, type, onClose }: { cid: string; type: NoteTypeConfig 
   )
 }
 
-function ConfirmDeleteDialog({ open, label, isPending, onConfirm, onClose }: {
-  open: boolean; label: string; isPending: boolean; onConfirm: () => void; onClose: () => void
-}) {
-  return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2 } } }}>
-      <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 700, color: colors.text.primary }}>Excluir {label}?</DialogTitle>
-      <DialogContent>
-        <Typography sx={{ fontSize: '0.88rem', color: colors.text.secondary }}>Esta ação não pode ser desfeita.</Typography>
-      </DialogContent>
-      <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
-        <Button variant="ghost" onClick={onClose} sx={{ flex: 1 }}>Cancelar</Button>
-        <Button variant="rose" loading={isPending} onClick={onConfirm} sx={{ flex: 1 }}>Excluir</Button>
-      </DialogActions>
-    </Dialog>
-  )
-}
 
 function PackEditor({ cid, pack, rarities, types, onClose }: {
   cid: string
@@ -3012,11 +2996,11 @@ export function CollectionManagePage() {
         )}
       </Dialog>
 
-      <ConfirmDeleteDialog open={!!deletingNote} label={`o bilhete “${deletingNote?.title ?? ''}”`} isPending={deleteNote.isPending} onConfirm={confirmDeleteNote} onClose={() => setDeletingNote(null)} />
-      <ConfirmDeleteDialog open={!!deletingRarity} label={`a raridade “${deletingRarity?.label ?? ''}”`} isPending={deleteRarity.isPending} onConfirm={confirmDeleteRarity} onClose={() => setDeletingRarity(null)} />
-      <ConfirmDeleteDialog open={!!deletingType} label={`o tipo “${deletingType?.label ?? ''}”`} isPending={deleteType.isPending} onConfirm={confirmDeleteType} onClose={() => setDeletingType(null)} />
-      <ConfirmDeleteDialog open={!!deletingPack} label={`o pacotinho “${deletingPack?.name ?? ''}”`} isPending={deletePack.isPending} onConfirm={confirmDeletePack} onClose={() => setDeletingPack(null)} />
-      <ConfirmDeleteDialog open={!!deletingAchievement} label={`a conquista “${deletingAchievement?.label ?? ''}”`} isPending={deleteAchievement.isPending} onConfirm={confirmDeleteAchievement} onClose={() => setDeletingAchievement(null)} />
+      <ConfirmDeleteDialog open={!!deletingNote} title={`Excluir o bilhete “${deletingNote?.title ?? ''}”?`} isPending={deleteNote.isPending} onConfirm={confirmDeleteNote} onClose={() => setDeletingNote(null)} />
+      <ConfirmDeleteDialog open={!!deletingRarity} title={`Excluir a raridade “${deletingRarity?.label ?? ''}”?`} isPending={deleteRarity.isPending} onConfirm={confirmDeleteRarity} onClose={() => setDeletingRarity(null)} />
+      <ConfirmDeleteDialog open={!!deletingType} title={`Excluir o tipo “${deletingType?.label ?? ''}”?`} isPending={deleteType.isPending} onConfirm={confirmDeleteType} onClose={() => setDeletingType(null)} />
+      <ConfirmDeleteDialog open={!!deletingPack} title={`Excluir o pacotinho “${deletingPack?.name ?? ''}”?`} isPending={deletePack.isPending} onConfirm={confirmDeletePack} onClose={() => setDeletingPack(null)} />
+      <ConfirmDeleteDialog open={!!deletingAchievement} title={`Excluir a conquista “${deletingAchievement?.label ?? ''}”?`} isPending={deleteAchievement.isPending} onConfirm={confirmDeleteAchievement} onClose={() => setDeletingAchievement(null)} />
       <NoteDetailDialog note={viewingNote} rarities={rarities} types={types} onClose={() => setViewingNote(null)} />
       <PackSimulationDialog
         simulation={packSimulation}
