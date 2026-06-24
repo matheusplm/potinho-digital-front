@@ -1,0 +1,86 @@
+import type { CollectionPack, CollectionPackCategory, CollectionPackDistribution, CollectionPackFormData, CollectionPackStatus, NoteRecord, RarityConfig } from '../../types/note'
+
+export type PackFilter = 'all' | 'active' | 'draft' | 'daily' | 'bonus' | 'guaranteed' | 'thematic'
+export type PackView = 'cards' | 'list'
+export type PackSimulation = { pack: CollectionPack; rewards: NoteRecord[]; eligibleCount: number; guaranteedApplied: boolean }
+
+export const PACK_DEFAULT_SCHEDULE: Pick<CollectionPackFormData, 'scheduleMode' | 'scheduleTime' | 'scheduleTimezone' | 'cumulative' | 'maxAccumulated'> = {
+  scheduleMode: 'cooldown', scheduleTime: null, scheduleTimezone: 'America/Sao_Paulo', cumulative: false, maxAccumulated: 3,
+}
+
+export const PACK_TEMPLATES: CollectionPackFormData[] = [
+  { id: 'daily', name: 'Pacotinho diário', emoji: '💌', description: 'O pacote padrão da coleção, liberado automaticamente por tempo.', cardsPerOpen: 1, cooldownHours: 24, distribution: 'all_with_access', status: 'active', category: 'daily', allowedTypeIds: [], allowedRarityIds: [], guaranteedRarityId: null, gradient: 'linear-gradient(135deg,#fff1f2,#ffe4e6,#fbcfe8)', accent: '#e11d48', ...PACK_DEFAULT_SCHEDULE },
+  { id: 'daily_fixed', name: 'Diário hora fixa', emoji: '⏰', description: 'Liberado todo dia no mesmo horário. Slots acumulam se não forem abertos.', cardsPerOpen: 1, cooldownHours: null, distribution: 'all_with_access', status: 'active', category: 'daily', allowedTypeIds: [], allowedRarityIds: [], guaranteedRarityId: null, gradient: 'linear-gradient(135deg,#fff1f2,#ffe4e6,#fbcfe8)', accent: '#e11d48', scheduleMode: 'fixed_time', scheduleTime: '06:00', scheduleTimezone: 'America/Sao_Paulo', cumulative: true, maxAccumulated: 3 },
+  { id: 'sentimental', name: 'Pacote sentimental', emoji: '🥹', description: 'Exemplo de pacote temático filtrando apenas um tipo de bilhete.', cardsPerOpen: 4, cooldownHours: 168, distribution: 'manual_bonus', status: 'draft', category: 'thematic', allowedTypeIds: [], allowedRarityIds: [], guaranteedRarityId: null, gradient: 'linear-gradient(135deg,#eef2ff,#e0e7ff,#f5d0fe)', accent: '#6366f1', ...PACK_DEFAULT_SCHEDULE },
+  { id: 'legendary', name: 'Lendário garantido', emoji: '👑', description: 'Exemplo de pacote especial para eventos, datas e recompensas raras.', cardsPerOpen: 3, cooldownHours: null, distribution: 'selected_readers', status: 'draft', category: 'guaranteed', allowedTypeIds: [], allowedRarityIds: [], guaranteedRarityId: null, gradient: 'linear-gradient(135deg,#fff7ed,#fed7aa,#fde68a)', accent: '#f97316', ...PACK_DEFAULT_SCHEDULE },
+  { id: 'saudade', name: 'Dose de saudade', emoji: '🌙', description: 'Pacotinho emocional para bilhetes de saudade e carinho.', cardsPerOpen: 2, cooldownHours: 12, distribution: 'all_with_access', status: 'draft', category: 'thematic', allowedTypeIds: [], allowedRarityIds: [], guaranteedRarityId: null, gradient: 'linear-gradient(135deg,#eef2ff,#c7d2fe,#e0e7ff)', accent: '#4f46e5', ...PACK_DEFAULT_SCHEDULE },
+  { id: 'surpresa', name: 'Surpresa relâmpago', emoji: '⚡', description: 'Um bônus rápido liberado manualmente pelo criador.', cardsPerOpen: 1, cooldownHours: null, distribution: 'manual_bonus', status: 'active', category: 'bonus', allowedTypeIds: [], allowedRarityIds: [], guaranteedRarityId: null, gradient: 'linear-gradient(135deg,#fefce8,#fef3c7,#fde68a)', accent: '#eab308', ...PACK_DEFAULT_SCHEDULE },
+  { id: 'evento', name: 'Evento especial', emoji: '🎉', description: 'Template para aniversário, datas especiais ou coleções sazonais.', cardsPerOpen: 5, cooldownHours: null, distribution: 'all_with_access', status: 'draft', category: 'bonus', allowedTypeIds: [], allowedRarityIds: [], guaranteedRarityId: null, gradient: 'linear-gradient(135deg,#ecfeff,#cffafe,#f0abfc)', accent: '#06b6d4', ...PACK_DEFAULT_SCHEDULE },
+]
+
+export const PACK_FILTERS: { id: PackFilter; label: string }[] = [
+  { id: 'all', label: 'Todos' }, { id: 'active', label: 'Ativos' }, { id: 'draft', label: 'Rascunhos' },
+  { id: 'daily', label: 'Diários' }, { id: 'bonus', label: 'Bônus' }, { id: 'guaranteed', label: 'Garantidos' }, { id: 'thematic', label: 'Temáticos' },
+]
+
+export const PACK_CATEGORY_LABELS: Record<CollectionPackCategory, string> = {
+  daily: 'Diário', bonus: 'Bônus', guaranteed: 'Garantido', thematic: 'Temático',
+}
+export const PACK_STATUS_LABELS: Record<CollectionPackStatus, string> = {
+  active: 'Ativo', draft: 'Rascunho', disabled: 'Pausado',
+}
+export const PACK_DISTRIBUTION_LABELS: Record<CollectionPackDistribution, string> = {
+  all_with_access: 'Todos com acesso', manual_bonus: 'Brinde manual', selected_readers: 'Selecionar leitores',
+}
+export const PACK_CATEGORY_OPTIONS = Object.entries(PACK_CATEGORY_LABELS).map(([id, label]) => ({ id: id as CollectionPackCategory, label }))
+export const PACK_STATUS_OPTIONS = Object.entries(PACK_STATUS_LABELS).map(([id, label]) => ({ id: id as CollectionPackStatus, label }))
+export const PACK_DISTRIBUTION_OPTIONS = Object.entries(PACK_DISTRIBUTION_LABELS).map(([id, label]) => ({ id: id as CollectionPackDistribution, label }))
+
+export function formatCooldown(hours: number | null) {
+  if (!hours) return 'Uso único'
+  if (hours < 24) return `${hours}h`
+  if (hours % 24 === 0) return `${hours / 24} dia${hours / 24 === 1 ? '' : 's'}`
+  return `${hours}h`
+}
+
+export function formatPackSchedule(pack: { scheduleMode?: string; scheduleTime?: string | null; cooldownHours?: number | null; cumulative?: boolean }) {
+  if (pack.scheduleMode === 'fixed_time') return `⏰ ${pack.scheduleTime ?? '06:00'}${pack.cumulative ? ' (acum.)' : ''}`
+  return formatCooldown(pack.cooldownHours ?? null)
+}
+
+export function buildPackRules(pack: CollectionPack) {
+  return [
+    pack.allowedTypeIds.length > 0 ? `${pack.allowedTypeIds.length} tipo${pack.allowedTypeIds.length === 1 ? '' : 's'} permitido${pack.allowedTypeIds.length === 1 ? '' : 's'}` : 'Todos os tipos',
+    pack.allowedRarityIds.length > 0 ? `${pack.allowedRarityIds.length} raridade${pack.allowedRarityIds.length === 1 ? '' : 's'} permitida${pack.allowedRarityIds.length === 1 ? '' : 's'}` : 'Todas as raridades',
+    pack.guaranteedRarityId ? `Garante ${pack.guaranteedRarityId}` : 'Sem garantia fixa',
+  ]
+}
+
+function pickRandomNote(notes: NoteRecord[]) {
+  return notes[Math.floor(Math.random() * notes.length)]
+}
+
+function pickWeightedNote(notes: NoteRecord[], rarities: RarityConfig[]) {
+  const availableRarities = rarities
+    .filter((r) => r.odds > 0 && notes.some((n) => n.rarity === r.id))
+    .map((r) => ({ ...r, weight: r.odds * 10 }))
+  const totalWeight = availableRarities.reduce((sum, r) => sum + r.weight, 0)
+  if (availableRarities.length === 0 || totalWeight <= 0) return pickRandomNote(notes)
+  let cursor = Math.random() * totalWeight
+  const selectedRarity = availableRarities.find((r) => { cursor -= r.weight; return cursor <= 0 }) ?? availableRarities[availableRarities.length - 1]
+  const rarityNotes = notes.filter((n) => n.rarity === selectedRarity.id)
+  return pickRandomNote(rarityNotes.length > 0 ? rarityNotes : notes)
+}
+
+export function simulatePackOpening(pack: CollectionPack, notes: NoteRecord[], rarities: RarityConfig[]): PackSimulation | null {
+  const eligibleNotes = notes.filter((n) =>
+    (pack.allowedTypeIds.length === 0 || pack.allowedTypeIds.includes(n.typeId)) &&
+    (pack.allowedRarityIds.length === 0 || pack.allowedRarityIds.includes(n.rarity)),
+  )
+  if (eligibleNotes.length === 0) return null
+  const rewards: NoteRecord[] = []
+  const guaranteedPool = pack.guaranteedRarityId ? eligibleNotes.filter((n) => n.rarity === pack.guaranteedRarityId) : []
+  if (pack.guaranteedRarityId && guaranteedPool.length > 0) rewards.push(pickRandomNote(guaranteedPool))
+  while (rewards.length < pack.cardsPerOpen) rewards.push(pickWeightedNote(eligibleNotes, rarities))
+  return { pack, rewards, eligibleCount: eligibleNotes.length, guaranteedApplied: Boolean(pack.guaranteedRarityId && guaranteedPool.length > 0) }
+}

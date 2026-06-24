@@ -1,4 +1,4 @@
-﻿import FavoriteIcon from '@mui/icons-material/Favorite'
+import FavoriteIcon from '@mui/icons-material/Favorite'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import SearchIcon from '@mui/icons-material/Search'
 import CloseIcon from '@mui/icons-material/Close'
@@ -6,11 +6,7 @@ import SwapVertIcon from '@mui/icons-material/SwapVert'
 import GridViewIcon from '@mui/icons-material/GridView'
 import ViewListIcon from '@mui/icons-material/ViewList'
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove'
-import {
-  Box, Chip, Dialog, DialogActions, DialogContent, DialogTitle,
-  IconButton, Stack, TextField, Typography,
-} from '@mui/material'
-import { keyframes } from '@emotion/react'
+import { Box, Chip, IconButton, Stack, Typography } from '@mui/material'
 import { useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
@@ -31,130 +27,12 @@ import { slugify } from '../utils/slug'
 import { isCollectionOwner } from '../utils/collectionAccess'
 import { gradientTextSx } from '../utils/colorUtils'
 import { NoteDetailDialog } from './CollectionPlayPage'
-import type { CollectionNoteView, CollectionPack, RarityConfig } from '../types/note'
-
-type SortKey = 'recent' | 'rarity' | 'az'
-const SORT_LABEL: Record<SortKey, string> = { recent: 'Recentes', rarity: 'Raridade', az: 'A-Z' }
-const SORT_CYCLE: SortKey[] = ['recent', 'rarity', 'az']
-
-const rarityShine = keyframes`
-  0%   { left: -45%; opacity: 0 }
-  20%  { opacity: 1 }
-  100% { left: 105%; opacity: 0 }
-`
-
-function rarityCardSx(r?: RarityConfig, compact = false) {
-  const glow = r?.glowColor || r?.borderColor || 'rgba(244,63,94,0.2)'
-  return {
-    p: compact ? 1.4 : 2,
-    borderRadius: compact ? radius.lg : radius.xl,
-    position: 'relative',
-    overflow: 'hidden',
-    isolation: 'isolate',
-    background: r?.cardBg ?? colors.surface.base,
-    border: `1.5px solid ${r?.borderColor ?? colors.border.subtle}`,
-    boxShadow: r
-      ? `${r.shadow || '0 4px 20px rgba(0,0,0,0.08)'}, 0 0 28px ${glow}`
-      : '0 2px 10px rgba(0,0,0,0.05)',
-    transition: 'transform 0.22s ease, box-shadow 0.22s ease',
-    cursor: 'pointer',
-    '&::before': {
-      content: '""',
-      position: 'absolute',
-      inset: 0,
-      zIndex: 0,
-      pointerEvents: 'none',
-      background: compact
-        ? `radial-gradient(circle at 12% 0%, rgba(255,255,255,0.42), transparent 38%), radial-gradient(circle at 92% 100%, ${glow}, transparent 34%)`
-        : `radial-gradient(circle at 12% 0%, rgba(255,255,255,0.58), transparent 36%), radial-gradient(circle at 95% 105%, ${glow}, transparent 42%)`,
-      opacity: compact ? 0.62 : 0.78,
-      mixBlendMode: 'soft-light',
-    },
-    '&::after': {
-      content: '""',
-      position: 'absolute',
-      top: '-35%',
-      left: '-45%',
-      zIndex: 0,
-      width: '38%',
-      height: '170%',
-      pointerEvents: 'none',
-      background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.42), transparent)',
-      animation: `${rarityShine} 4.4s ease-in-out infinite`,
-    },
-    '&:hover': {
-      transform: compact ? 'translateY(-1px)' : 'translateY(-2px) scale(1.01)',
-      boxShadow: r
-        ? `${r.shadow || '0 6px 24px rgba(0,0,0,0.1)'}, 0 0 40px ${glow}`
-        : '0 6px 20px rgba(0,0,0,0.1)',
-    },
-  }
-}
-
-function sortNotes(notes: CollectionNoteView[], sort: SortKey, rarityOrder: Record<string, number>) {
-  const arr = [...notes]
-  if (sort === 'az') return arr.sort((a, b) => (a.title ?? '').localeCompare(b.title ?? '', 'pt-BR'))
-  if (sort === 'rarity') return arr.sort((a, b) => (rarityOrder[b.rarity] ?? 0) - (rarityOrder[a.rarity] ?? 0) || (a.title ?? '').localeCompare(b.title ?? '', 'pt-BR'))
-  return arr.sort((a, b) => (b.obtainedAt ?? '').localeCompare(a.obtainedAt ?? ''))
-}
-
-function NoteCard({ note, rarity, onClick }: { note: CollectionNoteView; rarity?: RarityConfig; onClick: () => void }) {
-  return (
-    <Box onClick={onClick} sx={rarityCardSx(rarity)}>
-      <Box sx={{ position: 'relative', zIndex: 1 }}>
-        <Stack spacing={0.8}>
-          <Stack direction="row" alignItems="flex-start" justifyContent="space-between" spacing={0.5}>
-            <Typography sx={{ fontSize: '0.78rem', fontWeight: 800, color: rarity?.textColor ?? colors.text.primary, lineHeight: 1.3, flex: 1 }}>
-              {note.title}
-            </Typography>
-            {note.favorite && <FavoriteIcon sx={{ fontSize: 13, color: colors.rose.main, flexShrink: 0, mt: 0.1 }} />}
-          </Stack>
-          {rarity && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <Box sx={{ width: 7, height: 7, borderRadius: radius.full, background: rarity.cardBg, flexShrink: 0, boxShadow: `0 0 5px ${rarity.glowColor ?? rarity.borderColor}` }} />
-              <Typography sx={{ fontSize: '0.68rem', fontWeight: 800, color: rarity.captionColor ?? colors.text.muted, textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                {rarity.emoji} {rarity.label}
-              </Typography>
-            </Box>
-          )}
-          {note.message && (
-            <Typography sx={{
-              fontSize: '0.68rem', color: rarity?.textColor ? `${rarity.textColor}99` : colors.text.secondary,
-              lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
-            }}>
-              {note.message}
-            </Typography>
-          )}
-        </Stack>
-      </Box>
-    </Box>
-  )
-}
-
-function NoteRow({ note, rarity, onClick }: { note: CollectionNoteView; rarity?: RarityConfig; onClick: () => void }) {
-  return (
-    <Box onClick={onClick} sx={{ ...rarityCardSx(rarity, true), py: 1, px: 1.4 }}>
-      <Box sx={{ position: 'relative', zIndex: 1 }}>
-        <Stack direction="row" alignItems="center" spacing={1.2}>
-          {rarity && (
-            <Box sx={{ width: 9, height: 9, borderRadius: radius.full, background: rarity.cardBg, flexShrink: 0, boxShadow: `0 0 7px ${rarity.glowColor ?? rarity.borderColor}88` }} />
-          )}
-          <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Typography sx={{ fontSize: '0.82rem', fontWeight: 700, color: rarity?.textColor ?? colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {note.title}
-            </Typography>
-            {rarity && (
-              <Typography sx={{ fontSize: '0.70rem', fontWeight: 700, color: rarity.captionColor ?? colors.text.muted, textTransform: 'uppercase', letterSpacing: 0.4 }}>
-                {rarity.emoji} {rarity.label}
-              </Typography>
-            )}
-          </Box>
-          {note.favorite && <FavoriteIcon sx={{ fontSize: 13, color: colors.rose.main, flexShrink: 0 }} />}
-        </Stack>
-      </Box>
-    </Box>
-  )
-}
+import { NoteCard, NoteRow } from './reader/NoteCard'
+import { PackOpensDialog } from './reader/PackOpensDialog'
+import { RevokeAccessDialog } from './reader/RevokeAccessDialog'
+import { SORT_CYCLE, SORT_LABEL, sortNotes } from './reader/readerUtils'
+import type { SortKey } from './reader/readerUtils'
+import type { CollectionNoteView, CollectionPack } from '../types/note'
 
 const glassBtn = {
   width: 38, height: 38,
@@ -197,12 +75,8 @@ export function ReaderCollectionPage() {
   const [sort, setSort] = useState<SortKey>('recent')
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
   const [viewingNote, setViewingNote] = useState<CollectionNoteView | null>(null)
-
   const [packOpensDialog, setPackOpensDialog] = useState<{ pack: CollectionPack; currentOpens: number | undefined } | null>(null)
-  const [packOpensInput, setPackOpensInput] = useState(1)
-
   const [revokeDialogOpen, setRevokeDialogOpen] = useState(false)
-  const [revokeInput, setRevokeInput] = useState('')
 
   const rarityOrder = useMemo(() => Object.fromEntries(rarities.map((r) => [r.id, r.order])), [rarities])
   const rarityById = useMemo(() => new Map(rarities.map((r) => [r.id, r])), [rarities])
@@ -234,16 +108,10 @@ export function ReaderCollectionPage() {
 
   const isLoading = collectionsLoading || viewLoading
 
-  function openPackOpensDialog(pack: CollectionPack, currentOpens: number | undefined) {
-    setPackOpensInput(1)
-    setPackOpensDialog({ pack, currentOpens })
-  }
-
-  async function handleConfirmPackOpens() {
+  async function handleAddPackOpens(opens: number) {
     if (!packOpensDialog) return
-    const { pack } = packOpensDialog
     try {
-      await addPackOpensMutation.mutateAsync({ email, packId: pack.id, opens: packOpensInput })
+      await addPackOpensMutation.mutateAsync({ email, packId: packOpensDialog.pack.id, opens })
       void queryClient.invalidateQueries({ queryKey: ['reader-view', cid, email] })
       toast.success('Brindes atualizados.')
       setPackOpensDialog(null)
@@ -254,9 +122,8 @@ export function ReaderCollectionPage() {
 
   async function handleRemovePackAccess() {
     if (!packOpensDialog) return
-    const { pack } = packOpensDialog
     try {
-      await addPackOpensMutation.mutateAsync({ email, packId: pack.id, opens: 0 })
+      await addPackOpensMutation.mutateAsync({ email, packId: packOpensDialog.pack.id, opens: 0 })
       void queryClient.invalidateQueries({ queryKey: ['reader-view', cid, email] })
       toast.success('Brinde removido.')
       setPackOpensDialog(null)
@@ -294,23 +161,13 @@ export function ReaderCollectionPage() {
 
       <ScrollablePage sx={{ px: 2.5, py: 2.5 }}>
         <Stack direction="row" alignItems="center" spacing={1.2} sx={{ mb: 2.5 }}>
-          <IconButton
-            size="small"
-            aria-label="voltar"
-            onClick={() => navigate(`/colecoes/${slug}/gerenciar`)}
-            sx={{ ...glassBtn, color: theme.textOnBg }}
-          >
+          <IconButton size="small" aria-label="voltar" onClick={() => navigate(`/colecoes/${slug}/gerenciar`)} sx={{ ...glassBtn, color: theme.textOnBg }}>
             <ArrowBackIcon sx={{ fontSize: 20 }} />
           </IconButton>
           <Box sx={{ flex: 1 }}>
             <PageTitle title={collection?.name ?? 'Coleção'} subtitle={email} />
           </Box>
-          <IconButton
-            size="small"
-            aria-label="remover acesso"
-            onClick={() => { setRevokeInput(''); setRevokeDialogOpen(true) }}
-            sx={{ ...glassBtn, color: colors.rose.main }}
-          >
+          <IconButton size="small" aria-label="remover acesso" onClick={() => setRevokeDialogOpen(true)} sx={{ ...glassBtn, color: colors.rose.main }}>
             <PersonRemoveIcon sx={{ fontSize: 18 }} />
           </IconButton>
         </Stack>
@@ -361,7 +218,7 @@ export function ReaderCollectionPage() {
                       <Chip
                         key={pack.id}
                         label={hasOpens ? `${pack.emoji} ${pack.name} (${opens}x)` : `${pack.emoji} ${pack.name}`}
-                        onClick={() => openPackOpensDialog(pack, opens)}
+                        onClick={() => setPackOpensDialog({ pack, currentOpens: opens })}
                         disabled={addPackOpensMutation.isPending}
                         sx={{
                           height: 28, borderRadius: radius.full, fontSize: '0.72rem', fontWeight: 800, cursor: 'pointer',
@@ -481,7 +338,6 @@ export function ReaderCollectionPage() {
                 </Stack>
               )}
             </Box>
-
           </Stack>
         )}
       </ScrollablePage>
@@ -491,89 +347,23 @@ export function ReaderCollectionPage() {
       {viewingNote && (
         <NoteDetailDialog note={viewingNote} rarities={rarities} types={types} onClose={() => setViewingNote(null)} />
       )}
-      <Dialog
-        open={!!packOpensDialog}
+
+      <PackOpensDialog
+        pack={packOpensDialog?.pack ?? null}
+        currentOpens={packOpensDialog?.currentOpens}
+        isPending={addPackOpensMutation.isPending}
         onClose={() => setPackOpensDialog(null)}
-        maxWidth="xs"
-        fullWidth
-        slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'rgba(255,253,251,0.98)' } } }}
-      >
-        <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, pb: 0.5 }}>
-          {packOpensDialog ? `${packOpensDialog.pack.emoji} ${packOpensDialog.pack.name}` : ''}
-        </DialogTitle>
-        <DialogContent sx={{ pt: 1 }}>
-          <Stack spacing={1.5}>
-            {packOpensDialog?.currentOpens !== undefined && (
-              <Typography sx={{ fontSize: '0.82rem', color: colors.text.secondary }}>
-                Aberturas atuais: <strong>{packOpensDialog.currentOpens}</strong>
-              </Typography>
-            )}
-            <TextField
-              label="Aberturas para adicionar"
-              type="number"
-              value={packOpensInput}
-              onChange={(e) => setPackOpensInput(Math.max(1, Number(e.target.value)))}
-              inputProps={{ min: 1 }}
-              fullWidth
-              size="small"
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: radius.lg } }}
-            />
-          </Stack>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2.5, gap: 1, flexWrap: 'wrap' }}>
-          {packOpensDialog?.currentOpens !== undefined && (
-            <Button variant="ghost" loading={addPackOpensMutation.isPending} onClick={handleRemovePackAccess} sx={{ flex: '1 1 100%', color: colors.rose.main }}>
-              Remover brinde
-            </Button>
-          )}
-          <Button variant="ghost" onClick={() => setPackOpensDialog(null)} sx={{ flex: 1 }}>Cancelar</Button>
-          <Button variant="primary" loading={addPackOpensMutation.isPending} disabled={packOpensInput < 1} onClick={handleConfirmPackOpens} sx={{ flex: 1 }}>
-            Adicionar
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog
+        onAdd={handleAddPackOpens}
+        onRemove={handleRemovePackAccess}
+      />
+
+      <RevokeAccessDialog
         open={revokeDialogOpen}
+        email={email}
+        isPending={revokeMutation.isPending}
         onClose={() => setRevokeDialogOpen(false)}
-        maxWidth="xs"
-        fullWidth
-        slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'rgba(255,253,251,0.98)' } } }}
-      >
-        <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.rose.main, pb: 0.5 }}>
-          Remover acesso
-        </DialogTitle>
-        <DialogContent sx={{ pt: 1 }}>
-          <Stack spacing={1.5}>
-            <Typography sx={{ fontSize: '0.84rem', color: colors.text.secondary }}>
-              Para confirmar, digite o email do leitor:
-            </Typography>
-            <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.primary, px: 1.2, py: 0.6, borderRadius: radius.md, background: 'rgba(0,0,0,0.04)', fontFamily: 'monospace', wordBreak: 'break-all' }}>
-              {email}
-            </Typography>
-            <TextField
-              placeholder={email}
-              value={revokeInput}
-              onChange={(e) => setRevokeInput(e.target.value)}
-              fullWidth
-              size="small"
-              autoComplete="off"
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: radius.lg } }}
-            />
-          </Stack>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
-          <Button variant="ghost" onClick={() => setRevokeDialogOpen(false)} sx={{ flex: 1 }}>Cancelar</Button>
-          <Button
-            variant="ghost"
-            loading={revokeMutation.isPending}
-            disabled={revokeInput.trim().toLowerCase() !== email.toLowerCase()}
-            onClick={handleRevoke}
-            sx={{ flex: 1, color: colors.rose.main, background: `${colors.rose.main}15`, border: `1px solid ${colors.rose.main}30`, '&:hover': { background: `${colors.rose.main}25` } }}
-          >
-            Remover
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onRevoke={handleRevoke}
+      />
     </Box>
   )
 }
