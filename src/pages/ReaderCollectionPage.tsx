@@ -94,9 +94,9 @@ export function ReaderCollectionPage() {
   const dailyPackLabel = useMemo(() => {
     if (!view?.daily) return '—'
     if (view.daily.canOpen) return '✓ disponível'
-    const remainingMs = Date.parse(view.daily.availableAt) - Date.parse(view.daily.serverTime)
+    const remainingMs = Date.parse(view.daily.availableAt) - Date.now()
     return `⏳ ${formatRemainingTime(remainingMs)}`
-  }, [view?.daily?.canOpen, view?.daily?.availableAt, view?.daily?.serverTime])
+  }, [view?.daily?.canOpen, view?.daily?.availableAt])
 
   const ownedRarities = useMemo(
     () => rarities.filter((r) => ownedNotes.some((n) => n.rarity === r.id)).sort((a, b) => a.order - b.order),
