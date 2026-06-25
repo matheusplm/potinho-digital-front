@@ -4,7 +4,7 @@ import { useRef, useState } from 'react'
 import type { TurnstileInstance } from '@marsidev/react-turnstile'
 import { Link, useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
-import { api } from '../services/api'
+import { api, ApiRequestError } from '../services/api'
 import { Button, Input, TurnstileWidget, toast } from '../components/ui'
 import { ScrollHint } from '../components/ui/ScrollHint'
 import { fadeSlide, floatHeart, font } from '../design-system'
@@ -24,6 +24,7 @@ export function LoginPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [notVerified, setNotVerified] = useState(false)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaStatus, setCaptchaStatus] = useState<'pending' | 'verified' | 'error'>('pending')
   const turnstileRef = useRef<TurnstileInstance>(null)
@@ -32,6 +33,7 @@ export function LoginPage() {
     e.preventDefault()
     if (!captchaToken) return
     setError('')
+    setNotVerified(false)
     setLoading(true)
     try {
       const { token, refreshToken, user } = await api.login(email, password, captchaToken)
@@ -39,8 +41,13 @@ export function LoginPage() {
       toast.success(`Bem-vindo, ${user.name.split(' ')[0]}! 💙`)
       navigate('/home')
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Erro ao fazer login.'
-      setError(msg)
+      if (err instanceof ApiRequestError && err.code === 'EMAIL_NOT_VERIFIED') {
+        setNotVerified(true)
+        setError(err.message)
+      } else {
+        const msg = err instanceof Error ? err.message : 'Erro ao fazer login.'
+        setError(msg)
+      }
       turnstileRef.current?.reset()
       setCaptchaToken(null)
       setCaptchaStatus('pending')
@@ -93,7 +100,14 @@ export function LoginPage() {
         <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%', maxWidth: 320 }}>
           <Stack spacing={2}>
             <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" fullWidth required />
-            <Input label="Senha" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" fullWidth required />
+            <Box>
+              <Input label="Senha" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" fullWidth required />
+              <Typography sx={{ mt: 0.5, textAlign: 'right' }}>
+                <Link to="/esqueci-minha-senha" style={{ color: '#1d4ed8', fontSize: '0.78rem', textDecoration: 'none', fontWeight: 600 }}>
+                  Esqueci minha senha
+                </Link>
+              </Typography>
+            </Box>
             <TurnstileWidget
               ref={turnstileRef}
               status={captchaStatus}
@@ -109,6 +123,15 @@ export function LoginPage() {
                 <Typography sx={{ fontSize: '0.8rem', color: '#e11d48', fontWeight: 600 }}>
                   {error}
                 </Typography>
+                {notVerified && (
+                  <Typography
+                    component="span"
+                    onClick={() => { navigate(`/verificar-email?email=${encodeURIComponent(email)}`) }}
+                    sx={{ display: 'block', mt: 0.5, fontSize: '0.78rem', color: '#1d4ed8', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline' }}
+                  >
+                    Reenviar email de confirmação
+                  </Typography>
+                )}
               </Box>
             )}
           </Stack>

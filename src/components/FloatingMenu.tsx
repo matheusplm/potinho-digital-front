@@ -1,5 +1,6 @@
 ﻿import LogoutIcon from '@mui/icons-material/Logout'
 import FavoriteIcon from '@mui/icons-material/Favorite'
+import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined'
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
 import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined'
 import CheckIcon from '@mui/icons-material/Check'
@@ -318,6 +319,31 @@ export function FloatingMenu() {
                 </Box>
               </>
             )}
+
+            <Box sx={{ height: '1px', bgcolor: theme.surfaceBorder, mx: 1.5 }} />
+
+            <Box sx={{ p: 1 }}>
+              <Stack
+                direction="row" spacing={1.4}
+                onClick={() => { setOpen(false); navigate('/conta') }}
+                sx={{
+                  alignItems: 'center', px: 1.4, py: 1, cursor: 'pointer', borderRadius: radius.md,
+                  transition: 'background 0.12s',
+                  '&:hover': { bgcolor: `${theme.accent}0e` },
+                }}
+              >
+                <Box sx={{
+                  width: 30, height: 30, borderRadius: radius.sm, flexShrink: 0,
+                  background: `${theme.accent}14`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <ManageAccountsOutlinedIcon sx={{ fontSize: 16, color: theme.accent }} />
+                </Box>
+                <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: theme.textOnBg }}>
+                  Minha conta
+                </Typography>
+              </Stack>
+            </Box>
 
             <Box sx={{ height: '1px', bgcolor: theme.surfaceBorder, mx: 1.5 }} />
 

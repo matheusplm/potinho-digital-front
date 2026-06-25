@@ -17,7 +17,7 @@ const HEARTS = [
 
 export function RegisterPage() {
   const navigate = useNavigate()
-  const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' })
+  const [form, setForm] = useState({ name: '', email: '', username: '', password: '', confirm: '' })
   const [passwordTouched, setPasswordTouched] = useState(false)
   const [confirmTouched, setConfirmTouched] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -38,9 +38,10 @@ export function RegisterPage() {
     if (!captchaToken) return
     setLoading(true)
     try {
-      await api.register(form.name, form.email, form.password, captchaToken)
-      toast.success('Conta criada!', { description: 'Agora é só entrar.' })
-      navigate('/login')
+      const username = form.username.trim() || undefined
+      await api.register(form.name, form.email, form.password, captchaToken, username)
+      toast.success('Conta criada!', { description: 'Verifique seu email para ativar.' })
+      navigate(`/verificar-email?email=${encodeURIComponent(form.email)}`)
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erro ao criar conta.'
       toast.error(msg)
@@ -77,12 +78,7 @@ export function RegisterPage() {
       ))}
 
       <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 3, py: 5, animation: `${fadeSlide} 0.5s ease both` }} spacing={0}>
-        <FavoriteIcon sx={{
-          fontSize: 52,
-          color: '#1d4ed8',
-          filter: 'drop-shadow(0 4px 16px rgba(29,78,216,0.4))',
-          mb: 3,
-        }} />
+        <FavoriteIcon sx={{ fontSize: 52, color: '#1d4ed8', filter: 'drop-shadow(0 4px 16px rgba(29,78,216,0.4))', mb: 3 }} />
 
         <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2.8rem', lineHeight: 1, color: '#1e3a5f', textAlign: 'center', letterSpacing: '-0.5px' }}>
           Criar
@@ -98,6 +94,16 @@ export function RegisterPage() {
             <Stack spacing={2}>
               <Input label="Seu nome" value={form.name} onChange={set('name')} placeholder="Como te chamamos?" fullWidth required />
               <Input label="Email" type="email" value={form.email} onChange={set('email')} placeholder="seu@email.com" fullWidth required />
+              <Box>
+                <Input
+                  label="Username (opcional)" value={form.username} onChange={set('username')}
+                  placeholder="@meunome" fullWidth
+                  inputProps={{ maxLength: 30 }}
+                />
+                <Typography sx={{ fontSize: '0.72rem', color: 'rgba(30,58,95,0.45)', mt: 0.5, pl: 0.5 }}>
+                  Identificador único. Pode ser definido depois.
+                </Typography>
+              </Box>
               <Input
                 label="Senha" type="password" value={form.password}
                 onChange={set('password')} onBlur={() => setPasswordTouched(true)}
@@ -119,10 +125,7 @@ export function RegisterPage() {
                 onError={() => { setCaptchaToken(null); setCaptchaStatus('error') }}
                 onExpire={() => { setCaptchaToken(null); setCaptchaStatus('pending') }}
               />
-              <Button
-                variant="primary"
-                type="submit" fullWidth loading={loading} disabled={!captchaToken} sx={{ mt: 0.5 }}
-              >
+              <Button variant="primary" type="submit" fullWidth loading={loading} disabled={!captchaToken} sx={{ mt: 0.5 }}>
                 Criar conta
               </Button>
             </Stack>

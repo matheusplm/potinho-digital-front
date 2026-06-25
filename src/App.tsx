@@ -23,6 +23,11 @@ import { FavoritasPage } from './pages/FavoritasPage'
 import { TestPage } from './pages/TestPage'
 import { LandingPage } from './pages/LandingPage'
 import { NotFoundPage } from './pages/NotFoundPage'
+import { VerifyEmailPage } from './pages/VerifyEmailPage'
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
+import { ResetPasswordPage } from './pages/ResetPasswordPage'
+import { ContaPage } from './pages/ContaPage'
+import { ConfirmEmailChangePage } from './pages/ConfirmEmailChangePage'
 import { LoadingState } from './components/ui'
 import { Box } from '@mui/material'
 
@@ -58,6 +63,10 @@ function AppRoutes() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/verificar-email" element={<VerifyEmailPage />} />
+        <Route path="/esqueci-minha-senha" element={<ForgotPasswordPage />} />
+        <Route path="/redefinir-senha" element={<ResetPasswordPage />} />
+        <Route path="/confirmar-troca-email" element={<ConfirmEmailChangePage />} />
         {import.meta.env.DEV && <Route path="/test" element={<TestPage />} />}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
@@ -75,6 +84,7 @@ function AppRoutes() {
         <Route path="favoritas" element={<FavoritasPage />} />
         <Route path="colecoes/:slug/gerenciar" element={<RequireRole role="writer"><CollectionManagePage /></RequireRole>} />
         <Route path="colecoes/:slug/gerenciar/leitores/:email" element={<RequireRole role="writer"><ReaderCollectionPage /></RequireRole>} />
+        <Route path="conta" element={<ContaPage />} />
       </Route>
       {import.meta.env.DEV && <Route path="test" element={<TestPage />} />}
       <Route path="*" element={<NotFoundPage />} />

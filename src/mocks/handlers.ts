@@ -190,6 +190,68 @@ const authHandlers = [
     })
   }),
 
+  http.post('/auth/verify-email', async ({ request }) => {
+    await delay(500)
+    const { token } = (await request.json()) as { token: string }
+    let email: string
+    try { email = atob(token) } catch { return HttpResponse.json({ message: 'Link inválido ou expirado.' }, { status: 400 }) }
+    const user = db.users.find((u) => u.email === email)
+    if (!user) return HttpResponse.json({ message: 'Link inválido ou expirado.' }, { status: 400 })
+    return HttpResponse.json({ token: user.token, refreshToken: `refresh-${user.token}`, user: { ...publicUser(user), email: user.email, onboardingDone: null } })
+  }),
+
+  http.post('/auth/resend-verification', async () => {
+    await delay(300)
+    return HttpResponse.json({ ok: true })
+  }),
+
+  http.post('/auth/forgot-password', async () => {
+    await delay(300)
+    return HttpResponse.json({ ok: true })
+  }),
+
+  http.post('/auth/reset-password', async ({ request }) => {
+    await delay(400)
+    const { token, newPassword } = (await request.json()) as { token: string; newPassword: string }
+    let email: string
+    try { email = atob(token) } catch { return HttpResponse.json({ message: 'Link inválido ou expirado.' }, { status: 400 }) }
+    const user = db.users.find((u) => u.email === email)
+    if (!user || !newPassword) return HttpResponse.json({ message: 'Link inválido ou expirado.' }, { status: 400 })
+    user.password = newPassword
+    return HttpResponse.json({ ok: true })
+  }),
+
+  http.post('/auth/change-email', async ({ request }) => {
+    await delay(300)
+    const user = resolveUser(tokenFrom(request))
+    if (!user) return HttpResponse.json({ message: 'Não autenticado.' }, { status: 401 })
+    const { newEmail } = (await request.json()) as { newEmail?: string; password?: string }
+    if (newEmail) user.pendingEmail = newEmail
+    return HttpResponse.json({ ok: true })
+  }),
+
+  http.post('/auth/confirm-email-change', async ({ request }) => {
+    await delay(300)
+    const { token } = (await request.json()) as { token?: string }
+    let email: string
+    try { email = atob(token ?? '') } catch { return HttpResponse.json({ message: 'Link inválido ou expirado.' }, { status: 400 }) }
+    const user = db.users.find((u) => u.pendingEmail === email)
+    if (!user) return HttpResponse.json({ message: 'Link inválido ou expirado.' }, { status: 400 })
+    user.email = email
+    user.pendingEmail = undefined
+    return HttpResponse.json({ ok: true, email })
+  }),
+
+  http.patch('/auth/me', async ({ request }) => {
+    await delay(200)
+    const user = resolveUser(tokenFrom(request))
+    if (!user) return HttpResponse.json({ message: 'Não autenticado.' }, { status: 401 })
+    const data = (await request.json()) as { name?: string; username?: string }
+    if (data.name) user.name = data.name
+    if ('username' in data) user.username = data.username
+    return HttpResponse.json({ id: user.id, name: user.name, email: user.email, username: user.username })
+  }),
+
   http.post('/auth/logout', async () => {
     await delay(100)
     return HttpResponse.json({ ok: true })

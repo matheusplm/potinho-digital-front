@@ -46,6 +46,9 @@ const FRIENDLY_ERROR_MESSAGES: Record<string, string> = {
   PACK_NOT_ACTIVE: 'Este pacotinho não está disponível.',
   PACK_NOT_ALLOWED: 'Este pacotinho não está liberado para você.',
   CAPTCHA_FAILED: 'Verificação de segurança falhou. Tente novamente.',
+  EMAIL_NOT_VERIFIED: 'Email não verificado. Verifique sua caixa de entrada.',
+  INVALID_TOKEN: 'Link inválido ou expirado.',
+  USERNAME_ALREADY_EXISTS: 'Este nome de usuário já está em uso.',
   INVALID_CREDENTIALS: 'Email ou senha incorretos.',
   EMAIL_ALREADY_EXISTS: 'Este email já está cadastrado.',
   UNAUTHORIZED: 'Sessão expirada. Faça login novamente.',
@@ -197,13 +200,27 @@ export const api = {
     }),
   logout: (refreshToken: string) =>
     request<{ ok: boolean }>('/auth/logout', { method: 'POST', body: JSON.stringify({ refreshToken }) }).catch(() => {}),
-  register: (name: string, email: string, password: string, captchaToken: string) =>
+  register: (name: string, email: string, password: string, captchaToken: string, username?: string) =>
     request<{ id: string; name: string; role: string }>('/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ name, email, password, captchaToken }),
+      body: JSON.stringify({ name, email, password, captchaToken, ...(username ? { username } : {}) }),
     }),
-  me: () => request<{ id: string; name: string; role: string; email: string; onboardingDone: boolean | null }>('/auth/me'),
+  me: () => request<{ id: string; name: string; role: string; email: string; username?: string; emailVerified?: boolean; onboardingDone: boolean | null }>('/auth/me'),
   markOnboardingDone: () => request<{ ok: boolean }>('/auth/onboarding-done', { method: 'PATCH' }),
+  updateMe: (data: { name?: string; username?: string }) =>
+    request<{ id: string; name: string; email: string; username?: string }>('/auth/me', { method: 'PATCH', body: JSON.stringify(data) }),
+  verifyEmail: (token: string) =>
+    request<{ token: string; refreshToken: string; user: { id: string; name: string; role: string; email: string; username?: string; onboardingDone: boolean | null } }>('/auth/verify-email', { method: 'POST', body: JSON.stringify({ token }) }),
+  resendVerification: (email: string) =>
+    request<{ ok: boolean }>('/auth/resend-verification', { method: 'POST', body: JSON.stringify({ email }) }),
+  forgotPassword: (email: string) =>
+    request<{ ok: boolean }>('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) }),
+  resetPassword: (token: string, newPassword: string) =>
+    request<{ ok: boolean }>('/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, newPassword }) }),
+  changeEmail: (newEmail: string, password: string) =>
+    request<{ ok: boolean }>('/auth/change-email', { method: 'POST', body: JSON.stringify({ newEmail, password }) }),
+  confirmEmailChange: (token: string) =>
+    request<{ ok: boolean; email?: string }>('/auth/confirm-email-change', { method: 'POST', body: JSON.stringify({ token }) }),
 
   listCollections: () => request<Collection[]>('/api/collections'),
   createCollection: (data: CollectionFormData) =>
