@@ -242,6 +242,14 @@ const authHandlers = [
     return HttpResponse.json({ ok: true, email })
   }),
 
+  http.get('/auth/check-username', async ({ request }) => {
+    await delay(150)
+    const url = new URL(request.url)
+    const username = url.searchParams.get('username') ?? ''
+    const taken = db.users.some((u) => u.username?.toLowerCase() === username.toLowerCase())
+    return HttpResponse.json({ available: !taken })
+  }),
+
   http.patch('/auth/me', async ({ request }) => {
     await delay(200)
     const user = resolveUser(tokenFrom(request))
@@ -421,6 +429,13 @@ const collectionHandlers = [
     if (opens <= 0) delete access.packOpens[packId]
     else access.packOpens[packId] = (access.packOpens[packId] ?? 0) + opens
     return HttpResponse.json(access)
+  }),
+
+  http.post('/api/collections/:cid/access/:email/invite', async ({ params, request }) => {
+    await delay(200)
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    return HttpResponse.json({ ok: true })
   }),
 
   http.get('/api/collections/:cid/packs', async ({ params, request }) => {

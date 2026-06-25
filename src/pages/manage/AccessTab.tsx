@@ -1,6 +1,7 @@
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
+import SendOutlinedIcon from '@mui/icons-material/SendOutlined'
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
-import { Box, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, TextField, Typography } from '@mui/material'
+import { Box, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, TextField, Tooltip, Typography } from '@mui/material'
 import { useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Button, Card, Input, LoadingState, toast } from '../../components/ui'
@@ -8,6 +9,7 @@ import { useCollectionAccessQuery, useCollectionPacksQuery, useGrantAccessMutati
 import { colors, font, radius } from '../../design-system'
 import { useBackground } from '../../context/BackgroundContext'
 import { useUser } from '../../context/UserContext'
+import { api } from '../../services/api'
 import type { CollectionPack } from '../../types/note'
 import { actionButtonSx } from './shared'
 
@@ -25,6 +27,7 @@ export function AccessTab({ cid }: AccessTabProps) {
   const addPackOpensMutation = useAddPackOpensMutation(cid)
 
   const [emailInput, setEmailInput] = useState('')
+  const [resendingFor, setResendingFor] = useState<string | null>(null)
   const [packOpensDialog, setPackOpensDialog] = useState<{ email: string; pack: CollectionPack; currentOpens: number | undefined } | null>(null)
   const [packOpensInput, setPackOpensInput] = useState(1)
 
@@ -40,8 +43,26 @@ export function AccessTab({ cid }: AccessTabProps) {
       toast.error('Você não pode se adicionar como leitor da sua própria coleção.')
       return
     }
-    try { await grantMutation.mutateAsync(email); setEmailInput(''); toast.success(`Acesso concedido para ${email}`) }
-    catch (e) { toast.error((e as Error).message || 'Erro ao conceder acesso.') }
+    try {
+      await grantMutation.mutateAsync(email)
+      setEmailInput('')
+      api.sendInvite(cid, email).catch(() => {})
+      toast.success(`Convite enviado para ${email}!`, { description: 'Um email de convite foi enviado.' })
+    } catch (e) {
+      toast.error((e as Error).message || 'Erro ao conceder acesso.')
+    }
+  }
+
+  async function handleResendInvite(email: string) {
+    setResendingFor(email)
+    try {
+      await api.sendInvite(cid, email)
+      toast.success('Convite reenviado!', { description: email })
+    } catch (e) {
+      toast.error((e as Error).message || 'Erro ao reenviar convite.')
+    } finally {
+      setResendingFor(null)
+    }
   }
 
   function openPackOpensDialog(email: string, pack: CollectionPack, currentOpens: number | undefined) {
@@ -83,6 +104,7 @@ export function AccessTab({ cid }: AccessTabProps) {
             </Typography>
             <Stack direction="row" spacing={1} alignItems="flex-end">
               <Input type="email" placeholder="email@exemplo.com" value={emailInput} onChange={(e) => setEmailInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); void handleGrant() } }}
                 sx={{ flex: 1, '& .MuiOutlinedInput-root': { fontSize: '0.84rem' }, '& input': { py: 0.75 } }} />
               <Button variant="primary" loading={grantMutation.isPending} onClick={handleGrant} disabled={!emailInput.trim()} sx={{ py: 0.85, px: 1.5, fontSize: '0.78rem', whiteSpace: 'nowrap' }}>
                 <PersonAddIcon sx={{ fontSize: 16, mr: 0.4 }} /> Convidar
@@ -111,6 +133,19 @@ export function AccessTab({ cid }: AccessTabProps) {
                 <Typography sx={{ flex: 1, fontSize: '0.84rem', color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {a.email}
                 </Typography>
+                <Tooltip title="Reenviar convite" placement="top" arrow enterTouchDelay={0}>
+                  <span>
+                    <IconButton
+                      size="small"
+                      aria-label="reenviar convite"
+                      disabled={resendingFor === a.email}
+                      onClick={() => void handleResendInvite(a.email)}
+                      sx={{ ...actionButtonSx('neutral'), flexShrink: 0 }}
+                    >
+                      <SendOutlinedIcon sx={{ fontSize: 16 }} />
+                    </IconButton>
+                  </span>
+                </Tooltip>
                 <IconButton size="small" aria-label="ver coleção" onClick={() => navigate(`/colecoes/${slug}/gerenciar/leitores/${encodeURIComponent(a.email)}`)} sx={{ ...actionButtonSx('neutral'), flexShrink: 0 }}>
                   <VisibilityOutlinedIcon sx={{ fontSize: 17 }} />
                 </IconButton>

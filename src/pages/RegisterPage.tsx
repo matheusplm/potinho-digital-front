@@ -1,5 +1,5 @@
 import FavoriteIcon from '@mui/icons-material/Favorite'
-import { Box, Stack, Typography } from '@mui/material'
+import { Box, CircularProgress, Stack, Typography } from '@mui/material'
 import { useRef, useState } from 'react'
 import type { TurnstileInstance } from '@marsidev/react-turnstile'
 import { useNavigate, Link } from 'react-router-dom'
@@ -7,6 +7,8 @@ import { api } from '../services/api'
 import { Button, Input, TurnstileWidget, toast } from '../components/ui'
 import { ScrollHint } from '../components/ui/ScrollHint'
 import { fadeSlide, floatHeart, font } from '../design-system'
+
+type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken'
 
 const HEARTS = [
   { size: 18, left: '11%', delay: '0s',   dur: '13s' },
@@ -23,16 +25,35 @@ export function RegisterPage() {
   const [loading, setLoading] = useState(false)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaStatus, setCaptchaStatus] = useState<'pending' | 'verified' | 'error'>('pending')
+  const [usernameStatus, setUsernameStatus] = useState<UsernameStatus>('idle')
   const turnstileRef = useRef<TurnstileInstance>(null)
+  const usernameTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [field]: e.target.value }))
+
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setForm((f) => ({ ...f, username: value }))
+    if (usernameTimer.current) clearTimeout(usernameTimer.current)
+    if (!value.trim()) { setUsernameStatus('idle'); return }
+    setUsernameStatus('checking')
+    usernameTimer.current = setTimeout(async () => {
+      try {
+        const { available } = await api.checkUsername(value.trim())
+        setUsernameStatus(available ? 'available' : 'taken')
+      } catch {
+        setUsernameStatus('idle')
+      }
+    }, 500)
+  }
 
   const passwordError = passwordTouched && form.password.length < 6
   const confirmError = confirmTouched && form.confirm !== form.password
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (usernameStatus === 'taken') return
     if (form.password.length < 6) { setPasswordTouched(true); return }
     if (form.confirm !== form.password) { setConfirmTouched(true); return }
     if (!captchaToken) return
@@ -51,6 +72,19 @@ export function RegisterPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const usernameHelperText = () => {
+    if (usernameStatus === 'checking') return ''
+    if (usernameStatus === 'available') return '✓ disponível'
+    if (usernameStatus === 'taken') return 'já está em uso'
+    return 'Identificador único. Pode ser definido depois.'
+  }
+
+  const usernameHelperColor = () => {
+    if (usernameStatus === 'available') return '#22c55e'
+    if (usernameStatus === 'taken') return '#e11d48'
+    return 'rgba(30,58,95,0.45)'
   }
 
   return (
@@ -96,12 +130,19 @@ export function RegisterPage() {
               <Input label="Email" type="email" value={form.email} onChange={set('email')} placeholder="seu@email.com" fullWidth required />
               <Box>
                 <Input
-                  label="Username (opcional)" value={form.username} onChange={set('username')}
-                  placeholder="@meunome" fullWidth
+                  label="Username (opcional)"
+                  value={form.username}
+                  onChange={handleUsernameChange}
+                  placeholder="@meunome"
+                  fullWidth
                   inputProps={{ maxLength: 30 }}
+                  error={usernameStatus === 'taken'}
+                  InputProps={usernameStatus === 'checking' ? {
+                    endAdornment: <CircularProgress size={14} sx={{ color: 'rgba(30,58,95,0.35)', mr: 0.5 }} />,
+                  } : undefined}
                 />
-                <Typography sx={{ fontSize: '0.72rem', color: 'rgba(30,58,95,0.45)', mt: 0.5, pl: 0.5 }}>
-                  Identificador único. Pode ser definido depois.
+                <Typography sx={{ fontSize: '0.72rem', color: usernameHelperColor(), mt: 0.5, pl: 0.5, fontWeight: usernameStatus === 'idle' ? 400 : 600 }}>
+                  {usernameHelperText()}
                 </Typography>
               </Box>
               <Input
@@ -125,7 +166,11 @@ export function RegisterPage() {
                 onError={() => { setCaptchaToken(null); setCaptchaStatus('error') }}
                 onExpire={() => { setCaptchaToken(null); setCaptchaStatus('pending') }}
               />
-              <Button variant="primary" type="submit" fullWidth loading={loading} disabled={!captchaToken} sx={{ mt: 0.5 }}>
+              <Button
+                variant="primary" type="submit" fullWidth loading={loading}
+                disabled={!captchaToken || usernameStatus === 'taken' || usernameStatus === 'checking'}
+                sx={{ mt: 0.5 }}
+              >
                 Criar conta
               </Button>
             </Stack>

@@ -221,6 +221,8 @@ export const api = {
     request<{ ok: boolean }>('/auth/change-email', { method: 'POST', body: JSON.stringify({ newEmail, password }) }),
   confirmEmailChange: (token: string) =>
     request<{ ok: boolean; email?: string }>('/auth/confirm-email-change', { method: 'POST', body: JSON.stringify({ token }) }),
+  checkUsername: (username: string) =>
+    request<{ available: boolean }>(`/auth/check-username?username=${encodeURIComponent(username)}`),
 
   listCollections: () => request<Collection[]>('/api/collections'),
   createCollection: (data: CollectionFormData) =>
@@ -236,6 +238,8 @@ export const api = {
     request<CollectionAccess>(`/api/collections/${cid}/access`, { method: 'POST', body: JSON.stringify({ email }) }),
   revokeAccess: (cid: string, email: string) =>
     request<{ revoked: boolean }>(`/api/collections/${cid}/access/${encodeURIComponent(email)}`, { method: 'DELETE' }),
+  sendInvite: (cid: string, email: string) =>
+    request<{ ok: boolean }>(`/api/collections/${cid}/access/${encodeURIComponent(email)}/invite`, { method: 'POST' }),
   getReaderView: (cid: string, email: string) =>
     request<CollectionPlayView>(`/api/collections/${cid}/access/${encodeURIComponent(email)}/view`),
   addPackOpens: (cid: string, email: string, packId: string, opens: number) =>

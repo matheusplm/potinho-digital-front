@@ -7,8 +7,8 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
-import { Box, Collapse, Divider, Stack, Typography } from '@mui/material'
-import { useState } from 'react'
+import { Box, CircularProgress, Collapse, Divider, Stack, Typography } from '@mui/material'
+import { useRef, useState } from 'react'
 import { useBackground } from '../context/BackgroundContext'
 import { useUser } from '../context/UserContext'
 import { api } from '../services/api'
@@ -16,6 +16,7 @@ import { Button, Input, ScrollablePage, toast } from '../components/ui'
 import { fadeIn, font, radius } from '../design-system'
 
 type Section = 'profile' | 'email'
+type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken'
 
 export function ContaPage() {
   const { theme } = useBackground()
@@ -24,6 +25,8 @@ export function ContaPage() {
   const [editing, setEditing] = useState<Section | null>(null)
   const [profileForm, setProfileForm] = useState({ name: user?.name ?? '', username: user?.username ?? '' })
   const [profileLoading, setProfileLoading] = useState(false)
+  const [usernameStatus, setUsernameStatus] = useState<UsernameStatus>('idle')
+  const usernameTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const [emailForm, setEmailForm] = useState({ newEmail: '', password: '' })
   const [emailLoading, setEmailLoading] = useState(false)
@@ -31,7 +34,24 @@ export function ContaPage() {
   const [emailSentTo, setEmailSentTo] = useState('')
   const [pendingNewEmail, setPendingNewEmail] = useState('')
 
+  const handleUsernameChange = (value: string) => {
+    setProfileForm((f) => ({ ...f, username: value }))
+    if (usernameTimer.current) clearTimeout(usernameTimer.current)
+    const trimmed = value.trim()
+    if (!trimmed || trimmed === user?.username) { setUsernameStatus('idle'); return }
+    setUsernameStatus('checking')
+    usernameTimer.current = setTimeout(async () => {
+      try {
+        const { available } = await api.checkUsername(trimmed)
+        setUsernameStatus(available ? 'available' : 'taken')
+      } catch {
+        setUsernameStatus('idle')
+      }
+    }, 500)
+  }
+
   const handleProfileSave = async () => {
+    if (usernameStatus === 'taken' || usernameStatus === 'checking') return
     const name = profileForm.name.trim()
     const username = profileForm.username.trim() || undefined
     if (!name) return
@@ -104,9 +124,11 @@ export function ContaPage() {
                 if (editing === 'profile') {
                   setEditing(null)
                   setProfileForm({ name: user?.name ?? '', username: user?.username ?? '' })
+                  setUsernameStatus('idle')
                 } else {
                   setEditing('profile')
                   setProfileForm({ name: user?.name ?? '', username: user?.username ?? '' })
+                  setUsernameStatus('idle')
                 }
               }}
               sx={{ px: 2, py: 1.8, cursor: 'pointer', '&:hover': { bgcolor: `${theme.accent}0a` }, transition: 'background 0.12s' }}
@@ -138,20 +160,27 @@ export function ContaPage() {
                   <Input
                     label="Username (opcional)"
                     value={profileForm.username}
-                    onChange={(e) => setProfileForm((f) => ({ ...f, username: e.target.value }))}
+                    onChange={(e) => handleUsernameChange(e.target.value)}
                     fullWidth
                     placeholder="@meunome"
                     inputProps={{ maxLength: 30 }}
+                    error={usernameStatus === 'taken'}
+                    InputProps={usernameStatus === 'checking' ? {
+                      endAdornment: <CircularProgress size={14} sx={{ color: theme.textOnBgMuted, mr: 0.5 }} />,
+                    } : undefined}
                   />
-                  <Typography sx={{ fontSize: '0.7rem', color: theme.textOnBgMuted, mt: 0.4, pl: 0.3 }}>
-                    Identificador único, sem espaços.
+                  <Typography sx={{
+                    fontSize: '0.7rem', mt: 0.4, pl: 0.3, fontWeight: usernameStatus === 'idle' ? 400 : 600,
+                    color: usernameStatus === 'available' ? '#22c55e' : usernameStatus === 'taken' ? '#e11d48' : theme.textOnBgMuted,
+                  }}>
+                    {usernameStatus === 'available' ? '✓ disponível' : usernameStatus === 'taken' ? 'já está em uso' : 'Identificador único, sem espaços.'}
                   </Typography>
                 </Box>
                 <Stack direction="row" spacing={1} justifyContent="flex-end">
                   <Button variant="ghost" onClick={() => setEditing(null)} disabled={profileLoading} sx={{ fontSize: '0.82rem' }}>
                     Cancelar
                   </Button>
-                  <Button variant="primary" onClick={handleProfileSave} loading={profileLoading} disabled={!profileForm.name.trim()} sx={{ fontSize: '0.82rem' }}>
+                  <Button variant="primary" onClick={handleProfileSave} loading={profileLoading} disabled={!profileForm.name.trim() || usernameStatus === 'taken' || usernameStatus === 'checking'} sx={{ fontSize: '0.82rem' }}>
                     Salvar
                   </Button>
                 </Stack>
