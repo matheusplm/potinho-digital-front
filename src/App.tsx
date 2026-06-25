@@ -28,6 +28,7 @@ import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
 import { ResetPasswordPage } from './pages/ResetPasswordPage'
 import { ContaPage } from './pages/ContaPage'
 import { ConfirmEmailChangePage } from './pages/ConfirmEmailChangePage'
+import { MailLogPage } from './pages/MailLogPage'
 import { LoadingState } from './components/ui'
 import { Box } from '@mui/material'
 
@@ -75,6 +76,10 @@ function AppRoutes() {
 
   return (
     <Routes>
+      <Route path="/verificar-email" element={<VerifyEmailPage />} />
+      <Route path="/esqueci-minha-senha" element={<ForgotPasswordPage />} />
+      <Route path="/redefinir-senha" element={<ResetPasswordPage />} />
+      <Route path="/confirmar-troca-email" element={<ConfirmEmailChangePage />} />
       <Route element={<Layout />}>
         <Route index element={<Navigate to="/home" replace />} />
         <Route path="home" element={<HomeRoute />} />
@@ -85,6 +90,7 @@ function AppRoutes() {
         <Route path="colecoes/:slug/gerenciar" element={<RequireRole role="writer"><CollectionManagePage /></RequireRole>} />
         <Route path="colecoes/:slug/gerenciar/leitores/:email" element={<RequireRole role="writer"><ReaderCollectionPage /></RequireRole>} />
         <Route path="conta" element={<ContaPage />} />
+        <Route path="mail-logs" element={<RequireRole role="writer"><MailLogPage /></RequireRole>} />
       </Route>
       {import.meta.env.DEV && <Route path="test" element={<TestPage />} />}
       <Route path="*" element={<NotFoundPage />} />

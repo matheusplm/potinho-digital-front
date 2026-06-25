@@ -14,6 +14,7 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
 import BlockIcon from '@mui/icons-material/Block'
 import LogoutIcon from '@mui/icons-material/Logout'
 import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined'
+import MailOutlinedIcon from '@mui/icons-material/MailOutlined'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import { Box, Divider, Stack, Tooltip, Typography } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
@@ -454,6 +455,31 @@ export function DesktopLayout() {
             </Typography>
           </Stack>
         </Box>
+
+        {/* Mail log (writer only) */}
+        {user?.role === 'writer' && (
+          <Box sx={{ px: 2, pb: 0.5 }}>
+            <Stack
+              direction="row" spacing={1.1} alignItems="center"
+              onClick={() => navigate('/mail-logs')}
+              sx={{
+                py: 0.8, px: 1, borderRadius: radius.md, cursor: 'pointer',
+                transition: 'background 0.12s',
+                '&:hover': { bgcolor: `${theme.accent}0c` },
+              }}
+            >
+              <Box sx={{
+                width: 28, height: 28, borderRadius: radius.sm, flexShrink: 0,
+                background: `${theme.accent}14`, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <MailOutlinedIcon sx={{ fontSize: 14, color: theme.accent }} />
+              </Box>
+              <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: theme.textOnBg }}>
+                Log de emails
+              </Typography>
+            </Stack>
+          </Box>
+        )}
 
         {/* Logout */}
         <Box sx={{ px: 2, pb: 2.5 }}>

@@ -270,3 +270,13 @@ export interface ReaderAchievementsResponse {
   achievements: ReaderAchievement[]
   justUnlocked: string[]
 }
+
+export type MailLogType = 'invite' | 'verify-email' | 'resend-verification' | 'password-reset' | 'change-email' | 'confirm-email-change'
+
+export interface MailLogEntry {
+  id: string
+  type: MailLogType
+  to: string
+  sentAt: string
+  status: 'sent' | 'failed'
+}

@@ -5,6 +5,7 @@ import { Box, Stack, Typography } from '@mui/material'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../services/api'
+import { useCooldown } from '../hooks/useMailCooldown'
 import { Button, Input } from '../components/ui'
 import { fadeSlide, floatHeart, font } from '../design-system'
 
@@ -15,19 +16,23 @@ const HEARTS = [
   { size: 20, left: '84%', delay: '5.5s', dur: '11s' },
 ]
 
+const COOLDOWN_MS = 10 * 60_000
+
 export function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
+  const cooldown = useCooldown(`forgot-password:${email.trim().toLowerCase()}`, COOLDOWN_MS)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email.trim()) return
+    if (!email.trim() || cooldown.inCooldown) return
     setError('')
     setLoading(true)
     try {
       await api.forgotPassword(email.trim())
+      cooldown.record()
       setSent(true)
     } catch (err: unknown) {
       setError((err as Error).message || 'Erro ao enviar email.')
@@ -65,6 +70,11 @@ export function ForgotPasswordPage() {
             <Typography sx={{ fontSize: '0.8rem', color: 'rgba(30,58,95,0.4)', textAlign: 'center' }}>
               Verifique também a pasta de spam.
             </Typography>
+            {cooldown.inCooldown && (
+              <Typography sx={{ fontSize: '0.78rem', color: 'rgba(30,58,95,0.45)', textAlign: 'center' }}>
+                Reenvio disponível em {cooldown.label}
+              </Typography>
+            )}
             <Typography sx={{ mt: 1, fontSize: '0.85rem', color: 'rgba(30,58,95,0.5)' }}>
               <Link to="/login" style={{ color: '#1d4ed8', fontWeight: 700, textDecoration: 'none' }}>Voltar ao login</Link>
             </Typography>
@@ -85,8 +95,11 @@ export function ForgotPasswordPage() {
             <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
               <Stack spacing={2}>
                 <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" fullWidth required />
-                <Button variant="primary" type="submit" fullWidth loading={loading} disabled={!email.trim()}>
-                  Enviar link
+                <Button
+                  variant="primary" type="submit" fullWidth loading={loading}
+                  disabled={!email.trim() || cooldown.inCooldown}
+                >
+                  {cooldown.inCooldown ? `Aguarde ${cooldown.label}` : 'Enviar link'}
                 </Button>
                 {error && (
                   <Box sx={{ px: 1.5, py: 1, borderRadius: '10px', background: 'rgba(225,29,72,0.08)', border: '1px solid rgba(225,29,72,0.2)' }}>

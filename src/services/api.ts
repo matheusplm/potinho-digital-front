@@ -10,6 +10,7 @@ import type {
   CollectionPack,
   CollectionPackFormData,
   CollectionPlayView,
+  MailLogEntry,
   NoteFormData,
   NoteRecord,
   NoteTypeConfig,
@@ -240,6 +241,8 @@ export const api = {
     request<{ revoked: boolean }>(`/api/collections/${cid}/access/${encodeURIComponent(email)}`, { method: 'DELETE' }),
   sendInvite: (cid: string, email: string) =>
     request<{ ok: boolean }>(`/api/collections/${cid}/access/${encodeURIComponent(email)}/invite`, { method: 'POST' }),
+  getMailLogs: () =>
+    request<MailLogEntry[]>('/api/mail/logs'),
   getReaderView: (cid: string, email: string) =>
     request<CollectionPlayView>(`/api/collections/${cid}/access/${encodeURIComponent(email)}/view`),
   addPackOpens: (cid: string, email: string, packId: string, opens: number) =>

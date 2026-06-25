@@ -3,6 +3,8 @@ import type {
   CollectionAccess,
   CollectionAchievement,
   CollectionPack,
+  MailLogEntry,
+  MailLogType,
   NoteRecord,
   NoteTypeConfig,
   RarityConfig,
@@ -63,9 +65,12 @@ function cloneAchievements(collectionId: string): CollectionAchievement[] {
   ]
 }
 
+export type { MailLogEntry, MailLogType }
+
 export interface MockDb {
   users: MockUser[]
   collections: CollectionState[]
+  mailLogs: MailLogEntry[]
   sequence: number
 }
 
@@ -145,6 +150,7 @@ function createInitialDb(): MockDb {
   return {
     users: [writer, reader],
     collections,
+    mailLogs: [],
     sequence: 100,
   }
 }
