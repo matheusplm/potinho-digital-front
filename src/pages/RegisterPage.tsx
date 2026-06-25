@@ -1,25 +1,12 @@
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, Stack, Typography } from '@mui/material'
-import { keyframes } from '@emotion/react'
 import { useRef, useState } from 'react'
 import type { TurnstileInstance } from '@marsidev/react-turnstile'
 import { useNavigate, Link } from 'react-router-dom'
 import { api } from '../services/api'
 import { Button, Input, TurnstileWidget, toast } from '../components/ui'
 import { ScrollHint } from '../components/ui/ScrollHint'
-import { font } from '../design-system'
-
-const fadeSlide = keyframes`
-  from { opacity: 0; transform: translateY(28px); }
-  to   { opacity: 1; transform: translateY(0); }
-`
-
-const floatHeart = (i: number) => keyframes`
-  0%   { transform: translateY(0) rotate(${i % 2 === 0 ? -6 : 5}deg); opacity: 0; }
-  10%  { opacity: ${0.06 + (i % 3) * 0.02}; }
-  85%  { opacity: ${0.04 + (i % 3) * 0.01}; }
-  100% { transform: translateY(-100vh) rotate(${i % 2 === 0 ? 10 : -8}deg); opacity: 0; }
-`
+import { fadeSlide, floatHeart, font } from '../design-system'
 
 const HEARTS = [
   { size: 18, left: '11%', delay: '0s',   dur: '13s' },

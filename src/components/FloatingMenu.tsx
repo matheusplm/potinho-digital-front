@@ -10,7 +10,6 @@ import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNone
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
 import BlockIcon from '@mui/icons-material/Block'
 import { Box, Stack, Typography, Backdrop, IconButton, Tooltip } from '@mui/material'
-import { keyframes } from '@emotion/react'
 import { useMemo, useState } from 'react'
 import { OnboardingOverlay } from './ui'
 import { useNavigate } from 'react-router-dom'
@@ -20,12 +19,7 @@ import { useBackground } from '../context/BackgroundContext'
 import { useReader } from '../context/ReaderContext'
 import { useSimulation } from '../context/SimulationContext'
 import { useCollectionsQuery } from '../hooks/useNotes'
-import { backgroundThemes, colors, font, radius } from '../design-system'
-
-const menuIn = keyframes`
-  from { opacity: 0; transform: scale(0.94) translateY(-6px); }
-  to   { opacity: 1; transform: scale(1) translateY(0); }
-`
+import { backgroundThemes, colors, font, menuIn, radius } from '../design-system'
 
 export function FloatingMenu() {
   const [open, setOpen] = useState(false)

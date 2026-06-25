@@ -1,6 +1,5 @@
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, Stack, Typography } from '@mui/material'
-import { keyframes } from '@emotion/react'
 import { useMemo, useState } from 'react'
 import { LoadingState, ScrollablePage } from '../components/ui'
 import { NoteCard, NoteDetailDialog, type ReadableNote } from './CollectionPlayPage'
@@ -13,9 +12,7 @@ import {
   useCollectionTypesQuery,
   useToggleCollectionFavoriteMutation,
 } from '../hooks/useNotes'
-import { font } from '../design-system'
-
-const fadeIn = keyframes`from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); }`
+import { fadeIn, font } from '../design-system'
 
 export function FavoritasPage() {
   const { theme } = useBackground()

@@ -1,25 +1,7 @@
 import { Box, Stack, Typography } from '@mui/material'
-import { keyframes } from '@emotion/react'
 import { useState, useRef } from 'react'
-import { colors, font } from '../../design-system'
+import { cardIn, colors, font, overlayIn, slideL, slideR } from '../../design-system'
 import { Button } from './Button'
-
-const overlayIn = keyframes`
-  from { opacity: 0; }
-  to   { opacity: 1; }
-`
-const cardIn = keyframes`
-  from { opacity: 0; transform: translateY(20px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-`
-const slideR = keyframes`
-  from { opacity: 0; transform: translateX(22px); }
-  to   { opacity: 1; transform: translateX(0); }
-`
-const slideL = keyframes`
-  from { opacity: 0; transform: translateX(-22px); }
-  to   { opacity: 1; transform: translateX(0); }
-`
 
 const SLIDES = [
   {
