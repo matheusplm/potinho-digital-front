@@ -13,6 +13,7 @@ import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNone
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
 import BlockIcon from '@mui/icons-material/Block'
 import LogoutIcon from '@mui/icons-material/Logout'
+import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import { Box, Divider, Stack, Tooltip, Typography } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
@@ -430,6 +431,29 @@ export function DesktopLayout() {
             </Stack>
           </Box>
         )}
+
+        {/* My account */}
+        <Box sx={{ px: 2, pb: 0.5 }}>
+          <Stack
+            direction="row" spacing={1.1} alignItems="center"
+            onClick={() => navigate('/conta')}
+            sx={{
+              py: 0.8, px: 1, borderRadius: radius.md, cursor: 'pointer',
+              transition: 'background 0.12s',
+              '&:hover': { bgcolor: `${theme.accent}0c` },
+            }}
+          >
+            <Box sx={{
+              width: 28, height: 28, borderRadius: radius.sm, flexShrink: 0,
+              background: `${theme.accent}14`, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <ManageAccountsOutlinedIcon sx={{ fontSize: 14, color: theme.accent }} />
+            </Box>
+            <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: theme.textOnBg }}>
+              Minha conta
+            </Typography>
+          </Stack>
+        </Box>
 
         {/* Logout */}
         <Box sx={{ px: 2, pb: 2.5 }}>

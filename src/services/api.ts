@@ -220,7 +220,7 @@ export const api = {
   changeEmail: (newEmail: string, password: string) =>
     request<{ ok: boolean }>('/auth/change-email', { method: 'POST', body: JSON.stringify({ newEmail, password }) }),
   confirmEmailChange: (token: string) =>
-    request<{ ok: boolean }>('/auth/confirm-email-change', { method: 'POST', body: JSON.stringify({ token }) }),
+    request<{ ok: boolean; email?: string }>('/auth/confirm-email-change', { method: 'POST', body: JSON.stringify({ token }) }),
 
   listCollections: () => request<Collection[]>('/api/collections'),
   createCollection: (data: CollectionFormData) =>

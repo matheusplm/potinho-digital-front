@@ -25,6 +25,8 @@ export interface MockUser {
   id: string
   name: string
   email: string
+  pendingEmail?: string
+  username?: string
   password: string
   role: Role
   token: string
