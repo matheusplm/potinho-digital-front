@@ -2,7 +2,7 @@ import AddIcon from '@mui/icons-material/Add'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
 import { Box, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, TextField, Typography } from '@mui/material'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button, Card, ConfirmDeleteDialog, EmojiPickerInput, Input, toast } from '../../components/ui'
 import { useCollectionRaritiesQuery, useCreateCollectionRarityMutation, useDeleteCollectionRarityMutation, useImportCollectionRaritiesMutation, useUpdateCollectionRarityMutation } from '../../hooks/useNotes'
 import { useConfirmDelete } from '../../hooks/useConfirmDelete'
@@ -81,8 +81,14 @@ const RARITY_TEMPLATES: RarityConfig[] = [
 function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityConfig | null; onClose: () => void }) {
   const isNew = !rarity
   const { data: existingRarities = [] } = useCollectionRaritiesQuery(cid)
-  const [form, setForm] = useState<RarityConfig>(rarity ? { ...rarity } : { ...NEW_RARITY, order: existingRarities.length + 1 })
+  const [form, setForm] = useState<RarityConfig>(rarity ? { ...rarity } : { ...NEW_RARITY })
   const [appliedTemplateId, setAppliedTemplateId] = useState<string | null>(null)
+  const orderSet = useRef(!isNew)
+  useEffect(() => {
+    if (orderSet.current) return
+    orderSet.current = true
+    setForm((f) => ({ ...f, order: existingRarities.length + 1 }))
+  }, [existingRarities.length])
   const createMutation = useCreateCollectionRarityMutation(cid)
   const updateMutation = useUpdateCollectionRarityMutation(cid)
   const isPending = createMutation.isPending || updateMutation.isPending

@@ -19,6 +19,7 @@ export function BonusPackDialog({ pack, isRealReader, canOpen, block, opens, acc
   onOpen: (count?: number) => void
 }) {
   const [confirmAll, setConfirmAll] = useState(false)
+  const effectiveCount = pack?.cumulative ? accrued : opens
 
   useEffect(() => { if (!pack) setConfirmAll(false) }, [pack])
 
@@ -93,16 +94,16 @@ export function BonusPackDialog({ pack, isRealReader, canOpen, block, opens, acc
             </Box>
           </DialogContent>
           <DialogActions sx={{ px: 2, pb: 2, gap: 0.8, flexDirection: 'column' }}>
-            {opens > 1 && canOpen && !confirmAll && (
+            {effectiveCount > 1 && canOpen && !confirmAll && (
               <Button variant="primary" disabled={isOpeningPack} onClick={() => setConfirmAll(true)} sx={{ width: '100%', whiteSpace: 'nowrap' }}>
-                Abrir todos ({opens}x)
+                Abrir todos ({effectiveCount}x)
               </Button>
             )}
-            {opens > 1 && canOpen && confirmAll && (
+            {effectiveCount > 1 && canOpen && confirmAll && (
               <Stack direction="row" spacing={0.8} sx={{ width: '100%' }}>
                 <Button variant="ghost" onClick={() => setConfirmAll(false)} sx={{ flex: 1 }}>Cancelar</Button>
-                <Button variant="primary" disabled={isOpeningPack} onClick={() => { setConfirmAll(false); onOpen(opens) }} sx={{ flex: 1, whiteSpace: 'nowrap' }}>
-                  Confirmar ({opens}x)
+                <Button variant="primary" disabled={isOpeningPack} onClick={() => { setConfirmAll(false); onOpen(effectiveCount) }} sx={{ flex: 1, whiteSpace: 'nowrap' }}>
+                  Confirmar ({effectiveCount}x)
                 </Button>
               </Stack>
             )}
@@ -114,7 +115,7 @@ export function BonusPackDialog({ pack, isRealReader, canOpen, block, opens, acc
                 onClick={() => onOpen()}
                 sx={{ flex: 1, whiteSpace: 'nowrap' }}
               >
-                {block === 'cooldown' ? 'Em cooldown' : opens > 1 ? 'Abrir 1' : 'Abrir bônus'}
+                {block === 'cooldown' ? 'Em cooldown' : effectiveCount > 1 ? 'Abrir 1' : 'Abrir bônus'}
               </Button>
             </Stack>
           </DialogActions>

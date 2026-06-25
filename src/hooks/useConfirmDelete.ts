@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { toast } from '../components/ui'
 
 interface DeleteMutation {
-  mutate(id: string, options?: { onSuccess?: () => void; onError?: (e: Error) => void }): void
+  mutate(id: string, options?: { onSuccess?: () => void; onError?: (e: unknown) => void }): void
   isPending: boolean
 }
 
@@ -16,7 +16,7 @@ export function useConfirmDelete<T extends { id: string }>(
     if (!target) return
     mutation.mutate(target.id, {
       onSuccess: () => { toast.success(messages.success); setTarget(null) },
-      onError: (e) => toast.error(e.message || messages.error || 'Erro ao excluir.'),
+      onError: (e) => toast.error(e instanceof Error ? e.message : (messages.error || 'Erro ao excluir.')),
     })
   }
 

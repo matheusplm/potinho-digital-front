@@ -88,6 +88,7 @@ export function CollectionPlayPage() {
   }, [cid, isSimulating])
 
   const discoveredItems = useMemo(() => (play?.items ?? []).filter((item) => item.owned), [play?.items])
+  const undiscoveredItems = useMemo(() => (play?.items ?? []).filter((item) => !item.owned), [play?.items])
   const discoveredRarityIds = useMemo(() => new Set(discoveredItems.map((item) => item.rarity)), [discoveredItems])
   const discoveredTypeIds = useMemo(() => new Set(discoveredItems.map((item) => item.typeId)), [discoveredItems])
   const hasFavorites = useMemo(() => discoveredItems.some((item) => item.favorite), [discoveredItems])
@@ -197,18 +198,18 @@ export function CollectionPlayPage() {
               />
             )}
 
-            {!isSimulating && play.total > 0 && play.items.filter((n) => !n.owned).length > 0 && (
+            {!isSimulating && play.total > 0 && undiscoveredItems.length > 0 && (
               <Stack spacing={1}>
                 <Box>
                   <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 1.2, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
-                    Ainda por descobrir — {play.items.filter((n) => !n.owned).length}
+                    Ainda por descobrir — {undiscoveredItems.length}
                   </Typography>
                   <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted, mt: 0.3, fontStyle: 'italic' }}>
                     Continue abrindo pacotinhos para descobrir estas cartinhas 💌
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
-                  {play.items.filter((n) => !n.owned).map((note) => {
+                  {undiscoveredItems.map((note) => {
                     const r = rarities.find((x) => x.id === note.rarity)
                     return (
                       <Box key={note.id} sx={{ px: 1, py: 0.5, borderRadius: radius.full, background: 'rgba(255,255,255,0.08)', fontSize: '0.68rem', fontWeight: 700, color: theme.textOnBgMuted, display: 'flex', alignItems: 'center', gap: 0.4 }}>

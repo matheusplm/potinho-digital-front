@@ -59,6 +59,9 @@ export function AlbumSection({
   emptyHint: string
 }) {
   const order = useMemo(() => Object.fromEntries(rarities.map((r) => [r.id, r.order])), [rarities])
+  const rarityById = useMemo(() => new Map(rarities.map((r) => [r.id, r])), [rarities])
+  const typeById = useMemo(() => new Map(types.map((t) => [t.id, t])), [types])
+  const unreadSet = useMemo(() => new Set(unreadIds), [unreadIds])
   const sorted = useMemo(() => sortNotes(items, sort, order), [items, sort, order])
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
   const [filterSheetOpen, setFilterSheetOpen] = useState(false)
@@ -82,9 +85,9 @@ export function AlbumSection({
       <NoteCard
         key={note.id}
         note={note}
-        r={rarities.find((x) => x.id === note.rarity)}
-        t={types.find((x) => x.id === note.typeId)}
-        unread={unreadIds.includes(note.id)}
+        r={rarityById.get(note.rarity)}
+        t={typeById.get(note.typeId)}
+        unread={unreadSet.has(note.id)}
         variant={variant}
         onSelect={onSelect}
         onToggleFavorite={onToggleFavorite}

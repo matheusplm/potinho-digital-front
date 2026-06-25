@@ -261,13 +261,12 @@ export function SimulatedReaderHomePage() {
     : Math.min(1, Math.max(0, 1 - remainingMainPackMs / mainCooldownMs))
   const remainingLabel = formatRemainingTime(remainingMainPackMs)
 
+  const anyOnCooldown = !mainCanOpen || bonusPacks.some((pack) => bonusPackBlock(pack) === 'cooldown')
   useEffect(() => {
-    const mainOnCooldown = !mainCanOpen
-    const bonusOnCooldown = bonusPacks.some((pack) => bonusPackBlock(pack) === 'cooldown')
-    if (!mainOnCooldown && !bonusOnCooldown) return
+    if (!anyOnCooldown) return
     const interval = window.setInterval(() => setNow(Date.now()), 1000)
     return () => window.clearInterval(interval)
-  }, [mainCanOpen, bonusPacks, packCooldowns])
+  }, [anyOnCooldown])
 
   const selectedBonusPackBlock = selectedBonusPack ? bonusPackBlock(selectedBonusPack) : null
   const selectedBonusPackCanOpen = selectedBonusPack ? (isRealReader ? canOpenBonusPack(selectedBonusPack) : true) : false

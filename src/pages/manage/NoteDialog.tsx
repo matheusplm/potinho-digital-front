@@ -2,7 +2,7 @@ import { Box, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextFiel
 import { useEffect, useState } from 'react'
 import { Button, Input, toast } from '../../components/ui'
 import { ImagePicker } from '../../components/ImagePicker'
-import { RewardCard } from '../CollectionPlayPage'
+import { RewardCard } from '../../components/collection/RewardCard'
 import { useCreateCollectionNoteMutation, useUpdateCollectionNoteMutation } from '../../hooks/useNotes'
 import { colors, font, radius } from '../../design-system'
 import { gradientTextSx } from '../../utils/colorUtils'
