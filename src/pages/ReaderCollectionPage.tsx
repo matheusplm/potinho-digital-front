@@ -26,6 +26,7 @@ import { colors, font, radius } from '../design-system'
 import { slugify } from '../utils/slug'
 import { isCollectionOwner } from '../utils/collectionAccess'
 import { gradientTextSx } from '../utils/colorUtils'
+import { formatRemainingTime } from '../utils/packCooldowns'
 import { NoteDetailDialog } from './CollectionPlayPage'
 import { NoteCard, NoteRow } from './reader/NoteCard'
 import { PackOpensDialog } from './reader/PackOpensDialog'
@@ -93,9 +94,8 @@ export function ReaderCollectionPage() {
   const dailyPackLabel = useMemo(() => {
     if (!view?.daily) return '—'
     if (view.daily.canOpen) return '✓ disponível'
-    const nextAt = new Date(view.daily.availableAt)
-    const serverNow = new Date(view.daily.serverTime)
-    return nextAt.toDateString() === serverNow.toDateString() ? '⏳ aguardando' : '✓ aberto'
+    const remainingMs = Date.parse(view.daily.availableAt) - Date.parse(view.daily.serverTime)
+    return `⏳ ${formatRemainingTime(remainingMs)}`
   }, [view?.daily?.canOpen, view?.daily?.availableAt, view?.daily?.serverTime])
 
   const ownedRarities = useMemo(
