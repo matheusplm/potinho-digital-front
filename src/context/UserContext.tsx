@@ -7,6 +7,8 @@ export interface AuthUser {
   id: string
   name: string
   email?: string
+  username?: string
+  emailVerified?: boolean
   role: UserRole
   token: string
   refreshToken?: string
@@ -96,6 +98,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
             name: profile.name,
             role: profile.role as UserRole,
             email: profile.email,
+            username: profile.username,
+            emailVerified: profile.emailVerified,
             onboardingDone: profile.onboardingDone,
             token: current.token,
           }
