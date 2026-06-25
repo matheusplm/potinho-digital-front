@@ -96,7 +96,7 @@ export function ReaderCollectionPage() {
     const nextAt = new Date(view.daily.availableAt)
     const serverNow = new Date(view.daily.serverTime)
     return nextAt.toDateString() === serverNow.toDateString() ? '⏳ aguardando' : '✓ aberto'
-  }, [view?.daily])
+  }, [view?.daily?.canOpen, view?.daily?.availableAt, view?.daily?.serverTime])
 
   const ownedRarities = useMemo(
     () => rarities.filter((r) => ownedNotes.some((n) => n.rarity === r.id)).sort((a, b) => a.order - b.order),
