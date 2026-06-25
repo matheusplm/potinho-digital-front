@@ -186,8 +186,29 @@ const authHandlers = [
     const user = resolveUser(tokenFrom(request))
     if (!user) return HttpResponse.json({ message: 'Não autenticado.' }, { status: 401 })
     return HttpResponse.json({
-      id: user.id, name: user.name, role: inferMockRole(user),
+      id: user.id, name: user.name, role: inferMockRole(user), email: user.email, onboardingDone: true,
     })
+  }),
+
+  http.post('/auth/logout', async () => {
+    await delay(100)
+    return HttpResponse.json({ ok: true })
+  }),
+
+  http.post('/auth/refresh', async ({ request }) => {
+    await delay(200)
+    const { refreshToken } = (await request.json()) as { refreshToken?: string }
+    if (!refreshToken) return HttpResponse.json({ message: 'Token inválido.' }, { status: 401 })
+    const user = db.users.find((u) => u.token === refreshToken.replace('refresh-', ''))
+    if (!user) return HttpResponse.json({ message: 'Token inválido.' }, { status: 401 })
+    return HttpResponse.json({ token: user.token, refreshToken })
+  }),
+
+  http.patch('/auth/onboarding-done', async ({ request }) => {
+    await delay(120)
+    const user = resolveUser(tokenFrom(request))
+    if (!user) return HttpResponse.json({ message: 'Não autenticado.' }, { status: 401 })
+    return HttpResponse.json({ ok: true })
   }),
 ]
 
@@ -301,6 +322,43 @@ const collectionHandlers = [
     const email = decodeURIComponent(String(params.email))
     collection.access = collection.access.filter((item) => item.email !== email)
     return HttpResponse.json({ revoked: true })
+  }),
+
+  http.get('/api/collections/:cid/access/:email/view', async ({ params, request }) => {
+    await delay(260)
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
+    const email = decodeURIComponent(String(params.email))
+    const accessEntry = collection.access.find((a) => a.email === email)
+    if (!accessEntry) return notFound('Leitor não encontrado.')
+    const { ownership } = collection
+    const items = collection.notes.map((note) => {
+      const view = buildNoteView(note, ownership.owned, ownership.favorites, ownership.obtainedAt)
+      return { ...view, message: ownership.owned.has(note.id) ? note.message : '' }
+    })
+    return HttpResponse.json({
+      total: items.length,
+      owned: ownership.owned.size,
+      items,
+      daily: dailyStatus(collection.lastDailyOpenDate, new Date()),
+      packOpens: accessEntry.packOpens ?? {},
+    })
+  }),
+
+  http.patch('/api/collections/:cid/access/:email/packs', async ({ params, request }) => {
+    await delay(180)
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
+    const email = decodeURIComponent(String(params.email))
+    const access = collection.access.find((a) => a.email === email)
+    if (!access) return notFound('Acesso não encontrado.')
+    const { packId, opens } = (await request.json()) as { packId: string; opens: number }
+    if (!access.packOpens) access.packOpens = {}
+    if (opens <= 0) delete access.packOpens[packId]
+    else access.packOpens[packId] = (access.packOpens[packId] ?? 0) + opens
+    return HttpResponse.json(access)
   }),
 
   http.get('/api/collections/:cid/packs', async ({ params, request }) => {
@@ -469,6 +527,28 @@ const collectionHandlers = [
     return HttpResponse.json(record)
   }),
 
+  http.post('/api/collections/:cid/notes/import', async ({ params, request }) => {
+    await delay(350)
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
+    const { json } = (await request.json()) as { json: string }
+    let parsed: NoteFormData[]
+    try { parsed = JSON.parse(json) as NoteFormData[] } catch { return HttpResponse.json({ message: 'JSON inválido.' }, { status: 400 }) }
+    if (!Array.isArray(parsed)) return HttpResponse.json({ message: 'JSON inválido.' }, { status: 400 })
+    const now = new Date().toISOString()
+    const existingTitles = new Set(collection.notes.map((n) => n.title))
+    const created: typeof collection.notes = []
+    for (const data of parsed) {
+      if (existingTitles.has(data.title)) continue
+      const record = { id: nextId('note'), ...data, createdAt: now }
+      collection.notes.push(record)
+      created.push(record)
+      existingTitles.add(data.title)
+    }
+    return HttpResponse.json({ created: created.length, skipped: parsed.length - created.length, items: created })
+  }),
+
   http.put('/api/collections/:cid/notes/:id', async ({ params, request }) => {
     await delay(220)
     const auth = authorizeCollection(request, String(params.cid), 'owner')
@@ -497,6 +577,28 @@ const collectionHandlers = [
     if (!auth.ok) return auth.response
     const { collection } = auth
     return HttpResponse.json(collection.rarities)
+  }),
+
+  http.post('/api/collections/:cid/rarities/import', async ({ params, request }) => {
+    await delay(320)
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
+    const { json } = (await request.json()) as { json: string }
+    let parsed: RarityConfig[]
+    try { parsed = JSON.parse(json) as RarityConfig[] } catch { return HttpResponse.json({ message: 'JSON inválido.' }, { status: 400 }) }
+    if (!Array.isArray(parsed)) return HttpResponse.json({ message: 'JSON inválido.' }, { status: 400 })
+    const now = new Date().toISOString()
+    const existingIds = new Set(collection.rarities.map((r) => r.id))
+    const created: RarityConfig[] = []
+    for (const data of parsed) {
+      if (existingIds.has(data.id)) continue
+      const rarity = { ...data, createdAt: now }
+      collection.rarities.push(rarity)
+      created.push(rarity)
+      existingIds.add(data.id)
+    }
+    return HttpResponse.json({ created: created.length, skipped: parsed.length - created.length, items: created })
   }),
 
   http.post('/api/collections/:cid/rarities', async ({ params, request }) => {
@@ -536,6 +638,28 @@ const collectionHandlers = [
     if (!auth.ok) return auth.response
     const { collection } = auth
     return HttpResponse.json(collection.types)
+  }),
+
+  http.post('/api/collections/:cid/types/import', async ({ params, request }) => {
+    await delay(320)
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
+    const { json } = (await request.json()) as { json: string }
+    let parsed: NoteTypeConfig[]
+    try { parsed = JSON.parse(json) as NoteTypeConfig[] } catch { return HttpResponse.json({ message: 'JSON inválido.' }, { status: 400 }) }
+    if (!Array.isArray(parsed)) return HttpResponse.json({ message: 'JSON inválido.' }, { status: 400 })
+    const now = new Date().toISOString()
+    const existingIds = new Set(collection.types.map((t) => t.id))
+    const created: NoteTypeConfig[] = []
+    for (const data of parsed) {
+      if (existingIds.has(data.id)) continue
+      const type = { ...data, createdAt: now }
+      collection.types.push(type)
+      created.push(type)
+      existingIds.add(data.id)
+    }
+    return HttpResponse.json({ created: created.length, skipped: parsed.length - created.length, items: created })
   }),
 
   http.post('/api/collections/:cid/types', async ({ params, request }) => {
@@ -686,6 +810,16 @@ const collectionHandlers = [
     const { collection } = auth
     collection.achievements = collection.achievements.filter((a) => a.id !== params.id)
     return HttpResponse.json({ deleted: true })
+  }),
+
+  http.post('/api/push/subscribe', async () => {
+    await delay(120)
+    return HttpResponse.json({ success: true })
+  }),
+
+  http.delete('/api/push/unsubscribe', async () => {
+    await delay(120)
+    return HttpResponse.json({ success: true })
   }),
 ]
 
