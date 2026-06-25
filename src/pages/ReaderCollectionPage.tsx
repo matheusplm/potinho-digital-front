@@ -90,6 +90,14 @@ export function ReaderCollectionPage() {
   const completion = view && view.total > 0 ? Math.round((view.owned / view.total) * 100) : 0
   const favCount = useMemo(() => ownedNotes.filter((n) => n.favorite).length, [ownedNotes])
 
+  const dailyPackLabel = useMemo(() => {
+    if (!view?.daily) return '—'
+    if (view.daily.canOpen) return '✓ disponível'
+    const nextAt = new Date(view.daily.availableAt)
+    const serverNow = new Date(view.daily.serverTime)
+    return nextAt.toDateString() === serverNow.toDateString() ? '⏳ aguardando' : '✓ aberto'
+  }, [view?.daily])
+
   const ownedRarities = useMemo(
     () => rarities.filter((r) => ownedNotes.some((n) => n.rarity === r.id)).sort((a, b) => a.order - b.order),
     [ownedNotes, rarities],
@@ -192,7 +200,7 @@ export function ReaderCollectionPage() {
                   { label: 'coletados', value: `${view.owned}/${view.total}` },
                   { label: 'conclusão', value: `${completion}%` },
                   { label: 'favoritas', value: favCount },
-                  { label: 'pacote hoje', value: view.daily.canOpen ? '✓ disponível' : '⏳ aberto' },
+                  { label: 'pacote hoje', value: dailyPackLabel },
                 ].map((s) => (
                   <Box key={s.label} sx={{ p: 1.2, borderRadius: radius.lg, background: 'rgba(0,0,0,0.03)', border: `1px solid ${colors.border.subtle}`, textAlign: 'center' }}>
                     <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.1rem', color: colors.text.primary }}>
