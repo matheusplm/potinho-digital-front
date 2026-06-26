@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ApiRequestError } from '../services/api'
 
 function fmtSec(s: number): string {
@@ -11,16 +11,23 @@ function fmtSec(s: number): string {
 
 export function useRetryAfter() {
   const [remaining, setRemaining] = useState(0)
+  const [epoch, setEpoch] = useState(0)
+  const remainingRef = useRef(0)
+  remainingRef.current = remaining
 
   useEffect(() => {
     if (remaining <= 0) return
-    const id = setInterval(() => setRemaining((r) => (r > 1 ? r - 1 : 0)), 1000)
+    const id = setInterval(() => {
+      if (remainingRef.current <= 0) { clearInterval(id); return }
+      setRemaining((r) => (r > 1 ? r - 1 : 0))
+    }, 1000)
     return () => clearInterval(id)
-  }, [remaining > 0])
+  }, [epoch])
 
   function captureFromError(err: unknown) {
     if (err instanceof ApiRequestError && err.retryAfterSec && err.retryAfterSec > 0) {
       setRemaining(err.retryAfterSec)
+      setEpoch((e) => e + 1)
     }
   }
 

@@ -193,6 +193,16 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
   return json as T
 }
 
+async function requestRaw(url: string): Promise<string> {
+  const headers: Record<string, string> = {
+    ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+    ...(API_SECRET ? { 'x-api-key': API_SECRET } : {}),
+  }
+  const response = await fetch(`${BASE_URL}${url}`, { headers })
+  if (!response.ok) throw new Error(`HTTP ${response.status}`)
+  return response.text()
+}
+
 export const api = {
   login: (email: string, password: string, captchaToken: string) =>
     request<{ token: string; refreshToken: string; user: { id: string; name: string; role: string; email: string; onboardingDone: boolean | null } }>('/auth/login', {
@@ -243,6 +253,8 @@ export const api = {
     request<{ ok: boolean }>(`/api/collections/${cid}/access/${encodeURIComponent(email)}/invite`, { method: 'POST' }),
   getMailLogs: () =>
     request<MailLogEntry[]>('/api/mail/logs'),
+  getEmailPreview: (type: string) =>
+    requestRaw(`/api/mail/preview?type=${encodeURIComponent(type)}`),
   getReaderView: (cid: string, email: string) =>
     request<CollectionPlayView>(`/api/collections/${cid}/access/${encodeURIComponent(email)}/view`),
   addPackOpens: (cid: string, email: string, packId: string, opens: number) =>

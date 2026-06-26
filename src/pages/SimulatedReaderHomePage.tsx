@@ -275,33 +275,20 @@ export function SimulatedReaderHomePage() {
       setIsOpeningPack(true)
       const startedAt = Date.now()
       try {
+        if (isMain && !mainPack) {
+          toast.error('Nenhum pacotinho diário configurado.')
+          return
+        }
         let rewards: CollectionDailyReward[]
-        if (isMain) {
-          if (!mainPack) {
-            toast.error('Nenhum pacotinho diário configurado.')
-            return
-          }
-          const result = await openPackMutation.mutateAsync({ packId: mainPack.id, count })
-          await queryClient.invalidateQueries({ queryKey: ['col-play', cid] })
-          const mainAvailableAt = result.status.availableAt
-            || new Date(Date.now() + Math.max(1, mainPack.cooldownHours ?? 24) * 3_600_000).toISOString()
-          setPackCooldowns((current) => result.status.canOpen
-            ? current
-            : { ...current, [mainPack.id]: mainAvailableAt })
-          if ((result.status.availableCount ?? 0) > 1) {
-            setPackAvailableCounts((c) => ({ ...c, [mainPack.id]: result.status.availableCount! }))
-          } else {
-            setPackAvailableCounts((c) => { const n = { ...c }; delete n[mainPack.id]; return n })
-          }
-          rewards = result.rewards
-        } else {
+        {
           const result = await openPackMutation.mutateAsync({ packId: pack.id, count })
           await queryClient.invalidateQueries({ queryKey: ['col-play', cid] })
-          const bonusAvailableAt = result.status.availableAt
+          await queryClient.invalidateQueries({ queryKey: ['col-pack-statuses', cid] })
+          const availableAt = result.status.availableAt
             || new Date(Date.now() + Math.max(1, pack.cooldownHours ?? 24) * 3_600_000).toISOString()
           setPackCooldowns((current) => result.status.canOpen
             ? current
-            : { ...current, [pack.id]: bonusAvailableAt })
+            : { ...current, [pack.id]: availableAt })
           if ((result.status.availableCount ?? 0) > 1) {
             setPackAvailableCounts((c) => ({ ...c, [pack.id]: result.status.availableCount! }))
           } else {
