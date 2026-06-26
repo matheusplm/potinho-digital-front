@@ -317,43 +317,65 @@ interface InviteRowProps {
 }
 
 function InviteRow({ invite, effectiveStatus: status, isMutating, onResend, onCancel, hideActions }: InviteRowProps) {
+  const [confirmOpen, setConfirmOpen] = useState(false)
   const statusColor = STATUS_COLOR[status]
   const statusLabel = STATUS_LABEL[status]
   return (
-    <Card sx={{ p: 1.8 }}>
-      <Stack direction="row" alignItems="center" spacing={1.5}>
-        <Box sx={{ width: 36, height: 36, borderRadius: radius.md, background: `${statusColor}22`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-          <Typography sx={{ fontFamily: font.serif, fontWeight: 700, color: statusColor, fontSize: '0.9rem' }}>
-            {invite.email[0].toUpperCase()}
+    <>
+      <Card sx={{ p: 1.8 }}>
+        <Stack direction="row" alignItems="center" spacing={1.5}>
+          <Box sx={{ width: 36, height: 36, borderRadius: radius.md, background: `${statusColor}22`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, color: statusColor, fontSize: '0.9rem' }}>
+              {invite.email[0].toUpperCase()}
+            </Typography>
+          </Box>
+          <Typography sx={{ flex: 1, fontSize: '0.84rem', color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {invite.email}
           </Typography>
-        </Box>
-        <Typography sx={{ flex: 1, fontSize: '0.84rem', color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {invite.email}
-        </Typography>
-        <Chip
-          label={statusLabel}
-          size="small"
-          sx={{ height: 22, fontSize: '0.68rem', fontWeight: 800, color: statusColor, background: `${statusColor}18`, borderRadius: radius.full, flexShrink: 0 }}
-        />
-        {!hideActions && (
-          <>
-            <Tooltip title="Reenviar convite" placement="top" arrow enterTouchDelay={0}>
-              <span>
-                <IconButton size="small" aria-label="reenviar convite" disabled={isMutating} onClick={onResend} sx={{ ...actionButtonSx('neutral'), flexShrink: 0 }}>
-                  <ReplayIcon sx={{ fontSize: 16 }} />
-                </IconButton>
-              </span>
-            </Tooltip>
-            <Tooltip title="Cancelar convite" placement="top" arrow enterTouchDelay={0}>
-              <span>
-                <IconButton size="small" aria-label="cancelar convite" disabled={isMutating} onClick={onCancel} sx={{ ...actionButtonSx('neutral'), flexShrink: 0 }}>
-                  <CancelOutlinedIcon sx={{ fontSize: 16 }} />
-                </IconButton>
-              </span>
-            </Tooltip>
-          </>
-        )}
-      </Stack>
-    </Card>
+          <Chip
+            label={statusLabel}
+            size="small"
+            sx={{ height: 22, fontSize: '0.68rem', fontWeight: 800, color: statusColor, background: `${statusColor}18`, borderRadius: radius.full, flexShrink: 0 }}
+          />
+          {!hideActions && (
+            <>
+              <Tooltip title="Reenviar convite" placement="top" arrow enterTouchDelay={0}>
+                <span>
+                  <IconButton size="small" aria-label="reenviar convite" disabled={isMutating} onClick={onResend} sx={{ ...actionButtonSx('primary'), flexShrink: 0 }}>
+                    <ReplayIcon sx={{ fontSize: 16 }} />
+                  </IconButton>
+                </span>
+              </Tooltip>
+              <Tooltip title="Cancelar convite" placement="top" arrow enterTouchDelay={0}>
+                <span>
+                  <IconButton size="small" aria-label="cancelar convite" disabled={isMutating} onClick={() => setConfirmOpen(true)} sx={{ ...actionButtonSx('danger'), flexShrink: 0 }}>
+                    <CancelOutlinedIcon sx={{ fontSize: 16 }} />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </>
+          )}
+        </Stack>
+      </Card>
+
+      <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)} maxWidth="xs" fullWidth slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2 } } }}>
+        <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, pb: 0.5 }}>
+          Cancelar convite?
+        </DialogTitle>
+        <DialogContent>
+          <Typography sx={{ fontSize: '0.85rem', color: colors.text.secondary, lineHeight: 1.6 }}>
+            O convite enviado para <strong>{invite.email}</strong> será cancelado e o link ficará inválido.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
+          <Button variant="ghost" onClick={() => setConfirmOpen(false)} sx={{ flex: 1, fontSize: '0.82rem' }}>
+            Manter
+          </Button>
+          <Button variant="primary" onClick={() => { setConfirmOpen(false); onCancel() }} sx={{ flex: 1, fontSize: '0.82rem', background: colors.rose.main, '&:hover': { background: '#be123c' } }}>
+            Cancelar convite
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   )
 }
