@@ -5,8 +5,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { useCaptcha } from '../context/CaptchaContext'
 import { api, ApiRequestError } from '../services/api'
-import { Button, Input, toast } from '../components/ui'
-import { CaptchaStatus } from '../components/ui/CaptchaStatus'
+import { Button, Input, TurnstileWidget, toast } from '../components/ui'
 import { ScrollHint } from '../components/ui/ScrollHint'
 import { fadeSlide, floatHeart, font } from '../design-system'
 
@@ -107,7 +106,7 @@ export function LoginPage() {
                 </Link>
               </Typography>
             </Box>
-            <CaptchaStatus status={captchaStatus} onRetry={retryCaptcha} />
+            <TurnstileWidget status={captchaStatus} onRetry={retryCaptcha} />
             <Button variant="primary" type="submit" fullWidth loading={loading} disabled={!captchaToken} sx={{ mt: 0.5 }}>
               Entrar
             </Button>

@@ -4,12 +4,13 @@ import { useRef, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { api } from '../services/api'
 import { useCaptcha } from '../context/CaptchaContext'
-import { Button, Input, toast } from '../components/ui'
-import { CaptchaStatus } from '../components/ui/CaptchaStatus'
+import { Button, Input, TurnstileWidget, toast } from '../components/ui'
 import { ScrollHint } from '../components/ui/ScrollHint'
 import { fadeSlide, floatHeart, font } from '../design-system'
 
-type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken'
+type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid'
+
+const USERNAME_RE = /^[a-z0-9_]+$/
 
 const HEARTS = [
   { size: 18, left: '11%', delay: '0s',   dur: '13s' },
@@ -32,10 +33,11 @@ export function RegisterPage() {
     setForm((f) => ({ ...f, [field]: e.target.value }))
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
+    const value = e.target.value.toLowerCase()
     setForm((f) => ({ ...f, username: value }))
     if (usernameTimer.current) clearTimeout(usernameTimer.current)
     if (!value.trim()) { setUsernameStatus('idle'); return }
+    if (!USERNAME_RE.test(value) || value.length < 3) { setUsernameStatus('invalid'); return }
     setUsernameStatus('checking')
     usernameTimer.current = setTimeout(async () => {
       try {
@@ -44,7 +46,7 @@ export function RegisterPage() {
       } catch {
         setUsernameStatus('idle')
       }
-    }, 500)
+    }, 700)
   }
 
   const passwordError = passwordTouched && form.password.length < 6
@@ -52,7 +54,7 @@ export function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (usernameStatus === 'taken') return
+    if (usernameStatus === 'taken' || usernameStatus === 'invalid') return
     if (form.password.length < 6) { setPasswordTouched(true); return }
     if (form.confirm !== form.password) { setConfirmTouched(true); return }
     const t = consumeCaptcha()
@@ -75,12 +77,13 @@ export function RegisterPage() {
     if (usernameStatus === 'checking') return ''
     if (usernameStatus === 'available') return '✓ disponível'
     if (usernameStatus === 'taken') return 'já está em uso'
+    if (usernameStatus === 'invalid') return 'Apenas letras minúsculas, números e _ (mín. 3 caracteres)'
     return 'Identificador único. Pode ser definido depois.'
   }
 
   const usernameHelperColor = () => {
     if (usernameStatus === 'available') return '#22c55e'
-    if (usernameStatus === 'taken') return '#e11d48'
+    if (usernameStatus === 'taken' || usernameStatus === 'invalid') return '#e11d48'
     return 'rgba(30,58,95,0.45)'
   }
 
@@ -133,7 +136,7 @@ export function RegisterPage() {
                   placeholder="@meunome"
                   fullWidth
                   inputProps={{ maxLength: 30 }}
-                  error={usernameStatus === 'taken'}
+                  error={usernameStatus === 'taken' || usernameStatus === 'invalid'}
                   InputProps={usernameStatus === 'checking' ? {
                     endAdornment: <CircularProgress size={14} sx={{ color: 'rgba(30,58,95,0.35)', mr: 0.5 }} />,
                   } : undefined}
@@ -156,10 +159,10 @@ export function RegisterPage() {
                 error={confirmError}
                 helperText={confirmError ? 'As senhas não coincidem' : undefined}
               />
-              <CaptchaStatus status={captchaStatus} onRetry={retryCaptcha} />
+              <TurnstileWidget status={captchaStatus} onRetry={retryCaptcha} />
               <Button
                 variant="primary" type="submit" fullWidth loading={loading}
-                disabled={!captchaToken || usernameStatus === 'taken' || usernameStatus === 'checking'}
+                disabled={!captchaToken || usernameStatus === 'taken' || usernameStatus === 'checking' || usernameStatus === 'invalid'}
                 sx={{ mt: 0.5 }}
               >
                 Criar conta

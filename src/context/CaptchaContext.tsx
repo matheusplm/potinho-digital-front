@@ -21,11 +21,11 @@ export function CaptchaProvider({ children }: { children: React.ReactNode }) {
   const widgetRef = useRef<TurnstileInstance>(null)
 
   useEffect(() => {
-    if (!SITE_KEY) {
+    if (!SITE_KEY && token === null) {
       setToken('bypass')
       setStatus('verified')
     }
-  }, [])
+  }, [token])
 
   const consume = useCallback((): string | null => {
     const t = token

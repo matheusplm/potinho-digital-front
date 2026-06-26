@@ -7,8 +7,7 @@ import { Link } from 'react-router-dom'
 import { api } from '../services/api'
 import { useCaptcha } from '../context/CaptchaContext'
 import { useRetryAfter } from '../hooks/useRetryAfter'
-import { Button, Input } from '../components/ui'
-import { CaptchaStatus } from '../components/ui/CaptchaStatus'
+import { Button, Input, TurnstileWidget } from '../components/ui'
 import { fadeSlide, floatHeart, font } from '../design-system'
 
 const HEARTS = [
@@ -92,7 +91,7 @@ export function ForgotPasswordPage() {
             <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
               <Stack spacing={2}>
                 <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" fullWidth required />
-                <CaptchaStatus status={captchaStatus} onRetry={retryCaptcha} />
+                <TurnstileWidget status={captchaStatus} onRetry={retryCaptcha} />
                 <Button variant="primary" type="submit" fullWidth loading={loading} disabled={!email.trim() || !captchaToken || retry.blocked}>
                   {retry.blocked ? `Aguarde ${retry.label}` : 'Enviar link'}
                 </Button>
