@@ -9,7 +9,7 @@ import LinkedInIcon from '@mui/icons-material/LinkedIn'
 import InstagramIcon from '@mui/icons-material/Instagram'
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
 import { Box, Chip, IconButton, Stack, Tooltip, Typography, useMediaQuery } from '@mui/material'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, ScrollHint } from '../components/ui'
 import { backgroundThemes, colors, fadeInHero, fadeInRight, floatHeartLanding, font, radius } from '../design-system'
@@ -19,26 +19,49 @@ import { DemoNoteCard } from './landing/DemoNoteCard'
 import { HeroCardStack } from './landing/HeroCardStack'
 
 const LANDING_HEARTS = [
-  { size: 34, left: '4%',   delay: '0s',    dur: '18s', color: '#1d4ed8', blur: '1px'   },
-  { size: 13, left: '11%',  delay: '2.5s',  dur: '12s', color: '#e11d48', blur: '0px'   },
-  { size: 22, left: '19%',  delay: '6s',    dur: '16s', color: '#7c3aed', blur: '0.5px' },
-  { size: 10, left: '28%',  delay: '1s',    dur: '10s', color: '#db2777', blur: '0px'   },
-  { size: 18, left: '36%',  delay: '9s',    dur: '14s', color: '#1d4ed8', blur: '0.5px' },
-  { size: 28, left: '46%',  delay: '4s',    dur: '17s', color: '#e11d48', blur: '1.5px' },
-  { size: 11, left: '55%',  delay: '7s',    dur: '11s', color: '#7c3aed', blur: '0px'   },
-  { size: 20, left: '63%',  delay: '0.5s',  dur: '15s', color: '#0ea5e9', blur: '0.5px' },
-  { size: 15, left: '72%',  delay: '11s',   dur: '13s', color: '#db2777', blur: '0px'   },
-  { size: 30, left: '80%',  delay: '3s',    dur: '19s', color: '#1d4ed8', blur: '1.5px' },
-  { size: 10, left: '89%',  delay: '5.5s',  dur: '9s',  color: '#e11d48', blur: '0px'   },
-  { size: 24, left: '15%',  delay: '13s',   dur: '14s', color: '#0ea5e9', blur: '1px'   },
-  { size: 16, left: '33%',  delay: '15s',   dur: '16s', color: '#7c3aed', blur: '0.5px' },
-  { size: 12, left: '58%',  delay: '17s',   dur: '12s', color: '#db2777', blur: '0px'   },
+  { size: 34, left: '4%',   delay: '0s',    dur: '18s', color: '#1d4ed8', blur: '1px',   bottom: '-12px' },
+  { size: 13, left: '11%',  delay: '0s',    dur: '12s', color: '#e11d48', blur: '0px',   bottom: '42vh'  },
+  { size: 22, left: '19%',  delay: '6s',    dur: '16s', color: '#7c3aed', blur: '0.5px', bottom: '-12px' },
+  { size: 10, left: '28%',  delay: '0s',    dur: '10s', color: '#db2777', blur: '0px',   bottom: '28vh'  },
+  { size: 18, left: '36%',  delay: '9s',    dur: '14s', color: '#1d4ed8', blur: '0.5px', bottom: '-12px' },
+  { size: 28, left: '46%',  delay: '0s',    dur: '17s', color: '#e11d48', blur: '1.5px', bottom: '58vh'  },
+  { size: 11, left: '55%',  delay: '7s',    dur: '11s', color: '#7c3aed', blur: '0px',   bottom: '-12px' },
+  { size: 20, left: '63%',  delay: '0s',    dur: '15s', color: '#0ea5e9', blur: '0.5px', bottom: '20vh'  },
+  { size: 15, left: '72%',  delay: '11s',   dur: '13s', color: '#db2777', blur: '0px',   bottom: '-12px' },
+  { size: 30, left: '80%',  delay: '0s',    dur: '19s', color: '#1d4ed8', blur: '1.5px', bottom: '38vh'  },
+  { size: 10, left: '89%',  delay: '5.5s',  dur: '9s',  color: '#e11d48', blur: '0px',   bottom: '-12px' },
+  { size: 24, left: '15%',  delay: '0s',    dur: '14s', color: '#0ea5e9', blur: '1px',   bottom: '65vh'  },
+  { size: 16, left: '33%',  delay: '15s',   dur: '16s', color: '#7c3aed', blur: '0.5px', bottom: '-12px' },
+  { size: 12, left: '58%',  delay: '0s',    dur: '12s', color: '#db2777', blur: '0px',   bottom: '48vh'  },
 ]
 
 export function LandingPage() {
   const navigate = useNavigate()
   const isDesktop = useMediaQuery('(min-width: 900px)', { noSsr: true })
   const [activeRarity, setActiveRarity] = useState('Todos')
+
+  const blobTopRef = useRef<HTMLElement>(null)
+  const blobBotRef = useRef<HTMLElement>(null)
+  const parallaxTextRef = useRef<HTMLElement>(null)
+  const parallaxCardRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    if (!isDesktop) return
+    const onMove = (e: MouseEvent) => {
+      const x = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2)
+      const y = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2)
+      if (blobTopRef.current)
+        blobTopRef.current.style.transform = `translate(${x * -26}px, ${y * -18}px)`
+      if (blobBotRef.current)
+        blobBotRef.current.style.transform = `translate(${x * -14}px, ${y * -10}px)`
+      if (parallaxTextRef.current)
+        parallaxTextRef.current.style.transform = `translate(${x * -9}px, ${y * -6}px)`
+      if (parallaxCardRef.current)
+        parallaxCardRef.current.style.transform = `translate(${x * 18}px, ${y * 12}px)`
+    }
+    window.addEventListener('mousemove', onMove)
+    return () => window.removeEventListener('mousemove', onMove)
+  }, [isDesktop])
 
   const visibleNotes = activeRarity === 'Todos' ? DEMO_NOTES : DEMO_NOTES.filter((n) => n.rarity === activeRarity)
 
@@ -49,13 +72,13 @@ export function LandingPage() {
       overflowX: 'hidden', overflowY: 'auto', position: 'relative',
     }}>
       <Box sx={{ position: 'fixed', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}>
-        <Box sx={{ position: 'absolute', top: -100, right: -100, width: 420, height: 420, borderRadius: '50%', background: 'radial-gradient(circle,rgba(29,78,216,0.09) 0%,transparent 70%)' }} />
-        <Box sx={{ position: 'absolute', bottom: 80, left: -80, width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle,rgba(225,29,72,0.07) 0%,transparent 70%)' }} />
+        <Box ref={blobTopRef} sx={{ position: 'absolute', top: -100, right: -100, width: 420, height: 420, borderRadius: '50%', background: 'radial-gradient(circle,rgba(29,78,216,0.09) 0%,transparent 70%)', transition: 'transform 0.12s ease-out', willChange: 'transform' }} />
+        <Box ref={blobBotRef} sx={{ position: 'absolute', bottom: 80, left: -80, width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle,rgba(225,29,72,0.07) 0%,transparent 70%)', transition: 'transform 0.12s ease-out', willChange: 'transform' }} />
       </Box>
 
       {LANDING_HEARTS.map((h, i) => (
         <FavoriteIcon key={i} sx={{
-          position: 'fixed', bottom: -12, left: h.left,
+          position: 'fixed', bottom: h.bottom, left: h.left,
           fontSize: h.size, zIndex: 0, opacity: 0,
           color: h.color,
           filter: h.blur !== '0px'
@@ -103,6 +126,7 @@ export function LandingPage() {
         <Box sx={{ px: isDesktop ? 5 : 2.5, pt: isDesktop ? 8 : 5, pb: isDesktop ? 9 : 6, maxWidth: isDesktop ? 1200 : 480, mx: 'auto' }}>
           {isDesktop ? (
             <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, alignItems: 'center' }}>
+              <Box ref={parallaxTextRef} sx={{ transition: 'transform 0.14s ease-out', willChange: 'transform' }}>
               <Box sx={{ animation: `${fadeInHero} 0.6s ease both` }}>
                 <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.8, px: 1.4, py: 0.5, mb: 2.5, borderRadius: radius.full, background: 'rgba(29,78,216,0.08)', border: '1px solid rgba(29,78,216,0.18)' }}>
                   <AutoStoriesOutlinedIcon sx={{ fontSize: 13, color: colors.primary.main }} />
@@ -132,8 +156,11 @@ export function LandingPage() {
                   ✓ Gratuito &nbsp;·&nbsp; ✓ Sem cartão de crédito
                 </Typography>
               </Box>
+              </Box>
+              <Box ref={parallaxCardRef} sx={{ transition: 'transform 0.14s ease-out', willChange: 'transform' }}>
               <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', animation: `${fadeInRight} 0.7s 0.2s ease both` }}>
                 <HeroCardStack />
+              </Box>
               </Box>
             </Box>
           ) : (
