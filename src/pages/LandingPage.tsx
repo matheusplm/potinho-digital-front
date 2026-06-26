@@ -9,7 +9,7 @@ import LinkedInIcon from '@mui/icons-material/LinkedIn'
 import InstagramIcon from '@mui/icons-material/Instagram'
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
 import { Box, Chip, IconButton, Stack, Tooltip, Typography, useMediaQuery } from '@mui/material'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type FC } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, ScrollHint } from '../components/ui'
 import { backgroundThemes, colors, fadeInHero, fadeInRight, floatHeartLanding, font, radius } from '../design-system'
@@ -407,49 +407,7 @@ export function LandingPage() {
         </Box>
 
         {/* Themes */}
-        <Box sx={{ py: isDesktop ? 8 : 5, px: isDesktop ? 5 : 2.5, maxWidth: isDesktop ? 1200 : 480, mx: 'auto' }}>
-          <SectionTitle sub="O leitor escolhe o tema que mais combina com ele — do romântico e suave ao misterioso e sombrio.">
-            {`${backgroundThemes.length} temas visuais`}
-          </SectionTitle>
-          {isDesktop ? (
-            <Box sx={{ overflowX: 'auto', pt: 2.5, pb: 1, '&::-webkit-scrollbar': { display: 'none' } }}>
-              <Box sx={{ display: 'flex', gap: 1.5, width: 'max-content' }}>
-                {backgroundThemes.map((t) => (
-                  <Stack key={t.key} spacing={0.8} alignItems="center">
-                    <Box sx={{
-                      width: 64, height: 84, borderRadius: radius.xl, background: t.gradient,
-                      border: '1.5px solid rgba(255,255,255,0.65)', boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem',
-                      transition: 'transform 0.18s', '&:hover': { transform: 'translateY(-4px) scale(1.05)' }, cursor: 'default',
-                    }}>
-                      {t.emoji}
-                    </Box>
-                    <Typography sx={{ fontSize: '0.68rem', color: colors.text.secondary, fontWeight: 600, textAlign: 'center', whiteSpace: 'nowrap' }}>
-                      {t.label}
-                    </Typography>
-                  </Stack>
-                ))}
-              </Box>
-            </Box>
-          ) : (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.2, justifyContent: 'center' }}>
-              {backgroundThemes.map((t) => (
-                <Stack key={t.key} spacing={0.6} alignItems="center" sx={{ width: 58 }}>
-                  <Box sx={{
-                    width: 52, height: 68, borderRadius: radius.xl, background: t.gradient,
-                    border: '1.5px solid rgba(255,255,255,0.65)', boxShadow: '0 3px 12px rgba(0,0,0,0.1)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem',
-                  }}>
-                    {t.emoji}
-                  </Box>
-                  <Typography sx={{ fontSize: '0.62rem', color: colors.text.secondary, fontWeight: 600, textAlign: 'center', lineHeight: 1.2 }}>
-                    {t.label}
-                  </Typography>
-                </Stack>
-              ))}
-            </Box>
-          )}
-        </Box>
+        <ThemesSection isDesktop={isDesktop} />
 
         {/* For whom */}
         <Box sx={{ background: 'rgba(255,255,255,0.45)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(255,255,255,0.75)', borderBottom: '1px solid rgba(255,255,255,0.75)', py: isDesktop ? 7 : 5, px: isDesktop ? 5 : 2.5 }}>
@@ -588,6 +546,112 @@ export function LandingPage() {
 
       </Box>
       <ScrollHint />
+    </Box>
+  )
+}
+
+const ThemesSection: FC<{ isDesktop: boolean }> = ({ isDesktop }) => {
+  const [activeKey, setActiveKey] = useState('romance')
+  const active = backgroundThemes.find((t) => t.key === activeKey) ?? backgroundThemes[0]
+
+  return (
+    <Box sx={{ py: isDesktop ? 8 : 5, px: isDesktop ? 5 : 2.5, maxWidth: isDesktop ? 1200 : 480, mx: 'auto' }}>
+      <SectionTitle sub="O leitor escolhe o tema que mais combina com ele — do romântico e suave ao misterioso e sombrio.">
+        {`${backgroundThemes.length} temas visuais`}
+      </SectionTitle>
+
+      {isDesktop ? (
+        <Box sx={{ overflowX: 'auto', pt: 2.5, pb: 1, '&::-webkit-scrollbar': { display: 'none' } }}>
+          <Box sx={{ display: 'flex', gap: 1.5, width: 'max-content' }}>
+            {backgroundThemes.map((t) => {
+              const sel = t.key === activeKey
+              return (
+                <Stack key={t.key} spacing={0.8} alignItems="center" onClick={() => setActiveKey(t.key)} sx={{ cursor: 'pointer' }}>
+                  <Box sx={{
+                    width: 64, height: 84, borderRadius: radius.xl, background: t.gradient,
+                    border: sel ? `2.5px solid ${t.accent}` : '1.5px solid rgba(255,255,255,0.65)',
+                    boxShadow: sel ? `0 0 0 3px ${t.accent}44, 0 4px 16px rgba(0,0,0,0.12)` : '0 4px 16px rgba(0,0,0,0.1)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem',
+                    transform: sel ? 'translateY(-4px) scale(1.08)' : 'scale(1)',
+                    transition: 'transform 0.18s, box-shadow 0.18s, border 0.18s',
+                    '&:hover': { transform: sel ? 'translateY(-4px) scale(1.08)' : 'translateY(-4px) scale(1.05)' },
+                  }}>
+                    {t.emoji}
+                  </Box>
+                  <Typography sx={{ fontSize: '0.68rem', color: sel ? t.accent : colors.text.secondary, fontWeight: sel ? 700 : 600, textAlign: 'center', whiteSpace: 'nowrap', transition: 'color 0.18s' }}>
+                    {t.label}
+                  </Typography>
+                </Stack>
+              )
+            })}
+          </Box>
+        </Box>
+      ) : (
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.2, justifyContent: 'center', pt: 2 }}>
+          {backgroundThemes.map((t) => {
+            const sel = t.key === activeKey
+            return (
+              <Stack key={t.key} spacing={0.6} alignItems="center" sx={{ width: 58, cursor: 'pointer' }} onClick={() => setActiveKey(t.key)}>
+                <Box sx={{
+                  width: 52, height: 68, borderRadius: radius.xl, background: t.gradient,
+                  border: sel ? `2px solid ${t.accent}` : '1.5px solid rgba(255,255,255,0.65)',
+                  boxShadow: sel ? `0 0 0 2.5px ${t.accent}44, 0 3px 12px rgba(0,0,0,0.12)` : '0 3px 12px rgba(0,0,0,0.1)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem',
+                  transform: sel ? 'scale(1.1)' : 'scale(1)',
+                  transition: 'transform 0.18s, box-shadow 0.18s',
+                }}>
+                  {t.emoji}
+                </Box>
+                <Typography sx={{ fontSize: '0.62rem', color: sel ? t.accent : colors.text.secondary, fontWeight: sel ? 700 : 600, textAlign: 'center', lineHeight: 1.2, transition: 'color 0.18s' }}>
+                  {t.label}
+                </Typography>
+              </Stack>
+            )
+          })}
+        </Box>
+      )}
+
+      <Box sx={{
+        mt: 3, borderRadius: radius.xl, overflow: 'hidden',
+        background: active.gradient,
+        transition: 'background 0.4s ease',
+        boxShadow: `0 8px 32px rgba(0,0,0,0.18)`,
+      }}>
+        <Box sx={{ px: isDesktop ? 4 : 2.5, py: isDesktop ? 3.5 : 3 }}>
+          <Typography sx={{ fontSize: '0.78rem', color: active.textOnBgMuted, fontWeight: 500, mb: 0.2 }}>
+            Boa tarde,
+          </Typography>
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.6rem', color: active.textOnBg, lineHeight: 1.1, letterSpacing: '-0.5px', mb: 0.5 }}>
+            Maria 💙
+          </Typography>
+          <Typography sx={{ fontSize: '0.82rem', color: active.textOnBgMuted, fontStyle: 'italic', mb: 2.5 }}>
+            suas coleções estão esperando por você
+          </Typography>
+          <Box sx={{
+            background: active.surfaceBg, border: `1px solid ${active.surfaceBorder}`,
+            borderRadius: radius.lg, px: 2, py: 1.5,
+            display: 'flex', alignItems: 'center', gap: 1.5,
+          }}>
+            <Box sx={{ width: 36, height: 36, borderRadius: radius.md, background: `linear-gradient(135deg,${active.accent},${active.accent}88)`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '1rem' }}>
+              📦
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.9rem', color: active.isDark ? active.textOnBg : colors.text.primary, lineHeight: 1.2 }}>
+                Minhas coleções
+              </Typography>
+              <Typography sx={{ fontSize: '0.72rem', color: active.isDark ? active.textOnBgMuted : colors.text.secondary }}>
+                3 coleções criadas
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+        <Box sx={{ px: isDesktop ? 4 : 2.5, pb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ width: 6, height: 6, borderRadius: '50%', background: active.accent }} />
+          <Typography sx={{ fontSize: '0.7rem', color: active.textOnBgMuted, fontWeight: 600 }}>
+            Tema: {active.emoji} {active.label}
+          </Typography>
+        </Box>
+      </Box>
     </Box>
   )
 }
