@@ -51,8 +51,14 @@ export function AccessTab({ cid }: AccessTabProps) {
     [packs],
   )
 
-  const pendingInvites = useMemo(() => invites.filter((i) => i.status === 'pending'), [invites])
-  const rejectedInvites = useMemo(() => invites.filter((i) => i.status === 'rejected' || i.status === 'expired'), [invites])
+  function effectiveStatus(i: CollectionInvite): CollectionInvite['status'] {
+    if (i.status === 'pending' && new Date(i.expiresAt) < new Date()) return 'expired'
+    return i.status
+  }
+
+  const pendingInvites = useMemo(() => invites.filter((i) => effectiveStatus(i) === 'pending'), [invites])
+  const rejectedInvites = useMemo(() => invites.filter((i) => { const s = effectiveStatus(i); return s === 'rejected' || s === 'expired' }), [invites])
+  const acceptedInvites = useMemo(() => invites.filter((i) => effectiveStatus(i) === 'accepted'), [invites])
 
   async function handleInvite() {
     const email = emailInput.trim()
@@ -149,6 +155,7 @@ export function AccessTab({ cid }: AccessTabProps) {
               <InviteRow
                 key={invite.token}
                 invite={invite}
+                effectiveStatus={effectiveStatus(invite)}
                 isMutating={sendInviteMutation.isPending || cancelInviteMutation.isPending}
                 onResend={() => void handleResendInvite(invite.email)}
                 onCancel={() => void handleCancelInvite(invite.email)}
@@ -166,6 +173,7 @@ export function AccessTab({ cid }: AccessTabProps) {
               <InviteRow
                 key={invite.token}
                 invite={invite}
+                effectiveStatus={effectiveStatus(invite)}
                 isMutating={sendInviteMutation.isPending || cancelInviteMutation.isPending}
                 onResend={() => void handleResendInvite(invite.email)}
                 onCancel={() => void handleCancelInvite(invite.email)}
@@ -174,7 +182,26 @@ export function AccessTab({ cid }: AccessTabProps) {
           </Stack>
         )}
 
-        {!isLoading && accesses.length === 0 && pendingInvites.length === 0 && rejectedInvites.length === 0 && (
+        {!isLoading && acceptedInvites.length > 0 && (
+          <Stack spacing={1}>
+            <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.8, color: colors.text.muted, textTransform: 'uppercase', px: 0.5 }}>
+              Convites aceitos
+            </Typography>
+            {acceptedInvites.map((invite) => (
+              <InviteRow
+                key={invite.token}
+                invite={invite}
+                effectiveStatus={effectiveStatus(invite)}
+                isMutating={false}
+                onResend={() => void handleResendInvite(invite.email)}
+                onCancel={() => void handleCancelInvite(invite.email)}
+                hideActions
+              />
+            ))}
+          </Stack>
+        )}
+
+        {!isLoading && accesses.length === 0 && pendingInvites.length === 0 && rejectedInvites.length === 0 && acceptedInvites.length === 0 && (
           <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBgMuted, textAlign: 'center', py: 2 }}>
             Nenhum acesso ou convite ainda
           </Typography>
@@ -282,14 +309,16 @@ export function AccessTab({ cid }: AccessTabProps) {
 
 interface InviteRowProps {
   invite: CollectionInvite
+  effectiveStatus: CollectionInvite['status']
   isMutating: boolean
   onResend: () => void
   onCancel: () => void
+  hideActions?: boolean
 }
 
-function InviteRow({ invite, isMutating, onResend, onCancel }: InviteRowProps) {
-  const statusColor = STATUS_COLOR[invite.status]
-  const statusLabel = STATUS_LABEL[invite.status]
+function InviteRow({ invite, effectiveStatus: status, isMutating, onResend, onCancel, hideActions }: InviteRowProps) {
+  const statusColor = STATUS_COLOR[status]
+  const statusLabel = STATUS_LABEL[status]
   return (
     <Card sx={{ p: 1.8 }}>
       <Stack direction="row" alignItems="center" spacing={1.5}>
@@ -306,20 +335,24 @@ function InviteRow({ invite, isMutating, onResend, onCancel }: InviteRowProps) {
           size="small"
           sx={{ height: 22, fontSize: '0.68rem', fontWeight: 800, color: statusColor, background: `${statusColor}18`, borderRadius: radius.full, flexShrink: 0 }}
         />
-        <Tooltip title="Reenviar convite" placement="top" arrow enterTouchDelay={0}>
-          <span>
-            <IconButton size="small" aria-label="reenviar convite" disabled={isMutating} onClick={onResend} sx={{ ...actionButtonSx('neutral'), flexShrink: 0 }}>
-              <ReplayIcon sx={{ fontSize: 16 }} />
-            </IconButton>
-          </span>
-        </Tooltip>
-        <Tooltip title="Cancelar convite" placement="top" arrow enterTouchDelay={0}>
-          <span>
-            <IconButton size="small" aria-label="cancelar convite" disabled={isMutating} onClick={onCancel} sx={{ ...actionButtonSx('neutral'), flexShrink: 0 }}>
-              <CancelOutlinedIcon sx={{ fontSize: 16 }} />
-            </IconButton>
-          </span>
-        </Tooltip>
+        {!hideActions && (
+          <>
+            <Tooltip title="Reenviar convite" placement="top" arrow enterTouchDelay={0}>
+              <span>
+                <IconButton size="small" aria-label="reenviar convite" disabled={isMutating} onClick={onResend} sx={{ ...actionButtonSx('neutral'), flexShrink: 0 }}>
+                  <ReplayIcon sx={{ fontSize: 16 }} />
+                </IconButton>
+              </span>
+            </Tooltip>
+            <Tooltip title="Cancelar convite" placement="top" arrow enterTouchDelay={0}>
+              <span>
+                <IconButton size="small" aria-label="cancelar convite" disabled={isMutating} onClick={onCancel} sx={{ ...actionButtonSx('neutral'), flexShrink: 0 }}>
+                  <CancelOutlinedIcon sx={{ fontSize: 16 }} />
+                </IconButton>
+              </span>
+            </Tooltip>
+          </>
+        )}
       </Stack>
     </Card>
   )
