@@ -2,11 +2,14 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, CircularProgress, Stack, Typography } from '@mui/material'
 import { useRef, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { Turnstile } from '@marsidev/react-turnstile'
+import type { TurnstileInstance } from '@marsidev/react-turnstile'
 import { api } from '../services/api'
-import { useCaptcha } from '../context/CaptchaContext'
-import { Button, Input, TurnstileWidget, toast } from '../components/ui'
+import { Button, Input, toast } from '../components/ui'
 import { ScrollHint } from '../components/ui/ScrollHint'
 import { fadeSlide, floatHeart, font } from '../design-system'
+
+const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined
 
 type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid'
 
@@ -25,7 +28,8 @@ export function RegisterPage() {
   const [passwordTouched, setPasswordTouched] = useState(false)
   const [confirmTouched, setConfirmTouched] = useState(false)
   const [loading, setLoading] = useState(false)
-  const { token: captchaToken, status: captchaStatus, consume: consumeCaptcha, retry: retryCaptcha } = useCaptcha()
+  const [captchaToken, setCaptchaToken] = useState<string | null>(SITE_KEY ? null : 'bypass')
+  const widgetRef = useRef<TurnstileInstance>(null)
   const [usernameStatus, setUsernameStatus] = useState<UsernameStatus>('idle')
   const usernameTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -57,8 +61,10 @@ export function RegisterPage() {
     if (usernameStatus === 'taken' || usernameStatus === 'invalid') return
     if (form.password.length < 6) { setPasswordTouched(true); return }
     if (form.confirm !== form.password) { setConfirmTouched(true); return }
-    const t = consumeCaptcha()
+    const t = captchaToken
     if (!t) return
+    setCaptchaToken(null)
+    if (SITE_KEY) widgetRef.current?.reset()
     setLoading(true)
     try {
       const username = form.username.trim() || undefined
@@ -159,7 +165,16 @@ export function RegisterPage() {
                 error={confirmError}
                 helperText={confirmError ? 'As senhas não coincidem' : undefined}
               />
-              <TurnstileWidget status={captchaStatus} onRetry={retryCaptcha} />
+              {SITE_KEY && (
+                <Turnstile
+                  ref={widgetRef}
+                  siteKey={SITE_KEY}
+                  onSuccess={setCaptchaToken}
+                  onError={() => setCaptchaToken(null)}
+                  onExpire={() => setCaptchaToken(null)}
+                  options={{ size: 'normal', language: 'pt-BR' }}
+                />
+              )}
               <Button
                 variant="primary" type="submit" fullWidth loading={loading}
                 disabled={!captchaToken || usernameStatus === 'taken' || usernameStatus === 'checking' || usernameStatus === 'invalid'}

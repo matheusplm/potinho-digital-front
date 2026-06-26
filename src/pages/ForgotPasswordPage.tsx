@@ -2,13 +2,16 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import LockResetIcon from '@mui/icons-material/LockReset'
 import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead'
 import { Box, Stack, Typography } from '@mui/material'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { Turnstile } from '@marsidev/react-turnstile'
+import type { TurnstileInstance } from '@marsidev/react-turnstile'
 import { api } from '../services/api'
-import { useCaptcha } from '../context/CaptchaContext'
 import { useRetryAfter } from '../hooks/useRetryAfter'
-import { Button, Input, TurnstileWidget } from '../components/ui'
+import { Button, Input } from '../components/ui'
 import { fadeSlide, floatHeart, font } from '../design-system'
+
+const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined
 
 const HEARTS = [
   { size: 18, left: '9%',  delay: '0s',   dur: '14s' },
@@ -22,13 +25,16 @@ export function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
-  const { token: captchaToken, status: captchaStatus, consume: consumeCaptcha, retry: retryCaptcha } = useCaptcha()
+  const [captchaToken, setCaptchaToken] = useState<string | null>(SITE_KEY ? null : 'bypass')
+  const widgetRef = useRef<TurnstileInstance>(null)
   const retry = useRetryAfter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const t = consumeCaptcha()
+    const t = captchaToken
     if (!email.trim() || !t || retry.blocked) return
+    setCaptchaToken(null)
+    if (SITE_KEY) widgetRef.current?.reset()
     setError('')
     setLoading(true)
     try {
@@ -91,7 +97,16 @@ export function ForgotPasswordPage() {
             <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
               <Stack spacing={2}>
                 <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" fullWidth required />
-                <TurnstileWidget status={captchaStatus} onRetry={retryCaptcha} />
+                {SITE_KEY && (
+                  <Turnstile
+                    ref={widgetRef}
+                    siteKey={SITE_KEY}
+                    onSuccess={setCaptchaToken}
+                    onError={() => setCaptchaToken(null)}
+                    onExpire={() => setCaptchaToken(null)}
+                    options={{ size: 'normal', language: 'pt-BR' }}
+                  />
+                )}
                 <Button variant="primary" type="submit" fullWidth loading={loading} disabled={!email.trim() || !captchaToken || retry.blocked}>
                   {retry.blocked ? `Aguarde ${retry.label}` : 'Enviar link'}
                 </Button>

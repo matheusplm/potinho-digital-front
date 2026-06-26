@@ -1,13 +1,16 @@
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, Stack, Typography } from '@mui/material'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Turnstile } from '@marsidev/react-turnstile'
+import type { TurnstileInstance } from '@marsidev/react-turnstile'
 import { useUser } from '../context/UserContext'
-import { useCaptcha } from '../context/CaptchaContext'
 import { api, ApiRequestError } from '../services/api'
-import { Button, Input, TurnstileWidget, toast } from '../components/ui'
+import { Button, Input, toast } from '../components/ui'
 import { ScrollHint } from '../components/ui/ScrollHint'
 import { fadeSlide, floatHeart, font } from '../design-system'
+
+const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined
 
 const HEARTS = [
   { size: 20, left: '7%',  delay: '0s',    dur: '12s' },
@@ -22,7 +25,8 @@ export function LoginPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const fromPath = searchParams.get('from')
-  const { token: captchaToken, status: captchaStatus, consume: consumeCaptcha, retry: retryCaptcha } = useCaptcha()
+  const [captchaToken, setCaptchaToken] = useState<string | null>(SITE_KEY ? null : 'bypass')
+  const widgetRef = useRef<TurnstileInstance>(null)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -31,8 +35,10 @@ export function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const t = consumeCaptcha()
+    const t = captchaToken
     if (!t) return
+    setCaptchaToken(null)
+    if (SITE_KEY) widgetRef.current?.reset()
     setError('')
     setNotVerified(false)
     setLoading(true)
@@ -106,7 +112,16 @@ export function LoginPage() {
                 </Link>
               </Typography>
             </Box>
-            <TurnstileWidget status={captchaStatus} onRetry={retryCaptcha} />
+            {SITE_KEY && (
+              <Turnstile
+                ref={widgetRef}
+                siteKey={SITE_KEY}
+                onSuccess={setCaptchaToken}
+                onError={() => setCaptchaToken(null)}
+                onExpire={() => setCaptchaToken(null)}
+                options={{ size: 'normal', language: 'pt-BR' }}
+              />
+            )}
             <Button variant="primary" type="submit" fullWidth loading={loading} disabled={!captchaToken} sx={{ mt: 0.5 }}>
               Entrar
             </Button>
