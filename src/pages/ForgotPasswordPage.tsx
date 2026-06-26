@@ -2,11 +2,12 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import LockResetIcon from '@mui/icons-material/LockReset'
 import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead'
 import { Box, Stack, Typography } from '@mui/material'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import type { TurnstileInstance } from '@marsidev/react-turnstile'
 import { Link } from 'react-router-dom'
 import { api } from '../services/api'
 import { useCooldown } from '../hooks/useMailCooldown'
-import { Button, Input } from '../components/ui'
+import { Button, Input, TurnstileWidget } from '../components/ui'
 import { fadeSlide, floatHeart, font } from '../design-system'
 
 const HEARTS = [
@@ -23,19 +24,25 @@ export function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const [captchaStatus, setCaptchaStatus] = useState<'pending' | 'verified' | 'error'>('pending')
+  const turnstileRef = useRef<TurnstileInstance>(null)
   const cooldown = useCooldown(`forgot-password:${email.trim().toLowerCase()}`, COOLDOWN_MS)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email.trim() || cooldown.inCooldown) return
+    if (!email.trim() || !captchaToken || cooldown.inCooldown) return
     setError('')
     setLoading(true)
     try {
-      await api.forgotPassword(email.trim())
+      await api.forgotPassword(email.trim(), captchaToken)
       cooldown.record()
       setSent(true)
     } catch (err: unknown) {
       setError((err as Error).message || 'Erro ao enviar email.')
+      turnstileRef.current?.reset()
+      setCaptchaToken(null)
+      setCaptchaStatus('pending')
     } finally {
       setLoading(false)
     }
@@ -95,9 +102,16 @@ export function ForgotPasswordPage() {
             <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
               <Stack spacing={2}>
                 <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" fullWidth required />
+                <TurnstileWidget
+                  ref={turnstileRef}
+                  status={captchaStatus}
+                  onSuccess={(token) => { setCaptchaToken(token); setCaptchaStatus('verified') }}
+                  onError={() => { setCaptchaToken(null); setCaptchaStatus('error') }}
+                  onExpire={() => { setCaptchaToken(null); setCaptchaStatus('pending') }}
+                />
                 <Button
                   variant="primary" type="submit" fullWidth loading={loading}
-                  disabled={!email.trim() || cooldown.inCooldown}
+                  disabled={!email.trim() || !captchaToken || cooldown.inCooldown}
                 >
                   {cooldown.inCooldown ? `Aguarde ${cooldown.label}` : 'Enviar link'}
                 </Button>

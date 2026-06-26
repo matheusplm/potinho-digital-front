@@ -214,7 +214,7 @@ const authHandlers = [
 
   http.post('/auth/forgot-password', async ({ request }) => {
     await delay(300)
-    const { email } = (await request.json()) as { email?: string }
+    const { email } = (await request.json()) as { email?: string; captchaToken?: string }
     if (email) logMail('password-reset', email)
     return HttpResponse.json({ ok: true })
   }),

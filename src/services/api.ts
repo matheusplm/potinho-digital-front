@@ -214,8 +214,8 @@ export const api = {
     request<{ token: string; refreshToken: string; user: { id: string; name: string; role: string; email: string; username?: string; onboardingDone: boolean | null } }>('/auth/verify-email', { method: 'POST', body: JSON.stringify({ token }) }),
   resendVerification: (email: string) =>
     request<{ ok: boolean }>('/auth/resend-verification', { method: 'POST', body: JSON.stringify({ email }) }),
-  forgotPassword: (email: string) =>
-    request<{ ok: boolean }>('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) }),
+  forgotPassword: (email: string, captchaToken: string) =>
+    request<{ ok: boolean }>('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email, captchaToken }) }),
   resetPassword: (token: string, newPassword: string) =>
     request<{ ok: boolean }>('/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, newPassword }) }),
   changeEmail: (newEmail: string, password: string) =>
