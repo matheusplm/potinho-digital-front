@@ -31,6 +31,7 @@ import { ConfirmEmailChangePage } from './pages/ConfirmEmailChangePage'
 import { MailLogPage } from './pages/MailLogPage'
 import { InviteAcceptPage } from './pages/InviteAcceptPage'
 import { LoadingState } from './components/ui'
+import { CaptchaProvider } from './context/CaptchaContext'
 import { Box } from '@mui/material'
 
 function HomeRoute() {
@@ -61,18 +62,20 @@ function AppRoutes() {
 
   if (!user) {
     return (
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/verificar-email" element={<VerifyEmailPage />} />
-        <Route path="/esqueci-minha-senha" element={<ForgotPasswordPage />} />
-        <Route path="/redefinir-senha" element={<ResetPasswordPage />} />
-        <Route path="/confirmar-troca-email" element={<ConfirmEmailChangePage />} />
-        <Route path="/convite/:token" element={<InviteAcceptPage />} />
-        {import.meta.env.DEV && <Route path="/test" element={<TestPage />} />}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <CaptchaProvider>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/verificar-email" element={<VerifyEmailPage />} />
+          <Route path="/esqueci-minha-senha" element={<ForgotPasswordPage />} />
+          <Route path="/redefinir-senha" element={<ResetPasswordPage />} />
+          <Route path="/confirmar-troca-email" element={<ConfirmEmailChangePage />} />
+          <Route path="/convite/:token" element={<InviteAcceptPage />} />
+          {import.meta.env.DEV && <Route path="/test" element={<TestPage />} />}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </CaptchaProvider>
     )
   }
 

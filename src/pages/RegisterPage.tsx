@@ -1,10 +1,11 @@
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, CircularProgress, Stack, Typography } from '@mui/material'
 import { useRef, useState } from 'react'
-import type { TurnstileInstance } from '@marsidev/react-turnstile'
 import { useNavigate, Link } from 'react-router-dom'
 import { api } from '../services/api'
-import { Button, Input, TurnstileWidget, toast } from '../components/ui'
+import { useCaptcha } from '../context/CaptchaContext'
+import { Button, Input, toast } from '../components/ui'
+import { CaptchaStatus } from '../components/ui/CaptchaStatus'
 import { ScrollHint } from '../components/ui/ScrollHint'
 import { fadeSlide, floatHeart, font } from '../design-system'
 
@@ -23,10 +24,8 @@ export function RegisterPage() {
   const [passwordTouched, setPasswordTouched] = useState(false)
   const [confirmTouched, setConfirmTouched] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
-  const [captchaStatus, setCaptchaStatus] = useState<'pending' | 'verified' | 'error'>('pending')
+  const { token: captchaToken, status: captchaStatus, consume: consumeCaptcha, retry: retryCaptcha } = useCaptcha()
   const [usernameStatus, setUsernameStatus] = useState<UsernameStatus>('idle')
-  const turnstileRef = useRef<TurnstileInstance>(null)
   const usernameTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -56,19 +55,17 @@ export function RegisterPage() {
     if (usernameStatus === 'taken') return
     if (form.password.length < 6) { setPasswordTouched(true); return }
     if (form.confirm !== form.password) { setConfirmTouched(true); return }
-    if (!captchaToken) return
+    const t = consumeCaptcha()
+    if (!t) return
     setLoading(true)
     try {
       const username = form.username.trim() || undefined
-      await api.register(form.name, form.email, form.password, captchaToken, username)
+      await api.register(form.name, form.email, form.password, t, username)
       toast.success('Conta criada!', { description: 'Verifique seu email para ativar.' })
       navigate(`/verificar-email?email=${encodeURIComponent(form.email)}`)
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erro ao criar conta.'
       toast.error(msg)
-      turnstileRef.current?.reset()
-      setCaptchaToken(null)
-      setCaptchaStatus('pending')
     } finally {
       setLoading(false)
     }
@@ -159,13 +156,7 @@ export function RegisterPage() {
                 error={confirmError}
                 helperText={confirmError ? 'As senhas não coincidem' : undefined}
               />
-              <TurnstileWidget
-                ref={turnstileRef}
-                status={captchaStatus}
-                onSuccess={(t) => { setCaptchaToken(t); setCaptchaStatus('verified') }}
-                onError={() => { setCaptchaToken(null); setCaptchaStatus('error') }}
-                onExpire={() => { setCaptchaToken(null); setCaptchaStatus('pending') }}
-              />
+              <CaptchaStatus status={captchaStatus} onRetry={retryCaptcha} />
               <Button
                 variant="primary" type="submit" fullWidth loading={loading}
                 disabled={!captchaToken || usernameStatus === 'taken' || usernameStatus === 'checking'}

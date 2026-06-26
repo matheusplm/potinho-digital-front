@@ -2,12 +2,13 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import LockResetIcon from '@mui/icons-material/LockReset'
 import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead'
 import { Box, Stack, Typography } from '@mui/material'
-import { useRef, useState } from 'react'
-import type { TurnstileInstance } from '@marsidev/react-turnstile'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../services/api'
+import { useCaptcha } from '../context/CaptchaContext'
 import { useRetryAfter } from '../hooks/useRetryAfter'
-import { Button, Input, TurnstileWidget } from '../components/ui'
+import { Button, Input } from '../components/ui'
+import { CaptchaStatus } from '../components/ui/CaptchaStatus'
 import { fadeSlide, floatHeart, font } from '../design-system'
 
 const HEARTS = [
@@ -22,25 +23,21 @@ export function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
-  const [captchaStatus, setCaptchaStatus] = useState<'pending' | 'verified' | 'error'>('pending')
-  const turnstileRef = useRef<TurnstileInstance>(null)
+  const { token: captchaToken, status: captchaStatus, consume: consumeCaptcha, retry: retryCaptcha } = useCaptcha()
   const retry = useRetryAfter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email.trim() || !captchaToken || retry.blocked) return
+    const t = consumeCaptcha()
+    if (!email.trim() || !t || retry.blocked) return
     setError('')
     setLoading(true)
     try {
-      await api.forgotPassword(email.trim(), captchaToken)
+      await api.forgotPassword(email.trim(), t)
       setSent(true)
     } catch (err: unknown) {
       retry.captureFromError(err)
       setError((err as Error).message || 'Erro ao enviar email.')
-      turnstileRef.current?.reset()
-      setCaptchaToken(null)
-      setCaptchaStatus('pending')
     } finally {
       setLoading(false)
     }
@@ -95,13 +92,7 @@ export function ForgotPasswordPage() {
             <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
               <Stack spacing={2}>
                 <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" fullWidth required />
-                <TurnstileWidget
-                  ref={turnstileRef}
-                  status={captchaStatus}
-                  onSuccess={(token) => { setCaptchaToken(token); setCaptchaStatus('verified') }}
-                  onError={() => { setCaptchaToken(null); setCaptchaStatus('error') }}
-                  onExpire={() => { setCaptchaToken(null); setCaptchaStatus('pending') }}
-                />
+                <CaptchaStatus status={captchaStatus} onRetry={retryCaptcha} />
                 <Button variant="primary" type="submit" fullWidth loading={loading} disabled={!email.trim() || !captchaToken || retry.blocked}>
                   {retry.blocked ? `Aguarde ${retry.label}` : 'Enviar link'}
                 </Button>

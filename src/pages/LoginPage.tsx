@@ -1,11 +1,12 @@
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, Stack, Typography } from '@mui/material'
-import { useRef, useState } from 'react'
-import type { TurnstileInstance } from '@marsidev/react-turnstile'
+import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
+import { useCaptcha } from '../context/CaptchaContext'
 import { api, ApiRequestError } from '../services/api'
-import { Button, Input, TurnstileWidget, toast } from '../components/ui'
+import { Button, Input, toast } from '../components/ui'
+import { CaptchaStatus } from '../components/ui/CaptchaStatus'
 import { ScrollHint } from '../components/ui/ScrollHint'
 import { fadeSlide, floatHeart, font } from '../design-system'
 
@@ -22,23 +23,22 @@ export function LoginPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const fromPath = searchParams.get('from')
+  const { token: captchaToken, status: captchaStatus, consume: consumeCaptcha, retry: retryCaptcha } = useCaptcha()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [notVerified, setNotVerified] = useState(false)
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
-  const [captchaStatus, setCaptchaStatus] = useState<'pending' | 'verified' | 'error'>('pending')
-  const turnstileRef = useRef<TurnstileInstance>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!captchaToken) return
+    const t = consumeCaptcha()
+    if (!t) return
     setError('')
     setNotVerified(false)
     setLoading(true)
     try {
-      const { token, refreshToken, user } = await api.login(email, password, captchaToken)
+      const { token, refreshToken, user } = await api.login(email, password, t)
       setUser({ id: user.id, name: user.name, email: user.email, role: user.role as 'writer' | 'reader', token, refreshToken, onboardingDone: user.onboardingDone })
       toast.success(`Bem-vindo, ${user.name.split(' ')[0]}! 💙`)
       navigate(fromPath ?? '/home')
@@ -50,9 +50,6 @@ export function LoginPage() {
         const msg = err instanceof Error ? err.message : 'Erro ao fazer login.'
         setError(msg)
       }
-      turnstileRef.current?.reset()
-      setCaptchaToken(null)
-      setCaptchaStatus('pending')
     } finally {
       setLoading(false)
     }
@@ -110,13 +107,7 @@ export function LoginPage() {
                 </Link>
               </Typography>
             </Box>
-            <TurnstileWidget
-              ref={turnstileRef}
-              status={captchaStatus}
-              onSuccess={(t) => { setCaptchaToken(t); setCaptchaStatus('verified') }}
-              onError={() => { setCaptchaToken(null); setCaptchaStatus('error') }}
-              onExpire={() => { setCaptchaToken(null); setCaptchaStatus('pending') }}
-            />
+            <CaptchaStatus status={captchaStatus} onRetry={retryCaptcha} />
             <Button variant="primary" type="submit" fullWidth loading={loading} disabled={!captchaToken} sx={{ mt: 0.5 }}>
               Entrar
             </Button>
