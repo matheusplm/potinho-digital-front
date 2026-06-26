@@ -173,7 +173,7 @@ export function RegisterPage() {
                     onSuccess={setCaptchaToken}
                     onError={() => setCaptchaToken(null)}
                     onExpire={() => setCaptchaToken(null)}
-                    options={{ size: 'normal', language: 'pt-BR', theme: 'auto' }}
+                    options={{ size: 'normal', language: 'pt-BR', theme: 'light' }}
                   />
                 </Box>
               )}
