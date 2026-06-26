@@ -23,7 +23,7 @@ import { colors, fadeIn, font, radius } from '../design-system'
 import { isCollectionReader } from '../utils/collectionAccess'
 import { ApiRequestError } from '../services/api'
 import { simulatePackOpen } from '../utils/simulationPlay'
-import { loadPackCooldowns, savePackCooldowns, loadPackStatusEndpointMissing, savePackStatusEndpointMissing, formatRemainingTime } from '../utils/packCooldowns'
+import { formatRemainingTime } from '../utils/packCooldowns'
 import { computeAchievements } from '../utils/achievements'
 import { NoteDetailDialog, PACK_OPEN_ANIMATION_MS, PackOpeningDialog, wait, type ReadableNote } from './CollectionPlayPage'
 import type { CollectionDailyReward, CollectionPack } from '../types/note'
@@ -72,9 +72,8 @@ export function SimulatedReaderHomePage() {
   const cid = activeSession?.collectionId ?? ''
 
   useEffect(() => {
-    setPackCooldowns(isRealReader ? loadPackCooldowns(cid) : {})
+    setPackCooldowns({})
     setOpenedBonusPackIds([])
-    setPackStatusEndpointMissing(isRealReader ? loadPackStatusEndpointMissing(cid) : false)
   }, [cid, isRealReader])
 
   const { data: notes = [], isLoading: notesLoading } = useCollectionNotesQuery(cid, { enabled: !!session })
@@ -85,13 +84,10 @@ export function SimulatedReaderHomePage() {
   const activePacks = useMemo(() => packs.filter((pack) => pack.status === 'active'), [packs])
   const activePackIds = useMemo(() => activePacks.map((pack) => pack.id), [activePacks])
   const packsEmbedStatus = useMemo(() => packs.some((pack) => pack.readerStatus != null), [packs])
-  const [packStatusEndpointMissing, setPackStatusEndpointMissing] = useState(
-    () => (cid ? loadPackStatusEndpointMissing(cid) : false),
-  )
   const { data: packStatuses } = useCollectionPackStatusesQuery(
     cid,
     activePackIds,
-    isRealReader && !!cid && !packsEmbedStatus && !packStatusEndpointMissing,
+    isRealReader && !!cid && !packsEmbedStatus,
   )
   const openPackMutation = useOpenCollectionPackMutation(cid)
 
@@ -136,16 +132,14 @@ export function SimulatedReaderHomePage() {
   const [openingPack, setOpeningPack] = useState<CollectionPack | null>(null)
   const [selectedBonusPack, setSelectedBonusPack] = useState<CollectionPack | null>(null)
   const [openedBonusPackIds, setOpenedBonusPackIds] = useState<string[]>([])
-  const [packCooldowns, setPackCooldowns] = useState<Record<string, string>>(
-    () => (cid ? loadPackCooldowns(cid) : {}),
-  )
+  const [packCooldowns, setPackCooldowns] = useState<Record<string, string>>({})
   const [packAvailableCounts, setPackAvailableCounts] = useState<Record<string, number>>({})
   const [now, setNow] = useState(() => Date.now())
 
   useEffect(() => {
     if (!isRealReader || !cid || activePacks.length === 0) return
 
-    const cooldowns: Record<string, string> = { ...loadPackCooldowns(cid) }
+    const cooldowns: Record<string, string> = {}
     const counts: Record<string, number> = {}
     const ts = Date.now()
 
@@ -191,7 +185,6 @@ export function SimulatedReaderHomePage() {
     )
     setPackCooldowns(nextCooldowns)
     setPackAvailableCounts(counts)
-    savePackCooldowns(cid, nextCooldowns)
   }, [
     isRealReader,
     cid,
@@ -200,13 +193,6 @@ export function SimulatedReaderHomePage() {
     play?.daily.canOpen,
     play?.daily.availableAt,
   ])
-
-  useEffect(() => {
-    if (packStatuses && Object.values(packStatuses).every((s) => s === null)) {
-      setPackStatusEndpointMissing(true)
-      savePackStatusEndpointMissing(cid)
-    }
-  }, [cid, packStatuses])
 
   const mainPack = useMemo(
     () => activePacks.find((pack) => pack.category === 'daily') ?? activePacks[0],
@@ -299,13 +285,9 @@ export function SimulatedReaderHomePage() {
           await queryClient.invalidateQueries({ queryKey: ['col-play', cid] })
           const mainAvailableAt = result.status.availableAt
             || new Date(Date.now() + Math.max(1, mainPack.cooldownHours ?? 24) * 3_600_000).toISOString()
-          setPackCooldowns((current) => {
-            const next = result.status.canOpen
-              ? current
-              : { ...current, [mainPack.id]: mainAvailableAt }
-            savePackCooldowns(cid, next)
-            return next
-          })
+          setPackCooldowns((current) => result.status.canOpen
+            ? current
+            : { ...current, [mainPack.id]: mainAvailableAt })
           if ((result.status.availableCount ?? 0) > 1) {
             setPackAvailableCounts((c) => ({ ...c, [mainPack.id]: result.status.availableCount! }))
           } else {
@@ -317,13 +299,9 @@ export function SimulatedReaderHomePage() {
           await queryClient.invalidateQueries({ queryKey: ['col-play', cid] })
           const bonusAvailableAt = result.status.availableAt
             || new Date(Date.now() + Math.max(1, pack.cooldownHours ?? 24) * 3_600_000).toISOString()
-          setPackCooldowns((current) => {
-            const next = result.status.canOpen
-              ? current
-              : { ...current, [pack.id]: bonusAvailableAt }
-            savePackCooldowns(cid, next)
-            return next
-          })
+          setPackCooldowns((current) => result.status.canOpen
+            ? current
+            : { ...current, [pack.id]: bonusAvailableAt })
           if ((result.status.availableCount ?? 0) > 1) {
             setPackAvailableCounts((c) => ({ ...c, [pack.id]: result.status.availableCount! }))
           } else {
@@ -349,11 +327,7 @@ export function SimulatedReaderHomePage() {
         } else if (error instanceof ApiRequestError && (error.status === 429 || error.code === 'PACK_ON_COOLDOWN')) {
           const cooldownAvailableAt = error.availableAt
             || new Date(Date.now() + Math.max(1, pack.cooldownHours ?? 24) * 3_600_000).toISOString()
-          setPackCooldowns((current) => {
-            const next = { ...current, [pack.id]: cooldownAvailableAt }
-            savePackCooldowns(cid, next)
-            return next
-          })
+          setPackCooldowns((current) => ({ ...current, [pack.id]: cooldownAvailableAt }))
           await queryClient.invalidateQueries({ queryKey: ['col-play', cid] })
           setNow(Date.now())
           toast.info(error.message ?? 'Pacotinho ainda em cooldown.')
