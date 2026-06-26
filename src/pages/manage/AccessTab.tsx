@@ -1,19 +1,33 @@
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
-import SendOutlinedIcon from '@mui/icons-material/SendOutlined'
+import ReplayIcon from '@mui/icons-material/Replay'
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import { Box, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, TextField, Tooltip, Typography } from '@mui/material'
 import { useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Button, Card, Input, LoadingState, toast } from '../../components/ui'
-import { useCollectionAccessQuery, useCollectionPacksQuery, useGrantAccessMutation, useAddPackOpensMutation } from '../../hooks/useNotes'
+import { useCollectionAccessQuery, useCollectionPacksQuery, useAddPackOpensMutation, useCollectionInvitesQuery, useSendInviteMutation, useCancelInviteMutation } from '../../hooks/useNotes'
 import { colors, font, radius } from '../../design-system'
 import { useBackground } from '../../context/BackgroundContext'
 import { useUser } from '../../context/UserContext'
-import { api } from '../../services/api'
-import type { CollectionPack } from '../../types/note'
+import type { CollectionInvite, CollectionPack } from '../../types/note'
 import { actionButtonSx } from './shared'
 
 interface AccessTabProps { cid: string }
+
+const STATUS_LABEL: Record<CollectionInvite['status'], string> = {
+  pending: 'Pendente',
+  accepted: 'Aceito',
+  rejected: 'Recusado',
+  expired: 'Expirado',
+}
+
+const STATUS_COLOR: Record<CollectionInvite['status'], string> = {
+  pending: '#d97706',
+  accepted: '#16a34a',
+  rejected: '#dc2626',
+  expired: '#6b7280',
+}
 
 export function AccessTab({ cid }: AccessTabProps) {
   const { slug = '' } = useParams<{ slug: string }>()
@@ -22,12 +36,13 @@ export function AccessTab({ cid }: AccessTabProps) {
   const { user } = useUser()
 
   const { data: accesses = [], isLoading: accessLoading } = useCollectionAccessQuery(cid)
+  const { data: invites = [], isLoading: invitesLoading } = useCollectionInvitesQuery(cid)
   const { data: packs = [] } = useCollectionPacksQuery(cid)
-  const grantMutation = useGrantAccessMutation(cid)
+  const sendInviteMutation = useSendInviteMutation(cid)
+  const cancelInviteMutation = useCancelInviteMutation(cid)
   const addPackOpensMutation = useAddPackOpensMutation(cid)
 
   const [emailInput, setEmailInput] = useState('')
-  const [resendingFor, setResendingFor] = useState<string | null>(null)
   const [packOpensDialog, setPackOpensDialog] = useState<{ email: string; pack: CollectionPack; currentOpens: number | undefined } | null>(null)
   const [packOpensInput, setPackOpensInput] = useState(1)
 
@@ -36,34 +51,40 @@ export function AccessTab({ cid }: AccessTabProps) {
     [packs],
   )
 
-  async function handleGrant() {
+  const pendingInvites = useMemo(() => invites.filter((i) => i.status === 'pending'), [invites])
+  const rejectedInvites = useMemo(() => invites.filter((i) => i.status === 'rejected' || i.status === 'expired'), [invites])
+
+  async function handleInvite() {
     const email = emailInput.trim()
     if (!email) return
     if (user?.email && email.toLowerCase() === user.email.toLowerCase()) {
-      toast.error('Você não pode se adicionar como leitor da sua própria coleção.')
+      toast.error('Você não pode se convidar para a sua própria coleção.')
       return
     }
     try {
-      await grantMutation.mutateAsync(email)
+      await sendInviteMutation.mutateAsync(email)
       setEmailInput('')
-      api.sendInvite(cid, email).catch((e) => {
-        toast.error((e as Error).message || 'Erro ao enviar convite.')
-      })
-      toast.success(`Acesso concedido para ${email}!`, { description: 'Um email de convite foi enviado.' })
+      toast.success(`Convite enviado para ${email}!`, { description: 'O leitor verá um link de confirmação no email.' })
     } catch (e) {
-      toast.error((e as Error).message || 'Erro ao conceder acesso.')
+      toast.error((e as Error).message || 'Erro ao enviar convite.')
     }
   }
 
   async function handleResendInvite(email: string) {
-    setResendingFor(email)
     try {
-      await api.sendInvite(cid, email)
+      await sendInviteMutation.mutateAsync(email)
       toast.success('Convite reenviado!', { description: email })
     } catch (e) {
       toast.error((e as Error).message || 'Erro ao reenviar convite.')
-    } finally {
-      setResendingFor(null)
+    }
+  }
+
+  async function handleCancelInvite(email: string) {
+    try {
+      await cancelInviteMutation.mutateAsync(email)
+      toast.success('Convite cancelado.')
+    } catch (e) {
+      toast.error((e as Error).message || 'Erro ao cancelar convite.')
     }
   }
 
@@ -96,6 +117,8 @@ export function AccessTab({ cid }: AccessTabProps) {
     }
   }
 
+  const isLoading = accessLoading || invitesLoading
+
   return (
     <>
       <Stack spacing={2}>
@@ -106,86 +129,116 @@ export function AccessTab({ cid }: AccessTabProps) {
             </Typography>
             <Stack direction="row" spacing={1} alignItems="flex-end">
               <Input type="email" placeholder="email@exemplo.com" value={emailInput} onChange={(e) => setEmailInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); void handleGrant() } }}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); void handleInvite() } }}
                 sx={{ flex: 1, '& .MuiOutlinedInput-root': { fontSize: '0.84rem' }, '& input': { py: 0.75 } }} />
-              <Button variant="primary" loading={grantMutation.isPending} onClick={handleGrant} disabled={!emailInput.trim()} sx={{ py: 0.85, px: 1.5, fontSize: '0.78rem', whiteSpace: 'nowrap' }}>
+              <Button variant="primary" loading={sendInviteMutation.isPending} onClick={handleInvite} disabled={!emailInput.trim()} sx={{ py: 0.85, px: 1.5, fontSize: '0.78rem', whiteSpace: 'nowrap' }}>
                 <PersonAddIcon sx={{ fontSize: 16, mr: 0.4 }} /> Convidar
               </Button>
             </Stack>
           </Stack>
         </Card>
 
-        {accessLoading && <LoadingState compact label="Carregando acessos" accent={theme.accent} textColor={theme.textOnBg} mutedColor={theme.textOnBgMuted} />}
+        {isLoading && <LoadingState compact label="Carregando acessos" accent={theme.accent} textColor={theme.textOnBg} mutedColor={theme.textOnBgMuted} />}
 
-        {!accessLoading && accesses.length === 0 && (
+        {!isLoading && pendingInvites.length > 0 && (
+          <Stack spacing={1}>
+            <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.8, color: colors.text.muted, textTransform: 'uppercase', px: 0.5 }}>
+              Convites pendentes
+            </Typography>
+            {pendingInvites.map((invite) => (
+              <InviteRow
+                key={invite.token}
+                invite={invite}
+                isMutating={sendInviteMutation.isPending || cancelInviteMutation.isPending}
+                onResend={() => void handleResendInvite(invite.email)}
+                onCancel={() => void handleCancelInvite(invite.email)}
+              />
+            ))}
+          </Stack>
+        )}
+
+        {!isLoading && rejectedInvites.length > 0 && (
+          <Stack spacing={1}>
+            <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.8, color: colors.text.muted, textTransform: 'uppercase', px: 0.5 }}>
+              Convites recusados / expirados
+            </Typography>
+            {rejectedInvites.map((invite) => (
+              <InviteRow
+                key={invite.token}
+                invite={invite}
+                isMutating={sendInviteMutation.isPending || cancelInviteMutation.isPending}
+                onResend={() => void handleResendInvite(invite.email)}
+                onCancel={() => void handleCancelInvite(invite.email)}
+              />
+            ))}
+          </Stack>
+        )}
+
+        {!isLoading && accesses.length === 0 && pendingInvites.length === 0 && rejectedInvites.length === 0 && (
           <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBgMuted, textAlign: 'center', py: 2 }}>
-            Nenhum acesso concedido ainda
+            Nenhum acesso ou convite ainda
           </Typography>
         )}
 
-        {accesses.map((a) => (
-          <Card key={a.email} sx={{ p: 1.8 }}>
-            <Stack spacing={1.4}>
-              <Stack direction="row" alignItems="center" spacing={1.5}>
-                <Box sx={{ width: 36, height: 36, borderRadius: radius.md, background: `linear-gradient(135deg,${colors.primary.main},${colors.rose.main})`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Typography sx={{ fontFamily: font.serif, fontWeight: 700, color: '#fff', fontSize: '0.9rem' }}>
-                    {a.email[0].toUpperCase()}
-                  </Typography>
-                </Box>
-                <Typography sx={{ flex: 1, fontSize: '0.84rem', color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {a.email}
-                </Typography>
-                <Tooltip title="Reenviar convite" placement="top" arrow enterTouchDelay={0}>
-                  <span>
-                    <IconButton
-                      size="small"
-                      aria-label="reenviar convite"
-                      disabled={resendingFor === a.email}
-                      onClick={() => void handleResendInvite(a.email)}
-                      sx={{ ...actionButtonSx('neutral'), flexShrink: 0 }}
-                    >
-                      <SendOutlinedIcon sx={{ fontSize: 16 }} />
+        {accesses.length > 0 && (
+          <Stack spacing={1}>
+            {!isLoading && (
+              <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.8, color: colors.text.muted, textTransform: 'uppercase', px: 0.5 }}>
+                Leitores com acesso
+              </Typography>
+            )}
+            {accesses.map((a) => (
+              <Card key={a.email} sx={{ p: 1.8 }}>
+                <Stack spacing={1.4}>
+                  <Stack direction="row" alignItems="center" spacing={1.5}>
+                    <Box sx={{ width: 36, height: 36, borderRadius: radius.md, background: `linear-gradient(135deg,${colors.primary.main},${colors.rose.main})`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <Typography sx={{ fontFamily: font.serif, fontWeight: 700, color: '#fff', fontSize: '0.9rem' }}>
+                        {a.email[0].toUpperCase()}
+                      </Typography>
+                    </Box>
+                    <Typography sx={{ flex: 1, fontSize: '0.84rem', color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {a.email}
+                    </Typography>
+                    <IconButton size="small" aria-label="ver coleção" onClick={() => navigate(`/colecoes/${slug}/gerenciar/leitores/${encodeURIComponent(a.email)}`)} sx={{ ...actionButtonSx('neutral'), flexShrink: 0 }}>
+                      <VisibilityOutlinedIcon sx={{ fontSize: 17 }} />
                     </IconButton>
-                  </span>
-                </Tooltip>
-                <IconButton size="small" aria-label="ver coleção" onClick={() => navigate(`/colecoes/${slug}/gerenciar/leitores/${encodeURIComponent(a.email)}`)} sx={{ ...actionButtonSx('neutral'), flexShrink: 0 }}>
-                  <VisibilityOutlinedIcon sx={{ fontSize: 17 }} />
-                </IconButton>
-              </Stack>
-
-              {accessBonusPacks.length > 0 && (
-                <Stack spacing={0.8}>
-                  <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.7, color: colors.text.muted, textTransform: 'uppercase' }}>
-                    Brindes liberados
-                  </Typography>
-                  <Stack direction="row" spacing={0.7} sx={{ flexWrap: 'wrap', rowGap: 0.7 }}>
-                    {accessBonusPacks.map((pack) => {
-                      const opens = a.packOpens?.[pack.id]
-                      const selected = opens !== undefined
-                      const label = selected ? `${pack.emoji} ${pack.name} (${opens})` : `${pack.emoji} ${pack.name}`
-                      return (
-                        <Chip
-                          key={pack.id}
-                          label={label}
-                          onClick={() => openPackOpensDialog(a.email, pack, opens)}
-                          disabled={addPackOpensMutation.isPending}
-                          sx={{
-                            maxWidth: '100%', height: 28, borderRadius: radius.full, fontSize: '0.72rem', fontWeight: 800,
-                            color: selected ? '#fff' : pack.accent,
-                            background: selected ? pack.accent : `${pack.accent}12`,
-                            border: `1px solid ${pack.accent}${selected ? '00' : '33'}`,
-                            '& .MuiChip-label': { px: 1, overflow: 'hidden', textOverflow: 'ellipsis' },
-                            '&:hover': { background: selected ? pack.accent : `${pack.accent}1f` },
-                          }}
-                        />
-                      )
-                    })}
                   </Stack>
+
+                  {accessBonusPacks.length > 0 && (
+                    <Stack spacing={0.8}>
+                      <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.7, color: colors.text.muted, textTransform: 'uppercase' }}>
+                        Brindes liberados
+                      </Typography>
+                      <Stack direction="row" spacing={0.7} sx={{ flexWrap: 'wrap', rowGap: 0.7 }}>
+                        {accessBonusPacks.map((pack) => {
+                          const opens = a.packOpens?.[pack.id]
+                          const selected = opens !== undefined
+                          const label = selected ? `${pack.emoji} ${pack.name} (${opens})` : `${pack.emoji} ${pack.name}`
+                          return (
+                            <Chip
+                              key={pack.id}
+                              label={label}
+                              onClick={() => openPackOpensDialog(a.email, pack, opens)}
+                              disabled={addPackOpensMutation.isPending}
+                              sx={{
+                                maxWidth: '100%', height: 28, borderRadius: radius.full, fontSize: '0.72rem', fontWeight: 800,
+                                color: selected ? '#fff' : pack.accent,
+                                background: selected ? pack.accent : `${pack.accent}12`,
+                                border: `1px solid ${pack.accent}${selected ? '00' : '33'}`,
+                                '& .MuiChip-label': { px: 1, overflow: 'hidden', textOverflow: 'ellipsis' },
+                                '&:hover': { background: selected ? pack.accent : `${pack.accent}1f` },
+                              }}
+                            />
+                          )
+                        })}
+                      </Stack>
+                    </Stack>
+                  )}
                 </Stack>
-              )}
-            </Stack>
-          </Card>
-        ))}
+              </Card>
+            ))}
+          </Stack>
+        )}
       </Stack>
 
       <Dialog open={!!packOpensDialog} onClose={() => setPackOpensDialog(null)} maxWidth="xs" fullWidth slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'rgba(255,253,251,0.98)' } } }}>
@@ -224,5 +277,50 @@ export function AccessTab({ cid }: AccessTabProps) {
         </DialogActions>
       </Dialog>
     </>
+  )
+}
+
+interface InviteRowProps {
+  invite: CollectionInvite
+  isMutating: boolean
+  onResend: () => void
+  onCancel: () => void
+}
+
+function InviteRow({ invite, isMutating, onResend, onCancel }: InviteRowProps) {
+  const statusColor = STATUS_COLOR[invite.status]
+  const statusLabel = STATUS_LABEL[invite.status]
+  return (
+    <Card sx={{ p: 1.8 }}>
+      <Stack direction="row" alignItems="center" spacing={1.5}>
+        <Box sx={{ width: 36, height: 36, borderRadius: radius.md, background: `${statusColor}22`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 700, color: statusColor, fontSize: '0.9rem' }}>
+            {invite.email[0].toUpperCase()}
+          </Typography>
+        </Box>
+        <Typography sx={{ flex: 1, fontSize: '0.84rem', color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {invite.email}
+        </Typography>
+        <Chip
+          label={statusLabel}
+          size="small"
+          sx={{ height: 22, fontSize: '0.68rem', fontWeight: 800, color: statusColor, background: `${statusColor}18`, borderRadius: radius.full, flexShrink: 0 }}
+        />
+        <Tooltip title="Reenviar convite" placement="top" arrow enterTouchDelay={0}>
+          <span>
+            <IconButton size="small" aria-label="reenviar convite" disabled={isMutating} onClick={onResend} sx={{ ...actionButtonSx('neutral'), flexShrink: 0 }}>
+              <ReplayIcon sx={{ fontSize: 16 }} />
+            </IconButton>
+          </span>
+        </Tooltip>
+        <Tooltip title="Cancelar convite" placement="top" arrow enterTouchDelay={0}>
+          <span>
+            <IconButton size="small" aria-label="cancelar convite" disabled={isMutating} onClick={onCancel} sx={{ ...actionButtonSx('neutral'), flexShrink: 0 }}>
+              <CancelOutlinedIcon sx={{ fontSize: 16 }} />
+            </IconButton>
+          </span>
+        </Tooltip>
+      </Stack>
+    </Card>
   )
 }

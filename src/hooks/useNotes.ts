@@ -14,6 +14,7 @@ export const queryKeys = {
   play: (cid: string) => ['col-play', cid] as const,
   achievements: (cid: string) => ['col-achievements', cid] as const,
   readerAchievements: (cid: string) => ['reader-achievements', cid] as const,
+  invites: (cid: string) => ['col-invites', cid] as const,
 }
 
 export function useCollectionsQuery(options?: { enabled?: boolean }) {
@@ -335,5 +336,32 @@ export function useDeleteCollectionAchievementMutation(cid: string) {
   return useMutation({
     mutationFn: (id: string) => api.deleteCollectionAchievement(cid, id),
     onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.achievements(cid) }) },
+  })
+}
+
+export function useCollectionInvitesQuery(cid: string) {
+  return useQuery({
+    queryKey: queryKeys.invites(cid),
+    queryFn: () => api.listInvites(cid),
+    enabled: !!cid,
+  })
+}
+
+export function useSendInviteMutation(cid: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (email: string) => api.sendInvite(cid, email),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.access(cid) })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.invites(cid) })
+    },
+  })
+}
+
+export function useCancelInviteMutation(cid: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (email: string) => api.cancelInvite(cid, email),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.invites(cid) }) },
   })
 }

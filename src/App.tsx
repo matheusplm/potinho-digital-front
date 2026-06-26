@@ -29,6 +29,7 @@ import { ResetPasswordPage } from './pages/ResetPasswordPage'
 import { ContaPage } from './pages/ContaPage'
 import { ConfirmEmailChangePage } from './pages/ConfirmEmailChangePage'
 import { MailLogPage } from './pages/MailLogPage'
+import { InviteAcceptPage } from './pages/InviteAcceptPage'
 import { LoadingState } from './components/ui'
 import { Box } from '@mui/material'
 
@@ -68,6 +69,7 @@ function AppRoutes() {
         <Route path="/esqueci-minha-senha" element={<ForgotPasswordPage />} />
         <Route path="/redefinir-senha" element={<ResetPasswordPage />} />
         <Route path="/confirmar-troca-email" element={<ConfirmEmailChangePage />} />
+        <Route path="/convite/:token" element={<InviteAcceptPage />} />
         {import.meta.env.DEV && <Route path="/test" element={<TestPage />} />}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
@@ -80,6 +82,7 @@ function AppRoutes() {
       <Route path="/esqueci-minha-senha" element={<ForgotPasswordPage />} />
       <Route path="/redefinir-senha" element={<ResetPasswordPage />} />
       <Route path="/confirmar-troca-email" element={<ConfirmEmailChangePage />} />
+      <Route path="/convite/:token" element={<InviteAcceptPage />} />
       <Route element={<Layout />}>
         <Route index element={<Navigate to="/home" replace />} />
         <Route path="home" element={<HomeRoute />} />

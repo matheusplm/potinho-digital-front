@@ -2,7 +2,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, Stack, Typography } from '@mui/material'
 import { useRef, useState } from 'react'
 import type { TurnstileInstance } from '@marsidev/react-turnstile'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { api, ApiRequestError } from '../services/api'
 import { Button, Input, TurnstileWidget, toast } from '../components/ui'
@@ -20,6 +20,8 @@ const HEARTS = [
 export function LoginPage() {
   const { setUser } = useUser()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const fromPath = searchParams.get('from')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -39,7 +41,7 @@ export function LoginPage() {
       const { token, refreshToken, user } = await api.login(email, password, captchaToken)
       setUser({ id: user.id, name: user.name, email: user.email, role: user.role as 'writer' | 'reader', token, refreshToken, onboardingDone: user.onboardingDone })
       toast.success(`Bem-vindo, ${user.name.split(' ')[0]}! 💙`)
-      navigate('/home')
+      navigate(fromPath ?? '/home')
     } catch (err) {
       if (err instanceof ApiRequestError && err.code === 'EMAIL_NOT_VERIFIED') {
         setNotVerified(true)

@@ -6,10 +6,12 @@ import type {
   CollectionDailyReward,
   CollectionDailyStatus,
   CollectionFormData,
+  CollectionInvite,
   CollectionNoteView,
   CollectionPack,
   CollectionPackFormData,
   CollectionPlayView,
+  InviteDetails,
   MailLogEntry,
   NoteFormData,
   NoteRecord,
@@ -60,6 +62,12 @@ const FRIENDLY_ERROR_MESSAGES: Record<string, string> = {
   PACK_EXHAUSTED: 'Você já usou todas as aberturas deste pacotinho.',
   PACK_COUNT_EXCEEDED: 'Quantidade superior ao número de aberturas disponíveis.',
   PACK_ALREADY_EXISTS: 'Já existe um pacotinho com esse identificador.',
+  ALREADY_HAS_ACCESS: 'Esta pessoa já tem acesso à coleção.',
+  INVITE_NOT_FOUND: 'Convite não encontrado ou expirado.',
+  INVITE_EXPIRED: 'Este convite expirou. Peça um novo convite ao criador da coleção.',
+  INVITE_ALREADY_ACCEPTED: 'Você já aceitou este convite.',
+  INVITE_ALREADY_HANDLED: 'Este convite já foi respondido.',
+  INVITE_EMAIL_MISMATCH: 'Este convite foi enviado para outro email.',
   PACK_TYPE_NOT_FOUND: 'Tipo de bilhete não encontrado nesta coleção.',
   PACK_RARITY_NOT_FOUND: 'Raridade não encontrada nesta coleção.',
   PACK_GUARANTEED_RARITY_NOT_FOUND: 'Raridade garantida não encontrada nesta coleção.',
@@ -251,6 +259,16 @@ export const api = {
     request<{ revoked: boolean }>(`/api/collections/${cid}/access/${encodeURIComponent(email)}`, { method: 'DELETE' }),
   sendInvite: (cid: string, email: string) =>
     request<{ ok: boolean }>(`/api/collections/${cid}/access/${encodeURIComponent(email)}/invite`, { method: 'POST' }),
+  listInvites: (cid: string) =>
+    request<CollectionInvite[]>(`/api/collections/${cid}/invites`),
+  cancelInvite: (cid: string, email: string) =>
+    request<{ cancelled: boolean }>(`/api/collections/${cid}/invites/${encodeURIComponent(email)}`, { method: 'DELETE' }),
+  getInviteDetails: (token: string) =>
+    request<InviteDetails>(`/api/invite/${token}`),
+  acceptInvite: (token: string) =>
+    request<{ ok: boolean; collectionId: string }>(`/api/invite/${token}/accept`, { method: 'POST', body: JSON.stringify({}) }),
+  rejectInvite: (token: string) =>
+    request<{ ok: boolean }>(`/api/invite/${token}/reject`, { method: 'POST', body: JSON.stringify({}) }),
   getMailLogs: () =>
     request<MailLogEntry[]>('/api/mail/logs'),
   getEmailPreview: (type: string) =>

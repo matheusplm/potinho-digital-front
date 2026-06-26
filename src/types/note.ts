@@ -280,3 +280,24 @@ export interface MailLogEntry {
   sentAt: string
   status: 'sent' | 'failed'
 }
+
+export type CollectionInviteStatus = 'pending' | 'accepted' | 'rejected' | 'expired'
+
+export interface CollectionInvite {
+  token: string
+  collectionId: string
+  email: string
+  status: CollectionInviteStatus
+  createdAt: string
+  expiresAt: string
+}
+
+export interface InviteDetails {
+  token: string
+  collectionId: string
+  collectionName: string
+  inviterName: string
+  email: string
+  status: CollectionInviteStatus
+  expiresAt: string
+}
