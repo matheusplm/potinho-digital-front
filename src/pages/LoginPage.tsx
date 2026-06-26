@@ -113,14 +113,16 @@ export function LoginPage() {
               </Typography>
             </Box>
             {SITE_KEY && (
-              <Turnstile
-                ref={widgetRef}
-                siteKey={SITE_KEY}
-                onSuccess={setCaptchaToken}
-                onError={() => setCaptchaToken(null)}
-                onExpire={() => setCaptchaToken(null)}
-                options={{ size: 'normal', language: 'pt-BR' }}
-              />
+              <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                <Turnstile
+                  ref={widgetRef}
+                  siteKey={SITE_KEY}
+                  onSuccess={setCaptchaToken}
+                  onError={() => setCaptchaToken(null)}
+                  onExpire={() => setCaptchaToken(null)}
+                  options={{ size: 'normal', language: 'pt-BR', theme: 'auto' }}
+                />
+              </Box>
             )}
             <Button variant="primary" type="submit" fullWidth loading={loading} disabled={!captchaToken} sx={{ mt: 0.5 }}>
               Entrar

@@ -36,7 +36,6 @@ export function CaptchaProvider({ children }: { children: React.ReactNode }) {
     }, CHALLENGE_TIMEOUT_MS)
   }
 
-  // Dev bypass
   useEffect(() => {
     if (!SITE_KEY && token === null) {
       setToken('bypass')
@@ -44,7 +43,6 @@ export function CaptchaProvider({ children }: { children: React.ReactNode }) {
     }
   }, [token])
 
-  // Timeout while challenge is running
   useEffect(() => {
     if (!SITE_KEY) return
     if (status === 'pending') {
@@ -53,7 +51,7 @@ export function CaptchaProvider({ children }: { children: React.ReactNode }) {
       clearChallengeTimeout()
     }
     return clearChallengeTimeout
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status])
 
   const consume = useCallback((): string | null => {

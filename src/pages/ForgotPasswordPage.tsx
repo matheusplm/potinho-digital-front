@@ -98,14 +98,16 @@ export function ForgotPasswordPage() {
               <Stack spacing={2}>
                 <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" fullWidth required />
                 {SITE_KEY && (
-                  <Turnstile
-                    ref={widgetRef}
-                    siteKey={SITE_KEY}
-                    onSuccess={setCaptchaToken}
-                    onError={() => setCaptchaToken(null)}
-                    onExpire={() => setCaptchaToken(null)}
-                    options={{ size: 'normal', language: 'pt-BR' }}
-                  />
+                  <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <Turnstile
+                      ref={widgetRef}
+                      siteKey={SITE_KEY}
+                      onSuccess={setCaptchaToken}
+                      onError={() => setCaptchaToken(null)}
+                      onExpire={() => setCaptchaToken(null)}
+                      options={{ size: 'normal', language: 'pt-BR', theme: 'auto' }}
+                    />
+                  </Box>
                 )}
                 <Button variant="primary" type="submit" fullWidth loading={loading} disabled={!email.trim() || !captchaToken || retry.blocked}>
                   {retry.blocked ? `Aguarde ${retry.label}` : 'Enviar link'}
