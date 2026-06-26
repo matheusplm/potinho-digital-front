@@ -2,7 +2,9 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import { Box, Divider, Stack, Typography } from '@mui/material'
+import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
+import { api } from '../services/api'
 import { Button, Card, Input, LoadingState, OnboardingOverlay, SegmentedControl, toast } from '../components/ui'
 import { colors, font, gradients, radius, shadow } from '../design-system'
 import { RewardCard } from './CollectionPlayPage'
@@ -336,6 +338,75 @@ export function TestPage() {
         ))}
 
       <Box sx={{ height: 48 }} />
+
+      <EmailPreviewSection />
+
+      <Box sx={{ height: 48 }} />
     </Box>
+  )
+}
+
+const EMAIL_TYPES = [
+  { value: 'verify-email', label: '💌 Verificação' },
+  { value: 'resend-verification', label: '🔁 Reenvio' },
+  { value: 'password-reset', label: '🔑 Senha' },
+  { value: 'change-email', label: '📬 Trocar email' },
+  { value: 'invite', label: '🎁 Convite' },
+]
+
+function EmailPreviewSection() {
+  const [type, setType] = useState('verify-email')
+
+  const { data: html, isLoading } = useQuery({
+    queryKey: ['email-preview', type],
+    queryFn: () => api.getEmailPreview(type),
+    staleTime: Infinity,
+  })
+
+  return (
+    <Stack spacing={1.5}>
+      <Typography sx={{ fontSize: '0.66rem', fontWeight: 900, letterSpacing: 1.4, color: colors.text.muted, textTransform: 'uppercase' }}>
+        Templates de email
+      </Typography>
+
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
+        {EMAIL_TYPES.map((t) => (
+          <Box
+            key={t.value}
+            onClick={() => setType(t.value)}
+            sx={{
+              px: 1.4, py: 0.5, borderRadius: radius.full, cursor: 'pointer',
+              fontSize: '0.75rem', fontWeight: 700, transition: 'all 0.15s',
+              background: type === t.value ? colors.primary.main : 'rgba(0,0,0,0.05)',
+              color: type === t.value ? '#fff' : colors.text.secondary,
+              border: `1.5px solid ${type === t.value ? colors.primary.main : 'transparent'}`,
+            }}
+          >
+            {t.label}
+          </Box>
+        ))}
+      </Box>
+
+      <Box sx={{ borderRadius: radius.xl, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.08)', background: '#fff', minHeight: 400 }}>
+        {isLoading && (
+          <Box sx={{ p: 3 }}>
+            <Typography sx={{ fontSize: '0.8rem', color: colors.text.muted }}>Carregando...</Typography>
+          </Box>
+        )}
+        {html && !isLoading && (
+          <iframe
+            srcDoc={html}
+            title={`email-preview-${type}`}
+            style={{ width: '100%', border: 'none', display: 'block' }}
+            onLoad={(e) => {
+              const doc = e.currentTarget.contentDocument
+              if (doc) e.currentTarget.style.height = `${doc.body.scrollHeight + 32}px`
+            }}
+          />
+        )}
+      </Box>
+
+      <Divider sx={{ opacity: 0.3, mt: 0.5 }} />
+    </Stack>
   )
 }
