@@ -22,6 +22,42 @@ import {
   type MockUser,
 } from './db'
 
+function emailLayout(content: string): string {
+  return `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Potinho Digital</title></head><body style="margin:0;padding:0;background:#eef2ff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif"><table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#eef2ff;padding:40px 16px"><tr><td align="center"><table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="max-width:480px"><tr><td style="background:linear-gradient(135deg,#dbeafe 0%,#fce7f3 60%,#ede9fe 100%);border-radius:20px 20px 0 0;padding:36px 32px 28px;text-align:center"><div style="font-size:2.8rem;line-height:1;margin-bottom:10px">💌</div><div style="font-size:1.05rem;font-weight:800;color:#1e3a5f;letter-spacing:-0.2px">Potinho Digital</div></td></tr><tr><td style="background:#fff;padding:0 32px"><div style="height:3px;background:linear-gradient(90deg,#1d4ed8,#e11d48);border-radius:0 0 3px 3px"></div></td></tr><tr><td style="background:#fff;border-radius:0 0 20px 20px;padding:32px 32px 36px">${content}</td></tr><tr><td style="padding:24px 0;text-align:center"><p style="margin:0;color:#9ca3af;font-size:0.72rem;line-height:1.6">Você recebeu este email do <strong style="color:#6b7280">Potinho Digital</strong>.<br>Se não reconhece esta ação, ignore — nada acontecerá.</p></td></tr></table></td></tr></table></body></html>`
+}
+function ctaButton(href: string, label: string, color = '#1d4ed8'): string {
+  return `<table cellpadding="0" cellspacing="0" role="presentation" style="margin:28px auto 0"><tr><td style="background:${color};border-radius:12px;box-shadow:0 4px 14px ${color}55"><a href="${href}" style="display:block;padding:15px 36px;color:#fff;font-weight:700;font-size:0.95rem;text-decoration:none;letter-spacing:-0.1px;white-space:nowrap">${label}</a></td></tr></table>`
+}
+function fallbackLink(href: string): string {
+  return `<p style="margin:20px 0 0;color:#9ca3af;font-size:0.72rem;text-align:center;line-height:1.5;word-break:break-all">Ou copie o link: <a href="${href}" style="color:#1d4ed8">${href}</a></p>`
+}
+function emailPreviewHtml(type: string): string | null {
+  const base = 'https://potinhodigital.com.br'
+  switch (type) {
+    case 'verify-email': {
+      const link = `${base}/verificar-email?token=preview123`
+      return emailLayout(`<h1 style="margin:0 0 8px;font-size:1.5rem;font-weight:800;color:#1e3a5f;letter-spacing:-0.5px">Bem-vindo ao Potinho! 🎉</h1><p style="margin:0 0 4px;font-size:0.95rem;color:#4b5563;line-height:1.65">Estamos muito felizes em ter você por aqui. Só falta um passo: confirme seu email para ativar sua conta.</p>${ctaButton(link, 'Confirmar email ✓', '#1d4ed8')}<p style="margin:20px 0 0;color:#9ca3af;font-size:0.78rem;text-align:center">⏱ Este link expira em <strong>24 horas</strong>.</p>${fallbackLink(link)}`)
+    }
+    case 'resend-verification': {
+      const link = `${base}/verificar-email?token=preview123`
+      return emailLayout(`<h1 style="margin:0 0 8px;font-size:1.5rem;font-weight:800;color:#1e3a5f;letter-spacing:-0.5px">Confirme seu email 💌</h1><p style="margin:0 0 4px;font-size:0.95rem;color:#4b5563;line-height:1.65">Aqui está seu novo link de confirmação. Clique abaixo para verificar seu email e entrar no Potinho.</p>${ctaButton(link, 'Verificar email ✓', '#1d4ed8')}<p style="margin:20px 0 0;color:#9ca3af;font-size:0.78rem;text-align:center">⏱ Este link expira em <strong>24 horas</strong>.</p>${fallbackLink(link)}`)
+    }
+    case 'password-reset': {
+      const link = `${base}/redefinir-senha?token=preview123`
+      return emailLayout(`<h1 style="margin:0 0 8px;font-size:1.5rem;font-weight:800;color:#1e3a5f;letter-spacing:-0.5px">Redefinir senha 🔑</h1><p style="margin:0 0 4px;font-size:0.95rem;color:#4b5563;line-height:1.65">Recebemos uma solicitação para redefinir a senha da sua conta. Clique no botão abaixo para criar uma nova senha.</p>${ctaButton(link, 'Redefinir senha')}<p style="margin:20px 0 0;color:#9ca3af;font-size:0.78rem;text-align:center">⏱ Este link expira em <strong>30 minutos</strong>. Se não foi você, ignore.</p>${fallbackLink(link)}`)
+    }
+    case 'change-email': {
+      const link = `${base}/confirmar-troca-email?token=preview123`
+      return emailLayout(`<h1 style="margin:0 0 8px;font-size:1.5rem;font-weight:800;color:#1e3a5f;letter-spacing:-0.5px">Trocar email 📬</h1><p style="margin:0 0 4px;font-size:0.95rem;color:#4b5563;line-height:1.65">Você solicitou a troca do email da sua conta para:</p><p style="margin:12px 0;padding:10px 16px;background:#eef2ff;border-radius:8px;font-weight:700;color:#1e3a5f;font-size:0.92rem;word-break:break-all">novo@email.com</p><p style="margin:0 0 4px;font-size:0.95rem;color:#4b5563;line-height:1.65">Clique abaixo para confirmar a troca.</p>${ctaButton(link, 'Confirmar troca de email')}<p style="margin:20px 0 0;color:#9ca3af;font-size:0.78rem;text-align:center">⏱ Este link expira em <strong>30 minutos</strong>. Se não foi você, ignore.</p>${fallbackLink(link)}`)
+    }
+    case 'invite': {
+      const link = `${base}/convite/preview-token-123`
+      return emailLayout(`<h1 style="margin:0 0 8px;font-size:1.5rem;font-weight:800;color:#1e3a5f;letter-spacing:-0.5px">Você foi convidado! 🎁</h1><p style="margin:0 0 12px;font-size:0.95rem;color:#4b5563;line-height:1.65"><strong style="color:#1e3a5f">Maria Silva</strong> te convidou para acessar a coleção:</p><p style="margin:0 0 16px;padding:12px 16px;background:linear-gradient(135deg,#dbeafe,#fce7f3);border-radius:10px;font-weight:800;color:#1e3a5f;font-size:1.05rem;text-align:center">Coleção do Coração 💌</p><p style="margin:0 0 4px;font-size:0.95rem;color:#4b5563;line-height:1.65">Clique abaixo para aceitar ou recusar o convite. Ele expira em <strong>7 dias</strong>.</p>${ctaButton(link, 'Criar conta e aceitar 💌', '#e11d48')}<p style="margin:16px 0 0;font-size:0.88rem;color:#4b5563;line-height:1.65;text-align:center">Ainda não tem conta? Crie a sua gratuitamente — leva menos de 1 minuto.</p>${fallbackLink(link)}`)
+    }
+    default: return null
+  }
+}
+
 function evaluateReaderAchievements(collection: CollectionState) {
   const { ownership, notes, achievements, achievementState } = collection
   const ownedCount = notes.filter((n) => ownership.owned.has(n.id)).length
@@ -899,6 +935,14 @@ const collectionHandlers = [
   http.delete('/api/push/unsubscribe', async () => {
     await delay(120)
     return HttpResponse.json({ success: true })
+  }),
+
+  http.get('/api/mail/preview', async ({ request }) => {
+    await delay(100)
+    const type = new URL(request.url).searchParams.get('type') ?? ''
+    const html = emailPreviewHtml(type)
+    if (!html) return HttpResponse.json({ error: 'Unknown type' }, { status: 400 })
+    return new HttpResponse(html, { headers: { 'Content-Type': 'text/html; charset=utf-8' } })
   }),
 ]
 
