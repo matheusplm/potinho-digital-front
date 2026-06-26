@@ -123,7 +123,7 @@ export function LandingPage() {
       <Box sx={{ position: 'relative', zIndex: 1 }}>
 
         {/* Hero */}
-        <Box sx={{ px: isDesktop ? 5 : 2.5, pt: isDesktop ? 8 : 5, pb: isDesktop ? 9 : 6, maxWidth: isDesktop ? 1200 : 480, mx: 'auto', overflow: 'hidden' }}>
+        <Box sx={{ px: isDesktop ? 5 : 2.5, pt: isDesktop ? 8 : 5, pb: isDesktop ? 9 : 6, maxWidth: isDesktop ? 1200 : 480, mx: 'auto' }}>
           {isDesktop ? (
             <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, alignItems: 'center' }}>
               <Box ref={parallaxTextRef} sx={{ transition: 'transform 0.14s ease-out', willChange: 'transform' }}>
