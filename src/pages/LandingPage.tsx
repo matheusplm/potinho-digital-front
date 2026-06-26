@@ -57,7 +57,7 @@ export function LandingPage() {
       if (parallaxTextRef.current)
         parallaxTextRef.current.style.transform = `translate(${x * -9}px, ${y * -6}px)`
       if (parallaxCardRef.current)
-        parallaxCardRef.current.style.transform = `translate(${x * 18}px, ${y * 12}px)`
+        parallaxCardRef.current.style.transform = `translate(${x * 10}px, ${y * 7}px)`
     }
     window.addEventListener('mousemove', onMove)
     return () => window.removeEventListener('mousemove', onMove)
@@ -123,7 +123,7 @@ export function LandingPage() {
       <Box sx={{ position: 'relative', zIndex: 1 }}>
 
         {/* Hero */}
-        <Box sx={{ px: isDesktop ? 5 : 2.5, pt: isDesktop ? 8 : 5, pb: isDesktop ? 9 : 6, maxWidth: isDesktop ? 1200 : 480, mx: 'auto' }}>
+        <Box sx={{ px: isDesktop ? 5 : 2.5, pt: isDesktop ? 8 : 5, pb: isDesktop ? 9 : 6, maxWidth: isDesktop ? 1200 : 480, mx: 'auto', overflow: 'hidden' }}>
           {isDesktop ? (
             <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, alignItems: 'center' }}>
               <Box ref={parallaxTextRef} sx={{ transition: 'transform 0.14s ease-out', willChange: 'transform' }}>
