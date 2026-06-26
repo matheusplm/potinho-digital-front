@@ -1,5 +1,4 @@
 import { Box, CircularProgress, Stack, Typography } from '@mui/material'
-import { radius } from '../../design-system'
 
 const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined
 
@@ -10,37 +9,59 @@ interface Props {
   onRetry: () => void
 }
 
-const CloudflareIcon = () => (
-  <svg width="32" height="32" viewBox="0 0 109 83" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M79.4 48.7c.7-2.4.4-4.6-.7-6.2-1.1-1.5-2.8-2.4-4.9-2.6l-42.5-.6c-.3 0-.5-.1-.6-.3-.1-.2-.1-.5.1-.7l8.9-15.4c.8-1.4 2.3-2.2 3.9-2.2h7.7c1 0 1.9.7 2.1 1.6l2.1 8.4c.2.9 1.1 1.6 2.1 1.6h13.3c1.3 0 2.3-1.1 2.3-2.4V8c0-1.3-1-2.4-2.3-2.4H56.7c-1 0-1.9.7-2.1 1.6l-2.1 8.4c-.2.9-1.1 1.6-2.1 1.6h-7c-1.7 0-3.3.9-4.2 2.4L26 37.4c-.4.7-.6 1.5-.6 2.3 0 .4 0 .7.1 1.1-5.8 1.1-10.2 5.3-11.4 11a15.4 15.4 0 0 0 .4 7.6 14 14 0 0 0-2.5 8.1C12 73.7 17 79.2 23.5 79.2h51c6 0 11-4.5 11.6-10.3.6-5.7-2.8-10.9-8-12.6l1.3-7.6z" fill="#F48120"/>
-    <path d="M87.3 55.8c-.2.6-.4 1.2-.7 1.8 2.4 1.7 3.9 4.4 3.7 7.4-.3 4.2-3.9 7.5-8.2 7.5H31.5c-4.6 0-8.2-3.5-8.2-7.8 0-2 .8-3.8 2-5.2a10.3 10.3 0 0 1-.3-5.3c.8-4 4.1-7 8.2-7.5l-.1-.8c0-1.3.5-2.5 1.3-3.5l.5-.5 42.1.6c3.5.2 6.4 2.6 7.3 5.9l3 7.4z" fill="#FBAD41"/>
-  </svg>
-)
+function CloudflareLogo() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 230 230" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M153.6 144.2l5.9-20.3c.7-2.4.4-4.8-.8-6.6-1.2-1.7-3.2-2.7-5.5-2.8l-91.6-.6c-.6 0-1-.3-1.2-.7-.2-.4-.1-.9.2-1.3l19.2-33.1c1.8-3.1 5.1-5 8.7-5h16.6c2.1 0 4 1.5 4.5 3.5l4.5 18.1c.5 1.9 2.4 3.3 4.5 3.3h28.7c2.8 0 5-2.3 5-5.2V17.6c0-2.9-2.2-5.2-5-5.2h-29.1c-2.1 0-4 1.5-4.5 3.5l-4.5 18.1c-.5 1.9-2.4 3.3-4.5 3.3H89.9c-3.7 0-7.1 2-9 5.1L56.2 91c-.9 1.6-1.4 3.3-1.4 5.1 0 .8.1 1.5.2 2.3-12.5 2.4-22 11.4-24.6 23.6a33 33 0 00.8 16.4A30 30 0 0025 155.8c0 16.6 13.5 30 30.2 30H163c12.9 0 23.7-9.7 25-22.2 1.3-12.3-6-23.4-17.3-27.2l2.9-12.2z" fill="#F6821F"/>
+      <path d="M175.3 119.7c-.4 1.3-.9 2.6-1.5 3.8 5.1 3.7 8.4 9.5 8 16-1 9-8.5 16.1-17.8 16.1H55.3c-9.9 0-17.8-7.6-17.8-16.9 0-4.3 1.7-8.3 4.4-11.2a22 22 0 01-.7-11.4c1.8-8.6 8.8-15.1 17.7-16.1v-1.8c0-2.7 1-5.3 2.9-7.4l1-.9 90.8 1.2c7.5.4 13.8 5.6 15.7 12.6z" fill="#FBAD41"/>
+    </svg>
+  )
+}
+
+function CheckMark() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+      <path d="M1.5 6.5L5 10L11.5 3" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  )
+}
 
 export function TurnstileWidget({ status, onRetry }: Props) {
   if (!SITE_KEY) return null
 
   return (
     <Box sx={{
-      border: `1px solid ${status === 'error' ? 'rgba(225,29,72,0.25)' : 'rgba(0,0,0,0.1)'}`,
-      borderRadius: radius.xl,
-      background: '#fafafa',
-      px: 1.5,
-      py: 1,
+      border: '1px solid',
+      borderColor: status === 'error' ? 'rgba(217,119,6,0.4)' : 'rgba(0,0,0,0.13)',
+      borderRadius: '4px',
+      background: '#f9f9f9',
+      height: 64,
+      display: 'flex',
+      alignItems: 'stretch',
+      overflow: 'hidden',
+      boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
       userSelect: 'none',
     }}>
-      <Stack direction="row" alignItems="center" spacing={1.5}>
-        <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+      {/* Status area */}
+      <Stack direction="row" alignItems="center" spacing={1.5} sx={{ flex: 1, px: 2 }}>
+        <Box sx={{ width: 26, height: 26, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {status === 'pending' && (
-            <Box sx={{ width: 28, height: 28, border: '1.5px solid rgba(0,0,0,0.15)', borderRadius: radius.md, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <CircularProgress size={14} sx={{ color: 'rgba(0,0,0,0.25)' }} />
+            <Box sx={{
+              width: 24, height: 24, borderRadius: '3px',
+              border: '1.5px solid #c0c0c0', background: '#fff',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <CircularProgress size={13} sx={{ color: '#c0c0c0' }} />
             </Box>
           )}
           {status === 'verified' && (
-            <Box sx={{ width: 28, height: 28, borderRadius: radius.md, background: '#00b341', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M2 7l3.5 3.5L12 3.5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+            <Box sx={{
+              width: 24, height: 24, borderRadius: '50%',
+              background: 'linear-gradient(135deg, #00b341 0%, #00952f 100%)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 1px 4px rgba(0,180,65,0.35)',
+            }}>
+              <CheckMark />
             </Box>
           )}
           {status === 'error' && (
@@ -49,40 +70,59 @@ export function TurnstileWidget({ status, onRetry }: Props) {
               type="button"
               onClick={onRetry}
               sx={{
-                width: 28, height: 28, borderRadius: radius.md,
-                background: 'rgba(225,29,72,0.1)', border: 'none', cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                '&:hover': { background: 'rgba(225,29,72,0.18)' },
+                width: 24, height: 24, borderRadius: '50%',
+                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                border: 'none', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 1px 4px rgba(217,119,6,0.35)',
+                '&:hover': { filter: 'brightness(1.1)' },
               }}
             >
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M7 1v4M7 9v4M1 7h4M9 7h4" stroke="#e11d48" strokeWidth="2" strokeLinecap="round"/>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M6 2v4M6 9v.5" stroke="white" strokeWidth="1.8" strokeLinecap="round"/>
               </svg>
             </Box>
           )}
         </Box>
 
-        <Box sx={{ flex: 1 }} />
-
-        <Stack alignItems="flex-end" spacing={0} sx={{ flexShrink: 0 }}>
-          <Stack direction="row" alignItems="center" spacing={0.5}>
-            <CloudflareIcon />
-            <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#1d1d1d', lineHeight: 1 }}>
-              Cloudflare
-            </Typography>
-          </Stack>
-          {status === 'error' ? (
-            <Typography
-              sx={{ fontSize: '0.62rem', color: '#e11d48', fontWeight: 600, lineHeight: 1.4, cursor: 'pointer' }}
-              onClick={onRetry}
-            >
-              Tentar novamente
-            </Typography>
-          ) : (
-            <Typography sx={{ fontSize: '0.62rem', color: 'rgba(0,0,0,0.35)', lineHeight: 1.4 }}>
-              Privacidade · Termos
+        <Box>
+          <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: '#1a1a1a', lineHeight: 1.2 }}>
+            {status === 'error' ? (
+              <Box
+                component="span"
+                onClick={onRetry}
+                sx={{ cursor: 'pointer', color: '#d97706', textDecoration: 'underline', textDecorationStyle: 'dotted' }}
+              >
+                Tentar novamente
+              </Box>
+            ) : 'Não sou robô'}
+          </Typography>
+          {status === 'pending' && (
+            <Typography sx={{ fontSize: '0.65rem', color: '#999', lineHeight: 1.3, mt: 0.2 }}>
+              verificando...
             </Typography>
           )}
+          {status === 'error' && (
+            <Typography sx={{ fontSize: '0.65rem', color: '#d97706', lineHeight: 1.3, mt: 0.2 }}>
+              falha na verificação
+            </Typography>
+          )}
+        </Box>
+      </Stack>
+
+      {/* Divider */}
+      <Box sx={{ width: '1px', background: 'rgba(0,0,0,0.1)', flexShrink: 0, my: 1 }} />
+
+      {/* Cloudflare branding */}
+      <Stack alignItems="center" justifyContent="center" sx={{ px: 1.5, minWidth: 82, gap: 0 }}>
+        <CloudflareLogo />
+        <Typography sx={{ fontSize: '0.6rem', fontWeight: 700, color: '#555', letterSpacing: 0.3, lineHeight: 1.4, mt: 0.3 }}>
+          Cloudflare
+        </Typography>
+        <Stack direction="row" spacing={0.4}>
+          <Typography sx={{ fontSize: '0.52rem', color: '#aaa', lineHeight: 1 }}>Privacidade</Typography>
+          <Typography sx={{ fontSize: '0.52rem', color: '#ccc', lineHeight: 1 }}>·</Typography>
+          <Typography sx={{ fontSize: '0.52rem', color: '#aaa', lineHeight: 1 }}>Termos</Typography>
         </Stack>
       </Stack>
     </Box>

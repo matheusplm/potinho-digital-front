@@ -17,7 +17,9 @@ import { Button, Input, ScrollablePage, toast } from '../components/ui'
 import { fadeIn, font, radius } from '../design-system'
 
 type Section = 'profile' | 'email'
-type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken'
+type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid'
+
+const USERNAME_RE = /^[a-z0-9_]+$/
 
 export function ContaPage() {
   const { theme } = useBackground()
@@ -37,10 +39,12 @@ export function ContaPage() {
   const emailRetry = useRetryAfter()
 
   const handleUsernameChange = (value: string) => {
-    setProfileForm((f) => ({ ...f, username: value }))
+    const lower = value.toLowerCase()
+    setProfileForm((f) => ({ ...f, username: lower }))
     if (usernameTimer.current) clearTimeout(usernameTimer.current)
-    const trimmed = value.trim()
+    const trimmed = lower.trim()
     if (!trimmed || trimmed === user?.username) { setUsernameStatus('idle'); return }
+    if (!USERNAME_RE.test(trimmed) || trimmed.length < 3) { setUsernameStatus('invalid'); return }
     setUsernameStatus('checking')
     usernameTimer.current = setTimeout(async () => {
       try {
@@ -49,11 +53,11 @@ export function ContaPage() {
       } catch {
         setUsernameStatus('idle')
       }
-    }, 500)
+    }, 700)
   }
 
   const handleProfileSave = async () => {
-    if (usernameStatus === 'taken' || usernameStatus === 'checking') return
+    if (usernameStatus === 'taken' || usernameStatus === 'checking' || usernameStatus === 'invalid') return
     const name = profileForm.name.trim()
     const username = profileForm.username.trim() || undefined
     if (!name) return
@@ -167,23 +171,23 @@ export function ContaPage() {
                     fullWidth
                     placeholder="@meunome"
                     inputProps={{ maxLength: 30 }}
-                    error={usernameStatus === 'taken'}
+                    error={usernameStatus === 'taken' || usernameStatus === 'invalid'}
                     InputProps={usernameStatus === 'checking' ? {
                       endAdornment: <CircularProgress size={14} sx={{ color: theme.textOnBgMuted, mr: 0.5 }} />,
                     } : undefined}
                   />
                   <Typography sx={{
                     fontSize: '0.7rem', mt: 0.4, pl: 0.3, fontWeight: usernameStatus === 'idle' ? 400 : 600,
-                    color: usernameStatus === 'available' ? '#22c55e' : usernameStatus === 'taken' ? '#e11d48' : theme.textOnBgMuted,
+                    color: usernameStatus === 'available' ? '#22c55e' : (usernameStatus === 'taken' || usernameStatus === 'invalid') ? '#e11d48' : theme.textOnBgMuted,
                   }}>
-                    {usernameStatus === 'available' ? '✓ disponível' : usernameStatus === 'taken' ? 'já está em uso' : 'Identificador único, sem espaços.'}
+                    {usernameStatus === 'available' ? '✓ disponível' : usernameStatus === 'taken' ? 'já está em uso' : usernameStatus === 'invalid' ? 'Apenas letras minúsculas, números e _ (mín. 3)' : 'Identificador único, sem espaços.'}
                   </Typography>
                 </Box>
                 <Stack direction="row" spacing={1} justifyContent="flex-end">
                   <Button variant="ghost" onClick={() => setEditing(null)} disabled={profileLoading} sx={{ fontSize: '0.82rem' }}>
                     Cancelar
                   </Button>
-                  <Button variant="primary" onClick={handleProfileSave} loading={profileLoading} disabled={!profileForm.name.trim() || usernameStatus === 'taken' || usernameStatus === 'checking'} sx={{ fontSize: '0.82rem' }}>
+                  <Button variant="primary" onClick={handleProfileSave} loading={profileLoading} disabled={!profileForm.name.trim() || usernameStatus === 'taken' || usernameStatus === 'checking' || usernameStatus === 'invalid'} sx={{ fontSize: '0.82rem' }}>
                     Salvar
                   </Button>
                 </Stack>
