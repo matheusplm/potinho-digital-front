@@ -10,7 +10,6 @@ import { colors, font, radius } from '../../design-system'
 import { useBackground } from '../../context/BackgroundContext'
 import { useUser } from '../../context/UserContext'
 import { api } from '../../services/api'
-import { recordMailSent, cooldownRemainingMs } from '../../hooks/useMailCooldown'
 import type { CollectionPack } from '../../types/note'
 import { actionButtonSx } from './shared'
 
@@ -47,30 +46,19 @@ export function AccessTab({ cid }: AccessTabProps) {
     try {
       await grantMutation.mutateAsync(email)
       setEmailInput('')
-      api.sendInvite(cid, email).catch(() => {})
-      recordMailSent(`invite:${cid}:${email}`)
-      toast.success(`Convite enviado para ${email}!`, { description: 'Um email de convite foi enviado.' })
+      api.sendInvite(cid, email).catch((e) => {
+        toast.error((e as Error).message || 'Erro ao enviar convite.')
+      })
+      toast.success(`Acesso concedido para ${email}!`, { description: 'Um email de convite foi enviado.' })
     } catch (e) {
       toast.error((e as Error).message || 'Erro ao conceder acesso.')
     }
   }
 
-  const INVITE_COOLDOWN_MS = 5 * 60_000
-
   async function handleResendInvite(email: string) {
-    const remaining = cooldownRemainingMs(`invite:${cid}:${email}`, INVITE_COOLDOWN_MS)
-    if (remaining > 0) {
-      const s = Math.ceil(remaining / 1000)
-      const m = Math.floor(s / 60)
-      const sec = s % 60
-      const label = m > 0 ? `${m}min${sec > 0 ? ` ${sec}s` : ''}` : `${sec}s`
-      toast.error(`Aguarde ${label} para reenviar o convite.`)
-      return
-    }
     setResendingFor(email)
     try {
       await api.sendInvite(cid, email)
-      recordMailSent(`invite:${cid}:${email}`)
       toast.success('Convite reenviado!', { description: email })
     } catch (e) {
       toast.error((e as Error).message || 'Erro ao reenviar convite.')

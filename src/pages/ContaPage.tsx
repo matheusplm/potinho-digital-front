@@ -12,7 +12,6 @@ import { useRef, useState } from 'react'
 import { useBackground } from '../context/BackgroundContext'
 import { useUser } from '../context/UserContext'
 import { api } from '../services/api'
-import { useCooldown } from '../hooks/useMailCooldown'
 import { Button, Input, ScrollablePage, toast } from '../components/ui'
 import { fadeIn, font, radius } from '../design-system'
 
@@ -34,7 +33,6 @@ export function ContaPage() {
   const [emailSent, setEmailSent] = useState(false)
   const [emailSentTo, setEmailSentTo] = useState('')
   const [pendingNewEmail, setPendingNewEmail] = useState('')
-  const emailCooldown = useCooldown(`change-email:${user?.email ?? ''}`, 10 * 60_000)
 
   const handleUsernameChange = (value: string) => {
     setProfileForm((f) => ({ ...f, username: value }))
@@ -73,11 +71,10 @@ export function ContaPage() {
   const handleEmailChange = async (e: React.FormEvent) => {
     e.preventDefault()
     const { newEmail, password } = emailForm
-    if (!newEmail.trim() || !password || emailCooldown.inCooldown) return
+    if (!newEmail.trim() || !password) return
     setEmailLoading(true)
     try {
       await api.changeEmail(newEmail.trim(), password)
-      emailCooldown.record()
       setEmailSentTo(user?.email ?? '')
       setPendingNewEmail(newEmail.trim())
       setEmailSent(true)
@@ -260,8 +257,8 @@ export function ContaPage() {
                       <Button variant="ghost" onClick={() => setEditing(null)} disabled={emailLoading} sx={{ fontSize: '0.82rem' }}>
                         Cancelar
                       </Button>
-                      <Button variant="primary" type="submit" loading={emailLoading} disabled={!emailForm.newEmail || !emailForm.password || emailCooldown.inCooldown} sx={{ fontSize: '0.82rem' }}>
-                        {emailCooldown.inCooldown ? `Aguarde ${emailCooldown.label}` : 'Enviar confirmação'}
+                      <Button variant="primary" type="submit" loading={emailLoading} disabled={!emailForm.newEmail || !emailForm.password} sx={{ fontSize: '0.82rem' }}>
+                        Enviar confirmação
                       </Button>
                     </Stack>
                   </Stack>
