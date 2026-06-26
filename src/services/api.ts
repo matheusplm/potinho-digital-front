@@ -12,7 +12,6 @@ import type {
   CollectionPackFormData,
   CollectionPlayView,
   InviteDetails,
-  MailLogEntry,
   NoteFormData,
   NoteRecord,
   NoteTypeConfig,
@@ -269,8 +268,6 @@ export const api = {
     request<{ ok: boolean; collectionId: string }>(`/api/invite/${token}/accept`, { method: 'POST', body: JSON.stringify({}) }),
   rejectInvite: (token: string) =>
     request<{ ok: boolean }>(`/api/invite/${token}/reject`, { method: 'POST', body: JSON.stringify({}) }),
-  getMailLogs: () =>
-    request<MailLogEntry[]>('/api/mail/logs'),
   getEmailPreview: (type: string) =>
     requestRaw(`/api/mail/preview?type=${encodeURIComponent(type)}`),
   getReaderView: (cid: string, email: string) =>

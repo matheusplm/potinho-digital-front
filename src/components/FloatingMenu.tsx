@@ -1,7 +1,6 @@
 ﻿import LogoutIcon from '@mui/icons-material/Logout'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined'
-import MailOutlinedIcon from '@mui/icons-material/MailOutlined'
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
 import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined'
 import CheckIcon from '@mui/icons-material/Check'
@@ -344,28 +343,6 @@ export function FloatingMenu() {
                   Minha conta
                 </Typography>
               </Stack>
-              {user?.role === 'writer' && (
-                <Stack
-                  direction="row" spacing={1.4}
-                  onClick={() => { setOpen(false); navigate('/mail-logs') }}
-                  sx={{
-                    alignItems: 'center', px: 1.4, py: 1, cursor: 'pointer', borderRadius: radius.md,
-                    transition: 'background 0.12s',
-                    '&:hover': { bgcolor: `${theme.accent}0e` },
-                  }}
-                >
-                  <Box sx={{
-                    width: 30, height: 30, borderRadius: radius.sm, flexShrink: 0,
-                    background: `${theme.accent}14`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    <MailOutlinedIcon sx={{ fontSize: 16, color: theme.accent }} />
-                  </Box>
-                  <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: theme.textOnBg }}>
-                    Log de emails
-                  </Typography>
-                </Stack>
-              )}
             </Box>
 
             <Box sx={{ height: '1px', bgcolor: theme.surfaceBorder, mx: 1.5 }} />

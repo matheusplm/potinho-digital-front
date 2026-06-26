@@ -19,13 +19,8 @@ import {
   nextId,
   resolveUser,
   type CollectionState,
-  type MailLogType,
   type MockUser,
 } from './db'
-
-function logMail(type: MailLogType, to: string) {
-  db.mailLogs.push({ id: nextId('mail'), type, to, sentAt: new Date().toISOString(), status: 'sent' })
-}
 
 function evaluateReaderAchievements(collection: CollectionState) {
   const { ownership, notes, achievements, achievementState } = collection
@@ -205,17 +200,13 @@ const authHandlers = [
     return HttpResponse.json({ token: user.token, refreshToken: `refresh-${user.token}`, user: { ...publicUser(user), email: user.email, onboardingDone: null } })
   }),
 
-  http.post('/auth/resend-verification', async ({ request }) => {
+  http.post('/auth/resend-verification', async () => {
     await delay(300)
-    const { email } = (await request.json()) as { email?: string }
-    if (email) logMail('resend-verification', email)
     return HttpResponse.json({ ok: true })
   }),
 
-  http.post('/auth/forgot-password', async ({ request }) => {
+  http.post('/auth/forgot-password', async () => {
     await delay(300)
-    const { email } = (await request.json()) as { email?: string; captchaToken?: string }
-    if (email) logMail('password-reset', email)
     return HttpResponse.json({ ok: true })
   }),
 
@@ -237,7 +228,6 @@ const authHandlers = [
     const { newEmail } = (await request.json()) as { newEmail?: string; password?: string }
     if (newEmail) {
       user.pendingEmail = newEmail
-      logMail('change-email', user.email)
     }
     return HttpResponse.json({ ok: true })
   }),
@@ -447,17 +437,7 @@ const collectionHandlers = [
     await delay(200)
     const auth = authorizeCollection(request, String(params.cid), 'owner')
     if (!auth.ok) return auth.response
-    const emailParam = decodeURIComponent(String(params.email))
-    logMail('invite', emailParam)
     return HttpResponse.json({ ok: true })
-  }),
-
-  http.get('/api/mail/logs', async ({ request }) => {
-    await delay(200)
-    const user = resolveUser(tokenFrom(request))
-    if (!user || user.role !== 'writer') return HttpResponse.json({ message: 'Não autorizado.' }, { status: 403 })
-    const logs = [...db.mailLogs].reverse().slice(0, 100)
-    return HttpResponse.json(logs)
   }),
 
   http.get('/api/collections/:cid/packs', async ({ params, request }) => {
