@@ -5,7 +5,10 @@ import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined'
 import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined'
 import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined'
 import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined'
-import { Box, Chip, Stack, Typography, useMediaQuery } from '@mui/material'
+import LinkedInIcon from '@mui/icons-material/LinkedIn'
+import InstagramIcon from '@mui/icons-material/Instagram'
+import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
+import { Box, Chip, IconButton, Stack, Tooltip, Typography, useMediaQuery } from '@mui/material'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, ScrollHint } from '../components/ui'
@@ -480,9 +483,50 @@ export function LandingPage() {
               ✓ Gratuito &nbsp;·&nbsp; ✓ Sem cartão de crédito
             </Typography>
           </Box>
-          <Typography sx={{ mt: 3.5, textAlign: 'center', fontSize: '0.75rem', color: 'rgba(30,58,95,0.32)', fontStyle: 'italic' }}>
-            Feito com ❤️ para guardar o que importa.
-          </Typography>
+          <Box component="footer" sx={{ mt: 4, textAlign: 'center' }}>
+            <Typography sx={{ fontSize: '0.74rem', color: 'rgba(30,58,95,0.35)', fontStyle: 'italic', mb: 1.2 }}>
+              Feito com ❤️ para guardar o que importa.
+            </Typography>
+            <Typography sx={{ fontSize: '0.72rem', color: 'rgba(30,58,95,0.38)', mb: 1 }}>
+              Criado por <strong style={{ fontWeight: 600 }}>Matheus Pereira Lopes de Morais</strong>
+            </Typography>
+            <Stack direction="row" spacing={0.5} justifyContent="center">
+              <Tooltip title="LinkedIn">
+                <IconButton
+                  component="a"
+                  href="https://www.linkedin.com/in/matheus-pereira-lopes/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  size="small"
+                  sx={{ color: 'rgba(30,58,95,0.35)', transition: 'color 0.18s', '&:hover': { color: '#0a66c2', background: 'rgba(10,102,194,0.08)' } }}
+                >
+                  <LinkedInIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Instagram">
+                <IconButton
+                  component="a"
+                  href="https://www.instagram.com/matheusplm96/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  size="small"
+                  sx={{ color: 'rgba(30,58,95,0.35)', transition: 'color 0.18s', '&:hover': { color: '#e1306c', background: 'rgba(225,48,108,0.08)' } }}
+                >
+                  <InstagramIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="matheusmty@gmail.com">
+                <IconButton
+                  component="a"
+                  href="mailto:matheusmty@gmail.com"
+                  size="small"
+                  sx={{ color: 'rgba(30,58,95,0.35)', transition: 'color 0.18s', '&:hover': { color: '#1d4ed8', background: 'rgba(29,78,216,0.08)' } }}
+                >
+                  <AlternateEmailIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
+            </Stack>
+          </Box>
         </Box>
 
       </Box>
