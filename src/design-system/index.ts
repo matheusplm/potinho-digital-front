@@ -6,5 +6,5 @@ export {
   overlayIn, cardIn, slideR, slideL, menuIn,
   shimmer, hintWiggle, sway,
   shineSweep, packCtaFloat, heartPulseAura, ghostPulse,
-  dropFade, heartBeat, chevronPulse, floatHeart,
+  dropFade, heartBeat, chevronPulse, floatHeart, floatHeartLanding,
 } from './animations'

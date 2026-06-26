@@ -108,3 +108,20 @@ export const floatHeart = (i: number) => keyframes`
   85%  { opacity: ${0.04 + (i % 3) * 0.01}; }
   100% { transform: translateY(-100vh) rotate(${i % 2 === 0 ? 10 : -8}deg); opacity: 0; }
 `
+
+export const floatHeartLanding = (i: number) => {
+  const driftMid = i % 3 === 0 ? 16 : i % 3 === 1 ? -18 : 8
+  const driftEnd = i % 2 === 0 ? -10 : 12
+  const rotateMid = (i * 11) % 20 - 10
+  const rotateStart = (i * 13 + 5) % 22 - 11
+  const rotateEnd = (i * 7) % 18 - 9
+  const opacityPeak = 0.14 + (i % 5) * 0.04
+  const opacityLate = 0.06 + (i % 3) * 0.03
+  return keyframes`
+    0%   { transform: translateY(0) translateX(0) rotate(${rotateStart}deg) scale(0.82); opacity: 0; }
+    14%  { opacity: ${opacityPeak}; }
+    50%  { transform: translateY(-50vh) translateX(${driftMid}px) rotate(${rotateMid}deg) scale(1.12); }
+    88%  { opacity: ${opacityLate}; }
+    100% { transform: translateY(-115vh) translateX(${driftEnd}px) rotate(${rotateEnd}deg) scale(0.72); opacity: 0; }
+  `
+}

@@ -12,11 +12,28 @@ import { Box, Chip, IconButton, Stack, Tooltip, Typography, useMediaQuery } from
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, ScrollHint } from '../components/ui'
-import { backgroundThemes, colors, fadeInHero, fadeInRight, font, radius } from '../design-system'
+import { backgroundThemes, colors, fadeInHero, fadeInRight, floatHeartLanding, font, radius } from '../design-system'
 import { AUDIENCES, CUSTOMIZATIONS, DEMO_NOTES, FEATURES, RARITY_COLOR, RARITY_FILTERS, STEPS } from './landing/landingData'
 import { SectionTitle } from './landing/SectionTitle'
 import { DemoNoteCard } from './landing/DemoNoteCard'
 import { HeroCardStack } from './landing/HeroCardStack'
+
+const LANDING_HEARTS = [
+  { size: 34, left: '4%',   delay: '0s',    dur: '18s', color: '#1d4ed8', blur: '1px'   },
+  { size: 13, left: '11%',  delay: '2.5s',  dur: '12s', color: '#e11d48', blur: '0px'   },
+  { size: 22, left: '19%',  delay: '6s',    dur: '16s', color: '#7c3aed', blur: '0.5px' },
+  { size: 10, left: '28%',  delay: '1s',    dur: '10s', color: '#db2777', blur: '0px'   },
+  { size: 18, left: '36%',  delay: '9s',    dur: '14s', color: '#1d4ed8', blur: '0.5px' },
+  { size: 28, left: '46%',  delay: '4s',    dur: '17s', color: '#e11d48', blur: '1.5px' },
+  { size: 11, left: '55%',  delay: '7s',    dur: '11s', color: '#7c3aed', blur: '0px'   },
+  { size: 20, left: '63%',  delay: '0.5s',  dur: '15s', color: '#0ea5e9', blur: '0.5px' },
+  { size: 15, left: '72%',  delay: '11s',   dur: '13s', color: '#db2777', blur: '0px'   },
+  { size: 30, left: '80%',  delay: '3s',    dur: '19s', color: '#1d4ed8', blur: '1.5px' },
+  { size: 10, left: '89%',  delay: '5.5s',  dur: '9s',  color: '#e11d48', blur: '0px'   },
+  { size: 24, left: '15%',  delay: '13s',   dur: '14s', color: '#0ea5e9', blur: '1px'   },
+  { size: 16, left: '33%',  delay: '15s',   dur: '16s', color: '#7c3aed', blur: '0.5px' },
+  { size: 12, left: '58%',  delay: '17s',   dur: '12s', color: '#db2777', blur: '0px'   },
+]
 
 export function LandingPage() {
   const navigate = useNavigate()
@@ -35,6 +52,19 @@ export function LandingPage() {
         <Box sx={{ position: 'absolute', top: -100, right: -100, width: 420, height: 420, borderRadius: '50%', background: 'radial-gradient(circle,rgba(29,78,216,0.09) 0%,transparent 70%)' }} />
         <Box sx={{ position: 'absolute', bottom: 80, left: -80, width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle,rgba(225,29,72,0.07) 0%,transparent 70%)' }} />
       </Box>
+
+      {LANDING_HEARTS.map((h, i) => (
+        <FavoriteIcon key={i} sx={{
+          position: 'fixed', bottom: -12, left: h.left,
+          fontSize: h.size, zIndex: 0, opacity: 0,
+          color: h.color,
+          filter: h.blur !== '0px'
+            ? `blur(${h.blur}) drop-shadow(0 0 6px ${h.color}88)`
+            : `drop-shadow(0 0 5px ${h.color}77)`,
+          animation: `${floatHeartLanding(i)} ${h.dur} ${h.delay} ease-in infinite`,
+          pointerEvents: 'none',
+        }} />
+      ))}
 
       {/* Navbar */}
       <Box component="nav" sx={{
