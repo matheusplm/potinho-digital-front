@@ -561,7 +561,7 @@ const ThemesSection: FC<{ isDesktop: boolean }> = ({ isDesktop }) => {
       </SectionTitle>
 
       {isDesktop ? (
-        <Box sx={{ overflowX: 'auto', pt: 2.5, pb: 1, '&::-webkit-scrollbar': { display: 'none' } }}>
+        <Box sx={{ overflowX: 'auto', pt: 2.5, pb: 1.5, px: 1, '&::-webkit-scrollbar': { display: 'none' } }}>
           <Box sx={{ display: 'flex', gap: 1.5, width: 'max-content' }}>
             {backgroundThemes.map((t) => {
               const sel = t.key === activeKey
