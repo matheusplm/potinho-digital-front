@@ -1,8 +1,10 @@
 import { Box } from '@mui/material'
 import { Turnstile } from '@marsidev/react-turnstile'
 import type { TurnstileInstance } from '@marsidev/react-turnstile'
-import { forwardRef } from 'react'
+import { forwardRef, useEffect } from 'react'
 import { radius } from '../../design-system'
+
+const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined
 
 type Status = 'pending' | 'verified' | 'error'
 
@@ -15,6 +17,12 @@ interface Props {
 
 export const TurnstileWidget = forwardRef<TurnstileInstance, Props>(
   ({ status, onSuccess, onError, onExpire }, ref) => {
+    useEffect(() => {
+      if (!SITE_KEY) onSuccess('bypass')
+    }, [])
+
+    if (!SITE_KEY) return null
+
     return (
       <Box sx={{
         borderRadius: radius.xl,
@@ -29,7 +37,7 @@ export const TurnstileWidget = forwardRef<TurnstileInstance, Props>(
       }}>
         <Turnstile
           ref={ref}
-          siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY as string}
+          siteKey={SITE_KEY}
           onSuccess={onSuccess}
           onError={onError}
           onExpire={onExpire}

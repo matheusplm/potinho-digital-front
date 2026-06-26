@@ -12,6 +12,7 @@ import { useRef, useState } from 'react'
 import { useBackground } from '../context/BackgroundContext'
 import { useUser } from '../context/UserContext'
 import { api } from '../services/api'
+import { useRetryAfter } from '../hooks/useRetryAfter'
 import { Button, Input, ScrollablePage, toast } from '../components/ui'
 import { fadeIn, font, radius } from '../design-system'
 
@@ -33,6 +34,7 @@ export function ContaPage() {
   const [emailSent, setEmailSent] = useState(false)
   const [emailSentTo, setEmailSentTo] = useState('')
   const [pendingNewEmail, setPendingNewEmail] = useState('')
+  const emailRetry = useRetryAfter()
 
   const handleUsernameChange = (value: string) => {
     setProfileForm((f) => ({ ...f, username: value }))
@@ -71,7 +73,7 @@ export function ContaPage() {
   const handleEmailChange = async (e: React.FormEvent) => {
     e.preventDefault()
     const { newEmail, password } = emailForm
-    if (!newEmail.trim() || !password) return
+    if (!newEmail.trim() || !password || emailRetry.blocked) return
     setEmailLoading(true)
     try {
       await api.changeEmail(newEmail.trim(), password)
@@ -79,6 +81,7 @@ export function ContaPage() {
       setPendingNewEmail(newEmail.trim())
       setEmailSent(true)
     } catch (err: unknown) {
+      emailRetry.captureFromError(err)
       toast.error((err as Error).message || 'Erro ao solicitar troca de email.')
     } finally {
       setEmailLoading(false)
@@ -257,8 +260,8 @@ export function ContaPage() {
                       <Button variant="ghost" onClick={() => setEditing(null)} disabled={emailLoading} sx={{ fontSize: '0.82rem' }}>
                         Cancelar
                       </Button>
-                      <Button variant="primary" type="submit" loading={emailLoading} disabled={!emailForm.newEmail || !emailForm.password} sx={{ fontSize: '0.82rem' }}>
-                        Enviar confirmação
+                      <Button variant="primary" type="submit" loading={emailLoading} disabled={!emailForm.newEmail || !emailForm.password || emailRetry.blocked} sx={{ fontSize: '0.82rem' }}>
+                        {emailRetry.blocked ? `Aguarde ${emailRetry.label}` : 'Enviar confirmação'}
                       </Button>
                     </Stack>
                   </Stack>

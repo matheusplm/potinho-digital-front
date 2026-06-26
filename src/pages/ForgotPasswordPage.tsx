@@ -6,6 +6,7 @@ import { useRef, useState } from 'react'
 import type { TurnstileInstance } from '@marsidev/react-turnstile'
 import { Link } from 'react-router-dom'
 import { api } from '../services/api'
+import { useRetryAfter } from '../hooks/useRetryAfter'
 import { Button, Input, TurnstileWidget } from '../components/ui'
 import { fadeSlide, floatHeart, font } from '../design-system'
 
@@ -24,16 +25,18 @@ export function ForgotPasswordPage() {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaStatus, setCaptchaStatus] = useState<'pending' | 'verified' | 'error'>('pending')
   const turnstileRef = useRef<TurnstileInstance>(null)
+  const retry = useRetryAfter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email.trim() || !captchaToken) return
+    if (!email.trim() || !captchaToken || retry.blocked) return
     setError('')
     setLoading(true)
     try {
       await api.forgotPassword(email.trim(), captchaToken)
       setSent(true)
     } catch (err: unknown) {
+      retry.captureFromError(err)
       setError((err as Error).message || 'Erro ao enviar email.')
       turnstileRef.current?.reset()
       setCaptchaToken(null)
@@ -99,8 +102,8 @@ export function ForgotPasswordPage() {
                   onError={() => { setCaptchaToken(null); setCaptchaStatus('error') }}
                   onExpire={() => { setCaptchaToken(null); setCaptchaStatus('pending') }}
                 />
-                <Button variant="primary" type="submit" fullWidth loading={loading} disabled={!email.trim() || !captchaToken}>
-                  Enviar link
+                <Button variant="primary" type="submit" fullWidth loading={loading} disabled={!email.trim() || !captchaToken || retry.blocked}>
+                  {retry.blocked ? `Aguarde ${retry.label}` : 'Enviar link'}
                 </Button>
                 {error && (
                   <Box sx={{ px: 1.5, py: 1, borderRadius: '10px', background: 'rgba(225,29,72,0.08)', border: '1px solid rgba(225,29,72,0.2)' }}>

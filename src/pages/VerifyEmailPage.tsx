@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { api } from '../services/api'
+import { useRetryAfter } from '../hooks/useRetryAfter'
 import { Button, toast } from '../components/ui'
 import { fadeSlide, floatHeart, font } from '../design-system'
 
@@ -27,6 +28,7 @@ export function VerifyEmailPage() {
   const [resendLoading, setResendLoading] = useState(false)
   const [resendSent, setResendSent] = useState(false)
   const verified = useRef(false)
+  const retry = useRetryAfter()
 
   useEffect(() => {
     if (!token || verified.current) return
@@ -44,13 +46,14 @@ export function VerifyEmailPage() {
   }, [token, setUser, navigate])
 
   const handleResend = async () => {
-    if (!emailFromState) return
+    if (!emailFromState || retry.blocked) return
     setResendLoading(true)
     try {
       await api.resendVerification(emailFromState)
       setResendSent(true)
       toast.success('Email reenviado!')
     } catch (err: unknown) {
+      retry.captureFromError(err)
       toast.error((err as Error).message || 'Erro ao reenviar. Tente novamente.')
     } finally {
       setResendLoading(false)
@@ -139,13 +142,18 @@ export function VerifyEmailPage() {
               Não recebeu? Verifique a pasta de spam.
             </Typography>
             {emailFromState && !resendSent && (
-              <Button variant="ghost" loading={resendLoading} onClick={handleResend} sx={{ width: '100%' }}>
-                Reenviar email
+              <Button variant="ghost" loading={resendLoading} disabled={retry.blocked} onClick={handleResend} sx={{ width: '100%' }}>
+                {retry.blocked ? `Aguarde ${retry.label}` : 'Reenviar email'}
               </Button>
             )}
-            {resendSent && (
+            {resendSent && !retry.blocked && (
               <Typography sx={{ fontSize: '0.85rem', color: '#1d4ed8', fontWeight: 600 }}>
                 Email reenviado!
+              </Typography>
+            )}
+            {resendSent && retry.blocked && (
+              <Typography sx={{ fontSize: '0.78rem', color: 'rgba(30,58,95,0.45)' }}>
+                Próximo reenvio em {retry.label}
               </Typography>
             )}
             {import.meta.env.DEV && emailFromState && (

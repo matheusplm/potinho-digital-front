@@ -29,7 +29,7 @@ let redirectingToLogin = false
 let refreshPromise: Promise<string | null> | null = null
 
 export class ApiRequestError extends Error {
-  constructor(message: string, public status: number, public availableAt?: string, public code?: string) {
+  constructor(message: string, public status: number, public availableAt?: string, public code?: string, public retryAfterSec?: number) {
     super(message)
   }
 }
@@ -180,10 +180,10 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
   }
 
   if (!response.ok) {
-    const payload = (await response.json()) as { message?: string; error?: string; details?: unknown; availableAt?: string }
+    const payload = (await response.json()) as { message?: string; error?: string; details?: unknown; availableAt?: string; retryAfterSec?: number }
     const code = payload.error
     const message = (code && FRIENDLY_ERROR_MESSAGES[code]) ?? payload.message ?? code ?? 'Erro inesperado na API.'
-    throw new ApiRequestError(message, response.status, payload.availableAt, code)
+    throw new ApiRequestError(message, response.status, payload.availableAt, code, payload.retryAfterSec)
   }
 
   const json = await response.json()
