@@ -3,6 +3,7 @@ import type { TurnstileInstance } from '@marsidev/react-turnstile'
 import { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react'
 
 const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined
+const CHALLENGE_TIMEOUT_MS = 12000
 
 type CaptchaStatus = 'pending' | 'verified' | 'error'
 
@@ -19,13 +20,41 @@ export function CaptchaProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null)
   const [status, setStatus] = useState<CaptchaStatus>('pending')
   const widgetRef = useRef<TurnstileInstance>(null)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  function clearChallengeTimeout() {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+      timeoutRef.current = null
+    }
+  }
+
+  function startChallengeTimeout() {
+    clearChallengeTimeout()
+    timeoutRef.current = setTimeout(() => {
+      setStatus('error')
+    }, CHALLENGE_TIMEOUT_MS)
+  }
+
+  // Dev bypass
   useEffect(() => {
     if (!SITE_KEY && token === null) {
       setToken('bypass')
       setStatus('verified')
     }
   }, [token])
+
+  // Timeout while challenge is running
+  useEffect(() => {
+    if (!SITE_KEY) return
+    if (status === 'pending') {
+      startChallengeTimeout()
+    } else {
+      clearChallengeTimeout()
+    }
+    return clearChallengeTimeout
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status])
 
   const consume = useCallback((): string | null => {
     const t = token
@@ -50,6 +79,7 @@ export function CaptchaProvider({ children }: { children: React.ReactNode }) {
           siteKey={SITE_KEY}
           onSuccess={(t) => { setToken(t); setStatus('verified') }}
           onError={() => setStatus('error')}
+          onTimeout={() => setStatus('error')}
           onExpire={() => { setToken(null); setStatus('pending'); widgetRef.current?.reset() }}
           options={{ size: 'invisible', language: 'pt-BR' }}
         />
