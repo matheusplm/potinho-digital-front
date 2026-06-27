@@ -175,7 +175,7 @@ export function DesktopLayout() {
 
         {/* User info */}
         <Box sx={{ px: 2, py: 1.6 }}>
-          <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.94rem', color: theme.textOnBg, lineHeight: 1.2 }}>
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.94rem', color: theme.textOnBg, lineHeight: 1.2, wordBreak: 'break-word' }}>
             {user?.name}
           </Typography>
           <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted, mt: 0.2 }}>

@@ -45,8 +45,8 @@ export function ConfirmEmailChangePage() {
 
   return (
     <Box sx={{
-      minHeight: '100dvh', display: 'flex', flexDirection: 'column', position: 'relative',
-      overflowX: 'hidden', overflowY: 'auto',
+      height: '100dvh', display: 'flex', flexDirection: 'column', position: 'relative',
+      overflow: 'hidden',
       background: 'linear-gradient(160deg, #dbeafe 0%, #fce7f3 55%, #ede9fe 100%)',
     }}>
       <Box sx={{ position: 'absolute', top: -120, right: -120, width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(29,78,216,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />

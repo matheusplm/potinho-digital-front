@@ -16,7 +16,7 @@ import { useRetryAfter } from '../hooks/useRetryAfter'
 import { Button, Input, ScrollablePage, toast } from '../components/ui'
 import { fadeIn, font, radius } from '../design-system'
 
-type Section = 'profile' | 'email'
+type Section = 'profile' | 'email' | 'password'
 type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid'
 
 const USERNAME_RE = /^[a-z0-9_]+$/
@@ -30,6 +30,10 @@ export function ContaPage() {
   const [profileLoading, setProfileLoading] = useState(false)
   const [usernameStatus, setUsernameStatus] = useState<UsernameStatus>('idle')
   const usernameTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' })
+  const [passwordLoading, setPasswordLoading] = useState(false)
+  const passwordRetry = useRetryAfter()
 
   const [emailForm, setEmailForm] = useState({ newEmail: '', password: '' })
   const [emailLoading, setEmailLoading] = useState(false)
@@ -71,6 +75,25 @@ export function ContaPage() {
       toast.error((err as Error).message || 'Erro ao salvar.')
     } finally {
       setProfileLoading(false)
+    }
+  }
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const { currentPassword, newPassword, confirmPassword } = passwordForm
+    if (!currentPassword || !newPassword || !confirmPassword || passwordRetry.blocked) return
+    if (newPassword !== confirmPassword) { toast.error('As senhas não coincidem.'); return }
+    setPasswordLoading(true)
+    try {
+      await api.changePassword(currentPassword, newPassword)
+      toast.success('Senha alterada com sucesso!')
+      setEditing(null)
+      setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' })
+    } catch (err: unknown) {
+      passwordRetry.captureFromError(err)
+      toast.error((err as Error).message || 'Erro ao alterar senha.')
+    } finally {
+      setPasswordLoading(false)
     }
   }
 
@@ -144,7 +167,7 @@ export function ContaPage() {
                 <AccountCircleOutlinedIcon sx={{ fontSize: 19, color: theme.accent }} />
               </Box>
               <Box sx={{ flex: 1, minWidth: 0 }}>
-                <Typography sx={{ fontSize: '0.88rem', fontWeight: 700, color: theme.textOnBg }}>{user?.name}</Typography>
+                <Typography sx={{ fontSize: '0.88rem', fontWeight: 700, color: theme.textOnBg, wordBreak: 'break-word' }}>{user?.name}</Typography>
                 {user?.username && (
                   <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted }}>@{user.username}</Typography>
                 )}
@@ -291,6 +314,83 @@ export function ContaPage() {
                   </Button>
                 </Stack>
               )}
+            </Collapse>
+          </Box>
+
+          {/* ── Senha ── */}
+          <Box sx={{ background: surfaceBg, backdropFilter: 'blur(16px)', borderRadius: radius.lg, border: `1px solid ${borderColor}`, overflow: 'hidden' }}>
+            <Stack
+              direction="row" alignItems="center" spacing={1.5}
+              onClick={() => {
+                if (editing === 'password') {
+                  setEditing(null)
+                  setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' })
+                } else {
+                  setEditing('password')
+                }
+              }}
+              sx={{ px: 2, py: 1.8, cursor: 'pointer', '&:hover': { bgcolor: `${theme.accent}0a` }, transition: 'background 0.12s' }}
+            >
+              <Box sx={{ width: 36, height: 36, borderRadius: radius.md, background: `${theme.accent}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <LockOutlinedIcon sx={{ fontSize: 19, color: theme.accent }} />
+              </Box>
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Typography sx={{ fontSize: '0.88rem', fontWeight: 700, color: theme.textOnBg }}>Senha</Typography>
+                <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted }}>alterar senha de acesso</Typography>
+              </Box>
+              {editing === 'password' ? <KeyboardArrowUpIcon sx={{ fontSize: 18, color: theme.textOnBgMuted }} /> : <KeyboardArrowDownIcon sx={{ fontSize: 18, color: theme.textOnBgMuted }} />}
+            </Stack>
+
+            <Collapse in={editing === 'password'}>
+              <Divider sx={{ borderColor }} />
+              <Box component="form" onSubmit={handlePasswordChange} sx={{ px: 2, py: 2 }}>
+                <Stack spacing={1.5}>
+                  <Input
+                    label="Senha atual"
+                    type="password"
+                    value={passwordForm.currentPassword}
+                    onChange={(e) => setPasswordForm((f) => ({ ...f, currentPassword: e.target.value }))}
+                    fullWidth
+                    required
+                    placeholder="••••••••"
+                    InputProps={{ startAdornment: <LockOutlinedIcon sx={{ fontSize: 16, color: theme.textOnBgMuted, mr: 0.5 }} /> }}
+                  />
+                  <Input
+                    label="Nova senha"
+                    type="password"
+                    value={passwordForm.newPassword}
+                    onChange={(e) => setPasswordForm((f) => ({ ...f, newPassword: e.target.value }))}
+                    fullWidth
+                    required
+                    placeholder="mínimo 6 caracteres"
+                    inputProps={{ minLength: 6 }}
+                    InputProps={{ startAdornment: <LockOutlinedIcon sx={{ fontSize: 16, color: theme.textOnBgMuted, mr: 0.5 }} /> }}
+                  />
+                  <Input
+                    label="Confirmar nova senha"
+                    type="password"
+                    value={passwordForm.confirmPassword}
+                    onChange={(e) => setPasswordForm((f) => ({ ...f, confirmPassword: e.target.value }))}
+                    fullWidth
+                    required
+                    placeholder="••••••••"
+                    error={!!passwordForm.confirmPassword && passwordForm.newPassword !== passwordForm.confirmPassword}
+                    InputProps={{ startAdornment: <LockOutlinedIcon sx={{ fontSize: 16, color: theme.textOnBgMuted, mr: 0.5 }} /> }}
+                  />
+                  <Stack direction="row" spacing={1} justifyContent="flex-end">
+                    <Button variant="ghost" onClick={() => { setEditing(null); setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' }) }} disabled={passwordLoading} sx={{ fontSize: '0.82rem' }}>
+                      Cancelar
+                    </Button>
+                    <Button
+                      variant="primary" type="submit" loading={passwordLoading}
+                      disabled={!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword || passwordForm.newPassword !== passwordForm.confirmPassword || passwordRetry.blocked}
+                      sx={{ fontSize: '0.82rem' }}
+                    >
+                      {passwordRetry.blocked ? `Aguarde ${passwordRetry.label}` : 'Alterar senha'}
+                    </Button>
+                  </Stack>
+                </Stack>
+              </Box>
             </Collapse>
           </Box>
 

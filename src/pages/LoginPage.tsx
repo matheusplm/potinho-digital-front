@@ -7,7 +7,6 @@ import type { TurnstileInstance } from '@marsidev/react-turnstile'
 import { useUser } from '../context/UserContext'
 import { api, ApiRequestError } from '../services/api'
 import { Button, Input, toast } from '../components/ui'
-import { ScrollHint } from '../components/ui/ScrollHint'
 import { fadeSlide, floatHeart, font } from '../design-system'
 
 const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined
@@ -62,14 +61,12 @@ export function LoginPage() {
 
   return (
     <Box sx={{
-      minHeight: '100dvh',
+      height: '100dvh',
       display: 'flex',
       flexDirection: 'column',
       position: 'relative',
       overflow: 'hidden',
       background: 'linear-gradient(160deg, #dbeafe 0%, #fce7f3 55%, #ede9fe 100%)',
-      overflowX: 'hidden',
-      overflowY: 'auto',
     }}>
       <Box sx={{ position: 'absolute', top: -120, right: -120, width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(29,78,216,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
       <Box sx={{ position: 'absolute', bottom: -80, left: -80, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(225,29,72,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
@@ -85,7 +82,7 @@ export function LoginPage() {
         }} />
       ))}
 
-      <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 3, py: 5, animation: `${fadeSlide} 0.5s ease both` }} spacing={0}>
+      <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 3, py: 2, animation: `${fadeSlide} 0.5s ease both` }} spacing={0}>
         <FavoriteIcon sx={{ fontSize: 52, color: '#e11d48', filter: 'drop-shadow(0 4px 16px rgba(225,29,72,0.4))', mb: 3 }} />
 
         <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2.8rem', lineHeight: 1, color: '#1e3a5f', textAlign: 'center', letterSpacing: '-0.5px' }}>
@@ -151,7 +148,6 @@ export function LoginPage() {
           <Link to="/register" style={{ color: '#1d4ed8', fontWeight: 700, textDecoration: 'none' }}>Criar conta</Link>
         </Typography>
       </Stack>
-      <ScrollHint />
     </Box>
   )
 }

@@ -235,6 +235,8 @@ export const api = {
     request<{ ok: boolean }>('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email, captchaToken }) }),
   resetPassword: (token: string, newPassword: string) =>
     request<{ ok: boolean }>('/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, newPassword }) }),
+  changePassword: (currentPassword: string, newPassword: string) =>
+    request<{ ok: boolean }>('/auth/change-password', { method: 'POST', body: JSON.stringify({ currentPassword, newPassword }) }),
   changeEmail: (newEmail: string, password: string) =>
     request<{ ok: boolean }>('/auth/change-email', { method: 'POST', body: JSON.stringify({ newEmail, password }) }),
   confirmEmailChange: (token: string) =>

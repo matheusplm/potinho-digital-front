@@ -8,7 +8,7 @@ import { useCallback } from 'react'
 import { useCollectionsQuery } from '../hooks/useNotes'
 import { Card, ScrollablePage, OnboardingOverlay } from '../components/ui'
 import { api } from '../services/api'
-import { backgroundThemes, colors, fadeIn, font } from '../design-system'
+import { colors, fadeIn, font } from '../design-system'
 import { useBackground } from '../context/BackgroundContext'
 import { isCollectionOwner } from '../utils/collectionAccess'
 
@@ -21,7 +21,7 @@ const FLOATING = [
 
 export function WriterHomePage() {
   const { user, patchUser } = useUser()
-  const { theme, themeKey, setThemeKey } = useBackground()
+  const { theme } = useBackground()
 
   const handleOnboardingDismiss = useCallback(async () => {
     patchUser({ onboardingDone: true })
@@ -65,6 +65,7 @@ export function WriterHomePage() {
           <Typography sx={{
             fontFamily: font.serif, fontWeight: 700, fontSize: '2rem',
             color: theme.textOnBg, lineHeight: 1.1, letterSpacing: '-0.5px',
+            wordBreak: 'break-word',
           }}>
             {firstName} 💙
           </Typography>
@@ -72,47 +73,6 @@ export function WriterHomePage() {
             {ownedCount > 0 ? 'suas coleções estão esperando por você' : 'que tal criar sua primeira coleção?'}
           </Typography>
         </Stack>
-
-        <Box>
-          <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted, fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', mb: 1 }}>
-            Tema visual
-          </Typography>
-          <Box sx={{ overflowX: 'auto', mx: -2.5, px: 2.5, '&::-webkit-scrollbar': { display: 'none' }, scrollbarWidth: 'none' }}>
-            <Stack direction="row" spacing={1} sx={{ width: 'max-content', pb: 0.5 }}>
-              {backgroundThemes.map((t) => {
-                const selected = t.key === themeKey
-                return (
-                  <Box
-                    key={t.key}
-                    onClick={() => setThemeKey(t.key)}
-                    title={t.label}
-                    sx={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: '50%',
-                      background: t.gradient,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '18px',
-                      lineHeight: 1,
-                      flexShrink: 0,
-                      boxShadow: selected
-                        ? `0 0 0 2.5px ${theme.surfaceBg}, 0 0 0 4.5px ${theme.accent}`
-                        : '0 1px 4px rgba(0,0,0,0.15)',
-                      transform: selected ? 'scale(1.12)' : 'scale(1)',
-                      transition: 'transform 0.18s, box-shadow 0.18s',
-                      '&:hover': { transform: selected ? 'scale(1.12)' : 'scale(1.06)' },
-                    }}
-                  >
-                    {t.emoji}
-                  </Box>
-                )
-              })}
-            </Stack>
-          </Box>
-        </Box>
 
         <Card onClick={() => navigate('/colecoes')} sx={{ p: 2, cursor: 'pointer', transition: 'transform 0.18s, box-shadow 0.18s', '&:hover': { transform: 'translateY(-2px)' } }}>
           <Stack direction="row" alignItems="center" spacing={1.5}>
