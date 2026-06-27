@@ -264,6 +264,8 @@ export const api = {
     request<CollectionInvite[]>(`/api/collections/${cid}/invites`),
   cancelInvite: (cid: string, email: string) =>
     request<{ cancelled: boolean }>(`/api/collections/${cid}/invites/${encodeURIComponent(email)}`, { method: 'DELETE' }),
+  getMyPendingInvites: () =>
+    request<{ token: string; collectionId: string; collectionName: string; inviterName: string; expiresAt: string }[]>('/api/invites/pending'),
   getInviteDetails: (token: string) =>
     request<InviteDetails>(`/api/invite/${token}`),
   acceptInvite: (token: string) =>
