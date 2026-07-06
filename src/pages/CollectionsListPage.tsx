@@ -274,25 +274,29 @@ export function CollectionsListPage() {
           </>
         )}
 
-        {isWriter && !isLoading && trashItem && (
+        {isWriter && !isLoading && (
           <Box sx={{
             mt: 2.5, p: 1.6, borderRadius: '16px',
             border: `1.5px dashed ${theme.accent}55`,
             background: 'rgba(255,255,255,0.35)', backdropFilter: 'blur(10px)',
           }}>
             <Stack direction="row" spacing={1.2} alignItems="center">
-              <Typography sx={{ fontSize: '1.3rem', lineHeight: 1, flexShrink: 0 }}>🗑️</Typography>
+              <Typography sx={{ fontSize: '1.3rem', lineHeight: 1, flexShrink: 0, opacity: trashItem ? 1 : 0.55 }}>🗑️</Typography>
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Typography sx={{ fontSize: '0.8rem', fontWeight: 800, color: theme.textOnBg, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  Lixeira: {trashItem.emoji} {trashItem.name}
+                  {trashItem ? `Lixeira: ${trashItem.emoji} ${trashItem.name}` : 'Lixeira vazia'}
                 </Typography>
                 <Typography sx={{ fontSize: '0.66rem', color: theme.textOnBgMuted }}>
-                  some de vez quando outra coleção for excluída
+                  {trashItem
+                    ? 'some de vez quando outra coleção for excluída'
+                    : 'quando você excluir uma coleção, ela fica aqui para restaurar'}
                 </Typography>
               </Box>
-              <Button variant="ghost" loading={restoreMutation.isPending} onClick={handleRestore} sx={{ py: 0.6, px: 1.3, fontSize: '0.76rem', flexShrink: 0 }}>
-                Restaurar
-              </Button>
+              {trashItem && (
+                <Button variant="ghost" loading={restoreMutation.isPending} onClick={handleRestore} sx={{ py: 0.6, px: 1.3, fontSize: '0.76rem', flexShrink: 0 }}>
+                  Restaurar
+                </Button>
+              )}
             </Stack>
           </Box>
         )}
