@@ -36,6 +36,60 @@ export const PACK_CATEGORY_OPTIONS = Object.entries(PACK_CATEGORY_LABELS).map(([
 export const PACK_STATUS_OPTIONS = Object.entries(PACK_STATUS_LABELS).map(([id, label]) => ({ id: id as CollectionPackStatus, label }))
 export const PACK_DISTRIBUTION_OPTIONS = Object.entries(PACK_DISTRIBUTION_LABELS).map(([id, label]) => ({ id: id as CollectionPackDistribution, label }))
 
+export const PACK_CATEGORY_HINTS: Record<CollectionPackCategory, string> = {
+  daily: 'O pacote principal, em destaque para o leitor — só um por coleção.',
+  bonus: 'Extra fora da rotina, ótimo para surpresas e presentes.',
+  guaranteed: 'Pacote de evento especial, com raridade garantida.',
+  thematic: 'Agrupa um tema: saudade, memórias, poemas...',
+}
+
+export const PACK_STATUS_HINTS: Record<CollectionPackStatus, string> = {
+  active: 'No ar — quem tem acesso já pode abrir.',
+  draft: 'Rascunho — só você vê por enquanto.',
+  disabled: 'Pausado — some para os leitores até você reativar.',
+}
+
+export const PACK_DISTRIBUTION_HINTS: Record<CollectionPackDistribution, string> = {
+  all_with_access: 'Libera sozinho para todo mundo que você convidou.',
+  manual_bonus: 'Você aperta um botão e presenteia na hora que quiser.',
+  selected_readers: 'Só para leitores específicos que você escolher.',
+}
+
+export type PackRhythmId = 'daily' | 'twice' | 'weekly' | 'fixed_time' | 'once' | 'manual'
+
+export const PACK_RHYTHMS: { id: PackRhythmId; emoji: string; label: string; hint: string }[] = [
+  { id: 'daily',      emoji: '☀️', label: '1x por dia',        hint: 'Libera sozinho a cada 24 horas — o clássico.' },
+  { id: 'twice',      emoji: '🌗', label: '2x por dia',        hint: 'Libera sozinho a cada 12 horas.' },
+  { id: 'weekly',     emoji: '📅', label: '1x por semana',     hint: 'Libera sozinho a cada 7 dias.' },
+  { id: 'fixed_time', emoji: '⏰', label: 'Hora marcada',      hint: 'Todo dia no mesmo horário, tipo café da manhã.' },
+  { id: 'once',       emoji: '🎈', label: 'Uma vez só',        hint: 'Cada leitor abre uma única vez.' },
+  { id: 'manual',     emoji: '🎁', label: 'Quando eu liberar', hint: 'Você envia na hora que quiser, como um presente.' },
+]
+
+export const PACK_RHYTHM_CUSTOM_HINT = 'Configuração personalizada — ajuste fino nas Opções avançadas.'
+
+export function detectRhythm(form: Pick<CollectionPackFormData, 'distribution' | 'scheduleMode' | 'cooldownHours'>): PackRhythmId | 'custom' {
+  if (form.distribution === 'manual_bonus') return 'manual'
+  if (form.scheduleMode === 'fixed_time') return 'fixed_time'
+  if (form.cooldownHours === 24) return 'daily'
+  if (form.cooldownHours === 12) return 'twice'
+  if (form.cooldownHours === 168) return 'weekly'
+  if (form.cooldownHours === null) return 'once'
+  return 'custom'
+}
+
+export function rhythmPatch(rhythm: PackRhythmId, current: Pick<CollectionPackFormData, 'distribution' | 'scheduleTime'>): Partial<CollectionPackFormData> {
+  const autoDistribution = current.distribution === 'manual_bonus' ? 'all_with_access' as const : current.distribution
+  switch (rhythm) {
+    case 'daily':      return { scheduleMode: 'cooldown', cooldownHours: 24, distribution: autoDistribution }
+    case 'twice':      return { scheduleMode: 'cooldown', cooldownHours: 12, distribution: autoDistribution }
+    case 'weekly':     return { scheduleMode: 'cooldown', cooldownHours: 168, distribution: autoDistribution }
+    case 'once':       return { scheduleMode: 'cooldown', cooldownHours: null, distribution: autoDistribution }
+    case 'fixed_time': return { scheduleMode: 'fixed_time', cooldownHours: null, scheduleTime: current.scheduleTime ?? '06:00', distribution: autoDistribution }
+    case 'manual':     return { scheduleMode: 'cooldown', cooldownHours: null, distribution: 'manual_bonus' }
+  }
+}
+
 export function formatCooldown(hours: number | null) {
   if (!hours) return 'Uso único'
   if (hours < 24) return `${hours}h`

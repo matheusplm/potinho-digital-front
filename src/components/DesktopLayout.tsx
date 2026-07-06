@@ -14,6 +14,7 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
 import BlockIcon from '@mui/icons-material/Block'
 import LogoutIcon from '@mui/icons-material/Logout'
 import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined'
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import { Box, Divider, Stack, Tooltip, Typography } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
@@ -21,7 +22,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { PushPrompt } from './PushPrompt'
 import { SimulateReaderSheet } from './SimulateReaderSheet'
 import { SimulationBanner } from './SimulationBanner'
-import { toast } from './ui'
+import { OnboardingOverlay, toast } from './ui'
 import { useUser, type UserRole } from '../context/UserContext'
 import { useSimulation } from '../context/SimulationContext'
 import { useReader } from '../context/ReaderContext'
@@ -54,6 +55,7 @@ export function DesktopLayout() {
   const { isActive, session, endSimulation, hasUnreadNotes } = useSimulation()
   const { hasUnread: readerHasUnread, activeCollectionId, setActiveCollectionId, unreadFor } = useReader()
   const [simulateOpen, setSimulateOpen] = useState(false)
+  const [showTutorial, setShowTutorial] = useState(false)
   const isReader = persona === 'reader' && !isActive
 
   const { data: collections = [] } = useCollectionsQuery()
@@ -455,6 +457,29 @@ export function DesktopLayout() {
           </Stack>
         </Box>
 
+        {/* Tutorial */}
+        <Box sx={{ px: 2, pb: 0.5 }}>
+          <Stack
+            direction="row" spacing={1.1} alignItems="center"
+            onClick={() => setShowTutorial(true)}
+            sx={{
+              py: 0.8, px: 1, borderRadius: radius.md, cursor: 'pointer',
+              transition: 'background 0.12s',
+              '&:hover': { bgcolor: `${theme.accent}0c` },
+            }}
+          >
+            <Box sx={{
+              width: 28, height: 28, borderRadius: radius.sm, flexShrink: 0,
+              background: `${theme.accent}14`, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <PlayCircleOutlineIcon sx={{ fontSize: 14, color: theme.accent }} />
+            </Box>
+            <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: theme.textOnBg }}>
+              Ver tutorial
+            </Typography>
+          </Stack>
+        </Box>
+
         {/* Logout */}
         <Box sx={{ px: 2, pb: 2.5 }}>
           <Stack
@@ -487,6 +512,7 @@ export function DesktopLayout() {
       </Box>
 
       <SimulateReaderSheet open={simulateOpen} onClose={() => setSimulateOpen(false)} />
+      {showTutorial && <OnboardingOverlay onDismiss={() => setShowTutorial(false)} />}
     </Box>
   )
 }

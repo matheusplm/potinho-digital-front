@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude --version)",
+      "PowerShell(claude --version)",
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Skill(run)",
+      "Skill(run:*)"
+    ],
+    "additionalDirectories": [
+      "m:\\Code\\Pessoal\\potinho-digital\\potinho-digital-api\\src\\schemas",
+      "m:\\Code\\Pessoal\\potinho-digital\\potinho-digital-api\\src\\routes",
+      "m:\\Code\\Pessoal\\potinho-digital\\potinho-digital-api\\src\\services",
+      "m:\\Code\\Pessoal\\potinho-digital\\potinho-digital-api\\src\\models",
+      "m:\\Code\\Pessoal\\potinho-digital\\potinho-digital-api\\src\\config"
+    ]
+  }
+}

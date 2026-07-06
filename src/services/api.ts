@@ -247,10 +247,26 @@ export const api = {
   listCollections: () => request<Collection[]>('/api/collections'),
   createCollection: (data: CollectionFormData) =>
     request<Collection>('/api/collections', { method: 'POST', body: JSON.stringify(data) }),
+  createCollectionFromTemplate: (templateId: string, inviteEmail?: string) =>
+    request<{ collection: Collection; inviteSent: boolean }>('/api/collections/from-template', {
+      method: 'POST',
+      body: JSON.stringify({ templateId, ...(inviteEmail ? { inviteEmail } : {}) }),
+    }),
   updateCollection: (id: string, data: Partial<CollectionFormData>) =>
     request<Collection>(`/api/collections/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-  deleteCollection: (id: string) =>
-    request<{ deleted: boolean }>(`/api/collections/${id}`, { method: 'DELETE' }),
+  deleteCollection: (id: string, options?: { force?: boolean; confirmName?: string }) => {
+    const params = new URLSearchParams()
+    if (options?.force) params.set('force', 'true')
+    if (options?.confirmName) params.set('confirmName', options.confirmName)
+    const query = params.toString()
+    return request<{ deleted: boolean; trashed: { id: string; name: string }; purged: { id: string; name: string } | null }>(
+      `/api/collections/${id}${query ? `?${query}` : ''}`,
+      { method: 'DELETE' },
+    )
+  },
+  getCollectionTrash: () => request<{ item: Collection | null }>('/api/collections/trash'),
+  restoreCollection: (id: string) =>
+    request<Collection>(`/api/collections/${id}/restore`, { method: 'POST', body: JSON.stringify({}) }),
 
   listCollectionAccess: async (cid: string) =>
     mergeLocalAccessPacks(cid, await request<CollectionAccess[]>(`/api/collections/${cid}/access`)),

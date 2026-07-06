@@ -123,6 +123,7 @@ export function WriterHomePage() {
             <ChevronRightIcon sx={{ color: colors.text.muted, flexShrink: 0 }} />
           </Stack>
         </Card>
+
       </ScrollablePage>
     </Box>
   )

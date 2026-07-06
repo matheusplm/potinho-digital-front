@@ -3,10 +3,11 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, Stack, Typography } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ConfirmDeleteDialog, LoadingState, PageTitle, ScrollablePage, toast } from '../components/ui'
+import { useQueryClient } from '@tanstack/react-query'
+import { Button, ConfirmDeleteDialog, Input, LoadingState, PageTitle, ScrollablePage, toast } from '../components/ui'
 import {
-  useCollectionsQuery, useCreateCollectionMutation,
-  useDeleteCollectionMutation, useUpdateCollectionMutation,
+  queryKeys, useCollectionsQuery, useCollectionTrashQuery, useCreateCollectionMutation,
+  useDeleteCollectionMutation, useRestoreCollectionMutation, useUpdateCollectionMutation,
 } from '../hooks/useNotes'
 import { useBackground } from '../context/BackgroundContext'
 import { useSimulation } from '../context/SimulationContext'
@@ -14,6 +15,11 @@ import { useUser } from '../context/UserContext'
 import { colors, fadeIn, font } from '../design-system'
 import { slugify } from '../utils/slug'
 import { isCollectionOwner } from '../utils/collectionAccess'
+import { ApiRequestError } from '../services/api'
+import { COLLECTION_TEMPLATES, createCollectionFromTemplate } from '../services/collectionTemplates'
+import type { CollectionTemplate } from '../services/collectionTemplates'
+import { TemplateKitRow } from '../components/TemplateKitRow'
+import { KitConfirmDialog } from '../components/KitConfirmDialog'
 import type { Collection, CollectionFormData } from '../types/note'
 import { CollectionsFilterBar } from './collections/CollectionsFilterBar'
 import { CollectionFormDialog } from './collections/CollectionFormDialog'
@@ -37,11 +43,18 @@ export function CollectionsListPage() {
   const [createOpen, setCreateOpen] = useState(false)
   const [editing, setEditing] = useState<Collection | null>(null)
   const [deleting, setDeleting] = useState<Collection | null>(null)
+  const [readersWarning, setReadersWarning] = useState<string | null>(null)
+  const [confirmNameInput, setConfirmNameInput] = useState('')
+  const [creatingKit, setCreatingKit] = useState<string | null>(null)
+  const [kitToConfirm, setKitToConfirm] = useState<CollectionTemplate | null>(null)
   const [view, setView] = useState<ViewMode>(() => (localStorage.getItem(VIEW_KEY) as ViewMode) ?? 'cards')
   const [sort, setSort] = useState<SortType>('name-asc')
   const [search, setSearch] = useState('')
+  const queryClient = useQueryClient()
 
   const isWriter = persona === 'writer'
+  const { data: trashItem } = useCollectionTrashQuery({ enabled: isWriter })
+  const restoreMutation = useRestoreCollectionMutation()
 
   useEffect(() => {
     if (!isActive || !session) return
@@ -100,6 +113,32 @@ export function CollectionsListPage() {
     setCreateOpen(false)
   }
 
+  async function handleKitCreate(template: CollectionTemplate) {
+    if (creatingKit) return
+    setCreatingKit(template.id)
+    try {
+      const { collection } = await createCollectionFromTemplate(template)
+      await queryClient.invalidateQueries({ queryKey: queryKeys.collections() })
+      toast.success('Coleção pronta! Deixamos bilhetes de exemplo para você editar. 💙')
+      setKitToConfirm(null)
+      navigate(`/colecoes/${slugify(collection.name)}/gerenciar`)
+    } catch (error) {
+      toast.error((error as Error).message || 'Erro ao criar a coleção.')
+    } finally {
+      setCreatingKit(null)
+    }
+  }
+
+  async function handleRestore() {
+    if (!trashItem || restoreMutation.isPending) return
+    try {
+      await restoreMutation.mutateAsync(trashItem.id)
+      toast.success(`"${trashItem.name}" restaurada! 💙`)
+    } catch (error) {
+      toast.error((error as Error).message || 'Erro ao restaurar a coleção.')
+    }
+  }
+
   async function handleUpdate(data: CollectionFormData) {
     if (!editing) return
     await updateMutation.mutateAsync({ id: editing.id, data })
@@ -107,14 +146,25 @@ export function CollectionsListPage() {
     setEditing(null)
   }
 
-  async function handleDelete() {
+  async function handleDelete(force = false, confirmName?: string) {
     if (!deleting) return
     try {
-      await deleteMutation.mutateAsync(deleting.id)
-      toast.success('Coleção excluída.')
+      const result = await deleteMutation.mutateAsync({ id: deleting.id, force, confirmName })
+      toast.success(
+        'Coleção movida para a lixeira. 🗑️',
+        result.purged ? { description: `"${result.purged.name}" foi excluída permanentemente.` } : undefined,
+      )
       setDeleting(null)
+      setReadersWarning(null)
+      setConfirmNameInput('')
     } catch (error) {
-      toast.error((error as Error).message || 'Erro ao excluir coleção.')
+      const err = error as ApiRequestError
+      if (err.code === 'COLLECTION_HAS_READERS') {
+        setConfirmNameInput('')
+        setReadersWarning(err.message)
+        return
+      }
+      toast.error(err.message || 'Erro ao excluir coleção.')
     }
   }
 
@@ -148,7 +198,7 @@ export function CollectionsListPage() {
         )}
 
         {!isLoading && collections.length === 0 && !search && (
-          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textAlign: 'center', py: 8 }}>
+          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textAlign: 'center', py: isWriter ? 4 : 8 }}>
             <Box sx={{
               width: 72, height: 72, borderRadius: '50%',
               background: `linear-gradient(135deg, ${theme.accent}22, ${theme.accent}44)`,
@@ -158,13 +208,29 @@ export function CollectionsListPage() {
             </Box>
             <Stack spacing={0.5}>
               <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.15rem', color: theme.textOnBg }}>
-                {isWriter ? 'Nenhuma coleção ainda' : 'Nenhuma coleção'}
+                {isWriter ? 'Sua primeira coleção' : 'Nenhuma coleção'}
               </Typography>
-              <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBgMuted, maxWidth: 240 }}>
-                {isWriter ? 'Crie sua primeira coleção de bilhetes' : 'Peça para liberarem seu email em uma coleção'}
+              <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBgMuted, maxWidth: 260 }}>
+                {isWriter ? 'Comece com um kit pronto — ou crie do zero' : 'Peça para liberarem seu email em uma coleção'}
               </Typography>
             </Stack>
-            {isWriter && <AddGhostCard view="cards" onClick={() => setCreateOpen(true)} accent={theme.accent} />}
+            {isWriter && (
+              <Stack spacing={0.9} sx={{ width: '100%', maxWidth: 360, textAlign: 'left' }}>
+                {COLLECTION_TEMPLATES.map((template) => (
+                  <TemplateKitRow
+                    key={template.id}
+                    template={template}
+                    busy={creatingKit === template.id}
+                    dimmed={!!creatingKit && creatingKit !== template.id}
+                    onClick={() => !creatingKit && setKitToConfirm(template)}
+                  />
+                ))}
+                <Typography sx={{ fontSize: '0.66rem', color: theme.textOnBgMuted, textAlign: 'center', opacity: 0.85 }}>
+                  Cada kit já vem com bilhetes de exemplo, raridades e pacotinhos
+                </Typography>
+                <AddGhostCard view="cards" onClick={() => setCreateOpen(true)} accent={theme.accent} />
+              </Stack>
+            )}
           </Box>
         )}
 
@@ -207,6 +273,29 @@ export function CollectionsListPage() {
             )}
           </>
         )}
+
+        {isWriter && !isLoading && trashItem && (
+          <Box sx={{
+            mt: 2.5, p: 1.6, borderRadius: '16px',
+            border: `1.5px dashed ${theme.accent}55`,
+            background: 'rgba(255,255,255,0.35)', backdropFilter: 'blur(10px)',
+          }}>
+            <Stack direction="row" spacing={1.2} alignItems="center">
+              <Typography sx={{ fontSize: '1.3rem', lineHeight: 1, flexShrink: 0 }}>🗑️</Typography>
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Typography sx={{ fontSize: '0.8rem', fontWeight: 800, color: theme.textOnBg, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  Lixeira: {trashItem.emoji} {trashItem.name}
+                </Typography>
+                <Typography sx={{ fontSize: '0.66rem', color: theme.textOnBgMuted }}>
+                  some de vez quando outra coleção for excluída
+                </Typography>
+              </Box>
+              <Button variant="ghost" loading={restoreMutation.isPending} onClick={handleRestore} sx={{ py: 0.6, px: 1.3, fontSize: '0.76rem', flexShrink: 0 }}>
+                Restaurar
+              </Button>
+            </Stack>
+          </Box>
+        )}
       </ScrollablePage>
 
       <CollectionFormDialog
@@ -225,12 +314,46 @@ export function CollectionsListPage() {
       />
 
       <ConfirmDeleteDialog
-        open={!!deleting}
+        open={!!deleting && !readersWarning}
         title="Excluir coleção"
         description={<>Tem certeza que deseja excluir <strong style={{ color: colors.text.primary }}>{deleting?.name}</strong>? Todos os bilhetes, raridades e tipos serão removidos.</>}
         isPending={deleteMutation.isPending}
-        onConfirm={handleDelete}
+        onConfirm={() => void handleDelete(false)}
         onClose={() => setDeleting(null)}
+      />
+
+      <ConfirmDeleteDialog
+        open={!!readersWarning}
+        title="⚠️ Tem gente usando essa coleção"
+        description={
+          <Stack spacing={1.2}>
+            <Typography sx={{ fontSize: '0.88rem', color: colors.text.primary, fontWeight: 700 }}>
+              {readersWarning}
+            </Typography>
+            <Typography sx={{ fontSize: '0.85rem', color: colors.text.secondary, lineHeight: 1.6 }}>
+              Ela vai para a lixeira e some para essas pessoas. Para confirmar, digite o nome exato da coleção:
+            </Typography>
+            <Input
+              placeholder={deleting?.name ?? ''}
+              value={confirmNameInput}
+              onChange={(e) => setConfirmNameInput(e.target.value)}
+              sx={{ '& .MuiOutlinedInput-root': { fontSize: '0.86rem' }, '& input': { py: 0.9 } }}
+            />
+          </Stack>
+        }
+        isPending={deleteMutation.isPending}
+        confirmLabel="Excluir mesmo assim"
+        confirmDisabled={confirmNameInput.trim().toLowerCase() !== (deleting?.name ?? '').trim().toLowerCase()}
+        onConfirm={() => void handleDelete(true, confirmNameInput)}
+        onClose={() => { setReadersWarning(null); setDeleting(null); setConfirmNameInput('') }}
+      />
+
+      <KitConfirmDialog
+        open={!!kitToConfirm}
+        template={kitToConfirm}
+        isPending={!!creatingKit}
+        onConfirm={() => { if (kitToConfirm) void handleKitCreate(kitToConfirm) }}
+        onClose={() => setKitToConfirm(null)}
       />
     </Box>
   )

@@ -4,6 +4,7 @@ import type { CollectionAchievementFormData, CollectionPackFormData, NoteFormDat
 
 export const queryKeys = {
   collections: () => ['collections'] as const,
+  collectionsTrash: () => ['collections-trash'] as const,
   notes: (cid: string) => ['col-notes', cid] as const,
   rarities: (cid: string) => ['col-rarities', cid] as const,
   types: (cid: string) => ['col-types', cid] as const,
@@ -45,8 +46,31 @@ export function useUpdateCollectionMutation() {
 export function useDeleteCollectionMutation() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: api.deleteCollection,
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.collections() }) },
+    mutationFn: ({ id, force, confirmName }: { id: string; force?: boolean; confirmName?: string }) =>
+      api.deleteCollection(id, { force, confirmName }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.collections() })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.collectionsTrash() })
+    },
+  })
+}
+
+export function useCollectionTrashQuery(options?: { enabled?: boolean }) {
+  return useQuery({
+    queryKey: queryKeys.collectionsTrash(),
+    queryFn: async () => (await api.getCollectionTrash()).item,
+    enabled: options?.enabled ?? true,
+  })
+}
+
+export function useRestoreCollectionMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => api.restoreCollection(id),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.collections() })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.collectionsTrash() })
+    },
   })
 }
 

@@ -10,6 +10,7 @@ interface ConfirmDeleteDialogProps {
   onConfirm: () => void
   onClose: () => void
   confirmLabel?: string
+  confirmDisabled?: boolean
 }
 
 export function ConfirmDeleteDialog({
@@ -20,6 +21,7 @@ export function ConfirmDeleteDialog({
   onConfirm,
   onClose,
   confirmLabel = 'Excluir',
+  confirmDisabled = false,
 }: ConfirmDeleteDialogProps) {
   return (
     <Dialog
@@ -41,7 +43,7 @@ export function ConfirmDeleteDialog({
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
         <Button variant="ghost" onClick={onClose} sx={{ flex: 1 }}>Cancelar</Button>
-        <Button variant="rose" loading={isPending} onClick={onConfirm} sx={{ flex: 1 }}>{confirmLabel}</Button>
+        <Button variant="rose" loading={isPending} disabled={confirmDisabled} onClick={onConfirm} sx={{ flex: 1 }}>{confirmLabel}</Button>
       </DialogActions>
     </Dialog>
   )

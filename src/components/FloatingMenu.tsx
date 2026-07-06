@@ -82,7 +82,7 @@ export function FloatingMenu() {
     <>
       <Backdrop open={open} onClick={() => setOpen(false)} sx={{ zIndex: 90, bgcolor: 'transparent' }} />
 
-      <Box sx={{ position: 'fixed', top: 16, right: 16, zIndex: 100 }}>
+      <Box sx={{ position: 'fixed', top: 16, right: 'max(16px, calc((100vw - 480px) / 2 + 16px))', zIndex: 100 }}>
         <IconButton
           onClick={() => setOpen((v) => !v)}
           sx={{

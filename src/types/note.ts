@@ -180,6 +180,7 @@ export interface Collection {
   access: 'owner' | 'reader'
   createdAt: string
   updatedAt: string
+  deletedAt?: string
 }
 
 export interface CollectionFormData {

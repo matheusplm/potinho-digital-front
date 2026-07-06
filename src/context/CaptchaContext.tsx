@@ -75,11 +75,12 @@ export function CaptchaProvider({ children }: { children: React.ReactNode }) {
         <Turnstile
           ref={widgetRef}
           siteKey={SITE_KEY}
+          injectScript={false}
           onSuccess={(t) => { setToken(t); setStatus('verified') }}
           onError={() => setStatus('error')}
           onTimeout={() => setStatus('error')}
           onExpire={() => { setToken(null); setStatus('pending'); widgetRef.current?.reset() }}
-          options={{ size: 'invisible', language: 'pt-BR' }}
+          options={{ size: 'invisible', language: 'pt-br' }}
         />
       )}
     </CaptchaContext.Provider>
