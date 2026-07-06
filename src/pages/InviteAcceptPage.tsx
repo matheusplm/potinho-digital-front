@@ -159,7 +159,7 @@ export function InviteAcceptPage() {
           </Stack>
         )}
 
-        {!isLoading && invite && invite.status === 'pending' && user && (user.email ?? '').toLowerCase() !== invite.email.toLowerCase() && (
+        {!isLoading && invite && invite.status === 'pending' && user && invite.isForMe === false && (
           <Stack alignItems="center" spacing={2.5} sx={{ maxWidth: 340, width: '100%' }}>
             <HighlightOffIcon sx={{ fontSize: 64, color: '#d97706', filter: 'drop-shadow(0 4px 16px rgba(217,119,6,0.3))' }} />
             <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.8rem', color: '#1e3a5f', textAlign: 'center' }}>
@@ -174,7 +174,7 @@ export function InviteAcceptPage() {
           </Stack>
         )}
 
-        {!isLoading && invite && invite.status === 'pending' && user && (user.email ?? '').toLowerCase() === invite.email.toLowerCase() && !rejectMutation.isSuccess && (
+        {!isLoading && invite && invite.status === 'pending' && user && invite.isForMe !== false && !rejectMutation.isSuccess && (
           <Stack alignItems="center" spacing={2.5} sx={{ maxWidth: 340, width: '100%' }}>
             <FavoriteIcon sx={{ fontSize: 64, color: '#1d4ed8', filter: 'drop-shadow(0 4px 16px rgba(29,78,216,0.3))' }} />
             <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2rem', color: '#1e3a5f', textAlign: 'center', letterSpacing: '-0.5px' }}>
@@ -220,7 +220,7 @@ export function InviteAcceptPage() {
           </Stack>
         )}
 
-        {!isLoading && invite && invite.status === 'pending' && user && (user.email ?? '').toLowerCase() === invite.email.toLowerCase() && rejectMutation.isSuccess && (
+        {!isLoading && invite && invite.status === 'pending' && user && invite.isForMe !== false && rejectMutation.isSuccess && (
           <Stack alignItems="center" spacing={2.5} sx={{ maxWidth: 340, width: '100%' }}>
             <HighlightOffIcon sx={{ fontSize: 64, color: '#6b7280', filter: 'drop-shadow(0 4px 16px rgba(107,114,128,0.25))' }} />
             <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.8rem', color: '#1e3a5f', textAlign: 'center' }}>

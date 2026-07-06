@@ -291,4 +291,5 @@ export interface InviteDetails {
   email: string
   status: CollectionInviteStatus
   expiresAt: string
+  isForMe: boolean | null
 }

@@ -19,7 +19,7 @@ import { isCollectionReader, personaCapabilities } from '../utils/collectionAcce
 import { useBackground } from '../context/BackgroundContext'
 import { useReader } from '../context/ReaderContext'
 import { useSimulation } from '../context/SimulationContext'
-import { useCollectionsQuery } from '../hooks/useNotes'
+import { useCollectionsQuery, usePendingInvitesQuery } from '../hooks/useNotes'
 import { backgroundThemes, colors, font, menuIn, radius } from '../design-system'
 
 export function FloatingMenu() {
@@ -53,6 +53,8 @@ export function FloatingMenu() {
     }
   }
   const { data: collections = [] } = useCollectionsQuery()
+  const { data: pendingInvites = [] } = usePendingInvitesQuery({ enabled: !!user })
+  const hasPendingInvites = pendingInvites.length > 0
   const { canSwitch, canWriter, canReader } = useMemo(
     () => personaCapabilities(collections, user?.id, user?.role ?? 'writer'),
     [collections, user?.id, user?.role],
@@ -72,7 +74,7 @@ export function FloatingMenu() {
   function switchPersona(next: UserRole) {
     if (next === persona) return
     if (next === 'writer' && !canWriter) return
-    if (next === 'reader' && !canReader) return
+    if (next === 'reader' && !canReader && !hasPendingInvites) return
     setPersona(next)
     setOpen(false)
     navigate('/home')
@@ -107,6 +109,9 @@ export function FloatingMenu() {
               }} />
             ))}
           </Stack>
+          {hasPendingInvites && persona !== 'reader' && !open && (
+            <Box sx={{ position: 'absolute', top: 2, right: 2, width: 10, height: 10, borderRadius: '50%', background: '#ef4444', border: '2px solid #fff', boxShadow: '0 1px 4px rgba(239,68,68,0.5)' }} />
+          )}
         </IconButton>
 
         {open && (
@@ -146,16 +151,18 @@ export function FloatingMenu() {
                 </Typography>
                 <Stack direction="row" spacing={0.6}>
                   {([
-                    { role: 'reader' as const, label: 'Leitor', icon: <MenuBookOutlinedIcon sx={{ fontSize: 15 }} />, enabled: canReader, disabledTip: 'Você ainda não tem acesso a nenhuma coleção como leitor' },
+                    { role: 'reader' as const, label: 'Leitor', icon: <MenuBookOutlinedIcon sx={{ fontSize: 15 }} />, enabled: canReader || hasPendingInvites, disabledTip: 'Você ainda não tem acesso a nenhuma coleção como leitor' },
                     { role: 'writer' as const, label: 'Escritor', icon: <EditOutlinedIcon sx={{ fontSize: 15 }} />, enabled: canWriter, disabledTip: 'Crie uma coleção para usar o modo escritor' },
                   ]).map(({ role, label, icon, enabled, disabledTip }) => {
                     const active = persona === role
+                    const showInviteDot = role === 'reader' && hasPendingInvites && persona !== 'reader'
                     const btn = (
                       <Box
                         key={role}
                         onClick={() => enabled && switchPersona(role)}
                         sx={{
                           flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5,
+                          position: 'relative',
                           py: 0.85, borderRadius: radius.md, cursor: enabled ? 'pointer' : 'default',
                           border: `1.5px solid ${active ? `${theme.accent}66` : theme.surfaceBorder}`,
                           background: active ? `${theme.accent}12` : 'transparent',
@@ -164,6 +171,9 @@ export function FloatingMenu() {
                           '&:hover': enabled ? { background: active ? `${theme.accent}18` : theme.isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.03)' } : undefined,
                         }}
                       >
+                        {showInviteDot && (
+                          <Box sx={{ position: 'absolute', top: -3, right: -3, width: 10, height: 10, borderRadius: '50%', background: '#ef4444', border: '2px solid #fff', boxShadow: '0 1px 4px rgba(239,68,68,0.5)' }} />
+                        )}
                         {icon}
                         <Typography sx={{ fontSize: '0.78rem', fontWeight: active ? 800 : 600, color: active ? theme.accent : theme.textOnBgMuted }}>
                           {label}

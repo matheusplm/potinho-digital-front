@@ -27,7 +27,7 @@ import { useUser, type UserRole } from '../context/UserContext'
 import { useSimulation } from '../context/SimulationContext'
 import { useReader } from '../context/ReaderContext'
 import { useBackground } from '../context/BackgroundContext'
-import { useCollectionsQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
+import { useCollectionsQuery, usePendingInvitesQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
 import { backgroundThemes, colors, font, radius } from '../design-system'
 import { slugify } from '../utils/slug'
 import { isCollectionReader, personaCapabilities } from '../utils/collectionAccess'
@@ -59,6 +59,8 @@ export function DesktopLayout() {
   const isReader = persona === 'reader' && !isActive
 
   const { data: collections = [] } = useCollectionsQuery()
+  const { data: pendingInvites = [] } = usePendingInvitesQuery({ enabled: !!user })
+  const hasPendingInvites = pendingInvites.length > 0
 
   const { canWriter, canReader } = useMemo(
     () => personaCapabilities(collections, user?.id, user?.role ?? 'writer'),
@@ -141,7 +143,7 @@ export function DesktopLayout() {
   function switchPersona(next: UserRole) {
     if (next === persona) return
     if (next === 'writer' && !canWriter) return
-    if (next === 'reader' && !canReader) return
+    if (next === 'reader' && !canReader && !hasPendingInvites) return
     setPersona(next)
     navigate('/home')
   }
@@ -334,16 +336,18 @@ export function DesktopLayout() {
             </Typography>
             <Stack direction="row" spacing={0.5}>
               {([
-                { role: 'reader' as const, label: 'Leitor', icon: <MenuBookOutlinedIcon sx={{ fontSize: 13 }} />, enabled: canReader },
+                { role: 'reader' as const, label: 'Leitor', icon: <MenuBookOutlinedIcon sx={{ fontSize: 13 }} />, enabled: canReader || hasPendingInvites },
                 { role: 'writer' as const, label: 'Escritor', icon: <EditOutlinedIcon sx={{ fontSize: 13 }} />, enabled: canWriter },
               ]).map(({ role, label, icon, enabled }) => {
                 const active = persona === role
+                const showInviteDot = role === 'reader' && hasPendingInvites && persona !== 'reader'
                 return (
                   <Box
                     key={role}
                     onClick={() => enabled && switchPersona(role)}
                     sx={{
                       flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.4,
+                      position: 'relative',
                       py: 0.7, borderRadius: radius.md, cursor: enabled ? 'pointer' : 'default',
                       border: `1.5px solid ${active ? `${theme.accent}55` : theme.surfaceBorder}`,
                       background: active ? `${theme.accent}10` : 'transparent',
@@ -352,6 +356,9 @@ export function DesktopLayout() {
                       '&:hover': enabled ? { background: active ? `${theme.accent}16` : theme.isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' } : undefined,
                     }}
                   >
+                    {showInviteDot && (
+                      <Box sx={{ position: 'absolute', top: -3, right: -3, width: 10, height: 10, borderRadius: '50%', background: '#ef4444', border: '2px solid #fff', boxShadow: '0 1px 4px rgba(239,68,68,0.5)' }} />
+                    )}
                     <Box sx={{ '& svg': { fontSize: '0.9rem', color: active ? theme.accent : theme.textOnBgMuted } }}>{icon}</Box>
                     <Typography sx={{ fontSize: '0.76rem', fontWeight: active ? 700 : 500, color: active ? theme.accent : theme.textOnBgMuted }}>
                       {label}

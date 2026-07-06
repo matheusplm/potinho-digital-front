@@ -1,12 +1,10 @@
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import Inventory2Icon from '@mui/icons-material/Inventory2'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
-import MailOutlineIcon from '@mui/icons-material/MailOutline'
 import { Box, Stack, Typography } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { useCallback } from 'react'
-import { useQuery } from '@tanstack/react-query'
 import { useCollectionsQuery } from '../hooks/useNotes'
 import { Card, ScrollablePage, OnboardingOverlay } from '../components/ui'
 import { api } from '../services/api'
@@ -31,11 +29,6 @@ export function WriterHomePage() {
   }, [patchUser])
   const navigate = useNavigate()
   const { data: collections = [] } = useCollectionsQuery()
-  const { data: pendingInvites = [] } = useQuery({
-    queryKey: ['pending-invites'],
-    queryFn: () => api.getMyPendingInvites(),
-    staleTime: 60_000,
-  })
 
   const firstName = user?.name?.split(' ')[0] ?? ''
   const ownedCount = collections.filter((c) => isCollectionOwner(c, user?.id)).length
@@ -80,32 +73,6 @@ export function WriterHomePage() {
             {ownedCount > 0 ? 'suas coleções estão esperando por você' : 'que tal criar sua primeira coleção?'}
           </Typography>
         </Stack>
-
-        {pendingInvites.map((invite) => (
-          <Card
-            key={invite.token}
-            onClick={() => navigate(`/convite/${invite.token}`)}
-            sx={{ p: 2, cursor: 'pointer', transition: 'transform 0.18s, box-shadow 0.18s', '&:hover': { transform: 'translateY(-2px)' }, border: '1.5px solid #dbeafe', background: 'linear-gradient(135deg, #eff6ff 0%, #fce7f3 100%)' }}
-          >
-            <Stack direction="row" alignItems="center" spacing={1.5}>
-              <Box sx={{ width: 46, height: 46, borderRadius: 2.5, background: 'linear-gradient(135deg, #1d4ed8, #7c3aed)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <MailOutlineIcon sx={{ fontSize: 22, color: '#fff' }} />
-              </Box>
-              <Box sx={{ flex: 1, minWidth: 0 }}>
-                <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#1d4ed8', textTransform: 'uppercase', letterSpacing: '0.04em', mb: 0.2 }}>
-                  Convite pendente
-                </Typography>
-                <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.05rem', color: colors.text.primary, lineHeight: 1.2, wordBreak: 'break-word' }}>
-                  {invite.collectionName || 'Coleção'}
-                </Typography>
-                <Typography sx={{ fontSize: '0.75rem', color: colors.text.secondary }}>
-                  {invite.inviterName ? `de ${invite.inviterName}` : 'ver convite'}
-                </Typography>
-              </Box>
-              <ChevronRightIcon sx={{ color: '#1d4ed8', flexShrink: 0 }} />
-            </Stack>
-          </Card>
-        ))}
 
         <Card onClick={() => navigate('/colecoes')} sx={{ p: 2, cursor: 'pointer', transition: 'transform 0.18s, box-shadow 0.18s', '&:hover': { transform: 'translateY(-2px)' } }}>
           <Stack direction="row" alignItems="center" spacing={1.5}>

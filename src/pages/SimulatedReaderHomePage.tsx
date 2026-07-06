@@ -2,7 +2,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import MailOutlineIcon from '@mui/icons-material/MailOutline'
 import ShuffleIcon from '@mui/icons-material/Shuffle'
 import { Box, LinearProgress, Stack, Typography } from '@mui/material'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, LoadingState, ScrollablePage, toast } from '../components/ui'
@@ -19,11 +19,12 @@ import {
   useCollectionsQuery,
   useCollectionTypesQuery,
   useOpenCollectionPackMutation,
+  usePendingInvitesQuery,
   useReaderAchievementsQuery,
 } from '../hooks/useNotes'
 import { colors, fadeIn, font, radius } from '../design-system'
 import { isCollectionReader } from '../utils/collectionAccess'
-import { api, ApiRequestError } from '../services/api'
+import { ApiRequestError } from '../services/api'
 import { simulatePackOpen } from '../utils/simulationPlay'
 import { formatRemainingTime } from '../utils/packCooldowns'
 import { computeAchievements } from '../utils/achievements'
@@ -65,12 +66,7 @@ export function SimulatedReaderHomePage() {
     }
   }, [isRealReader, readerCollection, activeCollectionId, setActiveCollectionId])
 
-  const { data: pendingInvites = [] } = useQuery({
-    queryKey: ['pending-invites'],
-    queryFn: () => api.getMyPendingInvites(),
-    staleTime: 60_000,
-    enabled: isRealReader,
-  })
+  const { data: pendingInvites = [] } = usePendingInvitesQuery({ enabled: isRealReader })
 
   const activeSession = session ?? (readerCollection ? {
     collectionId: readerCollection.id,

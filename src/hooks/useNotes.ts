@@ -55,6 +55,15 @@ export function useDeleteCollectionMutation() {
   })
 }
 
+export function usePendingInvitesQuery(options?: { enabled?: boolean }) {
+  return useQuery({
+    queryKey: ['pending-invites'],
+    queryFn: () => api.getMyPendingInvites(),
+    staleTime: 60_000,
+    enabled: options?.enabled ?? true,
+  })
+}
+
 export function useCollectionTrashQuery(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: queryKeys.collectionsTrash(),
