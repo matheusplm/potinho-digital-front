@@ -239,7 +239,7 @@ export function ContaPage() {
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Stack direction="row" alignItems="center" spacing={0.6}>
                   <Typography sx={{ fontSize: '0.88rem', fontWeight: 700, color: theme.textOnBg, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {user?.email ?? '—'}
+                    {user?.email ?? '...'}
                   </Typography>
                   {user?.emailVerified === true && (
                     <CheckCircleIcon sx={{ fontSize: 14, color: '#22c55e', flexShrink: 0 }} />

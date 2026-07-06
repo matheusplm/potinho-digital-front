@@ -297,21 +297,21 @@ const STEPS = [
     accent: '#e11d48',
     stageBg: 'linear-gradient(160deg,#fdf2f8 0%,#fce7f3 55%,#ede9fe 100%)',
     title: 'Bem-vindo(a) ao Potinho Digital',
-    desc: 'Crie um álbum de bilhetes para alguém especial descobrir aos pouquinhos — como um álbum de figurinhas, só que de amor.',
+    desc: 'Crie um álbum de bilhetes para alguém especial descobrir aos pouquinhos, como um álbum de figurinhas, só que de amor.',
     stage: <StageWelcome />,
   },
   {
     accent: '#7c3aed',
     stageBg: 'linear-gradient(160deg,#eef2ff 0%,#f5f3ff 55%,#fce7f3 100%)',
     title: 'Escreva bilhetes com raridade',
-    desc: 'Mensagens, memórias, poemas. Cada bilhete ganha uma raridade — e as mais especiais brilham diferente.',
+    desc: 'Mensagens, memórias, poemas. Cada bilhete ganha uma raridade, e as mais especiais brilham diferente.',
     stage: <StageRarities />,
   },
   {
     accent: '#d97706',
     stageBg: 'linear-gradient(160deg,#fff7ed 0%,#ffedd5 55%,#fce7f3 100%)',
     title: 'Monte pacotinhos surpresa',
-    desc: 'É assim que a pessoa recebe seus bilhetes: abrindo pacotinhos, um pouquinho por dia — cada abertura é uma surpresa.',
+    desc: 'É assim que a pessoa recebe seus bilhetes: abrindo pacotinhos, um pouquinho por dia. Cada abertura é uma surpresa.',
     stage: <StagePack />,
   },
   {
@@ -325,7 +325,7 @@ const STEPS = [
     accent: '#e11d48',
     stageBg: 'linear-gradient(160deg,#fdf2f8 0%,#ffe4e6 55%,#fce7f3 100%)',
     title: 'Escolha um kit e pronto',
-    desc: 'A coleção já nasce com bilhetes de exemplo — é só trocar pelas suas palavras.',
+    desc: 'A coleção já nasce com bilhetes de exemplo. É só trocar pelas suas palavras.',
     stage: <StageStart />,
   },
 ]
@@ -419,7 +419,7 @@ export function OnboardingOverlay({ onDismiss }: Props) {
       const { collection, inviteSent } = await createCollectionFromTemplate(template, email || undefined)
       await queryClient.invalidateQueries({ queryKey: queryKeys.collections() })
       if (email && !inviteSent) {
-        toast.info('Coleção criada! O convite não foi enviado — reenvie na aba Acesso.')
+        toast.info('Coleção criada! O convite não foi enviado. Reenvie na aba Acesso.')
       } else if (inviteSent) {
         toast.success(`Coleção pronta! Convite enviado para ${email} 💌`)
       } else {
@@ -453,7 +453,7 @@ export function OnboardingOverlay({ onDismiss }: Props) {
   const isPicker = step === STEPS.length - 1
   const displayTitle = isPicker && selectedKit ? `${selectedKit.emoji} ${selectedKit.title}` : s.title
   const displayDesc = isPicker && selectedKit
-    ? 'Dá uma olhada no que vem dentro — você pode editar tudo depois.'
+    ? 'Dá uma olhada no que vem dentro. Você pode editar tudo depois.'
     : isPicker
       ? 'Toque num kit para ver o que vem dentro dele.'
       : s.desc
@@ -543,7 +543,7 @@ export function OnboardingOverlay({ onDismiss }: Props) {
                       {selectedKit.collection.name}
                     </Typography>
                     <Typography sx={{ fontSize: '0.64rem', color: colors.text.secondary }}>
-                      nome da coleção — dá para renomear depois
+                      nome da coleção, dá para renomear depois
                     </Typography>
                   </Box>
                 </Box>

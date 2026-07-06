@@ -229,7 +229,7 @@ export function ImagePicker({ value, onChange }: Props) {
             autoFocus
           />
           <Typography sx={{ fontSize: '0.62rem', color: colors.text.muted, pl: 0.5 }}>
-            .jpg · .png · .gif · .webp · .avif — apenas HTTPS
+            .jpg · .png · .gif · .webp · .avif · apenas HTTPS
           </Typography>
         </Stack>
       )}

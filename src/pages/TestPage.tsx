@@ -311,28 +311,28 @@ export function TestPage() {
       <Box sx={{ height: 48 }} />
 
         {([
-          ['1 — banner', 'banner'],
-          ['2 — banner fino', 'banner-slim'],
-          ['3 — banner base', 'banner-bottom'],
-          ['4 — gradient fade', 'gradient-fade'],
-          ['5 — thumb esquerda', 'thumb-left'],
-          ['6 — thumb direita', 'thumb-right'],
-          ['7 — círculo esquerda', 'circle-left'],
-          ['8 — círculo direita', 'circle-right'],
-          ['9 — corner sup dir', 'corner-tr'],
-          ['10 — corner sup esq', 'corner-tl'],
-          ['11 — corner inf dir', 'corner-br'],
-          ['12 — corner inf esq', 'corner-bl'],
-          ['13 — círculo topo', 'circle-top'],
-          ['14 — polaroid', 'polaroid'],
-          ['15 — centralizado', 'centered'],
-          ['16 — stamp', 'stamp'],
-          ['17 — split', 'split'],
-          ['18 — stripe lateral', 'stripe-left'],
-          ['19 — hero overlay', 'hero-overlay'],
-          ['20 — bg blur', 'bg-blur'],
+          ['1 · banner', 'banner'],
+          ['2 · banner fino', 'banner-slim'],
+          ['3 · banner base', 'banner-bottom'],
+          ['4 · gradient fade', 'gradient-fade'],
+          ['5 · thumb esquerda', 'thumb-left'],
+          ['6 · thumb direita', 'thumb-right'],
+          ['7 · círculo esquerda', 'circle-left'],
+          ['8 · círculo direita', 'circle-right'],
+          ['9 · corner sup dir', 'corner-tr'],
+          ['10 · corner sup esq', 'corner-tl'],
+          ['11 · corner inf dir', 'corner-br'],
+          ['12 · corner inf esq', 'corner-bl'],
+          ['13 · círculo topo', 'circle-top'],
+          ['14 · polaroid', 'polaroid'],
+          ['15 · centralizado', 'centered'],
+          ['16 · stamp', 'stamp'],
+          ['17 · split', 'split'],
+          ['18 · stripe lateral', 'stripe-left'],
+          ['19 · hero overlay', 'hero-overlay'],
+          ['20 · bg blur', 'bg-blur'],
         ] as [string, ImageLayout][]).map(([label, layout]) => (
-          <Section key={layout} title={`Bilhete — ${label}`}>
+          <Section key={layout} title={`Bilhete · ${label}`}>
             <RewardCard reward={REWARD_COM_IMAGEM} rarities={[MOCK_RARITY]} types={[MOCK_TYPE]} imageLayout={layout} />
           </Section>
         ))}

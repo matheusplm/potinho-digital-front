@@ -211,7 +211,7 @@ export function CollectionsListPage() {
                 {isWriter ? 'Sua primeira coleção' : 'Nenhuma coleção'}
               </Typography>
               <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBgMuted, maxWidth: 260 }}>
-                {isWriter ? 'Comece com um kit pronto — ou crie do zero' : 'Peça para liberarem seu email em uma coleção'}
+                {isWriter ? 'Comece com um kit pronto ou crie do zero' : 'Peça para liberarem seu email em uma coleção'}
               </Typography>
             </Stack>
             {isWriter && (

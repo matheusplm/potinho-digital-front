@@ -122,7 +122,7 @@ export function CollectionPlayPage() {
           )}
           <Box sx={{ flex: 1 }}>
             <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.15rem', color: theme.textOnBg }}>
-              {isLoading ? 'Carregando...' : collectionName ?? (play ? 'Coleção' : '—')}
+              {isLoading ? 'Carregando...' : collectionName ?? (play ? 'Coleção' : '...')}
             </Typography>
             {isSimulating && (
               <Typography sx={{ mt: 0.15, fontSize: '0.72rem', color: theme.textOnBgMuted, fontWeight: 700 }}>
@@ -202,7 +202,7 @@ export function CollectionPlayPage() {
               <Stack spacing={1}>
                 <Box>
                   <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 1.2, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
-                    Ainda por descobrir — {undiscoveredItems.length}
+                    Ainda por descobrir · {undiscoveredItems.length}
                   </Typography>
                   <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted, mt: 0.3, fontStyle: 'italic' }}>
                     Continue abrindo pacotinhos para descobrir estas cartinhas 💌

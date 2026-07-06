@@ -236,7 +236,7 @@ export function AlbumSection({
       ) : (
         <Stack spacing={1}>
           <Typography sx={{ fontSize: '0.72rem', fontWeight: 900, letterSpacing: 1.1, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
-            Cartinhas da coleção — {sorted.length}
+            Cartinhas da coleção · {sorted.length}
           </Typography>
           {view === 'grid' ? (
             <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1 }}>

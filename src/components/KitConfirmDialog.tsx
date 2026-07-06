@@ -47,12 +47,12 @@ export function KitConfirmDialog({ open, template, inviteEmail, isPending, onCon
               {inviteEmail ? (
                 <Box sx={{ p: 1.1, borderRadius: radius.md, background: 'rgba(29,78,216,0.06)', border: '1px solid rgba(29,78,216,0.18)' }}>
                   <Typography sx={{ fontSize: '0.82rem', color: colors.text.primary, lineHeight: 1.5 }}>
-                    💌 Convidando <strong>{inviteEmail}</strong> — a pessoa recebe o convite por email assim que a coleção nascer.
+                    💌 Convidando <strong>{inviteEmail}</strong>: a pessoa recebe o convite por email assim que a coleção nascer.
                   </Typography>
                 </Box>
               ) : (
                 <SummaryRow icon="🔓">
-                  Sem convite por enquanto — dá para convidar depois na aba Acesso.
+                  Sem convite por enquanto. Dá para convidar depois na aba Acesso.
                 </SummaryRow>
               )}
             </Stack>

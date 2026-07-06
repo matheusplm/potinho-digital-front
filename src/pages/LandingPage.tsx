@@ -142,7 +142,7 @@ export function LandingPage() {
                 </Typography>
                 <Box sx={{ width: 56, height: 3, borderRadius: 2, background: 'linear-gradient(90deg,#1d4ed8,#e11d48)', mb: 3 }} />
                 <Typography sx={{ fontSize: '1.05rem', color: colors.text.secondary, lineHeight: 1.75, mb: 4, maxWidth: 440 }}>
-                  Escreva bilhetes especiais, monte pacotinhos surpresa e presenteie quem você ama com uma nova descoberta todo dia — como um álbum de figurinhas, só que com mensagens de verdade.
+                  Escreva bilhetes especiais, monte pacotinhos surpresa e presenteie quem você ama com uma nova descoberta todo dia, como um álbum de figurinhas, só que com mensagens de verdade.
                 </Typography>
                 <Stack direction="row" spacing={1.5} sx={{ mb: 2 }}>
                   <Button variant="primary" onClick={() => navigate('/register')} sx={{ py: 1.4, px: 3.5, fontSize: '0.97rem' }}>
@@ -179,14 +179,14 @@ export function LandingPage() {
               </Typography>
               <Box sx={{ width: 44, height: 3, borderRadius: 2, background: 'linear-gradient(90deg,#1d4ed8,#e11d48)', mb: 2.5 }} />
               <Typography sx={{ fontSize: '0.9rem', color: colors.text.secondary, textAlign: 'center', lineHeight: 1.72, mb: 3.5, maxWidth: 310 }}>
-                Escreva bilhetes, monte pacotinhos surpresa e presenteie quem você ama com novas descobertas todo dia — como um álbum de figurinhas.
+                Escreva bilhetes, monte pacotinhos surpresa e presenteie quem você ama com novas descobertas todo dia, como um álbum de figurinhas.
               </Typography>
               <Stack spacing={1.2} sx={{ width: '100%', maxWidth: 320 }}>
                 <Button variant="primary" fullWidth onClick={() => navigate('/register')} sx={{ py: 1.35, fontSize: '0.97rem' }}>
                   Criar conta grátis
                 </Button>
                 <Button variant="ghost" fullWidth onClick={() => navigate('/login')} sx={{ py: 1.1, fontSize: '0.9rem' }}>
-                  Já tenho conta — Entrar
+                  Já tenho conta · Entrar
                 </Button>
               </Stack>
               <Typography sx={{ mt: 2, fontSize: '0.74rem', color: colors.text.muted }}>
@@ -209,7 +209,7 @@ export function LandingPage() {
               Pense num álbum de figurinhas.
             </Typography>
             <Typography sx={{ fontSize: isDesktop ? '1.15rem' : '0.92rem', color: colors.text.secondary, lineHeight: 1.8, maxWidth: 580, mx: 'auto' }}>
-              Só que em vez de figurinhas, são <strong style={{ color: '#1e3a5f' }}>bilhetes escritos por você</strong>. Com raridades, tipos e surpresas. A pessoa descobre aos poucos, abrindo um pacotinho por dia — como receber uma carta esperada todo dia.
+              Só que em vez de figurinhas, são <strong style={{ color: '#1e3a5f' }}>bilhetes escritos por você</strong>. Com raridades, tipos e surpresas. A pessoa descobre aos poucos, abrindo um pacotinho por dia, como receber uma carta esperada todo dia.
             </Typography>
             <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', gap: 1.5, flexWrap: 'wrap' }}>
               {[
@@ -248,7 +248,7 @@ export function LandingPage() {
             {isDesktop ? (
               <Box sx={{ display: 'grid', gridTemplateColumns: '380px 1fr', gap: 7, alignItems: 'flex-start' }}>
                 <Box>
-                  <SectionTitle sub="Clique em uma raridade para filtrar. Cada bilhete tem visual único definido pela raridade — do comum ao lendário.">
+                  <SectionTitle sub="Clique em uma raridade para filtrar. Cada bilhete tem visual único definido pela raridade, do comum ao lendário.">
                     Veja como ficam os bilhetes
                   </SectionTitle>
                   <Stack spacing={1} sx={{ mt: 2.5 }}>
@@ -382,7 +382,7 @@ export function LandingPage() {
                 100% personalizável
               </Typography>
             </Box>
-            <SectionTitle sub="Nada é fixo. Raridades, tipos, pacotinhos, conquistas, temas — tudo criado do zero por você.">
+            <SectionTitle sub="Nada é fixo. Raridades, tipos, pacotinhos, conquistas, temas: tudo criado do zero por você.">
               Você controla tudo
             </SectionTitle>
             <Box sx={{ display: 'grid', gridTemplateColumns: isDesktop ? 'repeat(2,1fr)' : '1fr', gap: 1.8, mt: 3 }}>
@@ -473,7 +473,7 @@ export function LandingPage() {
               Pronto para começar?
             </Typography>
             <Typography sx={{ fontSize: '0.88rem', color: colors.text.secondary, lineHeight: 1.7, mb: 3.5, maxWidth: 400, mx: 'auto' }}>
-              Crie sua conta, monte sua coleção do zero e presenteie quem você ama com algo único — hoje mesmo.
+              Crie sua conta, monte sua coleção do zero e presenteie quem você ama com algo único, hoje mesmo.
             </Typography>
             {isDesktop ? (
               <Stack direction="row" spacing={1.5} justifyContent="center">
@@ -490,7 +490,7 @@ export function LandingPage() {
                   Criar conta agora
                 </Button>
                 <Button variant="ghost" fullWidth onClick={() => navigate('/login')} sx={{ py: 1.1, fontSize: '0.9rem' }}>
-                  Já tenho conta — Entrar
+                  Já tenho conta · Entrar
                 </Button>
               </Stack>
             )}
@@ -556,7 +556,7 @@ const ThemesSection: FC<{ isDesktop: boolean }> = ({ isDesktop }) => {
 
   return (
     <Box sx={{ py: isDesktop ? 8 : 5, px: isDesktop ? 5 : 2.5, maxWidth: isDesktop ? 1200 : 480, mx: 'auto' }}>
-      <SectionTitle sub="O leitor escolhe o tema que mais combina com ele — do romântico e suave ao misterioso e sombrio.">
+      <SectionTitle sub="O leitor escolhe o tema que mais combina com ele, do romântico e suave ao misterioso e sombrio.">
         {`${backgroundThemes.length} temas visuais`}
       </SectionTitle>
 

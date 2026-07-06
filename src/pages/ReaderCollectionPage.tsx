@@ -92,7 +92,7 @@ export function ReaderCollectionPage() {
   const favCount = useMemo(() => ownedNotes.filter((n) => n.favorite).length, [ownedNotes])
 
   const dailyPackLabel = useMemo(() => {
-    if (!view?.daily) return '—'
+    if (!view?.daily) return '...'
     if (view.daily.canOpen) return '✓ disponível'
     const remainingMs = Date.parse(view.daily.availableAt) - Date.now()
     return `⏳ ${formatRemainingTime(remainingMs)}`

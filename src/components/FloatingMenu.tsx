@@ -312,7 +312,7 @@ export function FloatingMenu() {
                         Notificações
                       </Typography>
                       <Typography sx={{ fontSize: '0.68rem', color: theme.textOnBgMuted }}>
-                        {notifStatus === 'denied' ? 'bloqueado pelo navegador' : notifEnabled ? 'ativo — toque para desligar' : 'toque para ativar'}
+                        {notifStatus === 'denied' ? 'bloqueado pelo navegador' : notifEnabled ? 'ativo, toque para desligar' : 'toque para ativar'}
                       </Typography>
                     </Box>
                   </Stack>

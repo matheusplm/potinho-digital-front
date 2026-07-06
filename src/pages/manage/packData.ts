@@ -37,16 +37,16 @@ export const PACK_STATUS_OPTIONS = Object.entries(PACK_STATUS_LABELS).map(([id, 
 export const PACK_DISTRIBUTION_OPTIONS = Object.entries(PACK_DISTRIBUTION_LABELS).map(([id, label]) => ({ id: id as CollectionPackDistribution, label }))
 
 export const PACK_CATEGORY_HINTS: Record<CollectionPackCategory, string> = {
-  daily: 'O pacote principal, em destaque para o leitor — só um por coleção.',
+  daily: 'O pacote principal, em destaque para o leitor. Só um por coleção.',
   bonus: 'Extra fora da rotina, ótimo para surpresas e presentes.',
   guaranteed: 'Pacote de evento especial, com raridade garantida.',
   thematic: 'Agrupa um tema: saudade, memórias, poemas...',
 }
 
 export const PACK_STATUS_HINTS: Record<CollectionPackStatus, string> = {
-  active: 'No ar — quem tem acesso já pode abrir.',
-  draft: 'Rascunho — só você vê por enquanto.',
-  disabled: 'Pausado — some para os leitores até você reativar.',
+  active: 'No ar: quem tem acesso já pode abrir.',
+  draft: 'Rascunho: só você vê por enquanto.',
+  disabled: 'Pausado: some para os leitores até você reativar.',
 }
 
 export const PACK_DISTRIBUTION_HINTS: Record<CollectionPackDistribution, string> = {
@@ -58,7 +58,7 @@ export const PACK_DISTRIBUTION_HINTS: Record<CollectionPackDistribution, string>
 export type PackRhythmId = 'daily' | 'twice' | 'weekly' | 'fixed_time' | 'once' | 'manual'
 
 export const PACK_RHYTHMS: { id: PackRhythmId; emoji: string; label: string; hint: string }[] = [
-  { id: 'daily',      emoji: '☀️', label: '1x por dia',        hint: 'Libera sozinho a cada 24 horas — o clássico.' },
+  { id: 'daily',      emoji: '☀️', label: '1x por dia',        hint: 'Libera sozinho a cada 24 horas, o clássico.' },
   { id: 'twice',      emoji: '🌗', label: '2x por dia',        hint: 'Libera sozinho a cada 12 horas.' },
   { id: 'weekly',     emoji: '📅', label: '1x por semana',     hint: 'Libera sozinho a cada 7 dias.' },
   { id: 'fixed_time', emoji: '⏰', label: 'Hora marcada',      hint: 'Todo dia no mesmo horário, tipo café da manhã.' },
@@ -66,7 +66,7 @@ export const PACK_RHYTHMS: { id: PackRhythmId; emoji: string; label: string; hin
   { id: 'manual',     emoji: '🎁', label: 'Quando eu liberar', hint: 'Você envia na hora que quiser, como um presente.' },
 ]
 
-export const PACK_RHYTHM_CUSTOM_HINT = 'Configuração personalizada — ajuste fino nas Opções avançadas.'
+export const PACK_RHYTHM_CUSTOM_HINT = 'Configuração personalizada. Ajuste fino nas Opções avançadas.'
 
 export function detectRhythm(form: Pick<CollectionPackFormData, 'distribution' | 'scheduleMode' | 'cooldownHours'>): PackRhythmId | 'custom' {
   if (form.distribution === 'manual_bonus') return 'manual'

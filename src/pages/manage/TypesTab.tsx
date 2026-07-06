@@ -108,7 +108,7 @@ export function TypesTab({ cid }: TypesTabProps) {
   const typeImport = useJsonImport(
     importTypes,
     (r) => r.created === 0
-      ? `Nenhum tipo novo — ${r.skipped} já existia${r.skipped !== 1 ? 'm' : ''}.`
+      ? `Nenhum tipo novo, ${r.skipped} já existia${r.skipped !== 1 ? 'm' : ''}.`
       : r.skipped > 0
         ? `${r.created} importado${r.created !== 1 ? 's' : ''}, ${r.skipped} ignorado${r.skipped !== 1 ? 's' : ''} (id duplicado).`
         : `${r.created} tipo${r.created !== 1 ? 's' : ''} importado${r.created !== 1 ? 's' : ''}.`,

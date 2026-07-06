@@ -260,7 +260,7 @@ export function RaritiesTab({ cid }: RaritiesTabProps) {
   const rarityImport = useJsonImport(
     importRarities,
     (r) => r.created === 0
-      ? `Nenhuma raridade nova — ${r.skipped} já existia${r.skipped !== 1 ? 'm' : ''}.`
+      ? `Nenhuma raridade nova, ${r.skipped} já existia${r.skipped !== 1 ? 'm' : ''}.`
       : r.skipped > 0
         ? `${r.created} importada${r.created !== 1 ? 's' : ''}, ${r.skipped} ignorada${r.skipped !== 1 ? 's' : ''} (id duplicado).`
         : `${r.created} raridade${r.created !== 1 ? 's' : ''} importada${r.created !== 1 ? 's' : ''}.`,

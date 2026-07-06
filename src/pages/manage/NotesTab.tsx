@@ -77,7 +77,7 @@ export function NotesTab({ cid }: NotesTabProps) {
   const noteImport = useJsonImport(
     importNotes,
     (r) => r.created === 0
-      ? `Nenhum bilhete novo — ${r.skipped} já existia${r.skipped !== 1 ? 'm' : ''}.`
+      ? `Nenhum bilhete novo, ${r.skipped} já existia${r.skipped !== 1 ? 'm' : ''}.`
       : r.skipped > 0
         ? `${r.created} importado${r.created !== 1 ? 's' : ''}, ${r.skipped} ignorado${r.skipped !== 1 ? 's' : ''} (título duplicado).`
         : `${r.created} bilhete${r.created !== 1 ? 's' : ''} importado${r.created !== 1 ? 's' : ''}.`,
