@@ -318,6 +318,15 @@ export function InviteAcceptPage() {
                     Recusar
                   </Button>
                 </Stack>
+                <Typography
+                  onClick={() => { if (!acceptMutation.isPending && !rejectMutation.isPending) navigate('/home') }}
+                  sx={{
+                    fontSize: '0.8rem', fontWeight: 700, color: '#1d4ed8', cursor: 'pointer',
+                    '&:hover': { textDecoration: 'underline' },
+                  }}
+                >
+                  Prefiro decidir depois (o convite fica guardado)
+                </Typography>
                 <Typography sx={{ fontSize: '0.72rem', color: 'rgba(30,58,95,0.45)' }}>
                   logado como {user?.email}
                 </Typography>
