@@ -1,36 +1,46 @@
 import type { ReactElement } from 'react'
-import { useEffect } from 'react'
+import { Suspense, lazy, useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { useMediaQuery } from '@mui/material'
 import { MobileLayout } from './components/MobileLayout'
 import { DesktopLayout } from './components/DesktopLayout'
 import { PersonaBootstrap } from './components/PersonaBootstrap'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { UserProvider, useUser, type UserRole } from './context/UserContext'
 import { BackgroundProvider } from './context/BackgroundContext'
 import { SimulationProvider, useSimulation } from './context/SimulationContext'
 import { ReaderProvider } from './context/ReaderContext'
-import { WriterHomePage } from './pages/WriterHomePage'
-import { SimulatedReaderHomePage } from './pages/SimulatedReaderHomePage'
-import { LoginPage } from './pages/LoginPage'
-import { RegisterPage } from './pages/RegisterPage'
-import { CollectionsListPage } from './pages/CollectionsListPage'
-import { CollectionPlayPage } from './pages/CollectionPlayPage'
-import { CollectionManagePage } from './pages/CollectionManagePage'
-import { ReaderCollectionPage } from './pages/ReaderCollectionPage'
-import { ConquistasPage } from './pages/ConquistasPage'
-import { FavoritasPage } from './pages/FavoritasPage'
-import { TestPage } from './pages/TestPage'
-import { LandingPage } from './pages/LandingPage'
-import { NotFoundPage } from './pages/NotFoundPage'
-import { VerifyEmailPage } from './pages/VerifyEmailPage'
-import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
-import { ResetPasswordPage } from './pages/ResetPasswordPage'
-import { ContaPage } from './pages/ContaPage'
-import { ConfirmEmailChangePage } from './pages/ConfirmEmailChangePage'
-import { InviteAcceptPage } from './pages/InviteAcceptPage'
 import { LoadingState } from './components/ui'
 import { Box } from '@mui/material'
+
+const WriterHomePage = lazy(() => import('./pages/WriterHomePage').then((m) => ({ default: m.WriterHomePage })))
+const SimulatedReaderHomePage = lazy(() => import('./pages/SimulatedReaderHomePage').then((m) => ({ default: m.SimulatedReaderHomePage })))
+const LoginPage = lazy(() => import('./pages/LoginPage').then((m) => ({ default: m.LoginPage })))
+const RegisterPage = lazy(() => import('./pages/RegisterPage').then((m) => ({ default: m.RegisterPage })))
+const CollectionsListPage = lazy(() => import('./pages/CollectionsListPage').then((m) => ({ default: m.CollectionsListPage })))
+const CollectionPlayPage = lazy(() => import('./pages/CollectionPlayPage').then((m) => ({ default: m.CollectionPlayPage })))
+const CollectionManagePage = lazy(() => import('./pages/CollectionManagePage').then((m) => ({ default: m.CollectionManagePage })))
+const ReaderCollectionPage = lazy(() => import('./pages/ReaderCollectionPage').then((m) => ({ default: m.ReaderCollectionPage })))
+const ConquistasPage = lazy(() => import('./pages/ConquistasPage').then((m) => ({ default: m.ConquistasPage })))
+const FavoritasPage = lazy(() => import('./pages/FavoritasPage').then((m) => ({ default: m.FavoritasPage })))
+const TestPage = lazy(() => import('./pages/TestPage').then((m) => ({ default: m.TestPage })))
+const LandingPage = lazy(() => import('./pages/LandingPage').then((m) => ({ default: m.LandingPage })))
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })))
+const VerifyEmailPage = lazy(() => import('./pages/VerifyEmailPage').then((m) => ({ default: m.VerifyEmailPage })))
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage').then((m) => ({ default: m.ForgotPasswordPage })))
+const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage').then((m) => ({ default: m.ResetPasswordPage })))
+const ContaPage = lazy(() => import('./pages/ContaPage').then((m) => ({ default: m.ContaPage })))
+const ConfirmEmailChangePage = lazy(() => import('./pages/ConfirmEmailChangePage').then((m) => ({ default: m.ConfirmEmailChangePage })))
+const InviteAcceptPage = lazy(() => import('./pages/InviteAcceptPage').then((m) => ({ default: m.InviteAcceptPage })))
+
+function RouteFallback() {
+  return (
+    <Box sx={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <LoadingState label="Carregando" />
+    </Box>
+  )
+}
 
 function HomeRoute() {
   const { persona } = useUser()
@@ -60,42 +70,46 @@ function AppRoutes() {
 
   if (!user) {
     return (
+      <Suspense fallback={<RouteFallback />}>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/verificar-email" element={<VerifyEmailPage />} />
+          <Route path="/esqueci-minha-senha" element={<ForgotPasswordPage />} />
+          <Route path="/redefinir-senha" element={<ResetPasswordPage />} />
+          <Route path="/confirmar-troca-email" element={<ConfirmEmailChangePage />} />
+          <Route path="/convite/:token" element={<InviteAcceptPage />} />
+          {import.meta.env.DEV && <Route path="/test" element={<TestPage />} />}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
+    )
+  }
+
+  return (
+    <Suspense fallback={<RouteFallback />}>
       <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
         <Route path="/verificar-email" element={<VerifyEmailPage />} />
         <Route path="/esqueci-minha-senha" element={<ForgotPasswordPage />} />
         <Route path="/redefinir-senha" element={<ResetPasswordPage />} />
         <Route path="/confirmar-troca-email" element={<ConfirmEmailChangePage />} />
         <Route path="/convite/:token" element={<InviteAcceptPage />} />
-        {import.meta.env.DEV && <Route path="/test" element={<TestPage />} />}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route element={<Layout />}>
+          <Route index element={<Navigate to="/home" replace />} />
+          <Route path="home" element={<HomeRoute />} />
+          <Route path="colecoes" element={<RequireRole role="writer"><CollectionsListPage /></RequireRole>} />
+          <Route path="colecoes/:slug" element={<CollectionPlayPage />} />
+          <Route path="conquistas" element={<ConquistasPage />} />
+          <Route path="favoritas" element={<FavoritasPage />} />
+          <Route path="colecoes/:slug/gerenciar" element={<RequireRole role="writer"><CollectionManagePage /></RequireRole>} />
+          <Route path="colecoes/:slug/gerenciar/leitores/:email" element={<RequireRole role="writer"><ReaderCollectionPage /></RequireRole>} />
+          <Route path="conta" element={<ContaPage />} />
+        </Route>
+        {import.meta.env.DEV && <Route path="test" element={<TestPage />} />}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
-    )
-  }
-
-  return (
-    <Routes>
-      <Route path="/verificar-email" element={<VerifyEmailPage />} />
-      <Route path="/esqueci-minha-senha" element={<ForgotPasswordPage />} />
-      <Route path="/redefinir-senha" element={<ResetPasswordPage />} />
-      <Route path="/confirmar-troca-email" element={<ConfirmEmailChangePage />} />
-      <Route path="/convite/:token" element={<InviteAcceptPage />} />
-      <Route element={<Layout />}>
-        <Route index element={<Navigate to="/home" replace />} />
-        <Route path="home" element={<HomeRoute />} />
-        <Route path="colecoes" element={<RequireRole role="writer"><CollectionsListPage /></RequireRole>} />
-        <Route path="colecoes/:slug" element={<CollectionPlayPage />} />
-        <Route path="conquistas" element={<ConquistasPage />} />
-        <Route path="favoritas" element={<FavoritasPage />} />
-        <Route path="colecoes/:slug/gerenciar" element={<RequireRole role="writer"><CollectionManagePage /></RequireRole>} />
-        <Route path="colecoes/:slug/gerenciar/leitores/:email" element={<RequireRole role="writer"><ReaderCollectionPage /></RequireRole>} />
-        <Route path="conta" element={<ContaPage />} />
-      </Route>
-      {import.meta.env.DEV && <Route path="test" element={<TestPage />} />}
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+    </Suspense>
   )
 }
 
@@ -107,23 +121,25 @@ function App() {
   }, [])
 
   return (
-    <BrowserRouter>
-      <UserProvider>
-        <PersonaBootstrap />
-        <BackgroundProvider>
-          <ReaderProvider>
-            <SimulationProvider>
-              <AppRoutes />
-            </SimulationProvider>
-          </ReaderProvider>
-          <Toaster
-            position="top-center"
-            gap={8}
-            toastOptions={{ unstyled: true }}
-          />
-        </BackgroundProvider>
-      </UserProvider>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <UserProvider>
+          <PersonaBootstrap />
+          <BackgroundProvider>
+            <ReaderProvider>
+              <SimulationProvider>
+                <AppRoutes />
+              </SimulationProvider>
+            </ReaderProvider>
+            <Toaster
+              position="top-center"
+              gap={8}
+              toastOptions={{ unstyled: true }}
+            />
+          </BackgroundProvider>
+        </UserProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   )
 }
 

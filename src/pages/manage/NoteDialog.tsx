@@ -1,12 +1,13 @@
 import { Box, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField, Typography } from '@mui/material'
-import { useEffect, useState } from 'react'
-import { Button, Input, toast } from '../../components/ui'
-import { ImagePicker } from '../../components/ImagePicker'
+import { Suspense, lazy, useEffect, useState } from 'react'
+import { Button, Input, LoadingState, toast } from '../../components/ui'
 import { RewardCard } from '../../components/collection/RewardCard'
 import { useCreateCollectionNoteMutation, useUpdateCollectionNoteMutation } from '../../hooks/useNotes'
 import { colors, font, radius } from '../../design-system'
 import { gradientTextSx } from '../../utils/colorUtils'
 import type { NoteFormData, NoteRecord, RarityConfig, NoteTypeConfig } from '../../types/note'
+
+const ImagePicker = lazy(() => import('../../components/ImagePicker').then((m) => ({ default: m.ImagePicker })))
 
 const EMPTY_NOTE: NoteFormData = { title: '', message: '', rarity: '', typeId: '', imageUrl: null, imageLayout: null }
 
@@ -155,7 +156,9 @@ export function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
           </Box>
           {form.imageLayout && (
             <Stack spacing={0.5}>
-              <ImagePicker value={form.imageUrl} onChange={(url) => { setForm((f) => ({ ...f, imageUrl: url })); if (!url) setTouched((t) => ({ ...t, imageUrl: true })) }} />
+              <Suspense fallback={<LoadingState compact label="Carregando seletor de imagem" />}>
+                <ImagePicker value={form.imageUrl} onChange={(url) => { setForm((f) => ({ ...f, imageUrl: url })); if (!url) setTouched((t) => ({ ...t, imageUrl: true })) }} />
+              </Suspense>
               {touched.imageUrl && errors.imageUrl && (
                 <Typography sx={{ fontSize: '0.7rem', color: colors.error.main, pl: 0.5 }}>{errors.imageUrl}</Typography>
               )}

@@ -9,7 +9,8 @@ import DensitySmallIcon from '@mui/icons-material/DensitySmall'
 import { Box, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, TextField, Typography } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
 import { Button, Card, ConfirmDeleteDialog, LoadingState, SegmentedControl } from '../../components/ui'
-import { NoteDetailDialog, RewardCard, type ReadableNote } from '../CollectionPlayPage'
+import { NoteDetailDialog, type ReadableNote } from '../../components/collection/NoteDetailDialog'
+import { RewardCard } from '../../components/collection/RewardCard'
 import {
   useCollectionNotesQuery, useCollectionRaritiesQuery, useCollectionTypesQuery,
   useDeleteCollectionNoteMutation, useImportCollectionNotesMutation,
