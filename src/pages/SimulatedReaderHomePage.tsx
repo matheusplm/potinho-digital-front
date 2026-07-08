@@ -28,7 +28,8 @@ import { ApiRequestError } from '../services/api'
 import { simulatePackOpen } from '../utils/simulationPlay'
 import { formatRemainingTime } from '../utils/packCooldowns'
 import { computeAchievements } from '../utils/achievements'
-import { NoteDetailDialog, PACK_OPEN_ANIMATION_MS, PackOpeningDialog, wait, type ReadableNote } from './CollectionPlayPage'
+import { NoteDetailDialog, type ReadableNote } from '../components/collection/NoteDetailDialog'
+import { PACK_OPEN_ANIMATION_MS, PackOpeningDialog, wait } from '../components/collection/PackOpeningDialog'
 import type { CollectionDailyReward, CollectionPack } from '../types/note'
 import { slugify } from '../utils/slug'
 import { MainPackButton } from './home/MainPackButton'
@@ -48,7 +49,7 @@ export function SimulatedReaderHomePage() {
   const isRealReader = !simulation.isActive && persona === 'reader'
   const readerCollections = useMemo(
     () => isRealReader ? collections.filter((c) => isCollectionReader(c, user?.id)) : [],
-    [collections, isRealReader],
+    [collections, isRealReader, user?.id],
   )
   const readerCollection = useMemo(
     () => {
@@ -111,7 +112,7 @@ export function SimulatedReaderHomePage() {
       new Notification('Potinho Digital 🎁', { body: 'Existem pacotes disponíveis para você!' })
     }
     prevCanOpen.current = canOpen
-  }, [playFromApi?.daily.canOpen])
+  }, [playFromApi])
 
   const play = isRealReader ? playFromApi : simulation.getPlayView(notes)
   const isLoading = isRealReader ? collectionsLoading || (!!cid && playLoading) : notesLoading
@@ -191,6 +192,7 @@ export function SimulatedReaderHomePage() {
     )
     setPackCooldowns(nextCooldowns)
     setPackAvailableCounts(counts)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- só os campos primitivos de play: o objeto muda a cada poll e recomputaria à toa
   }, [
     isRealReader,
     cid,

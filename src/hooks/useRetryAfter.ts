@@ -22,6 +22,7 @@ export function useRetryAfter() {
       setRemaining((r) => (r > 1 ? r - 1 : 0))
     }, 1000)
     return () => clearInterval(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- só epoch: remaining muda a cada tick via remainingRef e recriaria o interval a cada segundo
   }, [epoch])
 
   function captureFromError(err: unknown) {

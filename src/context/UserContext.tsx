@@ -111,7 +111,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     return () => {
       active = false
     }
-  }, [])
+  }, [user?.token])
 
   return (
     <UserContext.Provider value={{ user, persona, personaReady, setUser, patchUser, setPersona, markPersonaReady, logout }}>

@@ -27,7 +27,7 @@ import { slugify } from '../utils/slug'
 import { isCollectionOwner } from '../utils/collectionAccess'
 import { gradientTextSx } from '../utils/colorUtils'
 import { formatRemainingTime } from '../utils/packCooldowns'
-import { NoteDetailDialog } from './CollectionPlayPage'
+import { NoteDetailDialog } from '../components/collection/NoteDetailDialog'
 import { NoteCard, NoteRow } from './reader/NoteCard'
 import { PackOpensDialog } from './reader/PackOpensDialog'
 import { RevokeAccessDialog } from './reader/RevokeAccessDialog'
@@ -96,6 +96,7 @@ export function ReaderCollectionPage() {
     if (view.daily.canOpen) return '✓ disponível'
     const remainingMs = Date.parse(view.daily.availableAt) - Date.now()
     return `⏳ ${formatRemainingTime(remainingMs)}`
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- só os campos primitivos: view muda a cada poll e recomputaria à toa
   }, [view?.daily?.canOpen, view?.daily?.availableAt])
 
   const ownedRarities = useMemo(

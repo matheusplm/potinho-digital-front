@@ -1,10 +1,12 @@
 import { Dialog, DialogActions, DialogContent, Stack, Typography } from '@mui/material'
-import { Button } from '../ui'
+import { Suspense, lazy } from 'react'
+import { Button, LoadingState } from '../ui'
 import { colors, radius } from '../../design-system'
 import { useBackground } from '../../context/BackgroundContext'
-import { ShareCartinha } from '../album/ShareCartinha'
 import { RewardCard } from './RewardCard'
 import type { CollectionDailyReward, CollectionNoteView, NoteRecord, RarityConfig, NoteTypeConfig } from '../../types/note'
+
+const ShareCartinha = lazy(() => import('../album/ShareCartinha').then((m) => ({ default: m.ShareCartinha })))
 
 export type ReadableNote = CollectionDailyReward | CollectionNoteView | NoteRecord
 
@@ -40,7 +42,9 @@ export function NoteDetailDialog({ note, rarities, types, onClose }: {
                 <Typography sx={{ fontSize: '0.70rem', fontWeight: 900, letterSpacing: 0.8, color: rarity?.captionColor ?? colors.text.muted, textTransform: 'uppercase' }}>
                   Compartilhar
                 </Typography>
-                <ShareCartinha note={note} r={rarity} t={type} theme={theme} />
+                <Suspense fallback={<LoadingState compact label="Preparando compartilhamento" />}>
+                  <ShareCartinha note={note} r={rarity} t={type} theme={theme} />
+                </Suspense>
               </Stack>
             </Stack>
           </DialogContent>

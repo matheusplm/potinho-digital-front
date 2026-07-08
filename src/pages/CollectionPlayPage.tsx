@@ -19,15 +19,6 @@ import { AlbumSection, ALBUM_VIEW_KEY } from './play/AlbumSection'
 import type { AlbumView, AlbumSort, AlbumGroup, AlbumFilter } from './play/AlbumSection'
 import type { CollectionNoteView } from '../types/note'
 
-export type { ReadableNote } from '../components/collection/NoteDetailDialog'
-export type { AlbumView, AlbumSort } from './play/AlbumSection'
-export { ALBUM_VIEW_KEY } from './play/AlbumSection'
-export { RewardCard } from '../components/collection/RewardCard'
-export type { ImageLayout } from '../components/collection/RewardCard'
-export { NoteDetailDialog } from '../components/collection/NoteDetailDialog'
-export { NoteCard } from '../components/collection/NoteCard'
-export { PackOpeningDialog, PACK_OPEN_ANIMATION_MS, wait } from '../components/collection/PackOpeningDialog'
-
 export function CollectionPlayPage() {
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()

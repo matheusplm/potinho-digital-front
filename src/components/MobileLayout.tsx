@@ -62,6 +62,7 @@ export function MobileLayout() {
       const a = byId[id]
       if (a) toast.love('Conquista desbloqueada! 🏆', { description: `${a.emoji} ${a.label}` })
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- só justUnlockedKey: readerAch muda a cada poll e repetiria o toast
   }, [justUnlockedKey])
 
   const items = useMemo<NavItem[]>(() => {
