@@ -78,11 +78,6 @@ const FRIENDLY_ERROR_MESSAGES: Record<string, string> = {
   INVALID_COUNT: 'Quantidade inválida.',
   ACHIEVEMENT_ALREADY_EXISTS: 'Já existe uma conquista com esse identificador.',
   ACHIEVEMENT_INVALID_CONDITION: 'Condição inválida para esta conquista.',
-  RARITY_IN_USE: 'Essa raridade ainda está em uso por bilhetes desta coleção.',
-  TYPE_IN_USE: 'Esse tipo ainda está em uso por bilhetes desta coleção.',
-  NOTE_ALREADY_COLLECTED: 'Este bilhete já foi coletado por leitores. Raridade e tipo não podem mudar.',
-  PACK_HAS_PENDING_OPENS: 'Este pacotinho tem aberturas pendentes de leitores.',
-  ACHIEVEMENT_ALREADY_UNLOCKED: 'Esta conquista já foi desbloqueada por leitores.',
   NOTE_NOT_DISABLED: 'Desative o bilhete antes de excluí-lo permanentemente.',
 }
 

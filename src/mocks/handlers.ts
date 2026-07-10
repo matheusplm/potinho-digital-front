@@ -680,8 +680,33 @@ const collectionHandlers = [
     const auth = authorizeCollection(request, String(params.cid), 'owner')
     if (!auth.ok) return auth.response
     const { collection } = auth
+    const record = collection.notes.find((note) => note.id === params.id)
+    if (!record) return notFound('Bilhete não encontrado.')
+    record.disabledAt = new Date().toISOString()
+    return HttpResponse.json(record)
+  }),
+
+  http.post('/api/collections/:cid/notes/:id/restore', async ({ params, request }) => {
+    await delay(200)
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
+    const record = collection.notes.find((note) => note.id === params.id)
+    if (!record) return notFound('Bilhete não encontrado.')
+    record.disabledAt = null
+    return HttpResponse.json(record)
+  }),
+
+  http.delete('/api/collections/:cid/notes/:id/permanent', async ({ params, request }) => {
+    await delay(200)
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
     const index = collection.notes.findIndex((note) => note.id === params.id)
     if (index === -1) return notFound('Bilhete não encontrado.')
+    if (!collection.notes[index].disabledAt) {
+      return HttpResponse.json({ error: 'NOTE_NOT_DISABLED', message: 'Desative o bilhete antes de excluí-lo permanentemente.' }, { status: 400 })
+    }
     collection.notes.splice(index, 1)
     return HttpResponse.json({ deleted: true })
   }),
