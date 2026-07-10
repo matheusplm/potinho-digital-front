@@ -136,7 +136,7 @@ export function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
             )}
             {lockedIdentity && (
               <Typography sx={{ fontSize: '0.68rem', color: colors.text.muted, mt: 0.5, pl: 0.5 }}>
-                🔒 {editing?.timesCollected} leitor{editing?.timesCollected === 1 ? '' : 'es'} já {editing?.timesCollected === 1 ? 'coletou' : 'coletaram'} este bilhete — raridade e tipo não podem mudar.
+                🔒 {editing?.timesCollected} leitor{editing?.timesCollected === 1 ? '' : 'es'} já {editing?.timesCollected === 1 ? 'coletou' : 'coletaram'} este bilhete. Raridade e tipo não podem mudar.
               </Typography>
             )}
           </Box>
