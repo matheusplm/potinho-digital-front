@@ -31,7 +31,7 @@ export function FormDialog({
       onClose={onClose}
       maxWidth={maxWidth}
       fullWidth
-      slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'rgba(255,253,251,0.98)', backdropFilter: 'blur(24px)' } } }}
+      slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'var(--pd-surface-paper)', backdropFilter: 'blur(24px)' } } }}
     >
       <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 700, color: colors.text.primary, pb: 1 }}>
         {title}

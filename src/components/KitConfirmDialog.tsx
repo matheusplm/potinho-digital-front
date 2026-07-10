@@ -26,7 +26,7 @@ export function KitConfirmDialog({ open, template, inviteEmail, isPending, onCon
       onClose={isPending ? undefined : onClose}
       maxWidth="xs"
       fullWidth
-      slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'rgba(255,253,251,0.98)' } } }}
+      slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'var(--pd-surface-paper)' } } }}
     >
       {template && (
         <>

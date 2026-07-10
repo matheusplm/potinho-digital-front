@@ -23,7 +23,7 @@ import {
   usePendingInvitesQuery,
   useReaderAchievementsQuery,
 } from '../hooks/useNotes'
-import { colors, fadeIn, font, radius } from '../design-system'
+import { colors, fadeIn, font, ink, radius } from '../design-system'
 import { isCollectionReader } from '../utils/collectionAccess'
 import { ApiRequestError } from '../services/api'
 import { simulatePackOpen } from '../utils/simulationPlay'
@@ -463,12 +463,12 @@ export function SimulatedReaderHomePage() {
                 return (
                   <Box key={c.id} onClick={() => setActiveCollectionId(c.id)} sx={{
                     px: 1.1, py: 0.45, borderRadius: radius.full, cursor: 'pointer', position: 'relative',
-                    background: active ? theme.accent : 'rgba(255,255,255,0.5)',
-                    border: `1.5px solid ${active ? theme.accent : 'rgba(255,255,255,0.6)'}`,
+                    background: active ? theme.accent : theme.surfaceBg,
+                    border: `1.5px solid ${active ? theme.accent : theme.surfaceBorder}`,
                     backdropFilter: 'blur(10px)', transition: 'all 0.16s',
-                    '&:hover': active ? {} : { background: 'rgba(255,255,255,0.72)' },
+                    '&:hover': active ? {} : { borderColor: `${theme.accent}55` },
                   }}>
-                    <Typography sx={{ fontSize: '0.74rem', fontWeight: 800, color: active ? '#fff' : colors.text.secondary, maxWidth: 170, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <Typography sx={{ fontSize: '0.74rem', fontWeight: 800, color: active ? '#fff' : theme.textOnBgMuted, maxWidth: 170, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {c.emoji} {c.name}{hasNews ? ' 🎉' : ''}{hasPack ? ' 📦' : ''}
                     </Typography>
                     {(hasNews || hasPack) && !active && (
@@ -487,7 +487,7 @@ export function SimulatedReaderHomePage() {
             <Card onClick={() => navigate(`/convite/${pendingInvites[0].token}`)} sx={{ p: 1.15, mb: 1.35, cursor: 'pointer', border: '1.5px solid #dbeafe', background: 'linear-gradient(135deg,#eff6ff,#fce7f3)', transition: 'transform 0.16s', '&:hover': { transform: 'translateY(-1px)' } }}>
               <Stack direction="row" alignItems="center" spacing={1}>
                 <MailOutlineIcon sx={{ fontSize: 18, color: '#1d4ed8', flexShrink: 0 }} />
-                <Typography sx={{ flex: 1, minWidth: 0, fontSize: '0.78rem', fontWeight: 700, color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <Typography sx={{ flex: 1, minWidth: 0, fontSize: '0.78rem', fontWeight: 700, color: ink.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   Convite pendente: {pendingInvites[0].collectionName || 'Coleção'}
                 </Typography>
                 <Typography sx={{ fontSize: '0.9rem', color: '#1d4ed8', fontWeight: 900, flexShrink: 0 }}>→</Typography>
@@ -503,15 +503,15 @@ export function SimulatedReaderHomePage() {
             ].map((s) => (
               <Box key={s.label} onClick={() => navigate(s.to)} sx={{
                 flex: 1, px: 1, py: 0.85, borderRadius: radius.lg, textAlign: 'center', cursor: 'pointer',
-                background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.6)', backdropFilter: 'blur(12px)',
-                transition: 'transform 0.16s ease, background 0.16s ease',
-                '&:hover': { transform: 'translateY(-1px)', background: 'rgba(255,255,255,0.68)' },
+                background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}`, backdropFilter: 'blur(12px)',
+                transition: 'transform 0.16s ease, border-color 0.16s ease',
+                '&:hover': { transform: 'translateY(-1px)', borderColor: `${theme.accent}55` },
               }}>
                 <Typography sx={{ fontSize: '1rem', lineHeight: 1 }}>{s.emoji}</Typography>
-                <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.05rem', color: colors.text.primary, lineHeight: 1.2, mt: 0.25 }}>
+                <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.05rem', color: theme.textOnBg, lineHeight: 1.2, mt: 0.25 }}>
                   {s.value}
                 </Typography>
-                <Typography sx={{ fontSize: '0.70rem', fontWeight: 700, color: colors.text.secondary }}>
+                <Typography sx={{ fontSize: '0.70rem', fontWeight: 700, color: theme.textOnBgMuted }}>
                   {s.label}
                 </Typography>
               </Box>
@@ -519,7 +519,7 @@ export function SimulatedReaderHomePage() {
           </Stack>
 
           <Stack spacing={1.15} sx={{ minHeight: 'calc(100dvh - 214px)' }}>
-            <Card sx={{ p: 1.05, background: 'rgba(255,255,255,0.62)', backdropFilter: 'blur(14px)' }}>
+            <Card sx={{ p: 1.05, backdropFilter: 'blur(14px)' }}>
               <Stack spacing={0.65}>
                 {isLoading ? (
                   <LoadingState compact label="Carregando coleção" accent={theme.accent} />
@@ -536,7 +536,7 @@ export function SimulatedReaderHomePage() {
                     <LinearProgress variant="determinate" value={completion} sx={{
                       height: 7,
                       borderRadius: radius.full,
-                      bgcolor: 'rgba(0,0,0,0.06)',
+                      bgcolor: colors.border.subtle,
                       '& .MuiLinearProgress-bar': { borderRadius: radius.full, background: `linear-gradient(90deg, ${colors.rose.main}, ${theme.accent})` },
                     }} />
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -556,7 +556,7 @@ export function SimulatedReaderHomePage() {
             </Card>
 
             {relerNote && ownedItems.length > 0 && (
-              <Card sx={{ p: 1.15, background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(12px)' }}>
+              <Card sx={{ p: 1.15, backdropFilter: 'blur(12px)' }}>
                 <Stack direction="row" alignItems="center" spacing={1.1}>
                   <Box sx={{ width: 38, height: 38, borderRadius: radius.lg, flexShrink: 0, fontSize: '1.15rem', display: 'flex', alignItems: 'center', justifyContent: 'center', background: `${theme.accent}16`, border: `1px solid ${theme.accent}26` }}>
                     💭

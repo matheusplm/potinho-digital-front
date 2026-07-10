@@ -12,5 +12,5 @@ export function gradientTextSx(color: string) {
 
 export function themedCardBg(cardBg: string, isDark: boolean): string {
   if (!isDark) return cardBg
-  return `linear-gradient(rgba(15,18,28,0.15), rgba(15,18,28,0.15)), ${cardBg}`
+  return `linear-gradient(rgba(15,18,28,0.24), rgba(15,18,28,0.24)), ${cardBg}`
 }

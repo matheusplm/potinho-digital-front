@@ -69,7 +69,7 @@ export function AnnouncementModal({ notifications, onClose }: {
         <Stack spacing={2} sx={{ width: '100%', maxWidth: 480, flex: 1, zIndex: 1 }}>
           {notifications.map((notification) => (
             <Box key={notification.notificationId} sx={{
-              p: 2.2, borderRadius: radius.xl, background: 'rgba(255,253,251,0.96)',
+              p: 2.2, borderRadius: radius.xl, background: 'var(--pd-surface-paper)',
               border: `1.5px solid ${theme.accent}30`,
               boxShadow: `0 14px 40px ${theme.accent}${theme.isDark ? '30' : '22'}`,
             }}>

@@ -2,7 +2,7 @@ import StarIcon from '@mui/icons-material/Star'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import { Box, Chip, IconButton, Stack, Typography } from '@mui/material'
 import { Card } from '../ui'
-import { colors, font, radius } from '../../design-system'
+import { colors, font, ink, radius } from '../../design-system'
 import { gradientTextSx } from '../../utils/colorUtils'
 import { useBackground } from '../../context/BackgroundContext'
 import { RewardCard, rarityCardSx } from './RewardCard'
@@ -24,7 +24,7 @@ export function NoteCard({ note, r, t, unread, variant, onSelect, onToggleFavori
           <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.4, flexWrap: 'wrap', rowGap: 0.4 }}>
             {r && <Chip size="small" label={`${r.emoji} ${r.label}`} sx={{ height: 19, fontSize: '0.70rem', fontWeight: 800, background: r.chipBg, border: `1px solid ${r.borderColor}`, '& .MuiChip-label': { px: 0.8, ...gradientTextSx(r.chipColor) } }} />}
           </Stack>
-          <Typography sx={{ fontSize: grid ? '0.74rem' : '0.8rem', color: colors.text.muted, fontStyle: 'italic' }}>
+          <Typography sx={{ fontSize: grid ? '0.74rem' : '0.8rem', color: ink.muted, fontStyle: 'italic' }}>
             🔒 Ainda não coletado
           </Typography>
         </Box>
@@ -43,7 +43,7 @@ export function NoteCard({ note, r, t, unread, variant, onSelect, onToggleFavori
         {unread && (
           <Box sx={{ position: 'absolute', top: 2, left: 2, width: 11, height: 11, zIndex: 5, borderRadius: radius.full, background: colors.rose.main, boxShadow: `0 0 0 3px rgba(255,255,255,0.82), 0 0 14px ${colors.rose.glow}`, pointerEvents: 'none' }} />
         )}
-        <IconButton size="small" aria-label="favoritar bilhete" onClick={(event) => { event.stopPropagation(); onToggleFavorite(note) }} sx={{ position: 'absolute', top: 8, right: 8, p: 0.5, borderRadius: radius.md, zIndex: 5, color: note.favorite ? colors.rose.main : (r?.captionColor ?? colors.text.muted), background: note.favorite ? 'rgba(254,243,199,0.92)' : 'rgba(255,255,255,0.74)', border: `1px solid ${note.favorite ? 'rgba(234,179,8,0.38)' : 'rgba(255,255,255,0.68)'}`, backdropFilter: 'blur(8px)', boxShadow: '0 4px 12px rgba(15,23,42,0.08)' }}>
+        <IconButton size="small" aria-label="favoritar bilhete" onClick={(event) => { event.stopPropagation(); onToggleFavorite(note) }} sx={{ position: 'absolute', top: 8, right: 8, p: 0.5, borderRadius: radius.md, zIndex: 5, color: note.favorite ? colors.rose.main : (r?.captionColor ?? ink.muted), background: note.favorite ? 'rgba(254,243,199,0.92)' : 'rgba(255,255,255,0.74)', border: `1px solid ${note.favorite ? 'rgba(234,179,8,0.38)' : 'rgba(255,255,255,0.68)'}`, backdropFilter: 'blur(8px)', boxShadow: '0 4px 12px rgba(15,23,42,0.08)' }}>
           {note.favorite ? <StarIcon sx={{ fontSize: 16, color: '#eab308' }} /> : <StarBorderIcon sx={{ fontSize: 16 }} />}
         </IconButton>
       </Box>
@@ -65,13 +65,13 @@ export function NoteCard({ note, r, t, unread, variant, onSelect, onToggleFavori
               <Chip size="small" label={`${t.emoji} ${t.label}`} sx={{ height: 19, fontSize: '0.70rem', fontWeight: 800, background: t.tagBg, color: t.tagColor, border: `1px solid ${t.accentColor}44`, '& .MuiChip-label': { px: 0.8 } }} />
             )}
           </Stack>
-          <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: grid ? '0.9rem' : '0.98rem', color: colors.text.primary, mb: 0.3, display: '-webkit-box', WebkitLineClamp: grid ? 2 : 1, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: grid ? '0.9rem' : '0.98rem', color: ink.primary, mb: 0.3, display: '-webkit-box', WebkitLineClamp: grid ? 2 : 1, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
             {note.title ?? ''}
           </Typography>
-          <Typography sx={{ fontSize: grid ? '0.74rem' : '0.8rem', color: colors.text.secondary, lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: grid ? 3 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+          <Typography sx={{ fontSize: grid ? '0.74rem' : '0.8rem', color: ink.secondary, lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: grid ? 3 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
             {note.message ?? ''}
           </Typography>
-          <IconButton size="small" aria-label="favoritar bilhete" onClick={(event) => { event.stopPropagation(); onToggleFavorite(note) }} sx={{ position: 'absolute', top: 6, right: 6, p: 0.5, borderRadius: radius.md, color: note.favorite ? colors.rose.main : (r?.captionColor ?? colors.text.muted), background: note.favorite ? 'rgba(254,243,199,0.92)' : 'rgba(255,255,255,0.74)', border: `1px solid ${note.favorite ? 'rgba(234,179,8,0.38)' : 'rgba(255,255,255,0.68)'}`, backdropFilter: 'blur(8px)', boxShadow: '0 4px 12px rgba(15,23,42,0.08)' }}>
+          <IconButton size="small" aria-label="favoritar bilhete" onClick={(event) => { event.stopPropagation(); onToggleFavorite(note) }} sx={{ position: 'absolute', top: 6, right: 6, p: 0.5, borderRadius: radius.md, color: note.favorite ? colors.rose.main : (r?.captionColor ?? ink.muted), background: note.favorite ? 'rgba(254,243,199,0.92)' : 'rgba(255,255,255,0.74)', border: `1px solid ${note.favorite ? 'rgba(234,179,8,0.38)' : 'rgba(255,255,255,0.68)'}`, backdropFilter: 'blur(8px)', boxShadow: '0 4px 12px rgba(15,23,42,0.08)' }}>
             {note.favorite ? <StarIcon sx={{ fontSize: 16, color: '#eab308' }} /> : <StarBorderIcon sx={{ fontSize: 16 }} />}
           </IconButton>
         </Box>

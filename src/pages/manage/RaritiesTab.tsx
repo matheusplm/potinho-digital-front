@@ -312,7 +312,7 @@ export function RaritiesTab({ cid }: RaritiesTabProps) {
         ))}
       </Stack>
 
-      <Dialog open={rarityImportDialogOpen} onClose={() => setRarityImportDialogOpen(false)} maxWidth="sm" fullWidth slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'rgba(255,253,251,0.98)' } } }}>
+      <Dialog open={rarityImportDialogOpen} onClose={() => setRarityImportDialogOpen(false)} maxWidth="sm" fullWidth slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'var(--pd-surface-paper)' } } }}>
         <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, pb: 0.5 }}>
           Importar raridades por JSON
         </DialogTitle>

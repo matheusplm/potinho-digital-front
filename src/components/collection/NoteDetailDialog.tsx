@@ -1,7 +1,7 @@
 import { Dialog, DialogActions, DialogContent, Stack, Typography } from '@mui/material'
 import { Suspense, lazy } from 'react'
 import { Button, LoadingState } from '../ui'
-import { colors, radius } from '../../design-system'
+import { ink, radius } from '../../design-system'
 import { useBackground } from '../../context/BackgroundContext'
 import { RewardCard } from './RewardCard'
 import type { CollectionDailyReward, CollectionNoteView, NoteRecord, RarityConfig, NoteTypeConfig } from '../../types/note'
@@ -39,7 +39,7 @@ export function NoteDetailDialog({ note, rarities, types, onClose }: {
                 expanded
               />
               <Stack spacing={0.7}>
-                <Typography sx={{ fontSize: '0.70rem', fontWeight: 900, letterSpacing: 0.8, color: rarity?.captionColor ?? colors.text.muted, textTransform: 'uppercase' }}>
+                <Typography sx={{ fontSize: '0.70rem', fontWeight: 900, letterSpacing: 0.8, color: rarity?.captionColor ?? ink.muted, textTransform: 'uppercase' }}>
                   Compartilhar
                 </Typography>
                 <Suspense fallback={<LoadingState compact label="Preparando compartilhamento" />}>

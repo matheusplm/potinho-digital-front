@@ -162,7 +162,7 @@ export function TypesTab({ cid }: TypesTabProps) {
         ))}
       </Stack>
 
-      <Dialog open={typeImportDialogOpen} onClose={() => setTypeImportDialogOpen(false)} maxWidth="sm" fullWidth slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'rgba(255,253,251,0.98)' } } }}>
+      <Dialog open={typeImportDialogOpen} onClose={() => setTypeImportDialogOpen(false)} maxWidth="sm" fullWidth slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'var(--pd-surface-paper)' } } }}>
         <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, pb: 0.5 }}>
           Importar tipos por JSON
         </DialogTitle>

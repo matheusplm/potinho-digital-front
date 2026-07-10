@@ -1,6 +1,6 @@
 import { Box, Chip, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
-import { cardIn, colors, font, radius } from '../../design-system'
+import { cardIn, font, ink, radius } from '../../design-system'
 import { gradientTextSx, themedCardBg } from '../../utils/colorUtils'
 import type { CollectionDailyReward, NoteImageLayout, NoteTypeConfig, RarityConfig } from '../../types/note'
 
@@ -16,8 +16,8 @@ export function rarityCardSx(r?: RarityConfig, compact = false, isDark = false) 
     position: 'relative',
     overflow: 'hidden',
     isolation: 'isolate',
-    background: themedCardBg(r?.cardBg ?? colors.surface.base, isDark),
-    border: `1.5px solid ${r?.borderColor ?? colors.border.subtle}`,
+    background: themedCardBg(r?.cardBg ?? ink.surface, isDark),
+    border: `1.5px solid ${r?.borderColor ?? ink.borderSubtle}`,
     boxShadow: r ? `${r.shadow || '0 4px 20px rgba(0,0,0,0.08)'}, 0 0 34px ${glow}` : '0 4px 20px rgba(0,0,0,0.08)',
     transition: 'transform 0.22s ease, box-shadow 0.22s ease',
     '&::before': {
@@ -67,10 +67,10 @@ function CardTextBox({ title, message, children, expanded }: { title: string; me
   return (
     <Box sx={{ p: 1.15, borderRadius: radius.lg, background: 'rgba(255,255,255,0.68)', border: '1px solid rgba(255,255,255,0.58)', backdropFilter: 'blur(8px)', minWidth: 0 }}>
       {children}
-      <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.2rem', color: colors.text.primary, lineHeight: 1.3, overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampTitle }}>
+      <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.2rem', color: ink.primary, lineHeight: 1.3, overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampTitle }}>
         {title}
       </Typography>
-      <Typography sx={{ mt: 0.75, fontSize: '0.9rem', color: colors.text.secondary, lineHeight: 1.65, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampMsg }}>
+      <Typography sx={{ mt: 0.75, fontSize: '0.9rem', color: ink.secondary, lineHeight: 1.65, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampMsg }}>
         &ldquo;{message}&rdquo;
       </Typography>
     </Box>
@@ -123,7 +123,7 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
           </Stack>
         </Box>
         <Stack spacing={1} sx={{ p: 2, position: 'relative', zIndex: 1 }}>
-          <Typography sx={{ fontSize: '0.9rem', color: colors.text.secondary, lineHeight: 1.65, fontStyle: 'italic', ...clampM }}>
+          <Typography sx={{ fontSize: '0.9rem', color: ink.secondary, lineHeight: 1.65, fontStyle: 'italic', ...clampM }}>
             &ldquo;{reward.message}&rdquo;
           </Typography>
           <CardTag t={t} />
@@ -143,8 +143,8 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
         <Stack spacing={1.5} sx={{ position: 'relative', zIndex: 1 }}>
           <CardChips r={r} isNew={reward.isNew} />
           <Box sx={{ p: 1.15, borderRadius: radius.lg, background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.7)' }}>
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.2rem', color: colors.text.primary, lineHeight: 1.3 }}>{reward.title}</Typography>
-            <Typography sx={{ mt: 0.75, fontSize: '0.9rem', color: colors.text.secondary, lineHeight: 1.65, fontStyle: 'italic' }}>&ldquo;{reward.message}&rdquo;</Typography>
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.2rem', color: ink.primary, lineHeight: 1.3 }}>{reward.title}</Typography>
+            <Typography sx={{ mt: 0.75, fontSize: '0.9rem', color: ink.secondary, lineHeight: 1.65, fontStyle: 'italic' }}>&ldquo;{reward.message}&rdquo;</Typography>
           </Box>
           <CardTag t={t} />
         </Stack>
@@ -176,8 +176,8 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
           </Box>
           <Stack spacing={1.2} sx={{ flex: 1, p: 1.8, minWidth: 0 }}>
             <CardChips r={r} isNew={reward.isNew} />
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.05rem', color: colors.text.primary, lineHeight: 1.3, overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampT }}>{reward.title}</Typography>
-            <Typography sx={{ fontSize: '0.82rem', color: colors.text.secondary, lineHeight: 1.55, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampM }}>&ldquo;{reward.message}&rdquo;</Typography>
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.05rem', color: ink.primary, lineHeight: 1.3, overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampT }}>{reward.title}</Typography>
+            <Typography sx={{ fontSize: '0.82rem', color: ink.secondary, lineHeight: 1.55, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampM }}>&ldquo;{reward.message}&rdquo;</Typography>
             <CardTag t={t} />
           </Stack>
         </Stack>
@@ -205,10 +205,10 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
                 <ImgArea src={img} alt={reward.title} previewMode={previewMode} />
               </Box>
               <Box sx={{ minWidth: 0, flex: 1 }}>
-                <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.05rem', color: colors.text.primary, lineHeight: 1.3, overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampT }}>
+                <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.05rem', color: ink.primary, lineHeight: 1.3, overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampT }}>
                   {reward.title}
                 </Typography>
-                <Typography sx={{ mt: 0.5, fontSize: '0.83rem', color: colors.text.secondary, lineHeight: 1.55, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampM }}>
+                <Typography sx={{ mt: 0.5, fontSize: '0.83rem', color: ink.secondary, lineHeight: 1.55, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampM }}>
                   &ldquo;{reward.message}&rdquo;
                 </Typography>
               </Box>

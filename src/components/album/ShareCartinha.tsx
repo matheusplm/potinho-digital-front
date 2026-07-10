@@ -5,7 +5,7 @@ import { toPng } from 'html-to-image'
 import { parseGIF, decompressFrames } from 'gifuct-js'
 import { GIFEncoder, quantize, applyPalette } from 'gifenc'
 import { Button, toast } from '../ui'
-import { colors, font, radius } from '../../design-system'
+import { font, ink, radius } from '../../design-system'
 import type { BackgroundTheme } from '../../design-system'
 import type { RarityConfig, NoteTypeConfig, NoteImageLayout } from '../../types/note'
 import { gradientTextSx } from '../../utils/colorUtils'
@@ -222,8 +222,8 @@ export function ShareCartinha({ note, r, t, theme }: {
 
   const accent = r?.borderColor || theme.accent
   const bg = r?.cardBg || 'linear-gradient(135deg,#fff7ed,#fff1f2,#eef2ff)'
-  const textColor = r?.textColor || colors.text.primary
-  const caption = r?.captionColor || colors.text.secondary
+  const textColor = r?.textColor || ink.primary
+  const caption = r?.captionColor || ink.secondary
 
   const inner = (story: boolean) => {
     const thumbSize = layout.startsWith('circle') ? 56 : 64

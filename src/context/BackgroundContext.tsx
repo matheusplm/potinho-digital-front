@@ -27,6 +27,10 @@ export function BackgroundProvider({ children }: { children: ReactNode }) {
     }
   }, [themeKey])
 
+  useEffect(() => {
+    document.documentElement.setAttribute('data-pd-theme', getBackgroundTheme(themeKey).isDark ? 'dark' : 'light')
+  }, [themeKey])
+
   const value: BackgroundContextValue = {
     theme: getBackgroundTheme(themeKey),
     themeKey,

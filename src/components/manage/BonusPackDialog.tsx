@@ -63,7 +63,7 @@ export function BonusPackDialog({ cid, target, onClose, onSuccess }: {
   }
 
   return (
-    <Dialog open={!!target} onClose={onClose} maxWidth="sm" fullWidth slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'rgba(255,253,251,0.98)' } } }}>
+    <Dialog open={!!target} onClose={onClose} maxWidth="sm" fullWidth slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'var(--pd-surface-paper)' } } }}>
       <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, pb: 0.5 }}>
         {target ? `${target.pack.emoji} ${target.pack.name}` : ''}
       </DialogTitle>

@@ -157,8 +157,8 @@ export function CollectionGridItem({ col, i, onClick, onEdit, onDelete, hasNews 
       onClick={onClick}
       sx={{
         borderRadius: radius.xl, overflow: 'hidden', cursor: 'pointer',
-        background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(12px)',
-        border: '1px solid rgba(255,255,255,0.6)',
+        background: colors.surface.base, backdropFilter: 'blur(12px)',
+        border: `1px solid ${colors.border.subtle}`,
         boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
         animation: `${cardIn(i)} ${0.28 + i * 0.04}s cubic-bezier(0.16,1,0.3,1) both`,
         transition: 'transform 0.18s ease, box-shadow 0.18s ease',
@@ -211,12 +211,12 @@ export function CollectionListItem({ col, i, onClick, onEdit, onDelete, hasNews 
         display: 'flex', alignItems: 'center', gap: 1.4,
         px: 1.5, py: 1.3,
         borderRadius: radius.xl, cursor: 'pointer',
-        background: 'rgba(255,255,255,0.75)', backdropFilter: 'blur(12px)',
-        border: '1px solid rgba(255,255,255,0.5)',
+        background: colors.surface.base, backdropFilter: 'blur(12px)',
+        border: `1px solid ${colors.border.subtle}`,
         boxShadow: '0 1px 6px rgba(0,0,0,0.07)',
         animation: `${cardIn(i)} ${0.25 + i * 0.04}s cubic-bezier(0.16,1,0.3,1) both`,
         transition: 'background 0.15s, box-shadow 0.15s',
-        '&:hover': { background: 'rgba(255,255,255,0.92)', boxShadow: `0 3px 14px ${bg.accent}22` },
+        '&:hover': { boxShadow: `0 3px 14px ${bg.accent}44` },
         '&:active': { transform: 'scale(0.99)' },
       }}
     >

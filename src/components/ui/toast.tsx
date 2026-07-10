@@ -4,7 +4,7 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlined'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import { Box, Stack, Typography } from '@mui/material'
 import { toast as sonnerToast } from 'sonner'
-import { colors, radius, shadow } from '../../design-system'
+import { colors, ink, radius, shadow } from '../../design-system'
 
 interface ToastOptions {
   description?: string
@@ -35,11 +35,11 @@ function ToastContent({ icon, title, description, accent, bg, border }: ToastCon
       <Stack direction="row" spacing={1.2} alignItems="center">
         <Box sx={{ flexShrink: 0, color: accent, display: 'flex' }}>{icon}</Box>
         <Stack spacing={0.15}>
-          <Typography sx={{ fontSize: '0.87rem', fontWeight: 700, color: colors.text.primary, lineHeight: 1.3 }}>
+          <Typography sx={{ fontSize: '0.87rem', fontWeight: 700, color: ink.primary, lineHeight: 1.3 }}>
             {title}
           </Typography>
           {description && (
-            <Typography sx={{ fontSize: '0.76rem', color: colors.text.secondary, lineHeight: 1.35 }}>
+            <Typography sx={{ fontSize: '0.76rem', color: ink.secondary, lineHeight: 1.35 }}>
               {description}
             </Typography>
           )}

@@ -20,7 +20,7 @@ import {
 } from '../../hooks/useNotes'
 import { useConfirmDelete } from '../../hooks/useConfirmDelete'
 import { useJsonImport } from '../../hooks/useJsonImport'
-import { colors, font, radius } from '../../design-system'
+import { colors, font, ink, radius } from '../../design-system'
 import { useBackground } from '../../context/BackgroundContext'
 import { gradientTextSx, themedCardBg } from '../../utils/colorUtils'
 import type { NoteRecord } from '../../types/note'
@@ -415,7 +415,7 @@ export function NotesTab({ cid }: NotesTabProps) {
                       <Box component="img" src={note.imageUrl} alt="" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                     </Box>
                   )}
-                  <Typography sx={{ flex: 1, minWidth: 0, fontFamily: font.serif, fontWeight: 800, fontSize: '0.82rem', color: r?.textColor ?? colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <Typography sx={{ flex: 1, minWidth: 0, fontFamily: font.serif, fontWeight: 800, fontSize: '0.82rem', color: r?.textColor ?? ink.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {note.title}
                   </Typography>
                   <Stack direction="row" spacing={0.25} sx={{ flexShrink: 0, opacity: 0.72 }}>
@@ -452,7 +452,7 @@ export function NotesTab({ cid }: NotesTabProps) {
                     <Stack direction="row" alignItems="center" spacing={1}>
                       <Box sx={{ flex: 1, minWidth: 0 }}>
                         <Stack direction="row" spacing={0.6} alignItems="center" sx={{ minWidth: 0 }}>
-                          <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.92rem', color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.92rem', color: ink.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {note.title}
                           </Typography>
                           {r && (
@@ -466,10 +466,10 @@ export function NotesTab({ cid }: NotesTabProps) {
                             </Box>
                           )}
                         </Stack>
-                        <Typography sx={{ mt: 0.25, fontSize: '0.74rem', color: colors.text.secondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <Typography sx={{ mt: 0.25, fontSize: '0.74rem', color: ink.secondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {note.message}
                         </Typography>
-                        <Typography sx={{ mt: 0.35, fontSize: '0.70rem', color: colors.text.muted, fontWeight: 700 }}>
+                        <Typography sx={{ mt: 0.35, fontSize: '0.70rem', color: ink.muted, fontWeight: 700 }}>
                           {[r?.label, t?.label].filter(Boolean).join(' · ') || 'Sem categoria'}
                         </Typography>
                       </Box>
@@ -530,10 +530,10 @@ export function NotesTab({ cid }: NotesTabProps) {
                     </IconButton>
                   </Stack>
                   <Box sx={{ flex: 1, minWidth: 0, p: 1, borderRadius: radius.lg, background: 'rgba(255,255,255,0.68)', border: '1px solid rgba(255,255,255,0.58)', backdropFilter: 'blur(8px)' }}>
-                    <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.93rem', color: r?.textColor ?? colors.text.primary, mb: 0.3, display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                    <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.93rem', color: r?.textColor ?? ink.primary, mb: 0.3, display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                       {note.title}
                     </Typography>
-                    <Typography sx={{ fontSize: '0.78rem', color: r?.captionColor ?? colors.text.secondary, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.5, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                    <Typography sx={{ fontSize: '0.78rem', color: r?.captionColor ?? ink.secondary, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.5, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                       {note.message}
                     </Typography>
                     {(r || t) && (
@@ -596,7 +596,7 @@ export function NotesTab({ cid }: NotesTabProps) {
         )}
       </Stack>
 
-      <Dialog open={importDialogOpen} onClose={() => setImportDialogOpen(false)} maxWidth="sm" fullWidth slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'rgba(255,253,251,0.98)' } } }}>
+      <Dialog open={importDialogOpen} onClose={() => setImportDialogOpen(false)} maxWidth="sm" fullWidth slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'var(--pd-surface-paper)' } } }}>
         <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, pb: 0.5 }}>
           Importar bilhetes por JSON
         </DialogTitle>

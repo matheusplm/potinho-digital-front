@@ -1,3 +1,47 @@
+:root {
+  --pd-text-primary: #1e3a5f;
+  --pd-text-secondary: #64748b;
+  --pd-text-muted: #94a3b8;
+  --pd-surface-base: rgba(255, 253, 251, 0.95);
+  --pd-surface-overlay: rgba(255, 255, 255, 0.88);
+  --pd-surface-paper: rgba(255, 253, 251, 0.98);
+  --pd-border-subtle: rgba(0, 0, 0, 0.07);
+  --pd-border-medium: rgba(0, 0, 0, 0.1);
+}
+
+[data-pd-theme='dark'] {
+  --pd-text-primary: rgba(255, 255, 255, 0.94);
+  --pd-text-secondary: rgba(255, 255, 255, 0.74);
+  --pd-text-muted: rgba(255, 255, 255, 0.55);
+  --pd-surface-base: rgba(28, 34, 53, 0.95);
+  --pd-surface-overlay: rgba(255, 255, 255, 0.07);
+  --pd-surface-paper: rgba(24, 30, 47, 0.98);
+  --pd-border-subtle: rgba(255, 255, 255, 0.1);
+  --pd-border-medium: rgba(255, 255, 255, 0.18);
+}
+
+[data-pd-theme='dark'] .MuiOutlinedInput-root {
+  color: var(--pd-text-primary);
+}
+
+[data-pd-theme='dark'] .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+[data-pd-theme='dark'] .MuiInputLabel-root {
+  color: var(--pd-text-muted);
+}
+
+[data-pd-theme='dark'] .MuiOutlinedInput-root input::placeholder,
+[data-pd-theme='dark'] .MuiOutlinedInput-root textarea::placeholder {
+  color: var(--pd-text-muted);
+  opacity: 1;
+}
+
+[data-pd-theme='dark'] .MuiDialogTitle-root {
+  color: var(--pd-text-primary);
+}
+
 body {
   margin: 0;
   min-width: 320px;

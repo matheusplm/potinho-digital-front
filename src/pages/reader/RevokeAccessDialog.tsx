@@ -22,7 +22,7 @@ export function RevokeAccessDialog({ open, email, isPending, onClose, onRevoke }
       onClose={onClose}
       maxWidth="xs"
       fullWidth
-      slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'rgba(255,253,251,0.98)' } } }}
+      slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'var(--pd-surface-paper)' } } }}
     >
       <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.rose.main, pb: 0.5 }}>
         Remover acesso

@@ -37,7 +37,7 @@ export function ReleaseDialog({ cid, notes, open, onClose }: {
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'rgba(255,253,251,0.98)' } } }}>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'var(--pd-surface-paper)' } } }}>
       <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, pb: 0.5 }}>
         <RocketLaunchIcon sx={{ fontSize: 20, mr: 0.8, verticalAlign: 'text-bottom', color: colors.primary.main }} />
         Lançar {count} bilhete{count === 1 ? '' : 's'}?
