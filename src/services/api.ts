@@ -83,6 +83,7 @@ const FRIENDLY_ERROR_MESSAGES: Record<string, string> = {
   NOTE_ALREADY_COLLECTED: 'Este bilhete já foi coletado por leitores. Raridade e tipo não podem mudar.',
   PACK_HAS_PENDING_OPENS: 'Este pacotinho tem aberturas pendentes de leitores.',
   ACHIEVEMENT_ALREADY_UNLOCKED: 'Esta conquista já foi desbloqueada por leitores.',
+  NOTE_NOT_DISABLED: 'Desative o bilhete antes de excluí-lo permanentemente.',
 }
 
 function normalizeEmail(email: string) {
@@ -328,8 +329,12 @@ export const api = {
     }),
   updateCollectionNote: (cid: string, id: string, data: Partial<NoteFormData>) =>
     request<NoteRecord>(`/api/collections/${cid}/notes/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-  deleteCollectionNote: (cid: string, id: string) =>
-    request<{ deleted: boolean }>(`/api/collections/${cid}/notes/${id}`, { method: 'DELETE' }),
+  disableCollectionNote: (cid: string, id: string) =>
+    request<NoteRecord>(`/api/collections/${cid}/notes/${id}`, { method: 'DELETE' }),
+  restoreCollectionNote: (cid: string, id: string) =>
+    request<NoteRecord>(`/api/collections/${cid}/notes/${id}/restore`, { method: 'POST' }),
+  permanentlyDeleteCollectionNote: (cid: string, id: string) =>
+    request<{ deleted: boolean }>(`/api/collections/${cid}/notes/${id}/permanent`, { method: 'DELETE' }),
 
   getCollectionRarities: (cid: string) => request<RarityConfig[]>(`/api/collections/${cid}/rarities`),
   importCollectionRarities: (cid: string, json: string) =>

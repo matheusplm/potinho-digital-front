@@ -13,6 +13,7 @@ export interface NoteRecord {
   imageLayout?: NoteImageLayout | null
   createdAt: string
   timesCollected?: number
+  disabledAt?: string | null
 }
 
 export interface NoteFormData {
