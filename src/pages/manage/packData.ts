@@ -128,6 +128,7 @@ function pickWeightedNote(notes: NoteRecord[], rarities: RarityConfig[]) {
 
 export function simulatePackOpening(pack: CollectionPack, notes: NoteRecord[], rarities: RarityConfig[]): PackSimulation | null {
   const eligibleNotes = notes.filter((n) =>
+    !n.disabledAt &&
     (pack.allowedTypeIds.length === 0 || pack.allowedTypeIds.includes(n.typeId)) &&
     (pack.allowedRarityIds.length === 0 || pack.allowedRarityIds.includes(n.rarity)),
   )
