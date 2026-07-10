@@ -1,7 +1,7 @@
 import CasinoOutlinedIcon from '@mui/icons-material/CasinoOutlined'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { Box, Chip, Collapse, DialogActions, DialogContent, DialogTitle, Stack, TextField, Typography } from '@mui/material'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { Button, EmojiPickerInput, Input } from '../../components/ui'
 import { useCollectionNotesQuery, useCreateCollectionPackMutation, useCollectionPacksQuery, useUpdateCollectionPackMutation } from '../../hooks/useNotes'
@@ -47,7 +47,8 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
 }) {
   const isNew = !pack
   const { data: existingPacks = [] } = useCollectionPacksQuery(cid)
-  const { data: notes = [] } = useCollectionNotesQuery(cid)
+  const { data: allNotes = [] } = useCollectionNotesQuery(cid)
+  const notes = useMemo(() => allNotes.filter((n) => !n.disabledAt), [allNotes])
   const [form, setForm] = useState<CollectionPackFormData>(pack ? {
     name: pack.name, emoji: pack.emoji, description: pack.description, category: pack.category, status: pack.status,
     distribution: pack.distribution, cardsPerOpen: pack.cardsPerOpen, cooldownHours: pack.cooldownHours,
