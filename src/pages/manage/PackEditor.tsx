@@ -108,13 +108,30 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
     if (isNew) payload.id = uniqueConfigId(name, existingPacks.map((item) => item.id))
     else delete payload.id
 
-    const options = {
-      onSuccess: () => { toast.success(isNew ? 'Pacotinho criado!' : 'Pacotinho salvo!'); onClose() },
-      onError: (error: Error) => toast.error(error.message || 'Erro ao salvar pacotinho.'),
-    }
+    const onError = (error: Error) => toast.error(error.message || 'Erro ao salvar pacotinho.')
 
-    if (isNew) createMutation.mutate(payload, options)
-    else updateMutation.mutate({ id: pack.id, data: payload }, options)
+    if (isNew) {
+      createMutation.mutate(payload, {
+        onSuccess: () => { toast.success('Pacotinho criado!'); onClose() },
+        onError,
+      })
+    } else {
+      updateMutation.mutate({ id: pack.id, data: payload }, {
+        onSuccess: (updated) => {
+          const warning = updated.pendingOpensWarning
+          if (warning && warning.readersAffected > 0) {
+            toast.info(
+              `${warning.readersAffected} leitor${warning.readersAffected === 1 ? '' : 'es'} ainda ${warning.readersAffected === 1 ? 'tem' : 'têm'} ${warning.totalOpens} abertura${warning.totalOpens === 1 ? '' : 's'} pendente${warning.totalOpens === 1 ? '' : 's'} deste pacotinho`,
+              { description: 'As regras novas só valem a partir da próxima abertura.' },
+            )
+          } else {
+            toast.success('Pacotinho salvo!')
+          }
+          onClose()
+        },
+        onError,
+      })
+    }
   }
 
   const statusChipStyle = form.status === 'active'

@@ -18,6 +18,7 @@ import type {
   PackStatusResponse,
   RarityConfig,
   ReaderAchievementsResponse,
+  UpdateCollectionPackResponse,
 } from '../types/note'
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? ''
@@ -77,6 +78,10 @@ const FRIENDLY_ERROR_MESSAGES: Record<string, string> = {
   INVALID_COUNT: 'Quantidade inválida.',
   ACHIEVEMENT_ALREADY_EXISTS: 'Já existe uma conquista com esse identificador.',
   ACHIEVEMENT_INVALID_CONDITION: 'Condição inválida para esta conquista.',
+  RARITY_IN_USE: 'Essa raridade ainda está em uso por bilhetes desta coleção.',
+  NOTE_ALREADY_COLLECTED: 'Este bilhete já foi coletado por leitores. Raridade e tipo não podem mudar.',
+  PACK_HAS_PENDING_OPENS: 'Este pacotinho tem aberturas pendentes de leitores.',
+  ACHIEVEMENT_ALREADY_UNLOCKED: 'Esta conquista já foi desbloqueada por leitores.',
 }
 
 function normalizeEmail(email: string) {
@@ -355,15 +360,11 @@ export const api = {
   createCollectionPack: (cid: string, data: CollectionPackFormData) =>
     request<CollectionPack>(`/api/collections/${cid}/packs`, { method: 'POST', body: JSON.stringify(data) }),
   updateCollectionPack: (cid: string, id: string, data: Partial<CollectionPackFormData>) =>
-    request<CollectionPack>(`/api/collections/${cid}/packs/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    request<UpdateCollectionPackResponse>(`/api/collections/${cid}/packs/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteCollectionPack: (cid: string, id: string) =>
     request<{ deleted: boolean }>(`/api/collections/${cid}/packs/${id}`, { method: 'DELETE' }),
 
   getCollectionPlay: (cid: string) => request<CollectionPlayView>(`/api/collections/${cid}/play`),
-  openCollectionDaily: (cid: string) =>
-    request<{ rewards: CollectionDailyReward[]; status: CollectionDailyStatus }>(
-      `/api/collections/${cid}/daily/open`, { method: 'POST', body: JSON.stringify({}) }
-    ),
   openCollectionPack: (cid: string, packId: string, count = 1) =>
     request<{ rewards: CollectionDailyReward[]; status: CollectionDailyStatus }>(
       `/api/collections/${cid}/packs/${packId}/open`, { method: 'POST', body: JSON.stringify({ count }) }

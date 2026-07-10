@@ -36,6 +36,8 @@ export function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
     setTouched({ title: false, message: false, rarity: false, typeId: false, imageUrl: false })
   }, [open, editing])
 
+  const lockedIdentity = !!editing && (editing.timesCollected ?? 0) > 0
+
   const errors = {
     title: form.title.trim().length === 0 ? 'Obrigatório' : form.title.length > 60 ? 'Máx 60 caracteres' : '',
     message: form.message.trim().length === 0 ? 'Obrigatório' : form.message.length > 500 ? 'Máx 500 caracteres' : '',
@@ -97,10 +99,10 @@ export function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
           <Box>
             <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: touched.rarity && errors.rarity ? colors.error.main : colors.text.secondary, mb: 0.8 }}>Raridade</Typography>
             {rarities.length === 0 ? <Typography sx={{ fontSize: '0.8rem', color: colors.text.muted }}>Crie raridades na aba Raridades.</Typography> : (
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8, opacity: lockedIdentity ? 0.5 : 1 }}>
                 {rarities.map((r) => (
-                  <Box key={r.id} onClick={() => { setForm((f) => ({ ...f, rarity: r.id })); touch('rarity') }} sx={{
-                    px: 1.4, py: 0.6, borderRadius: radius.full, cursor: 'pointer', display: 'flex', alignItems: 'center',
+                  <Box key={r.id} onClick={() => { if (lockedIdentity) return; setForm((f) => ({ ...f, rarity: r.id })); touch('rarity') }} sx={{
+                    px: 1.4, py: 0.6, borderRadius: radius.full, cursor: lockedIdentity ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center',
                     background: form.rarity === r.id ? r.chipBg : 'rgba(0,0,0,0.04)',
                     border: `1.5px solid ${form.rarity === r.id ? r.borderColor : touched.rarity && errors.rarity ? colors.error.main + '66' : 'transparent'}`,
                     fontWeight: 700, fontSize: '0.78rem', transition: 'all 0.15s',
@@ -117,10 +119,10 @@ export function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
           <Box>
             <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: touched.typeId && errors.typeId ? colors.error.main : colors.text.secondary, mb: 0.8 }}>Tipo</Typography>
             {types.length === 0 ? <Typography sx={{ fontSize: '0.8rem', color: colors.text.muted }}>Crie tipos na aba Tipos.</Typography> : (
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8, opacity: lockedIdentity ? 0.5 : 1 }}>
                 {types.map((t) => (
-                  <Box key={t.id} onClick={() => { setForm((f) => ({ ...f, typeId: t.id })); touch('typeId') }} sx={{
-                    px: 1.4, py: 0.6, borderRadius: radius.full, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 0.5,
+                  <Box key={t.id} onClick={() => { if (lockedIdentity) return; setForm((f) => ({ ...f, typeId: t.id })); touch('typeId') }} sx={{
+                    px: 1.4, py: 0.6, borderRadius: radius.full, cursor: lockedIdentity ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: 0.5,
                     background: form.typeId === t.id ? t.tagBg : 'rgba(0,0,0,0.04)',
                     color: form.typeId === t.id ? t.tagColor : colors.text.secondary,
                     border: `1.5px solid ${form.typeId === t.id ? t.accentColor + '55' : touched.typeId && errors.typeId ? colors.error.main + '66' : 'transparent'}`,
@@ -131,6 +133,11 @@ export function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
             )}
             {touched.typeId && errors.typeId && (
               <Typography sx={{ fontSize: '0.68rem', color: colors.error.main, mt: 0.5, pl: 0.5 }}>{errors.typeId}</Typography>
+            )}
+            {lockedIdentity && (
+              <Typography sx={{ fontSize: '0.68rem', color: colors.text.muted, mt: 0.5, pl: 0.5 }}>
+                🔒 {editing?.timesCollected} leitor{editing?.timesCollected === 1 ? '' : 'es'} já {editing?.timesCollected === 1 ? 'coletou' : 'coletaram'} este bilhete — raridade e tipo não podem mudar.
+              </Typography>
             )}
           </Box>
           <Box>

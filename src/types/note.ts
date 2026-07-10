@@ -12,6 +12,7 @@ export interface NoteRecord {
   imageUrl?: string | null
   imageLayout?: NoteImageLayout | null
   createdAt: string
+  timesCollected?: number
 }
 
 export interface NoteFormData {
@@ -111,6 +112,15 @@ export interface CollectionPack {
 
 export type CollectionPackFormData = Omit<CollectionPack, 'id' | 'collectionId' | 'createdAt' | 'updatedAt'> & {
   id?: string
+}
+
+export interface PendingOpensWarning {
+  readersAffected: number
+  totalOpens: number
+}
+
+export interface UpdateCollectionPackResponse extends CollectionPack {
+  pendingOpensWarning?: PendingOpensWarning
 }
 
 export interface CollectionResponse {

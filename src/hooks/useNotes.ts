@@ -310,12 +310,6 @@ export function useCollectionPlayQuery(cid: string, options?: { enabled?: boolea
   })
 }
 
-export function useOpenCollectionDailyMutation(cid: string) {
-  return useMutation({
-    mutationFn: () => api.openCollectionDaily(cid),
-  })
-}
-
 export function useOpenCollectionPackMutation(cid: string) {
   return useMutation({
     mutationFn: ({ packId, count = 1 }: { packId: string; count?: number }) =>
