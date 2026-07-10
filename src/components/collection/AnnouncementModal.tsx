@@ -3,6 +3,7 @@ import type { TransitionProps } from '@mui/material/transitions'
 import { forwardRef } from 'react'
 import type { ReactElement, Ref } from 'react'
 import { Button } from '../ui'
+import { useBackground } from '../../context/BackgroundContext'
 import { colors, font, radius } from '../../design-system'
 import type { UserNotification } from '../../types/note'
 
@@ -32,6 +33,7 @@ export function AnnouncementModal({ notifications, onClose }: {
   notifications: UserNotification[]
   onClose: () => void
 }) {
+  const { theme } = useBackground()
   const open = notifications.length > 0
   const first = notifications[0]
   const many = notifications.length > 1
@@ -42,19 +44,24 @@ export function AnnouncementModal({ notifications, onClose }: {
       onClose={onClose}
       fullScreen
       slots={{ transition: SlideUp }}
-      slotProps={{ paper: { sx: { background: 'linear-gradient(160deg,#fdf2f8 0%,#eef2ff 55%,#fce7f3 100%)' } } }}
+      slotProps={{ paper: { sx: { background: theme.gradient } } }}
     >
       <Box sx={{ minHeight: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', px: 2.5, py: 4, position: 'relative', overflow: 'hidden' }}>
-        <Box sx={{ position: 'absolute', top: -70, right: -70, fontSize: 260, opacity: 0.08, pointerEvents: 'none', userSelect: 'none' }}>
+        <Box sx={{ position: 'absolute', top: -70, right: -70, fontSize: 260, opacity: theme.isDark ? 0.05 : 0.08, pointerEvents: 'none', userSelect: 'none' }}>
           {first?.collectionEmoji ?? '💌'}
         </Box>
 
         <Stack spacing={1} alignItems="center" sx={{ mt: { xs: 3, md: 6 }, mb: 3, textAlign: 'center', zIndex: 1 }}>
           <Typography sx={{ fontSize: '3.2rem', lineHeight: 1 }}>🎉</Typography>
-          <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: { xs: '1.6rem', md: '2rem' }, color: colors.text.primary, letterSpacing: -0.5 }}>
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: { xs: '1.6rem', md: '2rem' }, color: theme.textOnBg, letterSpacing: -0.5 }}>
             {many ? `${notifications.length} novidades desde sua última visita!` : 'Tem novidade pra você!'}
           </Typography>
-          <Typography sx={{ fontSize: '0.9rem', color: colors.text.secondary }}>
+          <Typography sx={{
+            display: 'inline-flex', alignItems: 'center', gap: 0.5,
+            fontSize: '0.82rem', fontWeight: 700, color: theme.textOnBgMuted,
+            bgcolor: `${theme.accent}14`, border: `1px solid ${theme.accent}28`,
+            borderRadius: radius.full, px: 1.2, py: 0.3,
+          }}>
             {first?.collectionEmoji} {first?.collectionName}
           </Typography>
         </Stack>
@@ -62,9 +69,9 @@ export function AnnouncementModal({ notifications, onClose }: {
         <Stack spacing={2} sx={{ width: '100%', maxWidth: 480, flex: 1, zIndex: 1 }}>
           {notifications.map((notification) => (
             <Box key={notification.notificationId} sx={{
-              p: 2.2, borderRadius: radius.xl, background: 'rgba(255,255,255,0.82)',
-              border: '1.5px solid rgba(255,255,255,0.95)', backdropFilter: 'blur(14px)',
-              boxShadow: '0 14px 40px rgba(190,24,93,0.12)',
+              p: 2.2, borderRadius: radius.xl, background: 'rgba(255,253,251,0.96)',
+              border: `1.5px solid ${theme.accent}30`,
+              boxShadow: `0 14px 40px ${theme.accent}${theme.isDark ? '30' : '22'}`,
             }}>
               <Stack spacing={1.2}>
                 <Stack direction="row" alignItems="center" spacing={1}>

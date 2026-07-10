@@ -1,6 +1,6 @@
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import { Box, Stack, Typography } from '@mui/material'
-import { LoadingState, ScrollablePage } from '../components/ui'
+import { Card, LoadingState, ScrollablePage } from '../components/ui'
 import { useBackground } from '../context/BackgroundContext'
 import { useMarkNotificationReadMutation, useMyNotificationsQuery } from '../hooks/useNotes'
 import { colors, fadeIn, font, radius } from '../design-system'
@@ -70,15 +70,15 @@ export function NotificationsPage() {
           {notifications.map((notification) => {
             const unread = !notification.readAt
             return (
-              <Box
+              <Card
                 key={`${notification.collectionId}-${notification.notificationId}`}
+                accent={unread ? theme.accent : undefined}
                 onClick={() => handleOpen(notification)}
                 sx={{
                   p: 1.8, borderRadius: radius.xl, cursor: unread ? 'pointer' : 'default',
-                  background: unread ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.5)',
-                  border: `1.5px solid ${unread ? theme.accent + '66' : 'rgba(255,255,255,0.6)'}`,
-                  backdropFilter: 'blur(12px)',
-                  boxShadow: unread ? `0 10px 30px ${theme.accent}22` : '0 4px 14px rgba(15,23,42,0.05)',
+                  ...(unread
+                    ? { border: `1.5px solid ${theme.accent}55`, boxShadow: `0 10px 30px ${theme.accent}22` }
+                    : { opacity: 0.78 }),
                   transition: 'all 0.16s ease',
                 }}
               >
@@ -109,7 +109,7 @@ export function NotificationsPage() {
                     </Typography>
                   )}
                 </Stack>
-              </Box>
+              </Card>
             )
           })}
         </Stack>

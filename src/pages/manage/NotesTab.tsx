@@ -2,6 +2,7 @@ import AddIcon from '@mui/icons-material/Add'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
 import ReplayIcon from '@mui/icons-material/Replay'
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import SearchIcon from '@mui/icons-material/Search'
 import CloseIcon from '@mui/icons-material/Close'
 import ViewAgendaIcon from '@mui/icons-material/ViewAgenda'
@@ -166,69 +167,135 @@ export function NotesTab({ cid }: NotesTabProps) {
         </Stack>
 
         {draftNotes.length > 0 && (
-          <Box sx={{ p: 1.4, borderRadius: radius.lg, border: `1.5px dashed ${colors.primary.main}55`, background: 'rgba(255,255,255,0.42)', backdropFilter: 'blur(10px)' }}>
-            <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-              <Typography sx={{ flex: 1, fontSize: '0.7rem', fontWeight: 800, letterSpacing: 0.6, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
-                🚧 Rascunhos ({draftNotes.length})
-              </Typography>
-              <Chip
-                label={selectedDraftIds.length === draftNotes.length ? 'Desmarcar todos' : 'Selecionar todos'}
-                size="small"
-                onClick={() => setSelectedDraftIds(selectedDraftIds.length === draftNotes.length ? [] : draftNotes.map((n) => n.id))}
-                sx={{ height: 24, fontSize: '0.68rem', fontWeight: 800, cursor: 'pointer', bgcolor: 'rgba(255,255,255,0.6)', color: colors.text.secondary }}
-              />
-            </Stack>
-            <Typography sx={{ fontSize: '0.7rem', color: theme.textOnBgMuted, mb: 1, lineHeight: 1.4 }}>
-              Rascunhos não aparecem pros leitores nem saem nos pacotinhos. Lance quando quiser, em quantos lotes quiser.
-            </Typography>
-            <Stack spacing={0.7}>
+          <Box sx={{
+            borderRadius: radius.xl, overflow: 'hidden',
+            border: `1.5px dashed ${theme.accent}66`,
+            background: theme.surfaceBg, backdropFilter: 'blur(14px)',
+            boxShadow: `0 8px 26px ${theme.accent}14`,
+          }}>
+            <Box sx={{ px: 1.6, pt: 1.4, pb: 1.1 }}>
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <Box sx={{
+                  width: 34, height: 34, borderRadius: radius.md, flexShrink: 0,
+                  background: `${theme.accent}18`, border: `1px solid ${theme.accent}30`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem',
+                }}>
+                  🚧
+                </Box>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.94rem', color: theme.textOnBg, lineHeight: 1.2 }}>
+                    Rascunhos
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.68rem', color: theme.textOnBgMuted }}>
+                    invisíveis pros leitores até você lançar
+                  </Typography>
+                </Box>
+                <Box sx={{
+                  px: 0.9, py: 0.25, borderRadius: radius.full, flexShrink: 0,
+                  background: theme.accent, color: '#fff',
+                  fontSize: '0.72rem', fontWeight: 900,
+                }}>
+                  {draftNotes.length}
+                </Box>
+              </Stack>
+            </Box>
+
+            <Stack spacing={0.8} sx={{ px: 1.6, pb: 1.4 }}>
+              <Stack direction="row" alignItems="center" justifyContent="flex-end">
+                <Typography
+                  onClick={() => setSelectedDraftIds(selectedDraftIds.length === draftNotes.length ? [] : draftNotes.map((n) => n.id))}
+                  sx={{ fontSize: '0.72rem', fontWeight: 800, color: theme.accent, cursor: 'pointer', userSelect: 'none', px: 0.5, '&:hover': { opacity: 0.75 } }}
+                >
+                  {selectedDraftIds.length === draftNotes.length ? 'Desmarcar todos' : 'Selecionar todos'}
+                </Typography>
+              </Stack>
+
               {draftNotes.map((note) => {
                 const selected = selectedDraftIds.includes(note.id)
                 const r = rarities.find((x) => x.id === note.rarity)
+                const t = types.find((x) => x.id === note.typeId)
                 return (
-                  <Card key={note.id} onClick={() => toggleDraft(note.id)} sx={{
-                    p: 1.1, cursor: 'pointer',
-                    border: `1.5px solid ${selected ? colors.primary.main : colors.border.subtle}`,
-                    background: selected ? `${colors.primary.main}0e` : 'rgba(255,255,255,0.78)',
-                    transition: 'all 0.14s',
+                  <Card key={note.id} onClick={() => toggleDraft(note.id)} accent={selected ? theme.accent : undefined} sx={{
+                    p: 1.2, cursor: 'pointer',
+                    border: `1.5px solid ${selected ? theme.accent : colors.border.subtle}`,
+                    boxShadow: selected ? `0 6px 20px ${theme.accent}26` : undefined,
+                    transition: 'all 0.15s ease',
+                    '&:hover': { transform: 'translateY(-1px)' },
                   }}>
-                    <Stack direction="row" alignItems="center" spacing={1}>
+                    <Stack direction="row" alignItems="center" spacing={1.1}>
                       <Box sx={{
-                        width: 18, height: 18, borderRadius: 5, flexShrink: 0,
-                        border: `2px solid ${selected ? colors.primary.main : colors.border.medium}`,
-                        background: selected ? colors.primary.main : 'transparent',
+                        width: 20, height: 20, borderRadius: 6, flexShrink: 0,
+                        border: `2px solid ${selected ? theme.accent : colors.border.medium}`,
+                        background: selected ? theme.accent : 'transparent',
                         display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.14s',
                       }}>
-                        {selected && <Box component="span" sx={{ color: '#fff', fontSize: '0.62rem', lineHeight: 1, fontWeight: 900 }}>✓</Box>}
+                        {selected && <Box component="span" sx={{ color: '#fff', fontSize: '0.66rem', lineHeight: 1, fontWeight: 900 }}>✓</Box>}
                       </Box>
+
+                      {note.imageUrl && (
+                        <Box sx={{ width: 40, height: 40, flexShrink: 0, borderRadius: radius.md, overflow: 'hidden', border: `1px solid ${r?.borderColor ?? colors.border.subtle}33` }}>
+                          <Box component="img" src={note.imageUrl} alt="" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                        </Box>
+                      )}
+
                       <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.84rem', color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {r?.emoji} {note.title}
+                        <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.86rem', color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {note.title}
                         </Typography>
-                        <Typography sx={{ fontSize: '0.7rem', color: colors.text.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <Typography sx={{ fontSize: '0.72rem', color: colors.text.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', mt: 0.15 }}>
                           {note.message}
                         </Typography>
+                        <Stack direction="row" spacing={0.5} sx={{ mt: 0.55, flexWrap: 'wrap', rowGap: 0.4 }}>
+                          {r && (
+                            <Box sx={{ display: 'inline-flex', alignItems: 'center', px: 0.7, py: 0.15, borderRadius: radius.full, background: r.chipBg, border: `1px solid ${r.borderColor}`, fontSize: '0.64rem', fontWeight: 800 }}>
+                              <Box component="span" sx={gradientTextSx(r.chipColor)}>{r.emoji} {r.label}</Box>
+                            </Box>
+                          )}
+                          {t && (
+                            <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.3, px: 0.7, py: 0.15, borderRadius: radius.full, background: t.tagBg, color: t.tagColor, border: `1px solid ${t.accentColor}33`, fontSize: '0.64rem', fontWeight: 800 }}>
+                              {t.emoji} {t.label}
+                            </Box>
+                          )}
+                        </Stack>
                       </Box>
-                      <IconButton size="small" aria-label="editar rascunho" onClick={(e) => { e.stopPropagation(); setEditingNote(note); setNoteDialog(true) }} sx={{ ...actionButtonSx('primary'), width: 28, height: 28, flexShrink: 0 }}>
-                        <EditOutlinedIcon sx={{ fontSize: 14 }} />
-                      </IconButton>
-                      <IconButton size="small" aria-label="desativar rascunho" onClick={(e) => { e.stopPropagation(); noteDisable.setTarget(note) }} sx={{ ...actionButtonSx('danger'), width: 28, height: 28, flexShrink: 0 }}>
-                        <DeleteForeverOutlinedIcon sx={{ fontSize: 14 }} />
-                      </IconButton>
+
+                      <Stack spacing={0.3} sx={{ flexShrink: 0 }}>
+                        <IconButton size="small" aria-label="ver rascunho" onClick={(e) => { e.stopPropagation(); setViewingNote(note) }} sx={{ ...actionButtonSx('neutral'), width: 28, height: 28 }}>
+                          <VisibilityOutlinedIcon sx={{ fontSize: 14 }} />
+                        </IconButton>
+                        <IconButton size="small" aria-label="editar rascunho" onClick={(e) => { e.stopPropagation(); setEditingNote(note); setNoteDialog(true) }} sx={{ ...actionButtonSx('primary'), width: 28, height: 28 }}>
+                          <EditOutlinedIcon sx={{ fontSize: 14 }} />
+                        </IconButton>
+                        <IconButton size="small" aria-label="desativar rascunho" onClick={(e) => { e.stopPropagation(); noteDisable.setTarget(note) }} sx={{ ...actionButtonSx('danger'), width: 28, height: 28 }}>
+                          <DeleteForeverOutlinedIcon sx={{ fontSize: 14 }} />
+                        </IconButton>
+                      </Stack>
                     </Stack>
                   </Card>
                 )
               })}
             </Stack>
-            <Button
-              variant="primary"
-              fullWidth
-              disabled={selectedDraftIds.length === 0}
-              onClick={() => setReleaseDialogOpen(true)}
-              sx={{ mt: 1.2, py: 0.85, fontSize: '0.8rem' }}
-            >
-              🚀 Lançar {selectedDraftIds.length > 0 ? `${selectedDraftIds.length} selecionado${selectedDraftIds.length === 1 ? '' : 's'}` : 'bilhetes'}
-            </Button>
+
+            <Box sx={{
+              px: 1.6, py: 1.2,
+              background: `${theme.accent}0e`,
+              borderTop: `1px solid ${theme.accent}22`,
+              display: 'flex', alignItems: 'center', gap: 1.2,
+            }}>
+              <Typography sx={{ flex: 1, fontSize: '0.72rem', fontWeight: 700, color: theme.textOnBgMuted, lineHeight: 1.35 }}>
+                {selectedDraftIds.length === 0
+                  ? 'Selecione os bilhetes que quer soltar pros leitores'
+                  : `${selectedDraftIds.length} de ${draftNotes.length} selecionado${selectedDraftIds.length === 1 ? '' : 's'}`}
+              </Typography>
+              <Button
+                variant="primary"
+                disabled={selectedDraftIds.length === 0}
+                onClick={() => setReleaseDialogOpen(true)}
+                sx={{ py: 0.75, px: 1.8, fontSize: '0.8rem', whiteSpace: 'nowrap', flexShrink: 0 }}
+              >
+                🚀 Lançar{selectedDraftIds.length > 0 ? ` (${selectedDraftIds.length})` : ''}
+              </Button>
+            </Box>
           </Box>
         )}
 
@@ -478,7 +545,7 @@ export function NotesTab({ cid }: NotesTabProps) {
         )}
 
         {trashedNotes.length > 0 && (
-          <Box sx={{ mt: 1.5, p: 1.4, borderRadius: radius.lg, border: `1.5px dashed ${colors.border.medium}`, background: 'rgba(255,255,255,0.35)' }}>
+          <Box sx={{ mt: 1.5, p: 1.4, borderRadius: radius.xl, border: `1.5px dashed ${theme.surfaceBorder}`, background: theme.surfaceBg, backdropFilter: 'blur(14px)' }}>
             <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, letterSpacing: 0.6, color: theme.textOnBgMuted, textTransform: 'uppercase', mb: 1 }}>
               🗑️ Lixeira
             </Typography>
