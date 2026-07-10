@@ -8,6 +8,7 @@ import type {
   CollectionFormData,
   CollectionInvite,
   CollectionNoteView,
+  CollectionNotification,
   CollectionPack,
   CollectionPackFormData,
   CollectionPlayView,
@@ -15,10 +16,13 @@ import type {
   NoteFormData,
   NoteRecord,
   NoteTypeConfig,
+  NotifyConfig,
   PackStatusResponse,
   RarityConfig,
   ReaderAchievementsResponse,
+  ReleaseNotesResponse,
   UpdateCollectionPackResponse,
+  UserNotification,
 } from '../types/note'
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? ''
@@ -294,10 +298,10 @@ export const api = {
     requestRaw(`/api/mail/preview?type=${encodeURIComponent(type)}`),
   getReaderView: (cid: string, email: string) =>
     request<CollectionPlayView>(`/api/collections/${cid}/access/${encodeURIComponent(email)}/view`),
-  addPackOpens: (cid: string, email: string, packId: string, opens: number) =>
+  addPackOpens: (cid: string, email: string, packId: string, opens: number, notify?: NotifyConfig) =>
     request<CollectionAccess>(`/api/collections/${cid}/access/${encodeURIComponent(email)}/packs`, {
       method: 'PATCH',
-      body: JSON.stringify({ packId, opens }),
+      body: JSON.stringify({ packId, opens, ...(notify ? { notify } : {}) }),
     }),
   setAccessPacks: async (cid: string, email: string, packIds: string[]) => {
     try {
@@ -326,6 +330,16 @@ export const api = {
     request<NoteRecord>(`/api/collections/${cid}/notes/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   disableCollectionNote: (cid: string, id: string) =>
     request<NoteRecord>(`/api/collections/${cid}/notes/${id}`, { method: 'DELETE' }),
+  releaseCollectionNotes: (cid: string, noteIds: string[], notify?: NotifyConfig) =>
+    request<ReleaseNotesResponse>(`/api/collections/${cid}/notes/release`, {
+      method: 'POST',
+      body: JSON.stringify({ noteIds, ...(notify ? { notify } : {}) }),
+    }),
+  getCollectionNotifications: (cid: string) =>
+    request<CollectionNotification[]>(`/api/collections/${cid}/notifications`),
+  getMyNotifications: () => request<UserNotification[]>('/api/notifications'),
+  markNotificationRead: (cid: string, notificationId: string) =>
+    request<{ read: boolean }>(`/api/notifications/${cid}/${notificationId}/read`, { method: 'PATCH' }),
   restoreCollectionNote: (cid: string, id: string) =>
     request<NoteRecord>(`/api/collections/${cid}/notes/${id}/restore`, { method: 'POST' }),
   permanentlyDeleteCollectionNote: (cid: string, id: string) =>

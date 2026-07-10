@@ -33,6 +33,7 @@ const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage').then((m
 const ContaPage = lazy(() => import('./pages/ContaPage').then((m) => ({ default: m.ContaPage })))
 const ConfirmEmailChangePage = lazy(() => import('./pages/ConfirmEmailChangePage').then((m) => ({ default: m.ConfirmEmailChangePage })))
 const InviteAcceptPage = lazy(() => import('./pages/InviteAcceptPage').then((m) => ({ default: m.InviteAcceptPage })))
+const NotificationsPage = lazy(() => import('./pages/NotificationsPage').then((m) => ({ default: m.NotificationsPage })))
 
 function RouteFallback() {
   return (
@@ -102,6 +103,7 @@ function AppRoutes() {
           <Route path="colecoes/:slug" element={<CollectionPlayPage />} />
           <Route path="conquistas" element={<ConquistasPage />} />
           <Route path="favoritas" element={<FavoritasPage />} />
+          <Route path="notificacoes" element={<NotificationsPage />} />
           <Route path="colecoes/:slug/gerenciar" element={<RequireRole role="writer"><CollectionManagePage /></RequireRole>} />
           <Route path="colecoes/:slug/gerenciar/leitores/:email" element={<RequireRole role="writer"><ReaderCollectionPage /></RequireRole>} />
           <Route path="conta" element={<ContaPage />} />

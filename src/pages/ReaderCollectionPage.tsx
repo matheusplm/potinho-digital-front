@@ -14,7 +14,6 @@ import { Button, Card, LoadingState, PageTitle, ScrollablePage, ScrollHint, toas
 import { useBackground } from '../context/BackgroundContext'
 import { useUser } from '../context/UserContext'
 import {
-  useAddPackOpensMutation,
   useCollectionPacksQuery,
   useCollectionRaritiesQuery,
   useCollectionTypesQuery,
@@ -29,7 +28,7 @@ import { gradientTextSx } from '../utils/colorUtils'
 import { formatRemainingTime } from '../utils/packCooldowns'
 import { NoteDetailDialog } from '../components/collection/NoteDetailDialog'
 import { NoteCard, NoteRow } from './reader/NoteCard'
-import { PackOpensDialog } from './reader/PackOpensDialog'
+import { BonusPackDialog } from '../components/manage/BonusPackDialog'
 import { RevokeAccessDialog } from './reader/RevokeAccessDialog'
 import { SORT_CYCLE, SORT_LABEL, sortNotes } from './reader/readerUtils'
 import type { SortKey } from './reader/readerUtils'
@@ -68,7 +67,6 @@ export function ReaderCollectionPage() {
   const { data: types = [] } = useCollectionTypesQuery(cid)
 
   const revokeMutation = useRevokeAccessMutation(cid)
-  const addPackOpensMutation = useAddPackOpensMutation(cid)
 
   const [rarityFilter, setRarityFilter] = useState<string | null>(null)
   const [favFilter, setFavFilter] = useState(false)
@@ -116,30 +114,6 @@ export function ReaderCollectionPage() {
   }, [ownedNotes, rarityFilter, favFilter, search, sort, rarityOrder])
 
   const isLoading = collectionsLoading || viewLoading
-
-  async function handleAddPackOpens(opens: number) {
-    if (!packOpensDialog) return
-    try {
-      await addPackOpensMutation.mutateAsync({ email, packId: packOpensDialog.pack.id, opens })
-      void queryClient.invalidateQueries({ queryKey: ['reader-view', cid, email] })
-      toast.success('Brindes atualizados.')
-      setPackOpensDialog(null)
-    } catch (e) {
-      toast.error((e as Error).message || 'Erro ao atualizar brindes.')
-    }
-  }
-
-  async function handleRemovePackAccess() {
-    if (!packOpensDialog) return
-    try {
-      await addPackOpensMutation.mutateAsync({ email, packId: packOpensDialog.pack.id, opens: 0 })
-      void queryClient.invalidateQueries({ queryKey: ['reader-view', cid, email] })
-      toast.success('Brinde removido.')
-      setPackOpensDialog(null)
-    } catch (e) {
-      toast.error((e as Error).message || 'Erro ao remover brinde.')
-    }
-  }
 
   async function handleRevoke() {
     try {
@@ -228,7 +202,6 @@ export function ReaderCollectionPage() {
                         key={pack.id}
                         label={hasOpens ? `${pack.emoji} ${pack.name} (${opens}x)` : `${pack.emoji} ${pack.name}`}
                         onClick={() => setPackOpensDialog({ pack, currentOpens: opens })}
-                        disabled={addPackOpensMutation.isPending}
                         sx={{
                           height: 28, borderRadius: radius.full, fontSize: '0.72rem', fontWeight: 800, cursor: 'pointer',
                           color: hasOpens ? '#fff' : pack.accent,
@@ -357,13 +330,11 @@ export function ReaderCollectionPage() {
         <NoteDetailDialog note={viewingNote} rarities={rarities} types={types} onClose={() => setViewingNote(null)} />
       )}
 
-      <PackOpensDialog
-        pack={packOpensDialog?.pack ?? null}
-        currentOpens={packOpensDialog?.currentOpens}
-        isPending={addPackOpensMutation.isPending}
+      <BonusPackDialog
+        cid={cid}
+        target={packOpensDialog ? { email, pack: packOpensDialog.pack, currentOpens: packOpensDialog.currentOpens } : null}
         onClose={() => setPackOpensDialog(null)}
-        onAdd={handleAddPackOpens}
-        onRemove={handleRemovePackAccess}
+        onSuccess={() => void queryClient.invalidateQueries({ queryKey: ['reader-view', cid, email] })}
       />
 
       <RevokeAccessDialog

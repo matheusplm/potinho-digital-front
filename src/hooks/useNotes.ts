@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api, ApiRequestError } from '../services/api'
-import type { CollectionAchievementFormData, CollectionPackFormData, NoteFormData, PackStatusResponse, RarityConfig, NoteTypeConfig } from '../types/note'
+import type { CollectionAchievementFormData, CollectionPackFormData, NoteFormData, NotifyConfig, PackStatusResponse, RarityConfig, NoteTypeConfig } from '../types/note'
 
 export const queryKeys = {
   collections: () => ['collections'] as const,
@@ -16,6 +16,8 @@ export const queryKeys = {
   achievements: (cid: string) => ['col-achievements', cid] as const,
   readerAchievements: (cid: string) => ['reader-achievements', cid] as const,
   invites: (cid: string) => ['col-invites', cid] as const,
+  myNotifications: () => ['my-notifications'] as const,
+  collectionNotifications: (cid: string) => ['col-notifications', cid] as const,
 }
 
 export function useCollectionsQuery(options?: { enabled?: boolean }) {
@@ -307,9 +309,48 @@ export function useReaderViewQuery(cid: string, email: string | null) {
 export function useAddPackOpensMutation(cid: string) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ email, packId, opens }: { email: string; packId: string; opens: number }) =>
-      api.addPackOpens(cid, email, packId, opens),
+    mutationFn: ({ email, packId, opens, notify }: { email: string; packId: string; opens: number; notify?: NotifyConfig }) =>
+      api.addPackOpens(cid, email, packId, opens, notify),
     onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.access(cid) }) },
+  })
+}
+
+export function useReleaseNotesMutation(cid: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ noteIds, notify }: { noteIds: string[]; notify?: NotifyConfig }) =>
+      api.releaseCollectionNotes(cid, noteIds, notify),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.notes(cid) })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.play(cid) })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.collectionNotifications(cid) })
+    },
+  })
+}
+
+export function useMyNotificationsQuery(options?: { enabled?: boolean }) {
+  return useQuery({
+    queryKey: queryKeys.myNotifications(),
+    queryFn: () => api.getMyNotifications(),
+    enabled: options?.enabled ?? true,
+    refetchInterval: 5 * 60_000,
+  })
+}
+
+export function useMarkNotificationReadMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ cid, notificationId }: { cid: string; notificationId: string }) =>
+      api.markNotificationRead(cid, notificationId),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.myNotifications() }) },
+  })
+}
+
+export function useCollectionNotificationsQuery(cid: string) {
+  return useQuery({
+    queryKey: queryKeys.collectionNotifications(cid),
+    queryFn: () => api.getCollectionNotifications(cid),
+    enabled: !!cid,
   })
 }
 

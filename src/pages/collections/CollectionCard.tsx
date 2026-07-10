@@ -28,6 +28,30 @@ interface CardProps {
   onClick: () => void
   onEdit: (col: Collection) => void
   onDelete: (col: Collection) => void
+  hasNews?: boolean
+}
+
+function CollectionBadges({ col, hasNews }: { col: Collection; hasNews?: boolean }) {
+  const hasPack = col.access === 'reader' && (col.dailyCanOpen || (col.pendingBonusOpens ?? 0) > 0)
+  if (!hasNews && !hasPack) return null
+  return (
+    <Stack direction="row" spacing={0.4} sx={{ flexShrink: 0 }}>
+      {hasNews && (
+        <Box title="novidade não vista" sx={{
+          width: 24, height: 24, borderRadius: '50%', fontSize: '0.72rem',
+          background: 'rgba(255,255,255,0.95)', boxShadow: '0 2px 8px rgba(0,0,0,0.18)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>🎉</Box>
+      )}
+      {hasPack && (
+        <Box title="pacotinho disponível" sx={{
+          width: 24, height: 24, borderRadius: '50%', fontSize: '0.72rem',
+          background: 'rgba(255,255,255,0.95)', boxShadow: '0 2px 8px rgba(0,0,0,0.18)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>📦</Box>
+      )}
+    </Stack>
+  )
 }
 
 function CardActions({ col, variant, onEdit, onDelete }: {
@@ -66,7 +90,7 @@ function CardActions({ col, variant, onEdit, onDelete }: {
   )
 }
 
-export function CollectionCardView({ col, i, onClick, onEdit, onDelete }: CardProps) {
+export function CollectionCardView({ col, i, onClick, onEdit, onDelete, hasNews }: CardProps) {
   const { user } = useUser()
   const bg = backgroundThemes.find((t) => t.key === col.theme) ?? backgroundThemes[0]
   const isOwner = isCollectionOwner(col, user?.id)
@@ -89,6 +113,11 @@ export function CollectionCardView({ col, i, onClick, onEdit, onDelete }: CardPr
         {isOwner && (
           <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 2 }}>
             <CardActions col={col} variant="overlay" onEdit={onEdit} onDelete={onDelete} />
+          </Box>
+        )}
+        {!isOwner && (
+          <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 2 }}>
+            <CollectionBadges col={col} hasNews={hasNews} />
           </Box>
         )}
       </Box>
@@ -119,7 +148,7 @@ export function CollectionCardView({ col, i, onClick, onEdit, onDelete }: CardPr
   )
 }
 
-export function CollectionGridItem({ col, i, onClick, onEdit, onDelete }: CardProps) {
+export function CollectionGridItem({ col, i, onClick, onEdit, onDelete, hasNews }: CardProps) {
   const { user } = useUser()
   const bg = backgroundThemes.find((t) => t.key === col.theme) ?? backgroundThemes[0]
   const isOwner = isCollectionOwner(col, user?.id)
@@ -147,6 +176,11 @@ export function CollectionGridItem({ col, i, onClick, onEdit, onDelete }: CardPr
             <CardActions col={col} variant="overlay" onEdit={onEdit} onDelete={onDelete} />
           </Box>
         )}
+        {!isOwner && (
+          <Box sx={{ position: 'absolute', top: 6, right: 6, zIndex: 2 }}>
+            <CollectionBadges col={col} hasNews={hasNews} />
+          </Box>
+        )}
       </Box>
       <Box sx={{ px: 1.3, py: 1.1, display: 'flex', flexDirection: 'column', gap: 0.35 }}>
         <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.88rem', color: colors.text.primary, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
@@ -166,7 +200,7 @@ export function CollectionGridItem({ col, i, onClick, onEdit, onDelete }: CardPr
   )
 }
 
-export function CollectionListItem({ col, i, onClick, onEdit, onDelete }: CardProps) {
+export function CollectionListItem({ col, i, onClick, onEdit, onDelete, hasNews }: CardProps) {
   const { user } = useUser()
   const bg = backgroundThemes.find((t) => t.key === col.theme) ?? backgroundThemes[0]
   const isOwner = isCollectionOwner(col, user?.id)
@@ -206,14 +240,17 @@ export function CollectionListItem({ col, i, onClick, onEdit, onDelete }: CardPr
       {isOwner
         ? <CardActions col={col} variant="inline" onEdit={onEdit} onDelete={onDelete} />
         : (
-          <Box sx={{
-            px: 0.8, py: 0.2, borderRadius: radius.full, flexShrink: 0,
-            background: `${colors.rose.main}15`,
-            fontSize: '0.68rem', fontWeight: 800, letterSpacing: 0.4,
-            color: colors.rose.main, textTransform: 'uppercase',
-          }}>
-            convidada
-          </Box>
+          <Stack direction="row" spacing={0.6} alignItems="center" sx={{ flexShrink: 0 }}>
+            <CollectionBadges col={col} hasNews={hasNews} />
+            <Box sx={{
+              px: 0.8, py: 0.2, borderRadius: radius.full, flexShrink: 0,
+              background: `${colors.rose.main}15`,
+              fontSize: '0.68rem', fontWeight: 800, letterSpacing: 0.4,
+              color: colors.rose.main, textTransform: 'uppercase',
+            }}>
+              convidada
+            </Box>
+          </Stack>
         )
       }
     </Box>

@@ -6,7 +6,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Button, Card, LoadingState, ScrollablePage } from '../components/ui'
 import { NoteDetailDialog } from '../components/collection/NoteDetailDialog'
-import { useCollectionPlayQuery, useCollectionRaritiesQuery, useCollectionTypesQuery, useCollectionsQuery, useCollectionNotesQuery, useToggleCollectionFavoriteMutation } from '../hooks/useNotes'
+import { AnnouncementModal } from '../components/collection/AnnouncementModal'
+import { useCollectionPlayQuery, useCollectionRaritiesQuery, useCollectionTypesQuery, useCollectionsQuery, useCollectionNotesQuery, useToggleCollectionFavoriteMutation, useMyNotificationsQuery, useMarkNotificationReadMutation } from '../hooks/useNotes'
 import { useBackground } from '../context/BackgroundContext'
 import { useUser } from '../context/UserContext'
 import { useSimulation } from '../context/SimulationContext'
@@ -55,6 +56,25 @@ export function CollectionPlayPage() {
   const isCollectionOwnerUser = collection ? isCollectionOwner(collection, user?.id) : false
   const isReaderView = !isSimulating && (persona === 'reader' || !isCollectionOwnerUser)
   const isWriter = isCollectionOwnerUser && persona === 'writer' && !isSimulating
+
+  const { data: myNotifications = [] } = useMyNotificationsQuery({ enabled: isReaderView && !!cid })
+  const markRead = useMarkNotificationReadMutation()
+  const [announcementsDismissed, setAnnouncementsDismissed] = useState(false)
+  const pendingAnnouncements = useMemo(
+    () => announcementsDismissed ? [] : myNotifications.filter((n) => n.collectionId === cid && n.inApp && !n.readAt),
+    [myNotifications, cid, announcementsDismissed],
+  )
+
+  useEffect(() => {
+    setAnnouncementsDismissed(false)
+  }, [cid])
+
+  function dismissAnnouncements() {
+    setAnnouncementsDismissed(true)
+    for (const notification of pendingAnnouncements) {
+      markRead.mutate({ cid, notificationId: notification.notificationId })
+    }
+  }
 
   function changeAlbumView(v: AlbumView) {
     setAlbumView(v)
@@ -216,6 +236,7 @@ export function CollectionPlayPage() {
       </ScrollablePage>
 
       <NoteDetailDialog note={selectedNote} rarities={rarities} types={types} onClose={() => setSelectedNote(null)} />
+      <AnnouncementModal notifications={pendingAnnouncements} onClose={dismissAnnouncements} />
     </Box>
   )
 }

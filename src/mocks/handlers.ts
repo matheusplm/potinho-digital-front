@@ -637,7 +637,7 @@ const collectionHandlers = [
     if (!auth.ok) return auth.response
     const { collection } = auth
     const data = (await request.json()) as NoteFormData
-    const record = { id: nextId('note'), ...data, createdAt: new Date().toISOString() }
+    const record = { id: nextId('note'), ...data, createdAt: new Date().toISOString(), status: 'preview' as const, releasedAt: null }
     collection.notes.push(record)
     return HttpResponse.json(record)
   }),
@@ -656,7 +656,7 @@ const collectionHandlers = [
     const created: typeof collection.notes = []
     for (const data of parsed) {
       if (existingTitles.has(data.title)) continue
-      const record = { id: nextId('note'), ...data, createdAt: now }
+      const record = { id: nextId('note'), ...data, createdAt: now, status: 'preview' as const, releasedAt: null }
       collection.notes.push(record)
       created.push(record)
       existingTitles.add(data.title)
@@ -709,6 +709,47 @@ const collectionHandlers = [
     }
     collection.notes.splice(index, 1)
     return HttpResponse.json({ deleted: true })
+  }),
+
+  http.post('/api/collections/:cid/notes/release', async ({ params, request }) => {
+    await delay(320)
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
+    const { noteIds, notify } = (await request.json()) as { noteIds: string[]; notify?: unknown }
+    const now = new Date().toISOString()
+    const targets = collection.notes.filter((n) => noteIds.includes(n.id) && n.status === 'preview' && !n.disabledAt)
+    if (targets.length !== noteIds.length) {
+      return HttpResponse.json({ error: 'NOTE_NOT_RELEASABLE', message: 'Só rascunhos fora da lixeira podem ser lançados.' }, { status: 409 })
+    }
+    for (const note of targets) {
+      note.status = 'released'
+      note.releasedAt = now
+    }
+    return HttpResponse.json({
+      release: { id: nextId('release'), collectionId: String(params.cid), noteIds, noteCount: noteIds.length, releasedAt: now },
+      notified: !!notify,
+    }, { status: 201 })
+  }),
+
+  http.get('/api/collections/:cid/releases', async () => {
+    await delay(120)
+    return HttpResponse.json([])
+  }),
+
+  http.get('/api/collections/:cid/notifications', async () => {
+    await delay(120)
+    return HttpResponse.json([])
+  }),
+
+  http.get('/api/notifications', async () => {
+    await delay(120)
+    return HttpResponse.json([])
+  }),
+
+  http.patch('/api/notifications/:cid/:id/read', async () => {
+    await delay(100)
+    return HttpResponse.json({ read: true })
   }),
 
   http.get('/api/collections/:cid/rarities', async ({ params, request }) => {
@@ -840,7 +881,8 @@ const collectionHandlers = [
     const { user, collection } = auth
     const isOwner = collection.meta.ownerId === user.id
     const { ownership } = collection
-    const items = collection.notes.map((note) => {
+    const visibleNotes = collection.notes.filter((note) => (!note.disabledAt && note.status !== 'preview') || ownership.owned.has(note.id))
+    const items = visibleNotes.map((note) => {
       const view = buildNoteView(note, ownership.owned, ownership.favorites, ownership.obtainedAt)
       const canSeeMessage = isOwner || ownership.owned.has(note.id)
       return { ...view, message: canSeeMessage ? note.message : '' }

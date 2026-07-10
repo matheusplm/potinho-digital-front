@@ -2,11 +2,13 @@ import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
 import ReplayIcon from '@mui/icons-material/Replay'
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
-import { Box, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, TextField, Tooltip, Typography } from '@mui/material'
+import { Box, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, Tooltip, Typography } from '@mui/material'
 import { useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Button, Card, Input, LoadingState, toast } from '../../components/ui'
-import { useCollectionAccessQuery, useCollectionPacksQuery, useAddPackOpensMutation, useCollectionInvitesQuery, useSendInviteMutation, useCancelInviteMutation } from '../../hooks/useNotes'
+import { BonusPackDialog } from '../../components/manage/BonusPackDialog'
+import type { BonusPackTarget } from '../../components/manage/BonusPackDialog'
+import { useCollectionAccessQuery, useCollectionPacksQuery, useCollectionInvitesQuery, useCollectionNotificationsQuery, useSendInviteMutation, useCancelInviteMutation } from '../../hooks/useNotes'
 import { colors, font, radius } from '../../design-system'
 import { useBackground } from '../../context/BackgroundContext'
 import { useUser } from '../../context/UserContext'
@@ -38,13 +40,12 @@ export function AccessTab({ cid }: AccessTabProps) {
   const { data: accesses = [], isLoading: accessLoading } = useCollectionAccessQuery(cid)
   const { data: invites = [], isLoading: invitesLoading } = useCollectionInvitesQuery(cid)
   const { data: packs = [] } = useCollectionPacksQuery(cid)
+  const { data: sentNotifications = [] } = useCollectionNotificationsQuery(cid)
   const sendInviteMutation = useSendInviteMutation(cid)
   const cancelInviteMutation = useCancelInviteMutation(cid)
-  const addPackOpensMutation = useAddPackOpensMutation(cid)
 
   const [emailInput, setEmailInput] = useState('')
-  const [packOpensDialog, setPackOpensDialog] = useState<{ email: string; pack: CollectionPack; currentOpens: number | undefined } | null>(null)
-  const [packOpensInput, setPackOpensInput] = useState(1)
+  const [packOpensDialog, setPackOpensDialog] = useState<BonusPackTarget | null>(null)
 
   const accessBonusPacks = useMemo(
     () => packs.filter((pack) => pack.category !== 'daily' && pack.distribution !== 'all_with_access'),
@@ -95,32 +96,7 @@ export function AccessTab({ cid }: AccessTabProps) {
   }
 
   function openPackOpensDialog(email: string, pack: CollectionPack, currentOpens: number | undefined) {
-    setPackOpensInput(1)
     setPackOpensDialog({ email, pack, currentOpens })
-  }
-
-  async function handleConfirmPackOpens() {
-    if (!packOpensDialog) return
-    const { email, pack } = packOpensDialog
-    try {
-      await addPackOpensMutation.mutateAsync({ email, packId: pack.id, opens: packOpensInput })
-      toast.success('Brindes atualizados.')
-      setPackOpensDialog(null)
-    } catch (error) {
-      toast.error((error as Error).message || 'Erro ao atualizar brindes.')
-    }
-  }
-
-  async function handleRemovePackAccess() {
-    if (!packOpensDialog) return
-    const { email, pack } = packOpensDialog
-    try {
-      await addPackOpensMutation.mutateAsync({ email, packId: pack.id, opens: 0 })
-      toast.success('Acesso ao brinde removido.')
-      setPackOpensDialog(null)
-    } catch (error) {
-      toast.error((error as Error).message || 'Erro ao remover brinde.')
-    }
   }
 
   const isLoading = accessLoading || invitesLoading
@@ -246,7 +222,6 @@ export function AccessTab({ cid }: AccessTabProps) {
                               key={pack.id}
                               label={label}
                               onClick={() => openPackOpensDialog(a.email, pack, opens)}
-                              disabled={addPackOpensMutation.isPending}
                               sx={{
                                 maxWidth: '100%', height: 28, borderRadius: radius.full, fontSize: '0.72rem', fontWeight: 800,
                                 color: selected ? '#fff' : pack.accent,
@@ -266,43 +241,44 @@ export function AccessTab({ cid }: AccessTabProps) {
             ))}
           </Stack>
         )}
+
+        {!isLoading && sentNotifications.length > 0 && (
+          <Stack spacing={1}>
+            <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.8, color: colors.text.muted, textTransform: 'uppercase', px: 0.5 }}>
+              Avisos enviados
+            </Typography>
+            {sentNotifications.map((notification) => (
+              <Card key={notification.id} sx={{ p: 1.6 }}>
+                <Stack spacing={0.8}>
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <Typography sx={{ flex: 1, fontSize: '0.82rem', fontWeight: 800, color: colors.text.primary }}>
+                      {notification.kind === 'release'
+                        ? `🚀 Lançamento de ${Number(notification.payload.noteCount ?? 0)} bilhete${Number(notification.payload.noteCount ?? 0) === 1 ? '' : 's'}`
+                        : `🎁 ${Number(notification.payload.opens ?? 0)}x ${String(notification.payload.packEmoji ?? '')} ${String(notification.payload.packName ?? 'pacotinho')}`}
+                    </Typography>
+                    <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: colors.text.muted, flexShrink: 0 }}>
+                      {new Date(notification.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
+                    </Typography>
+                  </Stack>
+                  {notification.message && (
+                    <Typography sx={{ fontSize: '0.78rem', color: colors.text.secondary, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>
+                      {notification.message}
+                    </Typography>
+                  )}
+                  <Stack direction="row" spacing={0.6} sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
+                    <Chip label={`${notification.readersNotified} leitor${notification.readersNotified === 1 ? '' : 'es'}`} size="small" sx={{ height: 20, fontSize: '0.64rem', fontWeight: 800, background: 'rgba(0,0,0,0.05)', color: colors.text.secondary }} />
+                    {notification.channels.inApp && <Chip label="💌 app" size="small" sx={{ height: 20, fontSize: '0.64rem', fontWeight: 800, background: `${colors.primary.main}12`, color: colors.primary.main }} />}
+                    {notification.channels.push && <Chip label="🔔 push" size="small" sx={{ height: 20, fontSize: '0.64rem', fontWeight: 800, background: `${colors.primary.main}12`, color: colors.primary.main }} />}
+                    {notification.channels.email && <Chip label="✉️ email" size="small" sx={{ height: 20, fontSize: '0.64rem', fontWeight: 800, background: `${colors.primary.main}12`, color: colors.primary.main }} />}
+                  </Stack>
+                </Stack>
+              </Card>
+            ))}
+          </Stack>
+        )}
       </Stack>
 
-      <Dialog open={!!packOpensDialog} onClose={() => setPackOpensDialog(null)} maxWidth="xs" fullWidth slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'rgba(255,253,251,0.98)' } } }}>
-        <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, pb: 0.5 }}>
-          {packOpensDialog ? `${packOpensDialog.pack.emoji} ${packOpensDialog.pack.name}` : ''}
-        </DialogTitle>
-        <DialogContent sx={{ pt: 1 }}>
-          <Stack spacing={1.5}>
-            {packOpensDialog?.currentOpens !== undefined && (
-              <Typography sx={{ fontSize: '0.82rem', color: colors.text.secondary }}>
-                Aberturas atuais: <strong>{packOpensDialog.currentOpens}</strong>
-              </Typography>
-            )}
-            <TextField
-              label="Quantas aberturas adicionar"
-              type="number"
-              value={packOpensInput}
-              onChange={(e) => setPackOpensInput(Math.max(1, Number(e.target.value)))}
-              inputProps={{ min: 1 }}
-              fullWidth
-              size="small"
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: radius.lg } }}
-            />
-          </Stack>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2.5, gap: 1, flexWrap: 'wrap' }}>
-          {packOpensDialog?.currentOpens !== undefined && (
-            <Button variant="ghost" loading={addPackOpensMutation.isPending} onClick={handleRemovePackAccess} sx={{ flex: '1 1 100%', color: 'error.main' }}>
-              Remover brinde
-            </Button>
-          )}
-          <Button variant="ghost" onClick={() => setPackOpensDialog(null)} sx={{ flex: 1 }}>Cancelar</Button>
-          <Button variant="primary" loading={addPackOpensMutation.isPending} disabled={packOpensInput < 1 || addPackOpensMutation.isPending} onClick={handleConfirmPackOpens} sx={{ flex: 1 }}>
-            Adicionar
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <BonusPackDialog cid={cid} target={packOpensDialog} onClose={() => setPackOpensDialog(null)} />
     </>
   )
 }

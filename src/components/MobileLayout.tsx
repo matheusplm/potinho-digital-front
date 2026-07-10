@@ -3,6 +3,7 @@ import Inventory2Icon from '@mui/icons-material/Inventory2'
 import AutoStoriesOutlinedIcon from '@mui/icons-material/AutoStoriesOutlined'
 import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
+import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone'
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import StopCircleOutlinedIcon from '@mui/icons-material/StopCircleOutlined'
 import { Box, Tooltip, Typography } from '@mui/material'
@@ -17,7 +18,7 @@ import { useUser } from '../context/UserContext'
 import { useSimulation } from '../context/SimulationContext'
 import { useReader } from '../context/ReaderContext'
 import { useBackground } from '../context/BackgroundContext'
-import { useCollectionsQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
+import { useCollectionsQuery, useMyNotificationsQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
 import { slugify } from '../utils/slug'
 import { isCollectionReader } from '../utils/collectionAccess'
 import { colors, radius } from '../design-system'
@@ -53,6 +54,9 @@ export function MobileLayout() {
   }, [isReader, collections, activeCollectionId, user?.id])
   const readerAlbumPath = readerActive ? `/colecoes/${slugify(readerActive.name)}` : '/home'
 
+  const { data: myNotifications = [] } = useMyNotificationsQuery({ enabled: isReader })
+  const hasUnreadNotifications = useMemo(() => myNotifications.some((n) => !n.readAt), [myNotifications])
+
   const { data: readerAch } = useReaderAchievementsQuery(readerActive?.id ?? '', { enabled: isReader && !!readerActive })
   const justUnlockedKey = (readerAch?.justUnlocked ?? []).join(',')
   useEffect(() => {
@@ -72,6 +76,7 @@ export function MobileLayout() {
         { label: 'Coleção', path: readerAlbumPath, icon: <AutoStoriesOutlinedIcon /> },
         { label: 'Conquistas', path: '/conquistas', icon: <EmojiEventsOutlinedIcon /> },
         { label: 'Favoritas', path: '/favoritas', icon: <FavoriteBorderIcon /> },
+        { label: 'Novidades', path: '/notificacoes', icon: <NotificationsNoneIcon /> },
       ]
     }
     if (persona !== 'writer') {
@@ -130,7 +135,8 @@ export function MobileLayout() {
             const active = navValue === item.path
             const isEnd = item.action === 'end-simulation'
             const showUnreadDot =
-              item.label === 'Coleção' && ((isActive && hasUnreadNotes) || (isReader && readerHasUnread))
+              (item.label === 'Coleção' && ((isActive && hasUnreadNotes) || (isReader && readerHasUnread))) ||
+              (item.label === 'Novidades' && hasUnreadNotifications)
             const navBox = (
               <Box
                 key={item.path + item.label}

@@ -214,9 +214,11 @@ export function drawReward(
   owned: Set<string>,
   obtainedAt: Record<string, string>,
 ): PackReward {
+  const liveNotes = notes.filter((note) => !note.disabledAt && note.status !== 'preview')
+  const drawable = liveNotes.length > 0 ? liveNotes : notes
   const rarity = weightedRandomRarity(rarities)
-  const pool = notes.filter((note) => note.rarity === rarity)
-  const source = pool.length > 0 ? pool : notes
+  const pool = drawable.filter((note) => note.rarity === rarity)
+  const source = pool.length > 0 ? pool : drawable
   const selected = source[Math.floor(Math.random() * source.length)]
   const isNew = !owned.has(selected.id)
   if (isNew) {
