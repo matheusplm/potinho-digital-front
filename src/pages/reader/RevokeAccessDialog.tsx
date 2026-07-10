@@ -29,6 +29,9 @@ export function RevokeAccessDialog({ open, email, isPending, onClose, onRevoke }
       </DialogTitle>
       <DialogContent sx={{ pt: 1 }}>
         <Stack spacing={1.5}>
+          <Typography sx={{ fontSize: '0.82rem', color: colors.text.secondary, lineHeight: 1.6 }}>
+            O leitor perde acesso imediatamente. Os bilhetes já coletados, favoritos e conquistas continuam guardados e voltam a aparecer normalmente se ele for convidado de novo.
+          </Typography>
           <Typography sx={{ fontSize: '0.84rem', color: colors.text.secondary }}>
             Para confirmar, digite o email do leitor:
           </Typography>
