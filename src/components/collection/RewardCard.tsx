@@ -1,14 +1,14 @@
 import { Box, Chip, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { cardIn, colors, font, radius } from '../../design-system'
-import { gradientTextSx } from '../../utils/colorUtils'
+import { gradientTextSx, themedCardBg } from '../../utils/colorUtils'
 import type { CollectionDailyReward, NoteImageLayout, NoteTypeConfig, RarityConfig } from '../../types/note'
 
 export type { NoteImageLayout as ImageLayout } from '../../types/note'
 
 const rarityShine = keyframes`0%{transform:translateX(-140%) rotate(18deg);opacity:0}20%{opacity:.55}55%,100%{transform:translateX(160%) rotate(18deg);opacity:0}`
 
-export function rarityCardSx(r?: RarityConfig, compact = false) {
+export function rarityCardSx(r?: RarityConfig, compact = false, isDark = false) {
   const glow = r?.glowColor || r?.borderColor || 'rgba(244,63,94,0.2)'
   return {
     p: compact ? 1.8 : 2.5,
@@ -16,7 +16,7 @@ export function rarityCardSx(r?: RarityConfig, compact = false) {
     position: 'relative',
     overflow: 'hidden',
     isolation: 'isolate',
-    background: r?.cardBg ?? colors.surface.base,
+    background: themedCardBg(r?.cardBg ?? colors.surface.base, isDark),
     border: `1.5px solid ${r?.borderColor ?? colors.border.subtle}`,
     boxShadow: r ? `${r.shadow || '0 4px 20px rgba(0,0,0,0.08)'}, 0 0 34px ${glow}` : '0 4px 20px rgba(0,0,0,0.08)',
     transition: 'transform 0.22s ease, box-shadow 0.22s ease',

@@ -4,6 +4,7 @@ import { Box, Chip, IconButton, Stack, Typography } from '@mui/material'
 import { Card } from '../ui'
 import { colors, font, radius } from '../../design-system'
 import { gradientTextSx } from '../../utils/colorUtils'
+import { useBackground } from '../../context/BackgroundContext'
 import { RewardCard, rarityCardSx } from './RewardCard'
 import type { CollectionNoteView, NoteTypeConfig, RarityConfig } from '../../types/note'
 
@@ -13,11 +14,12 @@ export function NoteCard({ note, r, t, unread, variant, onSelect, onToggleFavori
   onSelect: (note: CollectionNoteView) => void
   onToggleFavorite: (note: CollectionNoteView) => void
 }) {
+  const { theme } = useBackground()
   const grid = variant === 'grid'
 
   if (!note.owned) {
     return (
-      <Card accent={r?.borderColor} sx={{ ...(rarityCardSx(r, true) as object), height: grid ? '100%' : undefined, opacity: 0.72, cursor: 'default' }}>
+      <Card accent={r?.borderColor} sx={{ ...(rarityCardSx(r, true, theme.isDark) as object), height: grid ? '100%' : undefined, opacity: 0.72, cursor: 'default' }}>
         <Box sx={{ position: 'relative', minWidth: 0, height: '100%', p: 1, borderRadius: radius.lg, background: 'rgba(255,255,255,0.68)', border: '1px solid rgba(255,255,255,0.58)', backdropFilter: 'blur(8px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: 52 }}>
           <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.4, flexWrap: 'wrap', rowGap: 0.4 }}>
             {r && <Chip size="small" label={`${r.emoji} ${r.label}`} sx={{ height: 19, fontSize: '0.70rem', fontWeight: 800, background: r.chipBg, border: `1px solid ${r.borderColor}`, '& .MuiChip-label': { px: 0.8, ...gradientTextSx(r.chipColor) } }} />}
@@ -49,7 +51,7 @@ export function NoteCard({ note, r, t, unread, variant, onSelect, onToggleFavori
   }
 
   return (
-    <Card accent={r?.borderColor} onClick={() => onSelect(note)} sx={{ ...(rarityCardSx(r, true) as object), cursor: 'pointer', height: grid ? '100%' : undefined }}>
+    <Card accent={r?.borderColor} onClick={() => onSelect(note)} sx={{ ...(rarityCardSx(r, true, theme.isDark) as object), cursor: 'pointer', height: grid ? '100%' : undefined }}>
       <Box sx={{ position: 'relative', zIndex: 1, height: '100%' }}>
         {unread && (
           <Box sx={{ position: 'absolute', top: -2, left: -2, width: 11, height: 11, zIndex: 3, borderRadius: radius.full, background: colors.rose.main, boxShadow: `0 0 0 3px rgba(255,255,255,0.82), 0 0 14px ${colors.rose.glow}` }} />

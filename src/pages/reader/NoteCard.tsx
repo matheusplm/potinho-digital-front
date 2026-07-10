@@ -2,6 +2,8 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { colors, radius } from '../../design-system'
+import { themedCardBg } from '../../utils/colorUtils'
+import { useBackground } from '../../context/BackgroundContext'
 import type { CollectionNoteView, RarityConfig } from '../../types/note'
 
 const rarityShine = keyframes`
@@ -10,7 +12,7 @@ const rarityShine = keyframes`
   100% { left: 105%; opacity: 0 }
 `
 
-export function rarityCardSx(r?: RarityConfig, compact = false) {
+export function rarityCardSx(r?: RarityConfig, compact = false, isDark = false) {
   const glow = r?.glowColor || r?.borderColor || 'rgba(244,63,94,0.2)'
   return {
     p: compact ? 1.4 : 2,
@@ -18,7 +20,7 @@ export function rarityCardSx(r?: RarityConfig, compact = false) {
     position: 'relative',
     overflow: 'hidden',
     isolation: 'isolate',
-    background: r?.cardBg ?? colors.surface.base,
+    background: themedCardBg(r?.cardBg ?? colors.surface.base, isDark),
     border: `1.5px solid ${r?.borderColor ?? colors.border.subtle}`,
     boxShadow: r
       ? `${r.shadow || '0 4px 20px rgba(0,0,0,0.08)'}, 0 0 28px ${glow}`
@@ -59,8 +61,9 @@ export function rarityCardSx(r?: RarityConfig, compact = false) {
 }
 
 export function NoteCard({ note, rarity, onClick }: { note: CollectionNoteView; rarity?: RarityConfig; onClick: () => void }) {
+  const { theme } = useBackground()
   return (
-    <Box onClick={onClick} sx={rarityCardSx(rarity)}>
+    <Box onClick={onClick} sx={rarityCardSx(rarity, false, theme.isDark)}>
       <Box sx={{ position: 'relative', zIndex: 1 }}>
         <Stack spacing={0.8}>
           <Stack direction="row" alignItems="flex-start" justifyContent="space-between" spacing={0.5}>
@@ -92,8 +95,9 @@ export function NoteCard({ note, rarity, onClick }: { note: CollectionNoteView; 
 }
 
 export function NoteRow({ note, rarity, onClick }: { note: CollectionNoteView; rarity?: RarityConfig; onClick: () => void }) {
+  const { theme } = useBackground()
   return (
-    <Box onClick={onClick} sx={{ ...rarityCardSx(rarity, true), py: 1, px: 1.4 }}>
+    <Box onClick={onClick} sx={{ ...rarityCardSx(rarity, true, theme.isDark), py: 1, px: 1.4 }}>
       <Box sx={{ position: 'relative', zIndex: 1 }}>
         <Stack direction="row" alignItems="center" spacing={1.2}>
           {rarity && (

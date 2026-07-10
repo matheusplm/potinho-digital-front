@@ -22,7 +22,7 @@ import { useConfirmDelete } from '../../hooks/useConfirmDelete'
 import { useJsonImport } from '../../hooks/useJsonImport'
 import { colors, font, radius } from '../../design-system'
 import { useBackground } from '../../context/BackgroundContext'
-import { gradientTextSx } from '../../utils/colorUtils'
+import { gradientTextSx, themedCardBg } from '../../utils/colorUtils'
 import type { NoteRecord } from '../../types/note'
 import { actionButtonSx } from './shared'
 import { NoteDialog } from './NoteDialog'
@@ -509,7 +509,7 @@ export function NotesTab({ cid }: NotesTabProps) {
           return (
             <Card key={note.id} accent={r?.borderColor} onClick={() => setViewingNote(note)} sx={{
               p: 0, overflow: 'hidden', position: 'relative', cursor: 'pointer',
-              background: r?.cardBg ?? colors.surface.base,
+              background: themedCardBg(r?.cardBg ?? colors.surface.base, theme.isDark),
               border: `1.5px solid ${r?.borderColor ?? colors.border.subtle}`,
               boxShadow: r?.glowColor ? `${r.shadow}, 0 0 26px ${r.glowColor}` : r?.shadow,
               '&::before': r ? {
