@@ -116,10 +116,26 @@ export function useUpdateCollectionNoteMutation(cid: string) {
   })
 }
 
-export function useDeleteCollectionNoteMutation(cid: string) {
+export function useDisableCollectionNoteMutation(cid: string) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (id: string) => api.deleteCollectionNote(cid, id),
+    mutationFn: (id: string) => api.disableCollectionNote(cid, id),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.notes(cid) }) },
+  })
+}
+
+export function useRestoreCollectionNoteMutation(cid: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => api.restoreCollectionNote(cid, id),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.notes(cid) }) },
+  })
+}
+
+export function usePermanentlyDeleteCollectionNoteMutation(cid: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => api.permanentlyDeleteCollectionNote(cid, id),
     onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.notes(cid) }) },
   })
 }

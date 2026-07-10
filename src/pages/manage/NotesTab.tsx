@@ -1,6 +1,7 @@
 import AddIcon from '@mui/icons-material/Add'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
+import ReplayIcon from '@mui/icons-material/Replay'
 import SearchIcon from '@mui/icons-material/Search'
 import CloseIcon from '@mui/icons-material/Close'
 import ViewAgendaIcon from '@mui/icons-material/ViewAgenda'
@@ -8,12 +9,13 @@ import ViewListIcon from '@mui/icons-material/ViewList'
 import DensitySmallIcon from '@mui/icons-material/DensitySmall'
 import { Box, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, TextField, Typography } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Card, ConfirmDeleteDialog, LoadingState, SegmentedControl } from '../../components/ui'
+import { Button, Card, ConfirmDeleteDialog, Input, LoadingState, SegmentedControl, toast } from '../../components/ui'
 import { NoteDetailDialog, type ReadableNote } from '../../components/collection/NoteDetailDialog'
 import { RewardCard } from '../../components/collection/RewardCard'
 import {
   useCollectionNotesQuery, useCollectionRaritiesQuery, useCollectionTypesQuery,
-  useDeleteCollectionNoteMutation, useImportCollectionNotesMutation,
+  useDisableCollectionNoteMutation, useRestoreCollectionNoteMutation, usePermanentlyDeleteCollectionNoteMutation,
+  useImportCollectionNotesMutation,
 } from '../../hooks/useNotes'
 import { useConfirmDelete } from '../../hooks/useConfirmDelete'
 import { useJsonImport } from '../../hooks/useJsonImport'
@@ -61,7 +63,9 @@ export function NotesTab({ cid }: NotesTabProps) {
   const { data: notes = [], isLoading: notesLoading } = useCollectionNotesQuery(cid)
   const { data: rarities = [] } = useCollectionRaritiesQuery(cid)
   const { data: types = [] } = useCollectionTypesQuery(cid)
-  const deleteNote = useDeleteCollectionNoteMutation(cid)
+  const disableNote = useDisableCollectionNoteMutation(cid)
+  const restoreNote = useRestoreCollectionNoteMutation(cid)
+  const permanentlyDeleteNote = usePermanentlyDeleteCollectionNoteMutation(cid)
   const importNotes = useImportCollectionNotesMutation(cid)
 
   const [search, setSearch] = useState('')
@@ -73,8 +77,13 @@ export function NotesTab({ cid }: NotesTabProps) {
   const [editingNote, setEditingNote] = useState<NoteRecord | null>(null)
   const [viewingNote, setViewingNote] = useState<ReadableNote | null>(null)
   const [importDialogOpen, setImportDialogOpen] = useState(false)
+  const [purgeConfirmInput, setPurgeConfirmInput] = useState('')
 
-  const noteDelete = useConfirmDelete<NoteRecord>(deleteNote, { success: 'Bilhete removido.', error: 'Erro ao remover bilhete.' })
+  const activeNotes = useMemo(() => notes.filter((n) => !n.disabledAt), [notes])
+  const trashedNotes = useMemo(() => notes.filter((n) => n.disabledAt), [notes])
+
+  const noteDisable = useConfirmDelete<NoteRecord>(disableNote, { success: 'Bilhete movido para a lixeira.', error: 'Erro ao desativar bilhete.' })
+  const notePurge = useConfirmDelete<NoteRecord>(permanentlyDeleteNote, { success: 'Bilhete excluído permanentemente.', error: 'Erro ao excluir bilhete.' })
   const noteImport = useJsonImport(
     importNotes,
     (r) => r.created === 0
@@ -86,11 +95,20 @@ export function NotesTab({ cid }: NotesTabProps) {
     DEFAULT_IMPORT_JSON,
   )
 
+  async function handleRestore(note: NoteRecord) {
+    try {
+      await restoreNote.mutateAsync(note.id)
+      toast.success(`"${note.title}" voltou a ficar disponível.`)
+    } catch (e) {
+      toast.error((e as Error).message || 'Erro ao restaurar bilhete.')
+    }
+  }
+
   const filteredNotes = useMemo(() => {
     const q = search.trim().toLowerCase()
     const rarityOrder = new Map(rarities.map((r) => [r.id, r.order]))
     const typeOrder = new Map(types.map((t) => [t.id, t.order]))
-    const filtered = notes.filter((note) =>
+    const filtered = activeNotes.filter((note) =>
       (rarityFilter === 'all' || note.rarity === rarityFilter) &&
       (q === '' || note.title.toLowerCase().includes(q) || note.message.toLowerCase().includes(q)),
     )
@@ -101,7 +119,7 @@ export function NotesTab({ cid }: NotesTabProps) {
       if (noteSort === 'type') return (typeOrder.get(a.typeId) ?? 0) - (typeOrder.get(b.typeId) ?? 0) || a.title.localeCompare(b.title, 'pt-BR')
       return (b.createdAt ?? '').localeCompare(a.createdAt ?? '') || a.title.localeCompare(b.title, 'pt-BR')
     })
-  }, [noteSort, notes, rarities, rarityFilter, search, types])
+  }, [noteSort, activeNotes, rarities, rarityFilter, search, types])
 
   const visibleNotes = useMemo(() => filteredNotes.slice(0, visibleNoteCount), [filteredNotes, visibleNoteCount])
 
@@ -114,7 +132,8 @@ export function NotesTab({ cid }: NotesTabProps) {
       <Stack spacing={1.5}>
         <Stack spacing={1}>
           <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted, fontWeight: 600 }}>
-            {notes.length} bilhete{notes.length !== 1 ? 's' : ''}
+            {activeNotes.length} bilhete{activeNotes.length !== 1 ? 's' : ''}
+            {trashedNotes.length > 0 && ` · ${trashedNotes.length} na lixeira`}
           </Typography>
           <Stack direction="row" spacing={0.8} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.8 }}>
             <Box sx={{ flex: '1 1 260px', minWidth: 230 }}>
@@ -129,7 +148,7 @@ export function NotesTab({ cid }: NotesTabProps) {
           </Stack>
         </Stack>
 
-        {notes.length > 0 && (
+        {activeNotes.length > 0 && (
           <Stack spacing={1}>
             <Box sx={{
               display: 'flex', alignItems: 'center', gap: 1, px: 1.4, py: 0.7,
@@ -192,7 +211,7 @@ export function NotesTab({ cid }: NotesTabProps) {
 
         {notesLoading && <LoadingState compact label="Carregando bilhetes" accent={theme.accent} textColor={theme.textOnBg} mutedColor={theme.textOnBgMuted} />}
 
-        {!notesLoading && notes.length === 0 && (
+        {!notesLoading && activeNotes.length === 0 && (
           <Box sx={{ textAlign: 'center', py: 4 }}>
             <Typography sx={{ fontFamily: font.serif, fontSize: '1rem', fontWeight: 700, color: theme.textOnBg, mb: 0.5 }}>
               Nenhum bilhete ainda
@@ -201,7 +220,7 @@ export function NotesTab({ cid }: NotesTabProps) {
           </Box>
         )}
 
-        {!notesLoading && notes.length > 0 && filteredNotes.length === 0 && (
+        {!notesLoading && activeNotes.length > 0 && filteredNotes.length === 0 && (
           <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBgMuted, textAlign: 'center', py: 3 }}>
             Nenhum bilhete com esses filtros
           </Typography>
@@ -233,7 +252,7 @@ export function NotesTab({ cid }: NotesTabProps) {
                     <IconButton size="small" aria-label="editar bilhete" onClick={(e) => { e.stopPropagation(); setEditingNote(note); setNoteDialog(true) }} sx={{ ...actionButtonSx('primary'), width: 28, height: 28 }}>
                       <EditOutlinedIcon sx={{ fontSize: 14 }} />
                     </IconButton>
-                    <IconButton size="small" aria-label="excluir bilhete" onClick={(e) => { e.stopPropagation(); noteDelete.setTarget(note) }} sx={{ ...actionButtonSx('danger'), width: 28, height: 28 }}>
+                    <IconButton size="small" aria-label="desativar bilhete" onClick={(e) => { e.stopPropagation(); noteDisable.setTarget(note) }} sx={{ ...actionButtonSx('danger'), width: 28, height: 28 }}>
                       <DeleteForeverOutlinedIcon sx={{ fontSize: 14 }} />
                     </IconButton>
                   </Stack>
@@ -288,7 +307,7 @@ export function NotesTab({ cid }: NotesTabProps) {
                         <IconButton size="small" aria-label="editar bilhete" onClick={(e) => { e.stopPropagation(); setEditingNote(note); setNoteDialog(true) }} sx={actionButtonSx('primary')}>
                           <EditOutlinedIcon sx={{ fontSize: 16 }} />
                         </IconButton>
-                        <IconButton size="small" aria-label="excluir bilhete" onClick={(e) => { e.stopPropagation(); noteDelete.setTarget(note) }} sx={actionButtonSx('danger')}>
+                        <IconButton size="small" aria-label="desativar bilhete" onClick={(e) => { e.stopPropagation(); noteDisable.setTarget(note) }} sx={actionButtonSx('danger')}>
                           <DeleteForeverOutlinedIcon sx={{ fontSize: 16 }} />
                         </IconButton>
                       </Stack>
@@ -310,7 +329,7 @@ export function NotesTab({ cid }: NotesTabProps) {
                   <IconButton size="small" aria-label="editar bilhete" onClick={(e) => { e.stopPropagation(); setEditingNote(note); setNoteDialog(true) }} sx={{ ...actionButtonSx('primary'), backdropFilter: 'blur(8px)' }}>
                     <EditOutlinedIcon sx={{ fontSize: 16 }} />
                   </IconButton>
-                  <IconButton size="small" aria-label="excluir bilhete" onClick={(e) => { e.stopPropagation(); noteDelete.setTarget(note) }} sx={{ ...actionButtonSx('danger'), backdropFilter: 'blur(8px)' }}>
+                  <IconButton size="small" aria-label="desativar bilhete" onClick={(e) => { e.stopPropagation(); noteDisable.setTarget(note) }} sx={{ ...actionButtonSx('danger'), backdropFilter: 'blur(8px)' }}>
                     <DeleteForeverOutlinedIcon sx={{ fontSize: 16 }} />
                   </IconButton>
                 </Stack>
@@ -336,7 +355,7 @@ export function NotesTab({ cid }: NotesTabProps) {
                     <IconButton size="small" aria-label="editar bilhete" onClick={(e) => { e.stopPropagation(); setEditingNote(note); setNoteDialog(true) }} sx={actionButtonSx('primary')}>
                       <EditOutlinedIcon sx={{ fontSize: 16 }} />
                     </IconButton>
-                    <IconButton size="small" aria-label="excluir bilhete" onClick={(e) => { e.stopPropagation(); noteDelete.setTarget(note) }} sx={actionButtonSx('danger')}>
+                    <IconButton size="small" aria-label="desativar bilhete" onClick={(e) => { e.stopPropagation(); noteDisable.setTarget(note) }} sx={actionButtonSx('danger')}>
                       <DeleteForeverOutlinedIcon sx={{ fontSize: 16 }} />
                     </IconButton>
                   </Stack>
@@ -373,6 +392,38 @@ export function NotesTab({ cid }: NotesTabProps) {
             Mostrar mais {Math.min(NOTE_PAGE_SIZE, filteredNotes.length - visibleNotes.length)} bilhetes
           </Button>
         )}
+
+        {trashedNotes.length > 0 && (
+          <Box sx={{ mt: 1.5, p: 1.4, borderRadius: radius.lg, border: `1.5px dashed ${colors.border.medium}`, background: 'rgba(255,255,255,0.35)' }}>
+            <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, letterSpacing: 0.6, color: theme.textOnBgMuted, textTransform: 'uppercase', mb: 1 }}>
+              🗑️ Lixeira
+            </Typography>
+            <Stack spacing={0.8}>
+              {trashedNotes.map((note) => (
+                <Card key={note.id} sx={{ p: 1.2, opacity: 0.8 }}>
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.86rem', color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {note.title}
+                      </Typography>
+                      {(note.timesCollected ?? 0) > 0 && (
+                        <Typography sx={{ fontSize: '0.68rem', color: colors.text.muted }}>
+                          {note.timesCollected} leitor{note.timesCollected === 1 ? '' : 'es'} já {note.timesCollected === 1 ? 'tem' : 'têm'} este bilhete
+                        </Typography>
+                      )}
+                    </Box>
+                    <Button variant="ghost" loading={restoreNote.isPending} onClick={() => void handleRestore(note)} sx={{ py: 0.5, px: 1, fontSize: '0.72rem', flexShrink: 0 }}>
+                      <ReplayIcon sx={{ fontSize: 14, mr: 0.3 }} /> Restaurar
+                    </Button>
+                    <IconButton size="small" aria-label="excluir permanentemente" onClick={() => { setPurgeConfirmInput(''); notePurge.setTarget(note) }} sx={{ ...actionButtonSx('danger'), flexShrink: 0 }}>
+                      <DeleteForeverOutlinedIcon sx={{ fontSize: 16 }} />
+                    </IconButton>
+                  </Stack>
+                </Card>
+              ))}
+            </Stack>
+          </Box>
+        )}
       </Stack>
 
       <Dialog open={importDialogOpen} onClose={() => setImportDialogOpen(false)} maxWidth="sm" fullWidth slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'rgba(255,253,251,0.98)' } } }}>
@@ -407,7 +458,48 @@ export function NotesTab({ cid }: NotesTabProps) {
 
       <NoteDialog open={noteDialog} editing={editingNote} rarities={rarities} types={types} cid={cid} onClose={() => { setNoteDialog(false); setEditingNote(null) }} />
       <NoteDetailDialog note={viewingNote} rarities={rarities} types={types} onClose={() => setViewingNote(null)} />
-      <ConfirmDeleteDialog open={noteDelete.isOpen} title={`Excluir o bilhete "${noteDelete.target?.title ?? ''}"?`} isPending={noteDelete.isPending} onConfirm={noteDelete.confirm} onClose={noteDelete.close} />
+
+      <ConfirmDeleteDialog
+        open={noteDisable.isOpen}
+        title={`Desativar o bilhete "${noteDisable.target?.title ?? ''}"?`}
+        description={
+          (noteDisable.target?.timesCollected ?? 0) > 0
+            ? `${noteDisable.target?.timesCollected} leitor${noteDisable.target?.timesCollected === 1 ? '' : 'es'} já ${noteDisable.target?.timesCollected === 1 ? 'tem' : 'têm'} este bilhete e não serão afetados. Ele só para de ser sorteado para novos leitores e vai para a lixeira, de onde dá para restaurar depois.`
+            : 'Ele para de ser sorteado e vai para a lixeira, de onde dá para restaurar depois.'
+        }
+        confirmLabel="Desativar"
+        isPending={noteDisable.isPending}
+        onConfirm={noteDisable.confirm}
+        onClose={noteDisable.close}
+      />
+
+      <ConfirmDeleteDialog
+        open={notePurge.isOpen}
+        title="Excluir permanentemente?"
+        description={
+          <Stack spacing={1.2}>
+            {(notePurge.target?.timesCollected ?? 0) > 0 && (
+              <Typography sx={{ fontSize: '0.86rem', color: colors.text.primary, fontWeight: 700 }}>
+                ⚠️ {notePurge.target?.timesCollected} leitor{notePurge.target?.timesCollected === 1 ? '' : 'es'} já {notePurge.target?.timesCollected === 1 ? 'tem' : 'têm'} este bilhete. Ele vai sumir do álbum dessas pessoas também.
+              </Typography>
+            )}
+            <Typography sx={{ fontSize: '0.85rem', color: colors.text.secondary, lineHeight: 1.6 }}>
+              Isso é permanente e não pode ser desfeito. Para confirmar, digite o título exato do bilhete:
+            </Typography>
+            <Input
+              placeholder={notePurge.target?.title ?? ''}
+              value={purgeConfirmInput}
+              onChange={(e) => setPurgeConfirmInput(e.target.value)}
+              sx={{ '& .MuiOutlinedInput-root': { fontSize: '0.86rem' }, '& input': { py: 0.9 } }}
+            />
+          </Stack>
+        }
+        confirmLabel="Excluir para sempre"
+        confirmDisabled={purgeConfirmInput.trim().toLowerCase() !== (notePurge.target?.title ?? '').trim().toLowerCase()}
+        isPending={notePurge.isPending}
+        onConfirm={notePurge.confirm}
+        onClose={() => { notePurge.close(); setPurgeConfirmInput('') }}
+      />
     </>
   )
 }
