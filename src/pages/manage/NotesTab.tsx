@@ -25,6 +25,7 @@ import { gradientTextSx } from '../../utils/colorUtils'
 import type { NoteRecord } from '../../types/note'
 import { actionButtonSx } from './shared'
 import { NoteDialog } from './NoteDialog'
+import { ReleaseDialog } from './ReleaseDialog'
 
 type NoteSort = 'newest' | 'oldest' | 'az' | 'rarity' | 'type'
 type NoteView = 'cards' | 'list' | 'compact'
@@ -78,9 +79,24 @@ export function NotesTab({ cid }: NotesTabProps) {
   const [viewingNote, setViewingNote] = useState<ReadableNote | null>(null)
   const [importDialogOpen, setImportDialogOpen] = useState(false)
   const [purgeConfirmInput, setPurgeConfirmInput] = useState('')
+  const [selectedDraftIds, setSelectedDraftIds] = useState<string[]>([])
+  const [releaseDialogOpen, setReleaseDialogOpen] = useState(false)
 
-  const activeNotes = useMemo(() => notes.filter((n) => !n.disabledAt), [notes])
+  const activeNotes = useMemo(() => notes.filter((n) => !n.disabledAt && n.status !== 'preview'), [notes])
+  const draftNotes = useMemo(() => notes.filter((n) => !n.disabledAt && n.status === 'preview'), [notes])
   const trashedNotes = useMemo(() => notes.filter((n) => n.disabledAt), [notes])
+
+  useEffect(() => {
+    setSelectedDraftIds((current) => current.filter((id) => draftNotes.some((n) => n.id === id)))
+  }, [draftNotes])
+
+  const selectedDrafts = useMemo(
+    () => draftNotes.filter((n) => selectedDraftIds.includes(n.id)),
+    [draftNotes, selectedDraftIds],
+  )
+
+  const toggleDraft = (id: string) =>
+    setSelectedDraftIds((current) => current.includes(id) ? current.filter((x) => x !== id) : [...current, id])
 
   const noteDisable = useConfirmDelete<NoteRecord>(disableNote, { success: 'Bilhete movido para a lixeira.', error: 'Erro ao desativar bilhete.' })
   const notePurge = useConfirmDelete<NoteRecord>(permanentlyDeleteNote, { success: 'Bilhete excluído permanentemente.', error: 'Erro ao excluir bilhete.' })
@@ -132,7 +148,8 @@ export function NotesTab({ cid }: NotesTabProps) {
       <Stack spacing={1.5}>
         <Stack spacing={1}>
           <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted, fontWeight: 600 }}>
-            {activeNotes.length} bilhete{activeNotes.length !== 1 ? 's' : ''}
+            {activeNotes.length} bilhete{activeNotes.length !== 1 ? 's' : ''} no ar
+            {draftNotes.length > 0 && ` · ${draftNotes.length} rascunho${draftNotes.length !== 1 ? 's' : ''}`}
             {trashedNotes.length > 0 && ` · ${trashedNotes.length} na lixeira`}
           </Typography>
           <Stack direction="row" spacing={0.8} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.8 }}>
@@ -147,6 +164,73 @@ export function NotesTab({ cid }: NotesTabProps) {
             </Button>
           </Stack>
         </Stack>
+
+        {draftNotes.length > 0 && (
+          <Box sx={{ p: 1.4, borderRadius: radius.lg, border: `1.5px dashed ${colors.primary.main}55`, background: 'rgba(255,255,255,0.42)', backdropFilter: 'blur(10px)' }}>
+            <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
+              <Typography sx={{ flex: 1, fontSize: '0.7rem', fontWeight: 800, letterSpacing: 0.6, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
+                🚧 Rascunhos ({draftNotes.length})
+              </Typography>
+              <Chip
+                label={selectedDraftIds.length === draftNotes.length ? 'Desmarcar todos' : 'Selecionar todos'}
+                size="small"
+                onClick={() => setSelectedDraftIds(selectedDraftIds.length === draftNotes.length ? [] : draftNotes.map((n) => n.id))}
+                sx={{ height: 24, fontSize: '0.68rem', fontWeight: 800, cursor: 'pointer', bgcolor: 'rgba(255,255,255,0.6)', color: colors.text.secondary }}
+              />
+            </Stack>
+            <Typography sx={{ fontSize: '0.7rem', color: theme.textOnBgMuted, mb: 1, lineHeight: 1.4 }}>
+              Rascunhos não aparecem pros leitores nem saem nos pacotinhos. Lance quando quiser, em quantos lotes quiser.
+            </Typography>
+            <Stack spacing={0.7}>
+              {draftNotes.map((note) => {
+                const selected = selectedDraftIds.includes(note.id)
+                const r = rarities.find((x) => x.id === note.rarity)
+                return (
+                  <Card key={note.id} onClick={() => toggleDraft(note.id)} sx={{
+                    p: 1.1, cursor: 'pointer',
+                    border: `1.5px solid ${selected ? colors.primary.main : colors.border.subtle}`,
+                    background: selected ? `${colors.primary.main}0e` : 'rgba(255,255,255,0.78)',
+                    transition: 'all 0.14s',
+                  }}>
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <Box sx={{
+                        width: 18, height: 18, borderRadius: 5, flexShrink: 0,
+                        border: `2px solid ${selected ? colors.primary.main : colors.border.medium}`,
+                        background: selected ? colors.primary.main : 'transparent',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.14s',
+                      }}>
+                        {selected && <Box component="span" sx={{ color: '#fff', fontSize: '0.62rem', lineHeight: 1, fontWeight: 900 }}>✓</Box>}
+                      </Box>
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.84rem', color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {r?.emoji} {note.title}
+                        </Typography>
+                        <Typography sx={{ fontSize: '0.7rem', color: colors.text.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {note.message}
+                        </Typography>
+                      </Box>
+                      <IconButton size="small" aria-label="editar rascunho" onClick={(e) => { e.stopPropagation(); setEditingNote(note); setNoteDialog(true) }} sx={{ ...actionButtonSx('primary'), width: 28, height: 28, flexShrink: 0 }}>
+                        <EditOutlinedIcon sx={{ fontSize: 14 }} />
+                      </IconButton>
+                      <IconButton size="small" aria-label="desativar rascunho" onClick={(e) => { e.stopPropagation(); noteDisable.setTarget(note) }} sx={{ ...actionButtonSx('danger'), width: 28, height: 28, flexShrink: 0 }}>
+                        <DeleteForeverOutlinedIcon sx={{ fontSize: 14 }} />
+                      </IconButton>
+                    </Stack>
+                  </Card>
+                )
+              })}
+            </Stack>
+            <Button
+              variant="primary"
+              fullWidth
+              disabled={selectedDraftIds.length === 0}
+              onClick={() => setReleaseDialogOpen(true)}
+              sx={{ mt: 1.2, py: 0.85, fontSize: '0.8rem' }}
+            >
+              🚀 Lançar {selectedDraftIds.length > 0 ? `${selectedDraftIds.length} selecionado${selectedDraftIds.length === 1 ? '' : 's'}` : 'bilhetes'}
+            </Button>
+          </Box>
+        )}
 
         {activeNotes.length > 0 && (
           <Stack spacing={1}>
@@ -211,7 +295,7 @@ export function NotesTab({ cid }: NotesTabProps) {
 
         {notesLoading && <LoadingState compact label="Carregando bilhetes" accent={theme.accent} textColor={theme.textOnBg} mutedColor={theme.textOnBgMuted} />}
 
-        {!notesLoading && activeNotes.length === 0 && (
+        {!notesLoading && activeNotes.length === 0 && draftNotes.length === 0 && (
           <Box sx={{ textAlign: 'center', py: 4 }}>
             <Typography sx={{ fontFamily: font.serif, fontSize: '1rem', fontWeight: 700, color: theme.textOnBg, mb: 0.5 }}>
               Nenhum bilhete ainda
@@ -458,6 +542,7 @@ export function NotesTab({ cid }: NotesTabProps) {
 
       <NoteDialog open={noteDialog} editing={editingNote} rarities={rarities} types={types} cid={cid} onClose={() => { setNoteDialog(false); setEditingNote(null) }} />
       <NoteDetailDialog note={viewingNote} rarities={rarities} types={types} onClose={() => setViewingNote(null)} />
+      <ReleaseDialog cid={cid} notes={selectedDrafts} open={releaseDialogOpen} onClose={() => setReleaseDialogOpen(false)} />
 
       <ConfirmDeleteDialog
         open={noteDisable.isOpen}

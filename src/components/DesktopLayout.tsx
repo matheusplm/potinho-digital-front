@@ -27,7 +27,7 @@ import { useUser, type UserRole } from '../context/UserContext'
 import { useSimulation } from '../context/SimulationContext'
 import { useReader } from '../context/ReaderContext'
 import { useBackground } from '../context/BackgroundContext'
-import { useCollectionsQuery, usePendingInvitesQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
+import { useCollectionsQuery, useMyNotificationsQuery, usePendingInvitesQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
 import { backgroundThemes, colors, font, radius } from '../design-system'
 import { slugify } from '../utils/slug'
 import { isCollectionReader, personaCapabilities } from '../utils/collectionAccess'
@@ -79,6 +79,9 @@ export function DesktopLayout() {
 
   const readerAlbumPath = readerActive ? `/colecoes/${slugify(readerActive.name)}` : '/home'
 
+  const { data: myNotifications = [] } = useMyNotificationsQuery({ enabled: isReader })
+  const hasUnreadNotifications = useMemo(() => myNotifications.some((n) => !n.readAt), [myNotifications])
+
   const { data: readerAch } = useReaderAchievementsQuery(readerActive?.id ?? '', { enabled: isReader && !!readerActive })
   const justUnlockedKey = (readerAch?.justUnlocked ?? []).join(',')
   useEffect(() => {
@@ -119,6 +122,7 @@ export function DesktopLayout() {
         { label: 'Coleção', path: readerAlbumPath, icon: <AutoStoriesOutlinedIcon /> },
         { label: 'Conquistas', path: '/conquistas', icon: <EmojiEventsOutlinedIcon /> },
         { label: 'Favoritas', path: '/favoritas', icon: <FavoriteBorderIcon /> },
+        { label: 'Novidades', path: '/notificacoes', icon: <NotificationsNoneOutlinedIcon /> },
       ]
     }
     if (persona !== 'writer') return [{ label: 'Início', path: '/home', icon: <HomeIcon /> }]
@@ -219,7 +223,8 @@ export function DesktopLayout() {
           {items.map((item) => {
             const active = navValue === item.path
             const isEnd = item.action === 'end-simulation'
-            const showDot = item.label === 'Coleção' && ((isActive && hasUnreadNotes) || (isReader && readerHasUnread))
+            const showDot = (item.label === 'Coleção' && ((isActive && hasUnreadNotes) || (isReader && readerHasUnread))) ||
+              (item.label === 'Novidades' && hasUnreadNotifications)
             const accentColor = isEnd ? colors.rose.main : theme.accent
             return (
               <Box

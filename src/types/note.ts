@@ -3,6 +3,8 @@ export type NoteType = string
 
 export type NoteImageLayout = 'banner' | 'thumb-left' | 'thumb-right' | 'circle-left' | 'circle-right' | 'split' | 'stripe-left' | 'hero-overlay' | 'bg-blur'
 
+export type NoteStatus = 'preview' | 'released'
+
 export interface NoteRecord {
   id: string
   title: string
@@ -14,6 +16,8 @@ export interface NoteRecord {
   createdAt: string
   timesCollected?: number
   disabledAt?: string | null
+  status?: NoteStatus
+  releasedAt?: string | null
 }
 
 export interface NoteFormData {
@@ -192,6 +196,8 @@ export interface Collection {
   createdAt: string
   updatedAt: string
   deletedAt?: string
+  pendingBonusOpens?: number
+  dailyCanOpen?: boolean
 }
 
 export interface CollectionFormData {
@@ -281,6 +287,60 @@ export interface ReaderAchievement {
 export interface ReaderAchievementsResponse {
   achievements: ReaderAchievement[]
   justUnlocked: string[]
+}
+
+export type NotificationKind = 'release' | 'bonus_pack'
+
+export interface NotificationChannels {
+  inApp: boolean
+  push: boolean
+  email: boolean
+}
+
+export interface NotifyConfig {
+  channels: NotificationChannels
+  message?: string
+  imageUrl?: string | null
+}
+
+export interface ReleaseRecord {
+  id: string
+  collectionId: string
+  noteIds: string[]
+  noteCount: number
+  releasedAt: string
+}
+
+export interface ReleaseNotesResponse {
+  release: ReleaseRecord
+  notified: boolean
+}
+
+export interface UserNotification {
+  userId: string
+  collectionId: string
+  collectionName: string
+  collectionEmoji: string
+  notificationId: string
+  kind: NotificationKind
+  message: string | null
+  imageUrl: string | null
+  inApp: boolean
+  payload: Record<string, unknown>
+  createdAt: string
+  readAt: string | null
+}
+
+export interface CollectionNotification {
+  id: string
+  collectionId: string
+  kind: NotificationKind
+  message: string | null
+  imageUrl: string | null
+  channels: NotificationChannels
+  payload: Record<string, unknown>
+  readersNotified: number
+  createdAt: string
 }
 
 export type CollectionInviteStatus = 'pending' | 'accepted' | 'rejected' | 'expired'

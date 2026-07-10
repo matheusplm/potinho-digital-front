@@ -34,7 +34,7 @@ export function buildSimulatedPlayView(
   const effectiveDaily = !daily.canOpen && Number.isFinite(availableAt) && availableAt <= Date.now()
     ? { ...daily, canOpen: true, serverTime: new Date().toISOString() }
     : daily
-  const visibleNotes = notes.filter((note) => !note.disabledAt || ownedSet.has(note.id))
+  const visibleNotes = notes.filter((note) => (!note.disabledAt && note.status !== 'preview') || ownedSet.has(note.id))
   const items: CollectionNoteView[] = visibleNotes.map((note) => ({
     id: note.id,
     title: note.title,
@@ -59,6 +59,7 @@ export function simulatePackOpen(pack: CollectionPack, notes: NoteRecord[], rari
   const eligibleNotes = notes.filter((note) =>
     !excluded.has(note.id) &&
     !note.disabledAt &&
+    note.status !== 'preview' &&
     (pack.allowedTypeIds.length === 0 || pack.allowedTypeIds.includes(note.typeId)) &&
     (pack.allowedRarityIds.length === 0 || pack.allowedRarityIds.includes(note.rarity)),
   )

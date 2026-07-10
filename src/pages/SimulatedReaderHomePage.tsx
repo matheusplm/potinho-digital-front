@@ -18,6 +18,7 @@ import {
   useCollectionRaritiesQuery,
   useCollectionsQuery,
   useCollectionTypesQuery,
+  useMyNotificationsQuery,
   useOpenCollectionPackMutation,
   usePendingInvitesQuery,
   useReaderAchievementsQuery,
@@ -68,6 +69,11 @@ export function SimulatedReaderHomePage() {
   }, [isRealReader, readerCollection, activeCollectionId, setActiveCollectionId])
 
   const { data: pendingInvites = [] } = usePendingInvitesQuery({ enabled: isRealReader })
+  const { data: myNotifications = [] } = useMyNotificationsQuery({ enabled: isRealReader })
+  const unreadNewsCids = useMemo(
+    () => new Set(myNotifications.filter((n) => !n.readAt).map((n) => n.collectionId)),
+    [myNotifications],
+  )
 
   const activeSession = session ?? (readerCollection ? {
     collectionId: readerCollection.id,
@@ -452,17 +458,25 @@ export function SimulatedReaderHomePage() {
             <Stack direction="row" spacing={0.6} sx={{ mb: 1.35, flexWrap: 'wrap', rowGap: 0.6 }}>
               {readerCollections.map((c) => {
                 const active = c.id === readerCollection?.id
+                const hasNews = unreadNewsCids.has(c.id)
+                const hasPack = c.dailyCanOpen || (c.pendingBonusOpens ?? 0) > 0
                 return (
                   <Box key={c.id} onClick={() => setActiveCollectionId(c.id)} sx={{
-                    px: 1.1, py: 0.45, borderRadius: radius.full, cursor: 'pointer',
+                    px: 1.1, py: 0.45, borderRadius: radius.full, cursor: 'pointer', position: 'relative',
                     background: active ? theme.accent : 'rgba(255,255,255,0.5)',
                     border: `1.5px solid ${active ? theme.accent : 'rgba(255,255,255,0.6)'}`,
                     backdropFilter: 'blur(10px)', transition: 'all 0.16s',
                     '&:hover': active ? {} : { background: 'rgba(255,255,255,0.72)' },
                   }}>
-                    <Typography sx={{ fontSize: '0.74rem', fontWeight: 800, color: active ? '#fff' : colors.text.secondary, maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {c.emoji} {c.name}
+                    <Typography sx={{ fontSize: '0.74rem', fontWeight: 800, color: active ? '#fff' : colors.text.secondary, maxWidth: 170, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {c.emoji} {c.name}{hasNews ? ' 🎉' : ''}{hasPack ? ' 📦' : ''}
                     </Typography>
+                    {(hasNews || hasPack) && !active && (
+                      <Box sx={{
+                        position: 'absolute', top: -3, right: -3, width: 9, height: 9, borderRadius: '50%',
+                        background: colors.rose.main, boxShadow: `0 0 0 2px rgba(255,253,251,0.95), 0 0 10px ${colors.rose.glow}`,
+                      }} />
+                    )}
                   </Box>
                 )
               })}

@@ -7,7 +7,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Button, ConfirmDeleteDialog, Input, LoadingState, PageTitle, ScrollablePage, toast } from '../components/ui'
 import {
   queryKeys, useCollectionsQuery, useCollectionTrashQuery, useCreateCollectionMutation,
-  useDeleteCollectionMutation, useRestoreCollectionMutation, useUpdateCollectionMutation,
+  useDeleteCollectionMutation, useMyNotificationsQuery, useRestoreCollectionMutation, useUpdateCollectionMutation,
 } from '../hooks/useNotes'
 import { useBackground } from '../context/BackgroundContext'
 import { useSimulation } from '../context/SimulationContext'
@@ -55,6 +55,13 @@ export function CollectionsListPage() {
   const isWriter = persona === 'writer'
   const { data: trashItem } = useCollectionTrashQuery({ enabled: isWriter })
   const restoreMutation = useRestoreCollectionMutation()
+
+  const hasReaderCollections = useMemo(() => collections.some((c) => c.access === 'reader'), [collections])
+  const { data: myNotifications = [] } = useMyNotificationsQuery({ enabled: hasReaderCollections })
+  const unreadNewsCids = useMemo(
+    () => new Set(myNotifications.filter((n) => !n.readAt).map((n) => n.collectionId)),
+    [myNotifications],
+  )
 
   useEffect(() => {
     if (!isActive || !session) return
@@ -250,7 +257,7 @@ export function CollectionsListPage() {
             {view === 'cards' && (
               <Stack spacing={1.4}>
                 {displayedCollections.map((col, i) => (
-                  <CollectionCardView key={col.id} col={col} i={i} onClick={() => openCollection(col)} onEdit={setEditing} onDelete={setDeleting} />
+                  <CollectionCardView key={col.id} col={col} i={i} onClick={() => openCollection(col)} onEdit={setEditing} onDelete={setDeleting} hasNews={unreadNewsCids.has(col.id)} />
                 ))}
                 {isWriter && <AddGhostCard view="cards" onClick={() => setCreateOpen(true)} accent={theme.accent} />}
               </Stack>
@@ -258,7 +265,7 @@ export function CollectionsListPage() {
             {view === 'grid' && (
               <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1.4 }}>
                 {displayedCollections.map((col, i) => (
-                  <CollectionGridItem key={col.id} col={col} i={i} onClick={() => openCollection(col)} onEdit={setEditing} onDelete={setDeleting} />
+                  <CollectionGridItem key={col.id} col={col} i={i} onClick={() => openCollection(col)} onEdit={setEditing} onDelete={setDeleting} hasNews={unreadNewsCids.has(col.id)} />
                 ))}
                 {isWriter && <AddGhostCard view="grid" onClick={() => setCreateOpen(true)} accent={theme.accent} />}
               </Box>
@@ -266,7 +273,7 @@ export function CollectionsListPage() {
             {view === 'list' && (
               <Stack spacing={0.8}>
                 {displayedCollections.map((col, i) => (
-                  <CollectionListItem key={col.id} col={col} i={i} onClick={() => openCollection(col)} onEdit={setEditing} onDelete={setDeleting} />
+                  <CollectionListItem key={col.id} col={col} i={i} onClick={() => openCollection(col)} onEdit={setEditing} onDelete={setDeleting} hasNews={unreadNewsCids.has(col.id)} />
                 ))}
                 {isWriter && <AddGhostCard view="list" onClick={() => setCreateOpen(true)} accent={theme.accent} />}
               </Stack>
