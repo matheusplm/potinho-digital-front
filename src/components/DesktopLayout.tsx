@@ -51,7 +51,7 @@ export function DesktopLayout() {
   const location = useLocation()
   const navigate = useNavigate()
   const { user, persona, setPersona, logout } = useUser()
-  const { theme, themeKey, setThemeKey } = useBackground()
+  const { theme, themeKey, setThemeKey, maskLightCards, setMaskLightCards } = useBackground()
   const { isActive, session, endSimulation, hasUnreadNotes } = useSimulation()
   const { hasUnread: readerHasUnread, activeCollectionId, setActiveCollectionId, unreadFor } = useReader()
   const [simulateOpen, setSimulateOpen] = useState(false)
@@ -408,6 +408,27 @@ export function DesktopLayout() {
               </Box>
             </Box>
           ))}
+          {theme.isDark && (
+            <Stack direction="row" spacing={0.9} alignItems="center" onClick={() => setMaskLightCards(!maskLightCards)} sx={{ mt: 0.6, cursor: 'pointer', userSelect: 'none' }}>
+              <Box sx={{
+                width: 30, height: 17, borderRadius: radius.full, flexShrink: 0, position: 'relative',
+                background: maskLightCards ? theme.accent : 'rgba(255,255,255,0.18)', transition: 'background 0.18s',
+              }}>
+                <Box sx={{
+                  position: 'absolute', top: 2, left: maskLightCards ? 15 : 2, width: 13, height: 13, borderRadius: '50%',
+                  background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.3)', transition: 'left 0.18s',
+                }} />
+              </Box>
+              <Box>
+                <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: theme.textOnBg, lineHeight: 1.2 }}>
+                  Suavizar bilhetes claros
+                </Typography>
+                <Typography sx={{ fontSize: '0.6rem', color: theme.textOnBgMuted }}>
+                  máscara escura sobre cards muito brancos
+                </Typography>
+              </Box>
+            </Stack>
+          )}
         </Box>
 
         {/* Notifications */}

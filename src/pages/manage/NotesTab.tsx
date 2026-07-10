@@ -61,7 +61,8 @@ const DEFAULT_IMPORT_JSON = `[
 interface NotesTabProps { cid: string }
 
 export function NotesTab({ cid }: NotesTabProps) {
-  const { theme } = useBackground()
+  const { theme, maskLightCards } = useBackground()
+  const maskCards = theme.isDark && maskLightCards
   const { data: notes = [], isLoading: notesLoading } = useCollectionNotesQuery(cid)
   const { data: rarities = [] } = useCollectionRaritiesQuery(cid)
   const { data: types = [] } = useCollectionTypesQuery(cid)
@@ -218,8 +219,9 @@ export function NotesTab({ cid }: NotesTabProps) {
               return (
                 <Card key={note.id} onClick={() => toggleDraft(note.id)} sx={{
                   p: 0, overflow: 'hidden', cursor: 'pointer',
-                  border: `1.5px solid ${selected ? theme.accent : colors.border.subtle}`,
-                  boxShadow: selected ? `0 8px 26px ${theme.accent}30` : '0 4px 14px rgba(15,23,42,0.06)',
+                  background: themedCardBg('rgba(255,255,255,0.78)', maskCards),
+                  border: `1.5px solid ${selected ? theme.accent : r?.borderColor ?? colors.border.subtle}`,
+                  boxShadow: selected ? `0 8px 26px ${theme.accent}30` : '0 6px 18px rgba(15,23,42,0.07)',
                   transition: 'border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease',
                   '&:hover': { transform: 'translateY(-1px)' },
                 }}>
@@ -235,10 +237,10 @@ export function NotesTab({ cid }: NotesTabProps) {
                     <Box sx={{ flex: 1, minWidth: 0, px: 1.3, py: 1.05 }}>
                       <Stack direction="row" alignItems="center" spacing={1}>
                         <Box sx={{ flex: 1, minWidth: 0 }}>
-                          <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.9rem', color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.9rem', color: ink.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {note.title}
                           </Typography>
-                          <Typography sx={{ mt: 0.2, fontSize: '0.74rem', color: colors.text.secondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <Typography sx={{ mt: 0.2, fontSize: '0.74rem', color: ink.secondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {note.message}
                           </Typography>
                           <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mt: 0.6, flexWrap: 'wrap', rowGap: 0.4 }}>
@@ -404,9 +406,9 @@ export function NotesTab({ cid }: NotesTabProps) {
               <Card key={note.id} accent={r?.borderColor} onClick={() => setViewingNote(note)} sx={{
                 p: 0, overflow: 'hidden', cursor: 'pointer',
                 border: `1px solid ${r?.borderColor ?? colors.border.subtle}`,
-                background: 'rgba(255,255,255,0.74)',
+                background: themedCardBg('rgba(255,255,255,0.74)', maskCards),
                 boxShadow: '0 3px 10px rgba(15,23,42,0.05)',
-                '&:hover': { background: 'rgba(255,255,255,0.9)', boxShadow: '0 5px 14px rgba(15,23,42,0.08)' },
+                '&:hover': { boxShadow: '0 5px 14px rgba(15,23,42,0.12)' },
               }}>
                 <Stack direction="row" alignItems="center" spacing={0.8} sx={{ minHeight: 38, px: 1, py: 0.35 }}>
                   <Box sx={{ width: 6, height: 22, borderRadius: radius.full, background: r?.borderColor ?? colors.border.subtle, flexShrink: 0 }} />
@@ -435,7 +437,7 @@ export function NotesTab({ cid }: NotesTabProps) {
               <Card key={note.id} accent={r?.borderColor} onClick={() => setViewingNote(note)} sx={{
                 p: 0, overflow: 'hidden', cursor: 'pointer',
                 border: `1.5px solid ${r?.borderColor ?? colors.border.subtle}`,
-                background: 'rgba(255,255,255,0.78)',
+                background: themedCardBg('rgba(255,255,255,0.78)', maskCards),
                 boxShadow: '0 6px 18px rgba(15,23,42,0.07)',
                 transition: 'transform 0.16s ease, box-shadow 0.16s ease',
                 '&:hover': { transform: 'translateY(-1px)', boxShadow: `0 8px 24px ${r?.glowColor || 'rgba(15,23,42,0.1)'}` },
@@ -509,7 +511,7 @@ export function NotesTab({ cid }: NotesTabProps) {
           return (
             <Card key={note.id} accent={r?.borderColor} onClick={() => setViewingNote(note)} sx={{
               p: 0, overflow: 'hidden', position: 'relative', cursor: 'pointer',
-              background: themedCardBg(r?.cardBg ?? colors.surface.base, theme.isDark),
+              background: themedCardBg(r?.cardBg ?? ink.surface, maskCards),
               border: `1.5px solid ${r?.borderColor ?? colors.border.subtle}`,
               boxShadow: r?.glowColor ? `${r.shadow}, 0 0 26px ${r.glowColor}` : r?.shadow,
               '&::before': r ? {

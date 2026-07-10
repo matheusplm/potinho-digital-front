@@ -26,7 +26,7 @@ export function FloatingMenu() {
   const [open, setOpen] = useState(false)
   const [showTutorial, setShowTutorial] = useState(false)
   const { user, persona, setPersona, logout } = useUser()
-  const { themeKey, setThemeKey, theme } = useBackground()
+  const { themeKey, setThemeKey, theme, maskLightCards, setMaskLightCards } = useBackground()
   const { activeCollectionId, setActiveCollectionId, unreadFor } = useReader()
   const { isActive: simulating } = useSimulation()
   const navigate = useNavigate()
@@ -288,6 +288,27 @@ export function FloatingMenu() {
                   </Box>
                 ))}
               </Stack>
+              {theme.isDark && (
+                <Stack direction="row" spacing={1} alignItems="center" onClick={() => setMaskLightCards(!maskLightCards)} sx={{ mt: 1.2, cursor: 'pointer', userSelect: 'none' }}>
+                  <Box sx={{
+                    width: 34, height: 19, borderRadius: radius.full, flexShrink: 0, position: 'relative',
+                    background: maskLightCards ? theme.accent : 'rgba(255,255,255,0.18)', transition: 'background 0.18s',
+                  }}>
+                    <Box sx={{
+                      position: 'absolute', top: 2, left: maskLightCards ? 17 : 2, width: 15, height: 15, borderRadius: '50%',
+                      background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.3)', transition: 'left 0.18s',
+                    }} />
+                  </Box>
+                  <Box>
+                    <Typography sx={{ fontSize: '0.76rem', fontWeight: 700, color: theme.textOnBg, lineHeight: 1.25 }}>
+                      Suavizar bilhetes claros
+                    </Typography>
+                    <Typography sx={{ fontSize: '0.64rem', color: theme.textOnBgMuted }}>
+                      aplica uma máscara escura sobre cards muito brancos
+                    </Typography>
+                  </Box>
+                </Stack>
+              )}
             </Box>
 
             {notifSupported && (

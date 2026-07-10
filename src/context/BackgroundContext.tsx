@@ -5,10 +5,13 @@ interface BackgroundContextValue {
   theme: BackgroundTheme
   themeKey: string
   setThemeKey: (key: string) => void
+  maskLightCards: boolean
+  setMaskLightCards: (value: boolean) => void
 }
 
 const BackgroundContext = createContext<BackgroundContextValue | null>(null)
 const STORAGE_KEY = 'potinho-bg-theme'
+const MASK_KEY = 'potinho-mask-cards'
 
 export function BackgroundProvider({ children }: { children: ReactNode }) {
   const [themeKey, setThemeKeyState] = useState<string>(() => {
@@ -18,6 +21,22 @@ export function BackgroundProvider({ children }: { children: ReactNode }) {
       return defaultBackgroundKey
     }
   })
+  const [maskLightCards, setMaskLightCardsState] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(MASK_KEY) !== 'false'
+    } catch {
+      return true
+    }
+  })
+
+  const setMaskLightCards = (value: boolean) => {
+    setMaskLightCardsState(value)
+    try {
+      localStorage.setItem(MASK_KEY, String(value))
+    } catch {
+      void 0
+    }
+  }
 
   useEffect(() => {
     try {
@@ -35,6 +54,8 @@ export function BackgroundProvider({ children }: { children: ReactNode }) {
     theme: getBackgroundTheme(themeKey),
     themeKey,
     setThemeKey: setThemeKeyState,
+    maskLightCards,
+    setMaskLightCards,
   }
 
   return <BackgroundContext.Provider value={value}>{children}</BackgroundContext.Provider>
