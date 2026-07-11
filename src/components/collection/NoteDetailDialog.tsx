@@ -31,6 +31,7 @@ export function NoteDetailDialog({ note, rarities, types, onClose }: {
                   message: note.message ?? '',
                   rarity: note.rarity,
                   typeId: note.typeId,
+                  typeIds: note.typeIds,
                   imageUrl: note.imageUrl ?? null,
                   imageLayout: note.imageLayout,
                   isNew: 'isNew' in note ? note.isNew : false,

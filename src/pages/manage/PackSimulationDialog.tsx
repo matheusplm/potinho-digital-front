@@ -117,7 +117,7 @@ export function PackSimulationDialog({ simulation, rarities, types, onClose, onS
                 )}
                 {simulation.rewards.map((note, index) => {
                   const rarity = rarities.find((item) => item.id === note.rarity)
-                  const type = types.find((item) => item.id === note.typeId)
+                  const noteTypes = (note.typeIds?.length ? note.typeIds : [note.typeId]).map((id) => types.find((item) => item.id === id)).filter((x): x is NoteTypeConfig => !!x)
                   return (
                     <Box key={`${note.id}-${index}`} sx={{ p: 1.25, borderRadius: radius.lg, background: rarity?.cardBg ?? ink.surface, border: `1.5px solid ${rarity?.borderColor ?? colors.border.subtle}`, boxShadow: rarity?.glowColor ? `${rarity.shadow}, 0 0 22px ${rarity.glowColor}` : rarity?.shadow, opacity: 0, animation: `${rewardReveal} 0.42s cubic-bezier(.2,.85,.2,1) forwards`, animationDelay: `${index * 0.12}s` }}>
                       <Stack direction="row" spacing={1} alignItems="flex-start">
@@ -133,11 +133,11 @@ export function PackSimulationDialog({ simulation, rarities, types, onClose, onS
                                 <Box component="span" sx={gradientTextSx(rarity.chipColor)}>{rarity.emoji} {rarity.label}</Box>
                               </Box>
                             )}
-                            {type && (
-                              <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.35, px: 0.75, py: 0.25, borderRadius: radius.full, background: type.tagBg, color: type.tagColor, border: `1px solid ${type.accentColor}44`, fontSize: '0.70rem', fontWeight: 750 }}>
+                            {noteTypes.map((type) => (
+                              <Box key={type.id} sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.35, px: 0.75, py: 0.25, borderRadius: radius.full, background: type.tagBg, color: type.tagColor, border: `1px solid ${type.accentColor}44`, fontSize: '0.70rem', fontWeight: 750 }}>
                                 {type.emoji} {type.label}
                               </Box>
-                            )}
+                            ))}
                           </Stack>
                         </Box>
                       </Stack>

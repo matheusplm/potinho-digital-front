@@ -164,7 +164,7 @@ export function ManageNoteCard({ note, view, r, noteTypes = [], mask, onOpen, on
         transition: 'box-shadow 0.15s ease',
       }}>
         <RewardCard
-          reward={{ id: note.id, title: note.title, message: note.message, rarity: note.rarity, typeId: note.typeId, imageUrl: note.imageUrl, imageLayout: note.imageLayout, isNew: false }}
+          reward={{ id: note.id, title: note.title, message: note.message, rarity: note.rarity, typeId: note.typeId, typeIds: note.typeIds, imageUrl: note.imageUrl, imageLayout: note.imageLayout, isNew: false }}
           rarities={r ? [r] : []}
           types={noteTypes}
         />

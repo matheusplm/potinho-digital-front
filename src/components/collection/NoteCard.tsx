@@ -36,7 +36,7 @@ export function NoteCard({ note, r, ts = [], unread, variant, onSelect, onToggle
     return (
       <Box sx={{ position: 'relative', cursor: 'pointer', height: grid ? '100%' : undefined }} onClick={() => onSelect(note)}>
         <RewardCard
-          reward={{ id: note.id, title: note.title ?? '', message: note.message ?? '', rarity: note.rarity, typeId: note.typeId, imageUrl: note.imageUrl, imageLayout: note.imageLayout, isNew: false }}
+          reward={{ id: note.id, title: note.title ?? '', message: note.message ?? '', rarity: note.rarity, typeId: note.typeId, typeIds: note.typeIds, imageUrl: note.imageUrl, imageLayout: note.imageLayout, isNew: false }}
           rarities={r ? [r] : []}
           types={ts}
         />

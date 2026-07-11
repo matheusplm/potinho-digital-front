@@ -199,7 +199,7 @@ export function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
               reward={{
                 id: '__preview__', title: form.title || 'Título do bilhete',
                 message: form.message || 'Mensagem especial que vai aparecer no cartãozinho...',
-                rarity: form.rarity || rarities[0]?.id || '', typeId: form.typeId || types[0]?.id || '',
+                rarity: form.rarity || rarities[0]?.id || '', typeId: form.typeId || types[0]?.id || '', typeIds: form.typeIds,
                 imageUrl: form.imageUrl, imageLayout: form.imageLayout, isNew: false,
               }}
               rarities={rarities}
