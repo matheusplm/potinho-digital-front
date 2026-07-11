@@ -198,17 +198,49 @@ export function NotesTab({ cid }: NotesTabProps) {
 
         {statusView === 'drafts' && (
           <>
-            <Stack direction="row" alignItems="center" spacing={1} sx={{ px: 0.3 }}>
-              <Typography sx={{ flex: 1, fontSize: '0.74rem', color: theme.textOnBgMuted, lineHeight: 1.45 }}>
-                Invisíveis pros leitores até você lançar. Lance em lotes, quando quiser.
-              </Typography>
-              <Typography
-                onClick={() => setSelectedDraftIds(selectedDraftIds.length === draftNotes.length ? [] : draftNotes.map((n) => n.id))}
-                sx={{ fontSize: '0.74rem', fontWeight: 800, color: theme.accent, cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap', flexShrink: 0, '&:hover': { opacity: 0.75 } }}
-              >
-                {selectedDraftIds.length === draftNotes.length ? 'Desmarcar todos' : 'Selecionar todos'}
-              </Typography>
-            </Stack>
+            <Box sx={{
+              position: 'sticky', top: 8, zIndex: 6,
+              borderRadius: radius.xl, overflow: 'hidden',
+              background: theme.surfaceBg, backdropFilter: 'blur(20px)',
+              border: `1.5px solid ${selectedDraftIds.length > 0 ? `${theme.accent}66` : theme.surfaceBorder}`,
+              boxShadow: selectedDraftIds.length > 0 ? `0 10px 34px ${theme.accent}38` : '0 8px 24px rgba(0,0,0,0.14)',
+              transition: 'border-color 0.18s ease, box-shadow 0.18s ease',
+            }}>
+              <Stack direction="row" alignItems="center" spacing={1.2} sx={{ px: 1.6, py: 1.2, flexWrap: 'wrap', rowGap: 1 }}>
+                <Box sx={{ flex: '1 1 160px', minWidth: 0 }}>
+                  <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.95rem', color: theme.textOnBg, lineHeight: 1.2 }}>
+                    {selectedDraftIds.length === 0 ? '🚀 Monte seu lote' : `🚀 ${selectedDraftIds.length} de ${draftNotes.length} no lote`}
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.68rem', color: theme.textOnBgMuted, mt: 0.2 }}>
+                    {selectedDraftIds.length === 0
+                      ? 'toque nos bilhetes abaixo pra escolher o que lançar'
+                      : 'pronto pra soltar pros leitores quando quiser'}
+                  </Typography>
+                </Box>
+                <Button
+                  variant="ghost"
+                  onClick={() => setSelectedDraftIds(selectedDraftIds.length === draftNotes.length ? [] : draftNotes.map((n) => n.id))}
+                  sx={{ py: 0.7, px: 1.4, fontSize: '0.76rem', whiteSpace: 'nowrap', flexShrink: 0 }}
+                >
+                  {selectedDraftIds.length === draftNotes.length ? 'Desmarcar' : 'Selecionar todos'}
+                </Button>
+                <Button
+                  variant="primary"
+                  disabled={selectedDraftIds.length === 0}
+                  onClick={() => setReleaseDialogOpen(true)}
+                  sx={{ py: 0.8, px: 2.2, fontSize: '0.85rem', whiteSpace: 'nowrap', flexShrink: 0 }}
+                >
+                  🚀 Lançar{selectedDraftIds.length > 0 ? ` ${selectedDraftIds.length}` : ''}
+                </Button>
+              </Stack>
+              <Box sx={{
+                height: 4,
+                background: selectedDraftIds.length > 0
+                  ? `linear-gradient(90deg, ${theme.accent}, ${theme.accent}88 ${Math.round((selectedDraftIds.length / draftNotes.length) * 100)}%, ${theme.accent}18 ${Math.round((selectedDraftIds.length / draftNotes.length) * 100)}%)`
+                  : `${theme.accent}18`,
+                transition: 'background 0.25s ease',
+              }} />
+            </Box>
 
             {draftNotes.map((note) => (
               <ManageNoteCard
@@ -224,30 +256,6 @@ export function NotesTab({ cid }: NotesTabProps) {
                 selection={{ selected: selectedDraftIds.includes(note.id), accent: theme.accent, onToggle: () => toggleDraft(note.id) }}
               />
             ))}
-
-            <Box sx={{
-              position: 'sticky', bottom: 8, zIndex: 5,
-              px: 1.5, py: 1.1, borderRadius: radius.xl,
-              background: theme.surfaceBg, backdropFilter: 'blur(18px)',
-              border: `1.5px solid ${selectedDraftIds.length > 0 ? `${theme.accent}55` : theme.surfaceBorder}`,
-              boxShadow: selectedDraftIds.length > 0 ? `0 10px 32px ${theme.accent}33` : '0 8px 24px rgba(0,0,0,0.12)',
-              display: 'flex', alignItems: 'center', gap: 1.2,
-              transition: 'border-color 0.18s ease, box-shadow 0.18s ease',
-            }}>
-              <Typography sx={{ flex: 1, fontSize: '0.76rem', fontWeight: 700, color: theme.textOnBgMuted, lineHeight: 1.35 }}>
-                {selectedDraftIds.length === 0
-                  ? 'Toque nos bilhetes pra escolher o lote'
-                  : `${selectedDraftIds.length} de ${draftNotes.length} no lote`}
-              </Typography>
-              <Button
-                variant="primary"
-                disabled={selectedDraftIds.length === 0}
-                onClick={() => setReleaseDialogOpen(true)}
-                sx={{ py: 0.8, px: 2, fontSize: '0.82rem', whiteSpace: 'nowrap', flexShrink: 0 }}
-              >
-                🚀 Lançar{selectedDraftIds.length > 0 ? ` ${selectedDraftIds.length}` : ''}
-              </Button>
-            </Box>
           </>
         )}
 
@@ -255,8 +263,8 @@ export function NotesTab({ cid }: NotesTabProps) {
           <Stack spacing={1}>
             <Box sx={{
               display: 'flex', alignItems: 'center', gap: 1, px: 1.4, py: 0.7,
-              background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(12px)',
-              border: '1.5px solid rgba(255,255,255,0.6)', borderRadius: radius.lg,
+              background: theme.surfaceBg, backdropFilter: 'blur(12px)',
+              border: `1.5px solid ${theme.surfaceBorder}`, borderRadius: radius.lg,
             }}>
               <SearchIcon sx={{ fontSize: 17, color: theme.textOnBgMuted, flexShrink: 0 }} />
               <Box component="input" value={search}
@@ -274,12 +282,12 @@ export function NotesTab({ cid }: NotesTabProps) {
               <Box sx={{ display: 'flex', gap: 0.6, flexWrap: 'wrap' }}>
                 <Chip label="Todas" size="small" onClick={() => setRarityFilter('all')}
                   sx={{ height: 26, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer',
-                    bgcolor: rarityFilter === 'all' ? colors.primary.main : 'rgba(255,255,255,0.5)',
+                    bgcolor: rarityFilter === 'all' ? theme.accent : theme.surfaceBg,
                     color: rarityFilter === 'all' ? '#fff' : theme.textOnBgMuted }} />
                 {rarities.map((r) => (
                   <Chip key={r.id} label={`${r.emoji} ${r.label}`} size="small" onClick={() => setRarityFilter(r.id)}
                     sx={{ height: 26, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer',
-                      background: rarityFilter === r.id ? r.chipBg : 'rgba(255,255,255,0.5)',
+                      background: rarityFilter === r.id ? r.chipBg : theme.surfaceBg,
                       border: `1.5px solid ${rarityFilter === r.id ? r.borderColor : 'transparent'}`,
                       '& .MuiChip-label': rarityFilter === r.id ? gradientTextSx(r.chipColor) : { color: theme.textOnBgMuted },
                     }} />
@@ -298,9 +306,9 @@ export function NotesTab({ cid }: NotesTabProps) {
                   onClick={() => setNoteSort(option.id)}
                   sx={{
                     height: 26, fontSize: '0.72rem', fontWeight: 800, cursor: 'pointer',
-                    bgcolor: noteSort === option.id ? colors.purple.main : 'rgba(255,255,255,0.5)',
+                    bgcolor: noteSort === option.id ? theme.accent : theme.surfaceBg,
                     color: noteSort === option.id ? '#fff' : theme.textOnBgMuted,
-                    border: `1.5px solid ${noteSort === option.id ? colors.purple.main : 'rgba(255,255,255,0.35)'}`,
+                    border: `1.5px solid ${noteSort === option.id ? theme.accent : theme.surfaceBorder}`,
                     '& .MuiChip-label': { px: 0.9 },
                   }}
                 />

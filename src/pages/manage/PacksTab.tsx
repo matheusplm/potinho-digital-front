@@ -120,7 +120,7 @@ export function PacksTab({ cid }: PacksTabProps) {
                 const active = packFilter === filter.id
                 return (
                   <Chip key={filter.id} label={filter.label} size="small" onClick={() => setPackFilter(filter.id)}
-                    sx={{ height: 26, fontSize: '0.72rem', fontWeight: 800, cursor: 'pointer', background: active ? colors.primary.main : 'rgba(255,255,255,0.5)', color: active ? '#fff' : theme.textOnBgMuted, border: `1.5px solid ${active ? colors.primary.main : 'rgba(255,255,255,0.55)'}`, backdropFilter: 'blur(10px)' }} />
+                    sx={{ height: 26, fontSize: '0.72rem', fontWeight: 800, cursor: 'pointer', background: active ? theme.accent : theme.surfaceBg, color: active ? '#fff' : theme.textOnBgMuted, border: `1.5px solid ${active ? theme.accent : theme.surfaceBorder}`, backdropFilter: 'blur(10px)' }} />
                 )
               })}
             </Box>

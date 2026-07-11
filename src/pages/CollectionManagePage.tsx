@@ -71,7 +71,7 @@ export function CollectionManagePage() {
             onClick={() => navigate('/colecoes')}
             sx={{
               width: 38, height: 38, color: theme.textOnBg,
-              background: 'rgba(255,255,255,0.5)', border: '1.5px solid rgba(255,255,255,0.66)',
+              background: theme.surfaceBg, border: `1.5px solid ${theme.surfaceBorder}`,
               backdropFilter: 'blur(14px)', boxShadow: '0 8px 24px rgba(15,23,42,0.08)',
               transition: 'transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease',
               '&:hover': { background: 'rgba(255,255,255,0.76)', transform: 'translateX(-2px) scale(1.04)', boxShadow: '0 10px 28px rgba(15,23,42,0.12)' },
