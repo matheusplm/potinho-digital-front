@@ -5,11 +5,12 @@ import { RewardCard } from '../../components/collection/RewardCard'
 import { useCreateCollectionNoteMutation, useUpdateCollectionNoteMutation } from '../../hooks/useNotes'
 import { colors, font, radius } from '../../design-system'
 import { gradientTextSx } from '../../utils/colorUtils'
+import { noteTypeIdList } from '../../utils/noteTypes'
 import type { NoteFormData, NoteRecord, RarityConfig, NoteTypeConfig } from '../../types/note'
 
 const ImagePicker = lazy(() => import('../../components/ImagePicker').then((m) => ({ default: m.ImagePicker })))
 
-const EMPTY_NOTE: NoteFormData = { title: '', message: '', rarity: '', typeId: '', imageUrl: null, imageLayout: null }
+const EMPTY_NOTE: NoteFormData = { title: '', message: '', rarity: '', typeId: '', typeIds: [], imageUrl: null, imageLayout: null }
 
 const IMAGE_LAYOUTS: { value: import('../../types/note').NoteImageLayout; label: string }[] = [
   { value: 'thumb-left', label: 'Thumb esq' },
@@ -32,7 +33,9 @@ export function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
 
   useEffect(() => {
     if (!open) return
-    setForm(editing ? { title: editing.title, message: editing.message, rarity: editing.rarity, typeId: editing.typeId, imageUrl: editing.imageUrl ?? null, imageLayout: editing.imageLayout ?? null } : { ...EMPTY_NOTE, rarity: rarities[0]?.id ?? '', typeId: types[0]?.id ?? '' })
+    setForm(editing
+      ? { title: editing.title, message: editing.message, rarity: editing.rarity, typeId: editing.typeId, typeIds: noteTypeIdList(editing), imageUrl: editing.imageUrl ?? null, imageLayout: editing.imageLayout ?? null }
+      : { ...EMPTY_NOTE, rarity: rarities[0]?.id ?? '', typeId: types[0]?.id ?? '', typeIds: types[0] ? [types[0].id] : [] })
     setTouched({ title: false, message: false, rarity: false, typeId: false, imageUrl: false })
   }, [open, editing, rarities, types])
 
@@ -42,7 +45,7 @@ export function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
     title: form.title.trim().length === 0 ? 'Obrigatório' : form.title.length > 60 ? 'Máx 60 caracteres' : '',
     message: form.message.trim().length === 0 ? 'Obrigatório' : form.message.length > 500 ? 'Máx 500 caracteres' : '',
     rarity: !form.rarity ? 'Selecione uma raridade' : '',
-    typeId: !form.typeId ? 'Selecione um tipo' : '',
+    typeId: !(form.typeIds?.length) ? 'Selecione pelo menos um tipo' : '',
     imageUrl: form.imageLayout && !form.imageUrl ? 'Selecione um GIF ou cole uma URL de imagem' : '',
   }
   const hasErrors = Object.values(errors).some(Boolean)
@@ -120,19 +123,35 @@ export function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
             <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: touched.typeId && errors.typeId ? colors.error.main : colors.text.secondary, mb: 0.8 }}>Tipo</Typography>
             {types.length === 0 ? <Typography sx={{ fontSize: '0.8rem', color: colors.text.muted }}>Crie tipos na aba Tipos.</Typography> : (
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8, opacity: lockedIdentity ? 0.5 : 1 }}>
-                {types.map((t) => (
-                  <Box key={t.id} onClick={() => { if (lockedIdentity) return; setForm((f) => ({ ...f, typeId: t.id })); touch('typeId') }} sx={{
-                    px: 1.4, py: 0.6, borderRadius: radius.full, cursor: lockedIdentity ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: 0.5,
-                    background: form.typeId === t.id ? t.tagBg : 'rgba(0,0,0,0.04)',
-                    color: form.typeId === t.id ? t.tagColor : colors.text.secondary,
-                    border: `1.5px solid ${form.typeId === t.id ? t.accentColor + '55' : touched.typeId && errors.typeId ? colors.error.main + '66' : 'transparent'}`,
-                    fontWeight: 700, fontSize: '0.78rem', transition: 'all 0.15s',
-                  }}>{t.emoji} {t.label}</Box>
-                ))}
+                {types.map((t) => {
+                  const active = (form.typeIds ?? []).includes(t.id)
+                  return (
+                    <Box key={t.id} onClick={() => {
+                      if (lockedIdentity) return
+                      setForm((f) => {
+                        const current = f.typeIds ?? []
+                        const next = active ? current.filter((id) => id !== t.id) : [...current, t.id]
+                        return { ...f, typeIds: next, typeId: next[0] ?? '' }
+                      })
+                      touch('typeId')
+                    }} sx={{
+                      px: 1.4, py: 0.6, borderRadius: radius.full, cursor: lockedIdentity ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: 0.5,
+                      background: active ? t.tagBg : 'rgba(0,0,0,0.04)',
+                      color: active ? t.tagColor : colors.text.secondary,
+                      border: `1.5px solid ${active ? t.accentColor + '55' : touched.typeId && errors.typeId ? colors.error.main + '66' : 'transparent'}`,
+                      fontWeight: 700, fontSize: '0.78rem', transition: 'all 0.15s',
+                    }}>{active ? '✓ ' : ''}{t.emoji} {t.label}</Box>
+                  )
+                })}
               </Box>
             )}
             {touched.typeId && errors.typeId && (
               <Typography sx={{ fontSize: '0.68rem', color: colors.error.main, mt: 0.5, pl: 0.5 }}>{errors.typeId}</Typography>
+            )}
+            {!lockedIdentity && (form.typeIds?.length ?? 0) > 1 && (
+              <Typography sx={{ fontSize: '0.66rem', color: colors.text.muted, mt: 0.5, pl: 0.5 }}>
+                {form.typeIds?.length} tipos selecionados, o bilhete conta pra todos eles
+              </Typography>
             )}
             {lockedIdentity && (
               <Typography sx={{ fontSize: '0.68rem', color: colors.text.muted, mt: 0.5, pl: 0.5 }}>

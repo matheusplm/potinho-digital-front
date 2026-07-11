@@ -21,7 +21,7 @@ interface ManageNoteCardProps {
   note: NoteRecord
   view: ManageNoteView
   r?: RarityConfig
-  t?: NoteTypeConfig
+  noteTypes?: NoteTypeConfig[]
   mask: boolean
   onOpen: () => void
   onEdit: () => void
@@ -69,7 +69,7 @@ function NoteActions({ size = 16, selection, onOpen, onEdit, onDisable, blur }: 
   )
 }
 
-export function ManageNoteCard({ note, view, r, t, mask, onOpen, onEdit, onDisable, selection }: ManageNoteCardProps) {
+export function ManageNoteCard({ note, view, r, noteTypes = [], mask, onOpen, onEdit, onDisable, selection }: ManageNoteCardProps) {
   const handleClick = selection ? selection.onToggle : onOpen
   const selectedBorder = selection?.selected ? selection.accent : undefined
   const selectedShadow = selection?.selected ? `0 8px 26px ${selection.accent}30` : undefined
@@ -132,17 +132,17 @@ export function ManageNoteCard({ note, view, r, t, mask, onOpen, onEdit, onDisab
                       <Box component="span" sx={gradientTextSx(r.chipColor)}>{r.emoji}</Box>
                     </Box>
                   )}
-                  {t && (
-                    <Box sx={{ px: 0.65, py: 0.15, borderRadius: radius.full, background: t.tagBg, color: t.tagColor, border: `1px solid ${t.accentColor}33`, fontSize: '0.68rem', fontWeight: 850, flexShrink: 0 }}>
+                  {noteTypes.map((t) => (
+                    <Box key={t.id} sx={{ px: 0.65, py: 0.15, borderRadius: radius.full, background: t.tagBg, color: t.tagColor, border: `1px solid ${t.accentColor}33`, fontSize: '0.68rem', fontWeight: 850, flexShrink: 0 }}>
                       {t.emoji}
                     </Box>
-                  )}
+                  ))}
                 </Stack>
                 <Typography sx={{ mt: 0.25, fontSize: '0.74rem', color: ink.secondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {note.message}
                 </Typography>
                 <Typography sx={{ mt: 0.35, fontSize: '0.70rem', color: ink.muted, fontWeight: 700 }}>
-                  {[r?.label, t?.label].filter(Boolean).join(' · ') || 'Sem categoria'}
+                  {[r?.label, ...noteTypes.map((t) => t.label)].filter(Boolean).join(' · ') || 'Sem categoria'}
                 </Typography>
               </Box>
               <Stack direction="row" spacing={0.4} alignItems="center" sx={{ flexShrink: 0 }}>
@@ -166,7 +166,7 @@ export function ManageNoteCard({ note, view, r, t, mask, onOpen, onEdit, onDisab
         <RewardCard
           reward={{ id: note.id, title: note.title, message: note.message, rarity: note.rarity, typeId: note.typeId, imageUrl: note.imageUrl, imageLayout: note.imageLayout, isNew: false }}
           rarities={r ? [r] : []}
-          types={t ? [t] : []}
+          types={noteTypes}
         />
         {selection && (
           <Box sx={{ position: 'absolute', top: 10, left: 10, zIndex: 5 }}>
@@ -208,18 +208,18 @@ export function ManageNoteCard({ note, view, r, t, mask, onOpen, onEdit, onDisab
             <Typography sx={{ fontSize: '0.78rem', color: r?.captionColor ?? ink.secondary, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.5, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
               {note.message}
             </Typography>
-            {(r || t) && (
+            {(r || noteTypes.length > 0) && (
               <Stack direction="row" spacing={0.6} sx={{ mt: 0.9, flexWrap: 'wrap', rowGap: 0.5 }}>
                 {r && (
                   <Box sx={{ display: 'inline-flex', alignItems: 'center', px: 1, py: 0.3, borderRadius: radius.full, background: r.chipBg, border: `1px solid ${r.borderColor}`, fontSize: '0.72rem', fontWeight: 700 }}>
                     <Box component="span" sx={gradientTextSx(r.chipColor)}>{r.emoji} {r.label}</Box>
                   </Box>
                 )}
-                {t && (
-                  <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.4, px: 1, py: 0.3, borderRadius: radius.full, background: t.tagBg, color: t.tagColor, border: `1px solid ${t.accentColor}44`, fontSize: '0.72rem', fontWeight: 700 }}>
+                {noteTypes.map((t) => (
+                  <Box key={t.id} sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.4, px: 1, py: 0.3, borderRadius: radius.full, background: t.tagBg, color: t.tagColor, border: `1px solid ${t.accentColor}44`, fontSize: '0.72rem', fontWeight: 700 }}>
                     {t.emoji} {t.label}
                   </Box>
-                )}
+                ))}
               </Stack>
             )}
           </Box>

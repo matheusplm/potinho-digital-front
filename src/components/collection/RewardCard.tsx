@@ -77,12 +77,17 @@ function CardTextBox({ title, message, children, expanded }: { title: string; me
   )
 }
 
-function CardTag({ t }: { t?: NoteTypeConfig }) {
-  if (!t) return null
+function CardTag({ t, all }: { t?: NoteTypeConfig; all?: NoteTypeConfig[] }) {
+  const list = all?.length ? all : t ? [t] : []
+  if (list.length === 0) return null
   return (
-    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, px: 1, py: 0.3, borderRadius: radius.full, background: t.tagBg, color: t.tagColor, fontSize: '0.68rem', fontWeight: 700, alignSelf: 'flex-start' }}>
-      {t.emoji} {t.label}
-    </Box>
+    <Stack direction="row" spacing={0.5} sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
+      {list.map((item) => (
+        <Box key={item.id} sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, px: 1, py: 0.3, borderRadius: radius.full, background: item.tagBg, color: item.tagColor, fontSize: '0.68rem', fontWeight: 700, alignSelf: 'flex-start' }}>
+          {item.emoji} {item.label}
+        </Box>
+      ))}
+    </Stack>
   )
 }
 
@@ -101,7 +106,8 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
   onClick?: () => void; imageLayout?: NoteImageLayout; previewMode?: boolean; expanded?: boolean
 }) {
   const r = rarities.find((x) => x.id === reward.rarity)
-  const t = types.find((x) => x.id === reward.typeId)
+  const rewardTypes = (reward.typeIds?.length ? reward.typeIds : [reward.typeId]).map((id) => types.find((x) => x.id === id)).filter((x): x is NoteTypeConfig => !!x)
+  const t = rewardTypes[0]
   const img = reward.imageUrl
   const imageLayout: NoteImageLayout = imageLayoutProp ?? reward.imageLayout ?? 'banner'
   const showImg = !!(img || (previewMode && (imageLayoutProp ?? reward.imageLayout)))
@@ -126,7 +132,7 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
           <Typography sx={{ fontSize: '0.9rem', color: ink.secondary, lineHeight: 1.65, fontStyle: 'italic', ...clampM }}>
             &ldquo;{reward.message}&rdquo;
           </Typography>
-          <CardTag t={t} />
+          <CardTag t={t} all={rewardTypes} />
         </Stack>
       </Box>
     )
@@ -146,7 +152,7 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
             <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.2rem', color: ink.primary, lineHeight: 1.3 }}>{reward.title}</Typography>
             <Typography sx={{ mt: 0.75, fontSize: '0.9rem', color: ink.secondary, lineHeight: 1.65, fontStyle: 'italic' }}>&ldquo;{reward.message}&rdquo;</Typography>
           </Box>
-          <CardTag t={t} />
+          <CardTag t={t} all={rewardTypes} />
         </Stack>
       </Box>
     )
@@ -161,7 +167,7 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
         <Stack spacing={1.5} sx={{ p: 2, position: 'relative', zIndex: 1 }}>
           <CardChips r={r} isNew={reward.isNew} />
           <CardTextBox title={reward.title} message={reward.message} expanded={expanded} />
-          <CardTag t={t} />
+          <CardTag t={t} all={rewardTypes} />
         </Stack>
       </Box>
     )
@@ -178,7 +184,7 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
             <CardChips r={r} isNew={reward.isNew} />
             <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.05rem', color: ink.primary, lineHeight: 1.3, overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampT }}>{reward.title}</Typography>
             <Typography sx={{ fontSize: '0.82rem', color: ink.secondary, lineHeight: 1.55, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampM }}>&ldquo;{reward.message}&rdquo;</Typography>
-            <CardTag t={t} />
+            <CardTag t={t} all={rewardTypes} />
           </Stack>
         </Stack>
       </Box>
@@ -218,7 +224,7 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
           <CardTextBox title={reward.title} message={reward.message} expanded={expanded} />
         )}
 
-        <CardTag t={t} />
+        <CardTag t={t} all={rewardTypes} />
       </Stack>
     </Box>
   )

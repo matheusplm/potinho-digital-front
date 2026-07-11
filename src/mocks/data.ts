@@ -191,6 +191,7 @@ export function buildNoteView(
     message: record.message,
     rarity: record.rarity,
     typeId: record.typeId,
+    typeIds: record.typeIds,
     owned: isOwned,
     favorite: favorites.has(record.id),
     obtainedAt: isOwned ? obtainedAt[record.id] ?? seedTimestamp : null,

@@ -41,6 +41,7 @@ export function buildSimulatedPlayView(
     message: note.message,
     rarity: note.rarity,
     typeId: note.typeId,
+    typeIds: note.typeIds,
     owned: ownedSet.has(note.id),
     favorite: favorites[note.id] ?? false,
     obtainedAt: ownedSet.has(note.id) ? new Date().toISOString() : null,
@@ -60,7 +61,7 @@ export function simulatePackOpen(pack: CollectionPack, notes: NoteRecord[], rari
     !excluded.has(note.id) &&
     !note.disabledAt &&
     note.status !== 'preview' &&
-    (pack.allowedTypeIds.length === 0 || pack.allowedTypeIds.includes(note.typeId)) &&
+    (pack.allowedTypeIds.length === 0 || (note.typeIds?.length ? note.typeIds : [note.typeId]).some((id) => pack.allowedTypeIds.includes(id))) &&
     (pack.allowedRarityIds.length === 0 || pack.allowedRarityIds.includes(note.rarity)),
   )
 
@@ -77,6 +78,7 @@ export function simulatePackOpen(pack: CollectionPack, notes: NoteRecord[], rari
       message: note.message,
       rarity: note.rarity,
       typeId: note.typeId,
+      typeIds: note.typeIds,
       imageUrl: note.imageUrl ?? null,
       imageLayout: note.imageLayout ?? null,
       isNew: true,

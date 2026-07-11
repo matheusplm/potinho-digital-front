@@ -130,7 +130,7 @@ export function simulatePackOpening(pack: CollectionPack, notes: NoteRecord[], r
   const eligibleNotes = notes.filter((n) =>
     !n.disabledAt &&
     n.status !== 'preview' &&
-    (pack.allowedTypeIds.length === 0 || pack.allowedTypeIds.includes(n.typeId)) &&
+    (pack.allowedTypeIds.length === 0 || (n.typeIds?.length ? n.typeIds : [n.typeId]).some((id) => pack.allowedTypeIds.includes(id))) &&
     (pack.allowedRarityIds.length === 0 || pack.allowedRarityIds.includes(n.rarity)),
   )
   if (eligibleNotes.length === 0) return null

@@ -20,6 +20,7 @@ import { useJsonImport } from '../../hooks/useJsonImport'
 import { colors, font, radius } from '../../design-system'
 import { useBackground } from '../../context/BackgroundContext'
 import { gradientTextSx } from '../../utils/colorUtils'
+import { noteTypeIdList } from '../../utils/noteTypes'
 import type { NoteRecord } from '../../types/note'
 import { actionButtonSx } from './shared'
 import { NoteDialog } from './NoteDialog'
@@ -248,7 +249,7 @@ export function NotesTab({ cid }: NotesTabProps) {
                 note={note}
                 view={noteView}
                 r={rarities.find((x) => x.id === note.rarity)}
-                t={types.find((x) => x.id === note.typeId)}
+                noteTypes={types.filter((x) => noteTypeIdList(note).includes(x.id))}
                 mask={maskCards}
                 onOpen={() => setViewingNote(note)}
                 onEdit={() => { setEditingNote(note); setNoteDialog(true) }}
@@ -355,7 +356,7 @@ export function NotesTab({ cid }: NotesTabProps) {
             note={note}
             view={noteView}
             r={rarities.find((x) => x.id === note.rarity)}
-            t={types.find((x) => x.id === note.typeId)}
+            noteTypes={types.filter((x) => noteTypeIdList(note).includes(x.id))}
             mask={maskCards}
             onOpen={() => setViewingNote(note)}
             onEdit={() => { setEditingNote(note); setNoteDialog(true) }}

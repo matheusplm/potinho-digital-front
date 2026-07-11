@@ -14,6 +14,7 @@ import {
   useToggleCollectionFavoriteMutation,
 } from '../hooks/useNotes'
 import { fadeIn, font } from '../design-system'
+import type { NoteTypeConfig } from '../types/note'
 
 export function FavoritasPage() {
   const { theme } = useBackground()
@@ -80,7 +81,7 @@ export function FavoritasPage() {
                 key={note.id}
                 note={note}
                 r={rarities.find((x) => x.id === note.rarity)}
-                t={types.find((x) => x.id === note.typeId)}
+                ts={(note.typeIds?.length ? note.typeIds : [note.typeId]).map((id) => types.find((x) => x.id === id)).filter((x): x is NoteTypeConfig => !!x)}
                 unread={cid ? reader.unreadFor(cid).includes(note.id) : false}
                 variant="grid"
                 onSelect={(n) => { if (cid) reader.markViewed(cid, n.id); setSelected(n) }}

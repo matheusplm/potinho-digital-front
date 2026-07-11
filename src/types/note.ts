@@ -11,6 +11,7 @@ export interface NoteRecord {
   message: string
   rarity: string
   typeId: string
+  typeIds?: string[]
   imageUrl?: string | null
   imageLayout?: NoteImageLayout | null
   createdAt: string
@@ -25,6 +26,7 @@ export interface NoteFormData {
   message: string
   rarity: string
   typeId: string
+  typeIds?: string[]
   imageUrl: string | null
   imageLayout: NoteImageLayout | null
 }
@@ -47,6 +49,7 @@ export interface Note {
   message: string | null
   rarity: string
   typeId: string
+  typeIds?: string[]
   imageUrl?: string | null
   imageLayout?: NoteImageLayout | null
   owned: boolean
@@ -240,6 +243,7 @@ export interface CollectionDailyReward {
   message: string
   rarity: string
   typeId: string
+  typeIds?: string[]
   imageUrl?: string | null
   imageLayout?: NoteImageLayout | null
   isNew: boolean

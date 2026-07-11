@@ -14,6 +14,7 @@ import { colors, font, radius } from '../../design-system'
 import type { BackgroundTheme } from '../../design-system'
 import { gradientTextSx } from '../../utils/colorUtils'
 import type { CollectionNoteView, NoteTypeConfig, RarityConfig } from '../../types/note'
+import { noteTypeIdList } from '../../utils/noteTypes'
 
 export type AlbumView = 'list' | 'grid' | 'folders'
 export type AlbumSort = 'recent' | 'rarity' | 'az'
@@ -76,7 +77,7 @@ export function AlbumSection({
         .filter((g) => g.items.length > 0)
     }
     return discoveredTypes
-      .map((t) => ({ key: t.id, label: `${t.emoji} ${t.label}`, accent: `${t.accentColor}66`, items: sorted.filter((n) => n.typeId === t.id) }))
+      .map((t) => ({ key: t.id, label: `${t.emoji} ${t.label}`, accent: `${t.accentColor}66`, items: sorted.filter((n) => noteTypeIdList(n).includes(t.id)) }))
       .filter((g) => g.items.length > 0)
   }, [view, group, discoveredRarities, discoveredTypes, sorted])
 
@@ -86,7 +87,7 @@ export function AlbumSection({
         key={note.id}
         note={note}
         r={rarityById.get(note.rarity)}
-        t={typeById.get(note.typeId)}
+        ts={noteTypeIdList(note).map((id) => typeById.get(id)).filter((x): x is NoteTypeConfig => !!x)}
         unread={unreadSet.has(note.id)}
         variant={variant}
         onSelect={onSelect}

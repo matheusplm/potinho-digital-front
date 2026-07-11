@@ -31,7 +31,7 @@ export function computeAchievements(
   const ownsTopRarity = topRarity ? owned.some((i) => i.rarity === topRarity.id) : false
 
   const typeComplete = types.some((t) => {
-    const inType = items.filter((i) => i.typeId === t.id)
+    const inType = items.filter((i) => (i.typeIds?.length ? i.typeIds : [i.typeId]).includes(t.id))
     return inType.length > 0 && inType.every((i) => i.owned)
   })
 

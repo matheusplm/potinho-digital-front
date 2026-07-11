@@ -8,8 +8,8 @@ import { useBackground } from '../../context/BackgroundContext'
 import { RewardCard, rarityCardSx } from './RewardCard'
 import type { CollectionNoteView, NoteTypeConfig, RarityConfig } from '../../types/note'
 
-export function NoteCard({ note, r, t, unread, variant, onSelect, onToggleFavorite }: {
-  note: CollectionNoteView; r?: RarityConfig; t?: NoteTypeConfig
+export function NoteCard({ note, r, ts = [], unread, variant, onSelect, onToggleFavorite }: {
+  note: CollectionNoteView; r?: RarityConfig; ts?: NoteTypeConfig[]
   unread: boolean; variant: 'list' | 'grid'
   onSelect: (note: CollectionNoteView) => void
   onToggleFavorite: (note: CollectionNoteView) => void
@@ -38,7 +38,7 @@ export function NoteCard({ note, r, t, unread, variant, onSelect, onToggleFavori
         <RewardCard
           reward={{ id: note.id, title: note.title ?? '', message: note.message ?? '', rarity: note.rarity, typeId: note.typeId, imageUrl: note.imageUrl, imageLayout: note.imageLayout, isNew: false }}
           rarities={r ? [r] : []}
-          types={t ? [t] : []}
+          types={ts}
         />
         {unread && (
           <Box sx={{ position: 'absolute', top: 2, left: 2, width: 11, height: 11, zIndex: 5, borderRadius: radius.full, background: colors.rose.main, boxShadow: `0 0 0 3px rgba(255,255,255,0.82), 0 0 14px ${colors.rose.glow}`, pointerEvents: 'none' }} />
@@ -61,9 +61,9 @@ export function NoteCard({ note, r, t, unread, variant, onSelect, onToggleFavori
             {r && (
               <Chip size="small" label={`${r.emoji} ${r.label}`} sx={{ height: 19, fontSize: '0.70rem', fontWeight: 800, background: r.chipBg, border: `1px solid ${r.borderColor}`, '& .MuiChip-label': { px: 0.8, ...gradientTextSx(r.chipColor) } }} />
             )}
-            {t && !grid && (
-              <Chip size="small" label={`${t.emoji} ${t.label}`} sx={{ height: 19, fontSize: '0.70rem', fontWeight: 800, background: t.tagBg, color: t.tagColor, border: `1px solid ${t.accentColor}44`, '& .MuiChip-label': { px: 0.8 } }} />
-            )}
+            {!grid && ts.map((t) => (
+              <Chip key={t.id} size="small" label={`${t.emoji} ${t.label}`} sx={{ height: 19, fontSize: '0.70rem', fontWeight: 800, background: t.tagBg, color: t.tagColor, border: `1px solid ${t.accentColor}44`, '& .MuiChip-label': { px: 0.8 } }} />
+            ))}
           </Stack>
           <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: grid ? '0.9rem' : '0.98rem', color: ink.primary, mb: 0.3, display: '-webkit-box', WebkitLineClamp: grid ? 2 : 1, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
             {note.title ?? ''}

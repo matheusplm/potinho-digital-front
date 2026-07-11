@@ -15,7 +15,8 @@ export function NoteDetailDialog({ note, rarities, types, onClose }: {
 }) {
   const { theme } = useBackground()
   const rarity = note ? rarities.find((item) => item.id === note.rarity) : undefined
-  const type = note ? types.find((item) => item.id === note.typeId) : undefined
+  const noteTypes = note ? (note.typeIds?.length ? note.typeIds : [note.typeId]).map((id) => types.find((item) => item.id === id)).filter((x): x is NoteTypeConfig => !!x) : []
+  const type = noteTypes[0]
 
   return (
     <Dialog open={!!note} onClose={onClose} maxWidth="sm" fullWidth slotProps={{ paper: { sx: { mx: 2, borderRadius: radius.xl, overflow: 'hidden' } } }}>

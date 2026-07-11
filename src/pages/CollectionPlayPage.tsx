@@ -15,6 +15,7 @@ import { useReader } from '../context/ReaderContext'
 import { colors, fadeIn, font, radius } from '../design-system'
 import { slugify } from '../utils/slug'
 import { isCollectionOwner } from '../utils/collectionAccess'
+import { noteTypeIdList } from '../utils/noteTypes'
 import { CollectionPanel } from '../components/album/CollectionPanel'
 import { AlbumSection, ALBUM_VIEW_KEY } from './play/AlbumSection'
 import type { AlbumView, AlbumSort, AlbumGroup, AlbumFilter } from './play/AlbumSection'
@@ -101,7 +102,7 @@ export function CollectionPlayPage() {
   const discoveredItems = useMemo(() => (play?.items ?? []).filter((item) => item.owned), [play?.items])
   const undiscoveredItems = useMemo(() => (play?.items ?? []).filter((item) => !item.owned), [play?.items])
   const discoveredRarityIds = useMemo(() => new Set(discoveredItems.map((item) => item.rarity)), [discoveredItems])
-  const discoveredTypeIds = useMemo(() => new Set(discoveredItems.map((item) => item.typeId)), [discoveredItems])
+  const discoveredTypeIds = useMemo(() => new Set(discoveredItems.flatMap((item) => noteTypeIdList(item))), [discoveredItems])
   const hasFavorites = useMemo(() => discoveredItems.some((item) => item.favorite), [discoveredItems])
   const discoveredRarities = useMemo(() => rarities.filter((rarity) => discoveredRarityIds.has(rarity.id)), [discoveredRarityIds, rarities])
   const discoveredTypes = useMemo(() => types.filter((type) => discoveredTypeIds.has(type.id)), [discoveredTypeIds, types])
@@ -110,7 +111,7 @@ export function CollectionPlayPage() {
     return discoveredItems.filter((item) => {
       const matchesStatus = albumFilter === 'all' || (albumFilter === 'favorites' && item.favorite)
       const matchesRarity = albumRarity === 'all' || item.rarity === albumRarity
-      const matchesType = albumType === 'all' || item.typeId === albumType
+      const matchesType = albumType === 'all' || noteTypeIdList(item).includes(albumType)
       const matchesSearch = q === '' || (item.title?.toLowerCase().includes(q) ?? false) || (item.message?.toLowerCase().includes(q) ?? false)
       return matchesStatus && matchesRarity && matchesType && matchesSearch
     })
