@@ -70,7 +70,7 @@ export function AchievementsTab({ cid }: AchievementsTabProps) {
                 sx={{
                   flexShrink: 0, px: 1.05, py: 0.55, borderRadius: radius.full, cursor: 'pointer',
                   fontSize: '0.74rem', fontWeight: 800, color: theme.textOnBg,
-                  background: 'rgba(255,255,255,0.55)', border: '1px solid rgba(255,255,255,0.62)', backdropFilter: 'blur(10px)',
+                  background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}`, backdropFilter: 'blur(10px)',
                 }}
               >
                 + {p.emoji} {p.label}

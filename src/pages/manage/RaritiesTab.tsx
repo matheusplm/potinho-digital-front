@@ -276,7 +276,7 @@ export function RaritiesTab({ cid }: RaritiesTabProps) {
             {rarities.length} raridade{rarities.length !== 1 ? 's' : ''}
           </Typography>
           <Stack direction="row" spacing={0.8} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.8 }}>
-            <Button variant="ghost" onClick={() => setRarityImportDialogOpen(true)} sx={{ flex: '1 1 132px', py: 0.7, px: 1.2, fontSize: '0.76rem', background: 'rgba(255,255,255,0.44)' }}>
+            <Button variant="ghost" onClick={() => setRarityImportDialogOpen(true)} sx={{ flex: '1 1 132px', py: 0.7, px: 1.2, fontSize: '0.76rem' }}>
               Importar JSON
             </Button>
             <Button variant="primary" onClick={() => { setEditingRarity(null); setRarityDialogOpen(true) }} sx={{ flex: '1 1 94px', py: 0.7, px: 1.4, fontSize: '0.78rem' }}>

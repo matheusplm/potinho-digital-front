@@ -3,7 +3,7 @@ import { Box, Dialog, DialogActions, DialogContent, Stack, Typography } from '@m
 import { keyframes } from '@emotion/react'
 import { useEffect, useState } from 'react'
 import { Button } from '../../components/ui'
-import { colors, font, radius, shineSweep } from '../../design-system'
+import { colors, font, ink, radius, shineSweep } from '../../design-system'
 import { gradientTextSx } from '../../utils/colorUtils'
 import type { RarityConfig, NoteTypeConfig } from '../../types/note'
 import type { PackSimulation } from './packData'
@@ -119,14 +119,14 @@ export function PackSimulationDialog({ simulation, rarities, types, onClose, onS
                   const rarity = rarities.find((item) => item.id === note.rarity)
                   const type = types.find((item) => item.id === note.typeId)
                   return (
-                    <Box key={`${note.id}-${index}`} sx={{ p: 1.25, borderRadius: radius.lg, background: rarity?.cardBg ?? colors.surface.overlay, border: `1.5px solid ${rarity?.borderColor ?? colors.border.subtle}`, boxShadow: rarity?.glowColor ? `${rarity.shadow}, 0 0 22px ${rarity.glowColor}` : rarity?.shadow, opacity: 0, animation: `${rewardReveal} 0.42s cubic-bezier(.2,.85,.2,1) forwards`, animationDelay: `${index * 0.12}s` }}>
+                    <Box key={`${note.id}-${index}`} sx={{ p: 1.25, borderRadius: radius.lg, background: rarity?.cardBg ?? ink.surface, border: `1.5px solid ${rarity?.borderColor ?? colors.border.subtle}`, boxShadow: rarity?.glowColor ? `${rarity.shadow}, 0 0 22px ${rarity.glowColor}` : rarity?.shadow, opacity: 0, animation: `${rewardReveal} 0.42s cubic-bezier(.2,.85,.2,1) forwards`, animationDelay: `${index * 0.12}s` }}>
                       <Stack direction="row" spacing={1} alignItems="flex-start">
-                        <Box sx={{ width: 28, height: 28, borderRadius: radius.md, display: 'flex', alignItems: 'center', justifyContent: 'center', background: rarity?.chipBg ?? 'rgba(0,0,0,0.04)', color: rarity ? colors.text.primary : colors.text.secondary, fontSize: '0.78rem', fontWeight: 900, flexShrink: 0 }}>
+                        <Box sx={{ width: 28, height: 28, borderRadius: radius.md, display: 'flex', alignItems: 'center', justifyContent: 'center', background: rarity?.chipBg ?? 'rgba(0,0,0,0.06)', color: rarity ? ink.primary : ink.secondary, fontSize: '0.78rem', fontWeight: 900, flexShrink: 0 }}>
                           {index + 1}
                         </Box>
                         <Box sx={{ flex: 1, minWidth: 0 }}>
-                          <Typography sx={{ fontFamily: font.serif, fontSize: '0.92rem', fontWeight: 800, color: rarity?.textColor ?? colors.text.primary, mb: 0.2 }}>{note.title}</Typography>
-                          <Typography sx={{ fontSize: '0.74rem', color: rarity?.captionColor ?? colors.text.secondary, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.45 }}>{note.message}</Typography>
+                          <Typography sx={{ fontFamily: font.serif, fontSize: '0.92rem', fontWeight: 800, color: rarity?.textColor ?? ink.primary, mb: 0.2 }}>{note.title}</Typography>
+                          <Typography sx={{ fontSize: '0.74rem', color: rarity?.captionColor ?? ink.secondary, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.45 }}>{note.message}</Typography>
                           <Stack direction="row" spacing={0.5} sx={{ mt: 0.75, flexWrap: 'wrap', rowGap: 0.45 }}>
                             {rarity && (
                               <Box sx={{ display: 'inline-flex', alignItems: 'center', px: 0.75, py: 0.25, borderRadius: radius.full, background: rarity.chipBg, border: `1px solid ${rarity.borderColor}`, fontSize: '0.70rem', fontWeight: 750 }}>

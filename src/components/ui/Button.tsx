@@ -36,7 +36,7 @@ const STYLES: Record<AppVariant, object> = {
     boxShadow: shadow.sm,
     color: colors.primary.main,
     border: `1.5px solid rgba(29,78,216,0.2)`,
-    '&:hover': { background: 'rgba(255,255,255,0.95)', boxShadow: shadow.md },
+    '&:hover': { background: colors.surface.base, boxShadow: shadow.md },
   },
 }
 

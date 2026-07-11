@@ -161,7 +161,7 @@ export function NotesTab({ cid }: NotesTabProps) {
             <Box sx={{ flex: '1 1 260px', minWidth: 230 }}>
               <SegmentedControl options={NOTE_VIEW_OPTIONS} value={noteView} onChange={setNoteView} />
             </Box>
-            <Button variant="ghost" onClick={() => setImportDialogOpen(true)} sx={{ flex: '1 1 132px', py: 0.7, px: 1.2, fontSize: '0.76rem', background: 'rgba(255,255,255,0.44)' }}>
+            <Button variant="ghost" onClick={() => setImportDialogOpen(true)} sx={{ flex: '1 1 132px', py: 0.7, px: 1.2, fontSize: '0.76rem' }}>
               Importar JSON
             </Button>
             <Button variant="primary" onClick={() => { setEditingNote(null); setNoteDialog(true) }} sx={{ flex: '1 1 94px', py: 0.7, px: 1.4, fontSize: '0.78rem' }}>
@@ -356,7 +356,7 @@ export function NotesTab({ cid }: NotesTabProps) {
         ))}
 
         {statusView === 'live' && !notesLoading && filteredNotes.length > visibleNotes.length && (
-          <Button variant="ghost" onClick={() => setVisibleNoteCount((c) => c + NOTE_PAGE_SIZE)} sx={{ alignSelf: 'center', mt: 0.5, px: 1.6, py: 0.8, fontSize: '0.78rem', background: 'rgba(255,255,255,0.5)' }}>
+          <Button variant="ghost" onClick={() => setVisibleNoteCount((c) => c + NOTE_PAGE_SIZE)} sx={{ alignSelf: 'center', mt: 0.5, px: 1.6, py: 0.8, fontSize: '0.78rem' }}>
             Mostrar mais {Math.min(NOTE_PAGE_SIZE, filteredNotes.length - visibleNotes.length)} bilhetes
           </Button>
         )}
@@ -426,7 +426,7 @@ export function NotesTab({ cid }: NotesTabProps) {
 
       <NoteDialog open={noteDialog} editing={editingNote} rarities={rarities} types={types} cid={cid} onClose={() => { setNoteDialog(false); setEditingNote(null) }} />
       <NoteDetailDialog note={viewingNote} rarities={rarities} types={types} onClose={() => setViewingNote(null)} />
-      <ReleaseDialog cid={cid} notes={selectedDrafts} open={releaseDialogOpen} onClose={() => setReleaseDialogOpen(false)} />
+      <ReleaseDialog cid={cid} notes={selectedDrafts} rarities={rarities} open={releaseDialogOpen} onClose={() => setReleaseDialogOpen(false)} />
 
       <ConfirmDeleteDialog
         open={noteDisable.isOpen}

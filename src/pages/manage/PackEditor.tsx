@@ -2,10 +2,9 @@ import CasinoOutlinedIcon from '@mui/icons-material/CasinoOutlined'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { Box, Chip, Collapse, DialogActions, DialogContent, DialogTitle, Stack, TextField, Typography } from '@mui/material'
 import { useState } from 'react'
-import type { ReactNode } from 'react'
-import { Button, EmojiPickerInput, Input } from '../../components/ui'
+import { Button, EmojiPickerInput, HintText, Input, SectionLabel } from '../../components/ui'
 import { useCollectionNotesQuery, useCreateCollectionPackMutation, useCollectionPacksQuery, useUpdateCollectionPackMutation } from '../../hooks/useNotes'
-import { colors, font, radius } from '../../design-system'
+import { colors, font, ink, radius } from '../../design-system'
 import { gradientTextSx } from '../../utils/colorUtils'
 import { uniqueConfigId } from '../../utils/slug'
 import { toast } from '../../components/ui'
@@ -20,14 +19,6 @@ import {
 import { PackSimulationDialog } from './PackSimulationDialog'
 import type { PackSimulation } from './packData'
 import type { CollectionPack, CollectionPackFormData, RarityConfig, NoteTypeConfig } from '../../types/note'
-
-function SectionLabel({ children }: { children: ReactNode }) {
-  return <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: colors.text.secondary, mb: 0.8 }}>{children}</Typography>
-}
-
-function HintText({ children }: { children: ReactNode }) {
-  return <Typography sx={{ fontSize: '0.68rem', color: colors.text.muted, mt: 0.7, lineHeight: 1.45 }}>{children}</Typography>
-}
 
 function CheckSquare({ checked }: { checked: boolean }) {
   return (
@@ -137,8 +128,8 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
   const statusChipStyle = form.status === 'active'
     ? { background: '#dcfce7', color: '#15803d' }
     : form.status === 'draft'
-      ? { background: 'rgba(255,255,255,0.72)', color: colors.text.secondary }
-      : { background: 'rgba(0,0,0,0.08)', color: colors.text.secondary }
+      ? { background: 'rgba(255,255,255,0.72)', color: ink.secondary }
+      : { background: 'rgba(0,0,0,0.12)', color: ink.secondary }
 
   return (
     <>
@@ -149,7 +140,7 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
         <Stack spacing={2.2} sx={{ pt: 1 }}>
           {isNew && (
             <Box>
-              <SectionLabel>Comece com um modelo</SectionLabel>
+              <SectionLabel sx={{ mb: 0.8 }}>Comece com um modelo</SectionLabel>
               <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 0.8 }}>
                 {PACK_TEMPLATES.map((template) => (
                   <Box key={template.id} onClick={() => applyTemplate(template)} sx={{
@@ -185,7 +176,7 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
                 </Box>
                 <Box sx={{ flex: 1, minWidth: 0 }}>
                   <Stack direction="row" spacing={0.7} alignItems="center" sx={{ mb: 0.5 }}>
-                    <Typography sx={{ flex: 1, minWidth: 0, fontFamily: font.serif, fontWeight: 800, fontSize: '1rem', color: colors.text.primary, lineHeight: 1.15, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <Typography sx={{ flex: 1, minWidth: 0, fontFamily: font.serif, fontWeight: 800, fontSize: '1rem', color: ink.primary, lineHeight: 1.15, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {form.name.trim() || 'Meu pacotinho'}
                     </Typography>
                     <Chip label={PACK_STATUS_LABELS[form.status]} size="small"
@@ -201,7 +192,7 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
                 </Box>
               </Stack>
             </Box>
-            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ px: 1.5, py: 0.7, background: '#fff', borderTop: `1px solid ${colors.border.subtle}` }}>
+            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ px: 1.5, py: 0.7, background: colors.surface.paper, borderTop: `1px solid ${colors.border.subtle}` }}>
               <Typography sx={{ fontSize: '0.62rem', fontWeight: 800, color: colors.text.muted, textTransform: 'uppercase', letterSpacing: 0.6 }}>
                 Prévia ao vivo
               </Typography>
@@ -226,7 +217,7 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
           </Stack>
 
           <Box>
-            <SectionLabel>Com que frequência ela recebe?</SectionLabel>
+            <SectionLabel sx={{ mb: 0.8 }}>Com que frequência ela recebe?</SectionLabel>
             <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 0.7 }}>
               {PACK_RHYTHMS.map((item) => {
                 const active = rhythm === item.id
@@ -290,7 +281,7 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
             <Collapse in={advancedOpen}>
               <Stack spacing={2.2} sx={{ pt: 2 }}>
                 <Box>
-                  <SectionLabel>Descrição</SectionLabel>
+                  <SectionLabel sx={{ mb: 0.8 }}>Descrição</SectionLabel>
                   <TextField multiline rows={2} fullWidth placeholder="Descrição do pacotinho..." value={form.description}
                     onChange={(e) => set('description', e.target.value)}
                     sx={{ '& .MuiOutlinedInput-root': { borderRadius: radius.md, fontSize: '0.86rem', background: colors.surface.overlay, '& fieldset': { borderColor: colors.border.medium } } }} />
@@ -298,14 +289,14 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
 
                 {form.scheduleMode === 'cooldown' && (
                   <Box>
-                    <SectionLabel>Cooldown exato (horas)</SectionLabel>
+                    <SectionLabel sx={{ mb: 0.8 }}>Cooldown exato (horas)</SectionLabel>
                     <Input type="number" value={form.cooldownHours ?? ''} onChange={(e) => set('cooldownHours', e.target.value === '' ? null : Number(e.target.value))} inputProps={{ min: 1, max: 8760 }} sx={{ width: 170 }} />
                     <HintText>Vazio = sem recarga automática (uma vez só). 24 = diário, 168 = semanal.</HintText>
                   </Box>
                 )}
 
                 <Box>
-                  <SectionLabel>Categoria</SectionLabel>
+                  <SectionLabel sx={{ mb: 0.8 }}>Categoria</SectionLabel>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6 }}>
                     {PACK_CATEGORY_OPTIONS.map((option) => (
                       <Chip key={option.id} label={option.label} size="small" onClick={() => set('category', option.id)}
@@ -316,7 +307,7 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
                 </Box>
 
                 <Box>
-                  <SectionLabel>Status</SectionLabel>
+                  <SectionLabel sx={{ mb: 0.8 }}>Status</SectionLabel>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6 }}>
                     {PACK_STATUS_OPTIONS.map((option) => (
                       <Chip key={option.id} label={option.label} size="small" onClick={() => set('status', option.id)}
@@ -327,7 +318,7 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
                 </Box>
 
                 <Box>
-                  <SectionLabel>Distribuição</SectionLabel>
+                  <SectionLabel sx={{ mb: 0.8 }}>Distribuição</SectionLabel>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6 }}>
                     {PACK_DISTRIBUTION_OPTIONS.map((option) => (
                       <Chip key={option.id} label={option.label} size="small" onClick={() => set('distribution', option.id)}
@@ -338,7 +329,7 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
                 </Box>
 
                 <Box>
-                  <SectionLabel>Tipos permitidos</SectionLabel>
+                  <SectionLabel sx={{ mb: 0.8 }}>Tipos permitidos</SectionLabel>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6 }}>
                     <Chip label="Todos" size="small" onClick={() => set('allowedTypeIds', [])}
                       sx={{ cursor: 'pointer', fontWeight: 800, background: form.allowedTypeIds.length === 0 ? colors.primary.main : 'rgba(0,0,0,0.05)', color: form.allowedTypeIds.length === 0 ? '#fff' : colors.text.secondary }} />
@@ -351,7 +342,7 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
                 </Box>
 
                 <Box>
-                  <SectionLabel>Raridades permitidas</SectionLabel>
+                  <SectionLabel sx={{ mb: 0.8 }}>Raridades permitidas</SectionLabel>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6 }}>
                     <Chip label="Todas" size="small" onClick={() => set('allowedRarityIds', [])}
                       sx={{ cursor: 'pointer', fontWeight: 800, background: form.allowedRarityIds.length === 0 ? colors.primary.main : 'rgba(0,0,0,0.05)', color: form.allowedRarityIds.length === 0 ? '#fff' : colors.text.secondary }} />
@@ -363,7 +354,7 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
                 </Box>
 
                 <Box>
-                  <SectionLabel>Raridade garantida</SectionLabel>
+                  <SectionLabel sx={{ mb: 0.8 }}>Raridade garantida</SectionLabel>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6 }}>
                     <Chip label="Nenhuma" size="small" onClick={() => set('guaranteedRarityId', null)}
                       sx={{ cursor: 'pointer', fontWeight: 800, background: form.guaranteedRarityId === null ? colors.primary.main : 'rgba(0,0,0,0.05)', color: form.guaranteedRarityId === null ? '#fff' : colors.text.secondary }} />

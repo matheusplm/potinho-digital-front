@@ -4,7 +4,7 @@ import { keyframes } from '@emotion/react'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
-import { cardIn, colors, font, overlayIn, packCtaFloat, radius, shimmer, slideL, slideR } from '../../design-system'
+import { cardIn, font, ink, overlayIn, packCtaFloat, radius, shimmer, slideL, slideR } from '../../design-system'
 import { queryKeys } from '../../hooks/useNotes'
 import { useUser } from '../../context/UserContext'
 import { COLLECTION_TEMPLATES, createCollectionFromTemplate } from '../../services/collectionTemplates'
@@ -110,7 +110,7 @@ function MiniNote({ r, message, sx }: { r: RarityLook; message: string; sx?: obj
         <Typography sx={{ fontSize: '0.66rem', opacity: 0.4, lineHeight: 1 }}>💌</Typography>
       </Stack>
       <Box sx={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-        <Typography sx={{ fontFamily: font.serif, fontSize: '0.78rem', color: colors.text.primary, lineHeight: 1.55 }}>
+        <Typography sx={{ fontFamily: font.serif, fontSize: '0.78rem', color: ink.primary, lineHeight: 1.55 }}>
           {message}
         </Typography>
       </Box>
@@ -149,7 +149,7 @@ function StageRarities() {
             border: `1px solid ${i === active ? `${item.color}55` : 'rgba(0,0,0,0.06)'}`,
             transition: 'all 0.25s ease',
           }}>
-            <Typography sx={{ fontSize: '0.58rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.5, color: i === active ? item.color : colors.text.muted, transition: 'color 0.25s ease' }}>
+            <Typography sx={{ fontSize: '0.58rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.5, color: i === active ? item.color : ink.muted, transition: 'color 0.25s ease' }}>
               {item.label}
             </Typography>
           </Box>
@@ -219,7 +219,7 @@ function StagePack() {
               }} />
             ))}
           </Box>
-          <Typography sx={{ mt: 1.2, fontSize: '0.72rem', fontWeight: 700, color: colors.text.secondary }}>
+          <Typography sx={{ mt: 1.2, fontSize: '0.72rem', fontWeight: 700, color: ink.secondary }}>
             ✨ Veio até um Lendário!
           </Typography>
           <Typography onClick={() => setOpened(false)} sx={{ mt: 0.3, fontSize: '0.66rem', fontWeight: 800, color: '#d97706', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>
@@ -245,8 +245,8 @@ function StageInvite() {
             <Typography sx={{ fontSize: '0.95rem', lineHeight: 1 }}>💙</Typography>
           </Box>
           <Box sx={{ minWidth: 0, flex: 1 }}>
-            <Typography sx={{ fontSize: '0.78rem', fontWeight: 800, color: colors.text.primary, lineHeight: 1.2 }}>Pessoa amada</Typography>
-            <Typography sx={{ fontSize: '0.64rem', color: colors.text.secondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>amor@email.com</Typography>
+            <Typography sx={{ fontSize: '0.78rem', fontWeight: 800, color: ink.primary, lineHeight: 1.2 }}>Pessoa amada</Typography>
+            <Typography sx={{ fontSize: '0.64rem', color: ink.secondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>amor@email.com</Typography>
           </Box>
           <Box sx={{ px: 0.8, py: 0.3, borderRadius: radius.full, background: 'rgba(220,252,231,0.9)', border: '1px solid rgba(21,128,61,0.25)', flexShrink: 0 }}>
             <Typography sx={{ fontSize: '0.56rem', fontWeight: 900, color: '#15803d' }}>✓ convidada</Typography>
@@ -259,7 +259,7 @@ function StageInvite() {
       }}>
         <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, color: '#fff' }}>👀 Simular como leitor</Typography>
       </Box>
-      <Typography sx={{ fontSize: '0.6rem', color: colors.text.muted }}>o Simular fica no menu principal</Typography>
+      <Typography sx={{ fontSize: '0.6rem', color: ink.muted }}>o Simular fica no menu principal</Typography>
     </Box>
   )
 }
@@ -514,7 +514,7 @@ export function OnboardingOverlay({ onDismiss }: Props) {
             }}>
               {displayTitle}
             </Typography>
-            <Typography sx={{ fontSize: '0.86rem', color: colors.text.secondary, lineHeight: 1.72, ...(isPicker ? {} : { minHeight: 66 }) }}>
+            <Typography sx={{ fontSize: '0.86rem', color: ink.secondary, lineHeight: 1.72, ...(isPicker ? {} : { minHeight: 66 }) }}>
               {displayDesc}
             </Typography>
           </Box>
@@ -539,16 +539,16 @@ export function OnboardingOverlay({ onDismiss }: Props) {
                     <Typography sx={{ fontSize: '1.15rem', lineHeight: 1 }}>{selectedKit.collection.emoji}</Typography>
                   </Box>
                   <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography sx={{ fontFamily: font.serif, fontSize: '0.9rem', fontWeight: 800, color: colors.text.primary, lineHeight: 1.2 }}>
+                    <Typography sx={{ fontFamily: font.serif, fontSize: '0.9rem', fontWeight: 800, color: ink.primary, lineHeight: 1.2 }}>
                       {selectedKit.collection.name}
                     </Typography>
-                    <Typography sx={{ fontSize: '0.64rem', color: colors.text.secondary }}>
+                    <Typography sx={{ fontSize: '0.64rem', color: ink.secondary }}>
                       nome da coleção, dá para renomear depois
                     </Typography>
                   </Box>
                 </Box>
                 <Box sx={{ px: 1.3, py: 1.1, background: 'rgba(255,255,255,0.97)', borderTop: '1px solid rgba(0,0,0,0.05)' }}>
-                  <Typography sx={{ fontSize: '0.6rem', fontWeight: 900, letterSpacing: 0.8, color: colors.text.muted, textTransform: 'uppercase', mb: 0.7 }}>
+                  <Typography sx={{ fontSize: '0.6rem', fontWeight: 900, letterSpacing: 0.8, color: ink.muted, textTransform: 'uppercase', mb: 0.7 }}>
                     Vem dentro
                   </Typography>
                   <Stack spacing={0.55}>
@@ -557,7 +557,7 @@ export function OnboardingOverlay({ onDismiss }: Props) {
                       return (
                         <Stack key={note.title} direction="row" spacing={0.8} alignItems="center">
                           <Box sx={{ width: 7, height: 7, borderRadius: '50%', flexShrink: 0, background: look.color, boxShadow: `0 0 6px ${look.color}66` }} />
-                          <Typography sx={{ flex: 1, minWidth: 0, fontSize: '0.74rem', color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <Typography sx={{ flex: 1, minWidth: 0, fontSize: '0.74rem', color: ink.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {note.title}
                           </Typography>
                           <Typography sx={{ fontSize: '0.56rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 0.5, color: look.color, flexShrink: 0 }}>
@@ -582,9 +582,9 @@ export function OnboardingOverlay({ onDismiss }: Props) {
               </Box>
 
               <Box>
-                <Typography sx={{ fontSize: '0.76rem', fontWeight: 800, color: colors.text.primary, mb: 0.7 }}>
+                <Typography sx={{ fontSize: '0.76rem', fontWeight: 800, color: ink.primary, mb: 0.7 }}>
                   Quer convidar alguém agora?{' '}
-                  <Box component="span" sx={{ color: colors.text.muted, fontWeight: 600 }}>(opcional)</Box>
+                  <Box component="span" sx={{ color: ink.muted, fontWeight: 600 }}>(opcional)</Box>
                 </Typography>
                 <Input
                   type="email"
@@ -594,7 +594,7 @@ export function OnboardingOverlay({ onDismiss }: Props) {
                   disabled={!!creating}
                   sx={{ '& .MuiOutlinedInput-root': { fontSize: '0.82rem' }, '& input': { py: 0.9 } }}
                 />
-                <Typography sx={{ fontSize: '0.64rem', color: colors.text.muted, mt: 0.5 }}>
+                <Typography sx={{ fontSize: '0.64rem', color: ink.muted, mt: 0.5 }}>
                   A pessoa recebe um convite por email para colecionar seus bilhetes.
                 </Typography>
               </Box>
@@ -635,9 +635,9 @@ export function OnboardingOverlay({ onDismiss }: Props) {
                 <Typography
                   onClick={dismiss}
                   sx={{
-                    textAlign: 'center', fontSize: '0.7rem', fontWeight: 700, color: colors.text.muted,
+                    textAlign: 'center', fontSize: '0.7rem', fontWeight: 700, color: ink.muted,
                     cursor: creating ? 'default' : 'pointer', py: 0.3,
-                    '&:hover': creating ? {} : { color: colors.text.secondary, textDecoration: 'underline' },
+                    '&:hover': creating ? {} : { color: ink.secondary, textDecoration: 'underline' },
                   }}
                 >
                   ou explorar por conta própria
