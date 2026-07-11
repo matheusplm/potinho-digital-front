@@ -1,8 +1,6 @@
 import AddIcon from '@mui/icons-material/Add'
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
 import ReplayIcon from '@mui/icons-material/Replay'
-import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import SearchIcon from '@mui/icons-material/Search'
 import CloseIcon from '@mui/icons-material/Close'
 import ViewAgendaIcon from '@mui/icons-material/ViewAgenda'
@@ -12,7 +10,6 @@ import { Box, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButto
 import { useEffect, useMemo, useState } from 'react'
 import { Button, Card, ConfirmDeleteDialog, Input, LoadingState, SegmentedControl, toast } from '../../components/ui'
 import { NoteDetailDialog, type ReadableNote } from '../../components/collection/NoteDetailDialog'
-import { RewardCard } from '../../components/collection/RewardCard'
 import {
   useCollectionNotesQuery, useCollectionRaritiesQuery, useCollectionTypesQuery,
   useDisableCollectionNoteMutation, useRestoreCollectionNoteMutation, usePermanentlyDeleteCollectionNoteMutation,
@@ -20,13 +17,14 @@ import {
 } from '../../hooks/useNotes'
 import { useConfirmDelete } from '../../hooks/useConfirmDelete'
 import { useJsonImport } from '../../hooks/useJsonImport'
-import { colors, font, ink, radius } from '../../design-system'
+import { colors, font, radius } from '../../design-system'
 import { useBackground } from '../../context/BackgroundContext'
-import { gradientTextSx, themedCardBg } from '../../utils/colorUtils'
+import { gradientTextSx } from '../../utils/colorUtils'
 import type { NoteRecord } from '../../types/note'
 import { actionButtonSx } from './shared'
 import { NoteDialog } from './NoteDialog'
 import { ReleaseDialog } from './ReleaseDialog'
+import { ManageNoteCard } from './ManageNoteCard'
 
 type NoteSort = 'newest' | 'oldest' | 'az' | 'rarity' | 'type'
 type NoteView = 'cards' | 'list' | 'compact'
@@ -212,75 +210,20 @@ export function NotesTab({ cid }: NotesTabProps) {
               </Typography>
             </Stack>
 
-            {draftNotes.map((note) => {
-              const selected = selectedDraftIds.includes(note.id)
-              const r = rarities.find((x) => x.id === note.rarity)
-              const t = types.find((x) => x.id === note.typeId)
-              return (
-                <Card key={note.id} onClick={() => toggleDraft(note.id)} sx={{
-                  p: 0, overflow: 'hidden', cursor: 'pointer',
-                  background: themedCardBg('rgba(255,255,255,0.78)', maskCards),
-                  border: `1.5px solid ${selected ? theme.accent : r?.borderColor ?? colors.border.subtle}`,
-                  boxShadow: selected ? `0 8px 26px ${theme.accent}30` : '0 6px 18px rgba(15,23,42,0.07)',
-                  transition: 'border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease',
-                  '&:hover': { transform: 'translateY(-1px)' },
-                }}>
-                  <Stack direction="row" alignItems="stretch" sx={{ minHeight: 78 }}>
-                    {note.imageUrl ? (
-                      <Box sx={{ width: 68, flexShrink: 0, overflow: 'hidden' }}>
-                        <Box component="img" src={note.imageUrl} alt="" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', filter: selected ? 'none' : 'saturate(0.85)' }} />
-                      </Box>
-                    ) : (
-                      <Box sx={{ width: 5, flexShrink: 0, background: r ? `linear-gradient(180deg,${r.borderColor},${r.glowColor || r.borderColor})` : colors.border.subtle, opacity: selected ? 1 : 0.55 }} />
-                    )}
-
-                    <Box sx={{ flex: 1, minWidth: 0, px: 1.3, py: 1.05 }}>
-                      <Stack direction="row" alignItems="center" spacing={1}>
-                        <Box sx={{ flex: 1, minWidth: 0 }}>
-                          <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.9rem', color: ink.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {note.title}
-                          </Typography>
-                          <Typography sx={{ mt: 0.2, fontSize: '0.74rem', color: ink.secondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {note.message}
-                          </Typography>
-                          <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mt: 0.6, flexWrap: 'wrap', rowGap: 0.4 }}>
-                            {r && (
-                              <Box sx={{ display: 'inline-flex', alignItems: 'center', px: 0.7, py: 0.15, borderRadius: radius.full, background: r.chipBg, border: `1px solid ${r.borderColor}`, fontSize: '0.64rem', fontWeight: 800 }}>
-                                <Box component="span" sx={gradientTextSx(r.chipColor)}>{r.emoji} {r.label}</Box>
-                              </Box>
-                            )}
-                            {t && (
-                              <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.3, px: 0.7, py: 0.15, borderRadius: radius.full, background: t.tagBg, color: t.tagColor, border: `1px solid ${t.accentColor}33`, fontSize: '0.64rem', fontWeight: 800 }}>
-                                {t.emoji} {t.label}
-                              </Box>
-                            )}
-                            <Box sx={{ flex: 1 }} />
-                            <IconButton size="small" aria-label="ver rascunho" onClick={(e) => { e.stopPropagation(); setViewingNote(note) }} sx={{ ...actionButtonSx('neutral'), width: 26, height: 26 }}>
-                              <VisibilityOutlinedIcon sx={{ fontSize: 13 }} />
-                            </IconButton>
-                            <IconButton size="small" aria-label="editar rascunho" onClick={(e) => { e.stopPropagation(); setEditingNote(note); setNoteDialog(true) }} sx={{ ...actionButtonSx('primary'), width: 26, height: 26 }}>
-                              <EditOutlinedIcon sx={{ fontSize: 13 }} />
-                            </IconButton>
-                            <IconButton size="small" aria-label="desativar rascunho" onClick={(e) => { e.stopPropagation(); noteDisable.setTarget(note) }} sx={{ ...actionButtonSx('danger'), width: 26, height: 26 }}>
-                              <DeleteForeverOutlinedIcon sx={{ fontSize: 13 }} />
-                            </IconButton>
-                          </Stack>
-                        </Box>
-
-                        <Box sx={{
-                          width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
-                          border: `2px solid ${selected ? theme.accent : colors.border.medium}`,
-                          background: selected ? theme.accent : 'transparent',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s ease',
-                        }}>
-                          {selected && <Box component="span" sx={{ color: '#fff', fontSize: '0.7rem', lineHeight: 1, fontWeight: 900 }}>✓</Box>}
-                        </Box>
-                      </Stack>
-                    </Box>
-                  </Stack>
-                </Card>
-              )
-            })}
+            {draftNotes.map((note) => (
+              <ManageNoteCard
+                key={note.id}
+                note={note}
+                view={noteView}
+                r={rarities.find((x) => x.id === note.rarity)}
+                t={types.find((x) => x.id === note.typeId)}
+                mask={maskCards}
+                onOpen={() => setViewingNote(note)}
+                onEdit={() => { setEditingNote(note); setNoteDialog(true) }}
+                onDisable={() => noteDisable.setTarget(note)}
+                selection={{ selected: selectedDraftIds.includes(note.id), accent: theme.accent, onToggle: () => toggleDraft(note.id) }}
+              />
+            ))}
 
             <Box sx={{
               position: 'sticky', bottom: 8, zIndex: 5,
@@ -398,166 +341,19 @@ export function NotesTab({ cid }: NotesTabProps) {
           </Typography>
         )}
 
-        {visibleNotes.map((note) => {
-          const r = rarities.find((x) => x.id === note.rarity)
-          const t = types.find((x) => x.id === note.typeId)
-          if (noteView === 'compact') {
-            return (
-              <Card key={note.id} accent={r?.borderColor} onClick={() => setViewingNote(note)} sx={{
-                p: 0, overflow: 'hidden', cursor: 'pointer',
-                border: `1px solid ${r?.borderColor ?? colors.border.subtle}`,
-                background: themedCardBg('rgba(255,255,255,0.74)', maskCards),
-                boxShadow: '0 3px 10px rgba(15,23,42,0.05)',
-                '&:hover': { boxShadow: '0 5px 14px rgba(15,23,42,0.12)' },
-              }}>
-                <Stack direction="row" alignItems="center" spacing={0.8} sx={{ minHeight: 38, px: 1, py: 0.35 }}>
-                  <Box sx={{ width: 6, height: 22, borderRadius: radius.full, background: r?.borderColor ?? colors.border.subtle, flexShrink: 0 }} />
-                  {note.imageUrl && (
-                    <Box sx={{ width: 28, height: 28, flexShrink: 0, borderRadius: radius.sm, overflow: 'hidden', border: `1px solid ${r?.borderColor ?? colors.border.subtle}22` }}>
-                      <Box component="img" src={note.imageUrl} alt="" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                    </Box>
-                  )}
-                  <Typography sx={{ flex: 1, minWidth: 0, fontFamily: font.serif, fontWeight: 800, fontSize: '0.82rem', color: r?.textColor ?? ink.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {note.title}
-                  </Typography>
-                  <Stack direction="row" spacing={0.25} sx={{ flexShrink: 0, opacity: 0.72 }}>
-                    <IconButton size="small" aria-label="editar bilhete" onClick={(e) => { e.stopPropagation(); setEditingNote(note); setNoteDialog(true) }} sx={{ ...actionButtonSx('primary'), width: 28, height: 28 }}>
-                      <EditOutlinedIcon sx={{ fontSize: 14 }} />
-                    </IconButton>
-                    <IconButton size="small" aria-label="desativar bilhete" onClick={(e) => { e.stopPropagation(); noteDisable.setTarget(note) }} sx={{ ...actionButtonSx('danger'), width: 28, height: 28 }}>
-                      <DeleteForeverOutlinedIcon sx={{ fontSize: 14 }} />
-                    </IconButton>
-                  </Stack>
-                </Stack>
-              </Card>
-            )
-          }
-          if (noteView === 'list') {
-            return (
-              <Card key={note.id} accent={r?.borderColor} onClick={() => setViewingNote(note)} sx={{
-                p: 0, overflow: 'hidden', cursor: 'pointer',
-                border: `1.5px solid ${r?.borderColor ?? colors.border.subtle}`,
-                background: themedCardBg('rgba(255,255,255,0.78)', maskCards),
-                boxShadow: '0 6px 18px rgba(15,23,42,0.07)',
-                transition: 'transform 0.16s ease, box-shadow 0.16s ease',
-                '&:hover': { transform: 'translateY(-1px)', boxShadow: `0 8px 24px ${r?.glowColor || 'rgba(15,23,42,0.1)'}` },
-              }}>
-                <Stack direction="row" alignItems="stretch" sx={{ minHeight: 74 }}>
-                  {note.imageUrl ? (
-                    <Box sx={{ width: 72, flexShrink: 0, overflow: 'hidden' }}>
-                      <Box component="img" src={note.imageUrl} alt="" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                    </Box>
-                  ) : (
-                    <Box sx={{ width: 5, flexShrink: 0, background: r ? `linear-gradient(180deg,${r.borderColor},${r.glowColor || r.borderColor})` : colors.border.subtle }} />
-                  )}
-                  <Box sx={{ flex: 1, minWidth: 0, px: 1.25, py: 1 }}>
-                    <Stack direction="row" alignItems="center" spacing={1}>
-                      <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Stack direction="row" spacing={0.6} alignItems="center" sx={{ minWidth: 0 }}>
-                          <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.92rem', color: ink.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {note.title}
-                          </Typography>
-                          {r && (
-                            <Box sx={{ px: 0.65, py: 0.15, borderRadius: radius.full, background: r.chipBg, border: `1px solid ${r.borderColor}`, fontSize: '0.68rem', fontWeight: 850, flexShrink: 0 }}>
-                              <Box component="span" sx={gradientTextSx(r.chipColor)}>{r.emoji}</Box>
-                            </Box>
-                          )}
-                          {t && (
-                            <Box sx={{ px: 0.65, py: 0.15, borderRadius: radius.full, background: t.tagBg, color: t.tagColor, border: `1px solid ${t.accentColor}33`, fontSize: '0.68rem', fontWeight: 850, flexShrink: 0 }}>
-                              {t.emoji}
-                            </Box>
-                          )}
-                        </Stack>
-                        <Typography sx={{ mt: 0.25, fontSize: '0.74rem', color: ink.secondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {note.message}
-                        </Typography>
-                        <Typography sx={{ mt: 0.35, fontSize: '0.70rem', color: ink.muted, fontWeight: 700 }}>
-                          {[r?.label, t?.label].filter(Boolean).join(' · ') || 'Sem categoria'}
-                        </Typography>
-                      </Box>
-                      <Stack direction="row" spacing={0.4} sx={{ flexShrink: 0 }}>
-                        <IconButton size="small" aria-label="editar bilhete" onClick={(e) => { e.stopPropagation(); setEditingNote(note); setNoteDialog(true) }} sx={actionButtonSx('primary')}>
-                          <EditOutlinedIcon sx={{ fontSize: 16 }} />
-                        </IconButton>
-                        <IconButton size="small" aria-label="desativar bilhete" onClick={(e) => { e.stopPropagation(); noteDisable.setTarget(note) }} sx={actionButtonSx('danger')}>
-                          <DeleteForeverOutlinedIcon sx={{ fontSize: 16 }} />
-                        </IconButton>
-                      </Stack>
-                    </Stack>
-                  </Box>
-                </Stack>
-              </Card>
-            )
-          }
-          if (note.imageUrl && note.imageLayout) {
-            return (
-              <Box key={note.id} sx={{ position: 'relative', cursor: 'pointer' }} onClick={() => setViewingNote(note)}>
-                <RewardCard
-                  reward={{ id: note.id, title: note.title, message: note.message, rarity: note.rarity, typeId: note.typeId, imageUrl: note.imageUrl, imageLayout: note.imageLayout, isNew: false }}
-                  rarities={r ? [r] : []}
-                  types={t ? [t] : []}
-                />
-                <Stack direction="row" spacing={0.4} sx={{ position: 'absolute', top: 8, right: 8, zIndex: 5 }}>
-                  <IconButton size="small" aria-label="editar bilhete" onClick={(e) => { e.stopPropagation(); setEditingNote(note); setNoteDialog(true) }} sx={{ ...actionButtonSx('primary'), backdropFilter: 'blur(8px)' }}>
-                    <EditOutlinedIcon sx={{ fontSize: 16 }} />
-                  </IconButton>
-                  <IconButton size="small" aria-label="desativar bilhete" onClick={(e) => { e.stopPropagation(); noteDisable.setTarget(note) }} sx={{ ...actionButtonSx('danger'), backdropFilter: 'blur(8px)' }}>
-                    <DeleteForeverOutlinedIcon sx={{ fontSize: 16 }} />
-                  </IconButton>
-                </Stack>
-              </Box>
-            )
-          }
-          return (
-            <Card key={note.id} accent={r?.borderColor} onClick={() => setViewingNote(note)} sx={{
-              p: 0, overflow: 'hidden', position: 'relative', cursor: 'pointer',
-              background: themedCardBg(r?.cardBg ?? ink.surface, maskCards),
-              border: `1.5px solid ${r?.borderColor ?? colors.border.subtle}`,
-              boxShadow: r?.glowColor ? `${r.shadow}, 0 0 26px ${r.glowColor}` : r?.shadow,
-              '&::before': r ? {
-                content: '""', position: 'absolute', inset: 0, pointerEvents: 'none',
-                background: `radial-gradient(circle at 10% 0%, rgba(255,255,255,0.46), transparent 34%), radial-gradient(circle at 100% 100%, ${r.glowColor || r.borderColor}, transparent 34%)`,
-                opacity: 0.42, mixBlendMode: 'soft-light',
-              } : undefined,
-            }}>
-              <Box sx={{ height: '3px', background: r ? `linear-gradient(90deg,${r.borderColor},${r.glowColor || r.borderColor})` : colors.border.subtle, position: 'relative', zIndex: 1 }} />
-              <Box sx={{ p: 1.8, position: 'relative', zIndex: 1 }}>
-                <Stack spacing={0.8}>
-                  <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-                    <IconButton size="small" aria-label="editar bilhete" onClick={(e) => { e.stopPropagation(); setEditingNote(note); setNoteDialog(true) }} sx={actionButtonSx('primary')}>
-                      <EditOutlinedIcon sx={{ fontSize: 16 }} />
-                    </IconButton>
-                    <IconButton size="small" aria-label="desativar bilhete" onClick={(e) => { e.stopPropagation(); noteDisable.setTarget(note) }} sx={actionButtonSx('danger')}>
-                      <DeleteForeverOutlinedIcon sx={{ fontSize: 16 }} />
-                    </IconButton>
-                  </Stack>
-                  <Box sx={{ flex: 1, minWidth: 0, p: 1, borderRadius: radius.lg, background: 'rgba(255,255,255,0.68)', border: '1px solid rgba(255,255,255,0.58)', backdropFilter: 'blur(8px)' }}>
-                    <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.93rem', color: r?.textColor ?? ink.primary, mb: 0.3, display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
-                      {note.title}
-                    </Typography>
-                    <Typography sx={{ fontSize: '0.78rem', color: r?.captionColor ?? ink.secondary, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.5, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
-                      {note.message}
-                    </Typography>
-                    {(r || t) && (
-                      <Stack direction="row" spacing={0.6} sx={{ mt: 0.9, flexWrap: 'wrap', rowGap: 0.5 }}>
-                        {r && (
-                          <Box sx={{ display: 'inline-flex', alignItems: 'center', px: 1, py: 0.3, borderRadius: radius.full, background: r.chipBg, border: `1px solid ${r.borderColor}`, fontSize: '0.72rem', fontWeight: 700 }}>
-                            <Box component="span" sx={gradientTextSx(r.chipColor)}>{r.emoji} {r.label}</Box>
-                          </Box>
-                        )}
-                        {t && (
-                          <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.4, px: 1, py: 0.3, borderRadius: radius.full, background: t.tagBg, color: t.tagColor, border: `1px solid ${t.accentColor}44`, fontSize: '0.72rem', fontWeight: 700 }}>
-                            {t.emoji} {t.label}
-                          </Box>
-                        )}
-                      </Stack>
-                    )}
-                  </Box>
-                </Stack>
-              </Box>
-            </Card>
-          )
-        })}
+        {visibleNotes.map((note) => (
+          <ManageNoteCard
+            key={note.id}
+            note={note}
+            view={noteView}
+            r={rarities.find((x) => x.id === note.rarity)}
+            t={types.find((x) => x.id === note.typeId)}
+            mask={maskCards}
+            onOpen={() => setViewingNote(note)}
+            onEdit={() => { setEditingNote(note); setNoteDialog(true) }}
+            onDisable={() => noteDisable.setTarget(note)}
+          />
+        ))}
 
         {statusView === 'live' && !notesLoading && filteredNotes.length > visibleNotes.length && (
           <Button variant="ghost" onClick={() => setVisibleNoteCount((c) => c + NOTE_PAGE_SIZE)} sx={{ alignSelf: 'center', mt: 0.5, px: 1.6, py: 0.8, fontSize: '0.78rem', background: 'rgba(255,255,255,0.5)' }}>
