@@ -3,7 +3,7 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
 import { Box, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, TextField, Typography } from '@mui/material'
 import { useState } from 'react'
-import { Button, Card, ConfirmDeleteDialog, EmojiPickerInput, Input, toast } from '../../components/ui'
+import { AdvancedOptions, Button, Card, ConfirmDeleteDialog, EmojiPickerInput, Input, toast } from '../../components/ui'
 import { useCollectionTypesQuery, useCreateCollectionTypeMutation, useDeleteCollectionTypeMutation, useImportCollectionTypesMutation, useUpdateCollectionTypeMutation } from '../../hooks/useNotes'
 import { useConfirmDelete } from '../../hooks/useConfirmDelete'
 import { useJsonImport } from '../../hooks/useJsonImport'
@@ -73,9 +73,11 @@ function TypeEditor({ cid, type, onClose }: { cid: string; type: NoteTypeConfig 
             <Input label="Nome" value={form.label} onChange={(e) => set('label', e.target.value)} sx={{ flex: 1 }} />
             <EmojiPickerInput label="Emoji" value={form.emoji} onChange={(emoji) => set('emoji', emoji)} />
           </Stack>
-          <ColorRow label="Cor de destaque" field="accentColor" value={form.accentColor} onChange={set} />
-          <ColorRow label="Fundo da tag" field="tagBg" value={form.tagBg} onChange={set} />
-          <ColorRow label="Texto da tag" field="tagColor" value={form.tagColor} onChange={set} />
+          <AdvancedOptions label="🎨 Cores da tag" spacing={1.4}>
+            <ColorRow label="Cor de destaque" field="accentColor" value={form.accentColor} onChange={set} />
+            <ColorRow label="Fundo da tag" field="tagBg" value={form.tagBg} onChange={set} />
+            <ColorRow label="Texto da tag" field="tagColor" value={form.tagColor} onChange={set} />
+          </AdvancedOptions>
           <Box sx={{ display: 'inline-flex', px: 0.8, py: 0.3, borderRadius: radius.md, bgcolor: form.tagBg, gap: 0.3, alignItems: 'center' }}>
             <Typography sx={{ fontSize: '0.8rem' }}>{form.emoji}</Typography>
             <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: form.tagColor }}>{form.label}</Typography>

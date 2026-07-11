@@ -3,7 +3,7 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
 import { Box, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, TextField, Typography } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
-import { Button, Card, ConfirmDeleteDialog, EmojiPickerInput, Input, toast } from '../../components/ui'
+import { AdvancedOptions, Button, Card, ConfirmDeleteDialog, EmojiPickerInput, Input, toast } from '../../components/ui'
 import { useCollectionRaritiesQuery, useCreateCollectionRarityMutation, useDeleteCollectionRarityMutation, useImportCollectionRaritiesMutation, useUpdateCollectionRarityMutation } from '../../hooks/useNotes'
 import { useConfirmDelete } from '../../hooks/useConfirmDelete'
 import { useJsonImport } from '../../hooks/useJsonImport'
@@ -224,6 +224,7 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
               </Typography>
             </Stack>
           </Box>
+          <AdvancedOptions label="🎨 Cores e efeitos" spacing={1.4}>
           <ColorRow label="Fundo do card" field="cardBg" value={form.cardBg} onChange={set} />
           <ColorRow label="Cor do texto" field="textColor" value={form.textColor} onChange={set} />
           <ColorRow label="Cor da legenda" field="captionColor" value={form.captionColor} onChange={set} />
@@ -232,6 +233,7 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
           <ColorRow label="Brilho (vazio = sem)" field="glowColor" value={form.glowColor} onChange={set} />
           <ColorRow label="Fundo do chip" field="chipBg" value={form.chipBg} onChange={set} />
           <ColorRow label="Texto do chip" field="chipColor" value={form.chipColor} onChange={set} />
+          </AdvancedOptions>
         </Stack>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>

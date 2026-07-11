@@ -1,8 +1,7 @@
 import CasinoOutlinedIcon from '@mui/icons-material/CasinoOutlined'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { Box, Chip, Collapse, DialogActions, DialogContent, DialogTitle, Stack, TextField, Typography } from '@mui/material'
+import { Box, Chip, DialogActions, DialogContent, DialogTitle, Stack, TextField, Typography } from '@mui/material'
 import { useState } from 'react'
-import { Button, EmojiPickerInput, HintText, Input, SectionLabel } from '../../components/ui'
+import { AdvancedOptions, Button, EmojiPickerInput, HintText, Input, SectionLabel } from '../../components/ui'
 import { useCollectionNotesQuery, useCreateCollectionPackMutation, useCollectionPacksQuery, useUpdateCollectionPackMutation } from '../../hooks/useNotes'
 import { colors, font, ink, radius } from '../../design-system'
 import { gradientTextSx } from '../../utils/colorUtils'
@@ -47,7 +46,6 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
     scheduleTime: pack.scheduleTime ?? null, scheduleTimezone: pack.scheduleTimezone ?? 'America/Sao_Paulo',
     cumulative: pack.cumulative ?? false, maxAccumulated: pack.maxAccumulated ?? 3,
   } : { ...PACK_TEMPLATES[0] })
-  const [advancedOpen, setAdvancedOpen] = useState(false)
   const [simulation, setSimulation] = useState<PackSimulation | null>(null)
   const createMutation = useCreateCollectionPackMutation(cid)
   const updateMutation = useUpdateCollectionPackMutation(cid)
@@ -266,20 +264,7 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
             </Box>
           </Stack>
 
-          <Box>
-            <Stack direction="row" alignItems="center" justifyContent="space-between" onClick={() => setAdvancedOpen((v) => !v)} sx={{
-              cursor: 'pointer', py: 0.7, px: 1.1, borderRadius: radius.md,
-              background: 'rgba(0,0,0,0.03)', border: `1px solid ${colors.border.subtle}`,
-              transition: 'background 0.14s', '&:hover': { background: 'rgba(0,0,0,0.05)' },
-            }}>
-              <Typography sx={{ fontSize: '0.78rem', fontWeight: 800, color: colors.text.secondary }}>
-                ⚙️ Opções avançadas
-              </Typography>
-              <ExpandMoreIcon sx={{ fontSize: 18, color: colors.text.muted, transform: advancedOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
-            </Stack>
-
-            <Collapse in={advancedOpen}>
-              <Stack spacing={2.2} sx={{ pt: 2 }}>
+          <AdvancedOptions>
                 <Box>
                   <SectionLabel sx={{ mb: 0.8 }}>Descrição</SectionLabel>
                   <TextField multiline rows={2} fullWidth placeholder="Descrição do pacotinho..." value={form.description}
@@ -368,9 +353,7 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
 
                 <ColorRow label="Gradiente" field="gradient" value={form.gradient} onChange={(field, value) => set(field as 'gradient', value)} />
                 <ColorRow label="Cor destaque" field="accent" value={form.accent} onChange={(field, value) => set(field as 'accent', value)} />
-              </Stack>
-            </Collapse>
-          </Box>
+          </AdvancedOptions>
         </Stack>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>

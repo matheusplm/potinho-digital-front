@@ -1,6 +1,6 @@
 import { Box, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField, Typography } from '@mui/material'
 import { Suspense, lazy, useEffect, useState } from 'react'
-import { Button, Input, LoadingState, toast } from '../../components/ui'
+import { AdvancedOptions, Button, Input, LoadingState, toast } from '../../components/ui'
 import { RewardCard } from '../../components/collection/RewardCard'
 import { useCreateCollectionNoteMutation, useUpdateCollectionNoteMutation } from '../../hooks/useNotes'
 import { colors, font, radius } from '../../design-system'
@@ -32,9 +32,9 @@ export function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
 
   useEffect(() => {
     if (!open) return
-    setForm(editing ? { title: editing.title, message: editing.message, rarity: editing.rarity, typeId: editing.typeId, imageUrl: editing.imageUrl ?? null, imageLayout: editing.imageLayout ?? null } : EMPTY_NOTE)
+    setForm(editing ? { title: editing.title, message: editing.message, rarity: editing.rarity, typeId: editing.typeId, imageUrl: editing.imageUrl ?? null, imageLayout: editing.imageLayout ?? null } : { ...EMPTY_NOTE, rarity: rarities[0]?.id ?? '', typeId: types[0]?.id ?? '' })
     setTouched({ title: false, message: false, rarity: false, typeId: false, imageUrl: false })
-  }, [open, editing])
+  }, [open, editing, rarities, types])
 
   const lockedIdentity = !!editing && (editing.timesCollected ?? 0) > 0
 
@@ -140,6 +140,7 @@ export function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
               </Typography>
             )}
           </Box>
+          <AdvancedOptions label="🖼️ Imagem e layout (opcional)">
           <Box>
             <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.secondary, mb: 0.8 }}>
               Posição da imagem{' '}
@@ -171,6 +172,7 @@ export function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
               )}
             </Stack>
           )}
+          </AdvancedOptions>
           <Box>
             <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.secondary, mb: 1 }}>Prévia</Typography>
             <RewardCard
