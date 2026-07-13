@@ -33,7 +33,7 @@ const CHANNEL_OPTIONS: { id: keyof NotificationChannels; emoji: string; label: s
   { id: 'email', emoji: '✉️', label: 'Email', hint: 'mensagem na caixa de entrada' },
 ]
 
-function ToggleRow({ checked, onToggle, title, subtitle }: { checked: boolean; onToggle: () => void; title: string; subtitle: string }) {
+export function ToggleRow({ checked, onToggle, title, subtitle }: { checked: boolean; onToggle: () => void; title: string; subtitle: string }) {
   return (
     <Stack direction="row" spacing={1.2} alignItems="center" onClick={onToggle} sx={{ cursor: 'pointer', userSelect: 'none' }}>
       <Box sx={{
