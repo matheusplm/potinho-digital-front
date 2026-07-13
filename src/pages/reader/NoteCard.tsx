@@ -3,6 +3,7 @@ import { Box, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { colors, ink, radius } from '../../design-system'
 import { themedCardBg } from '../../utils/colorUtils'
+import { linkifyText } from '../../utils/linkify'
 import { useBackground } from '../../context/BackgroundContext'
 import type { CollectionNoteView, RarityConfig } from '../../types/note'
 
@@ -85,7 +86,7 @@ export function NoteCard({ note, rarity, onClick }: { note: CollectionNoteView; 
               fontSize: '0.68rem', color: rarity?.textColor ? `${rarity.textColor}99` : ink.secondary,
               lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
             }}>
-              {note.message}
+              {linkifyText(note.message)}
             </Typography>
           )}
         </Stack>
