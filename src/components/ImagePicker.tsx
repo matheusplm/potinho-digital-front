@@ -209,7 +209,6 @@ export function ImagePicker({ value, onChange }: Props) {
                 fetchGifs={fetchGifs}
                 onGifClick={handleGifClick}
                 noLink
-                hideAttribution
               />
             )}
           </Box>
