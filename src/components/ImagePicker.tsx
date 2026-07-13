@@ -5,6 +5,9 @@ import { GiphyFetch } from '@giphy/js-fetch-api'
 import type { IGif } from '@giphy/js-types'
 import { colors, radius } from '../design-system'
 import { Input } from './ui'
+import { useBackground } from '../context/BackgroundContext'
+import poweredByGiphyLight from '../assets/giphy/powered-by-giphy-light.png'
+import poweredByGiphyDark from '../assets/giphy/powered-by-giphy-dark.png'
 
 const gf = new GiphyFetch(import.meta.env.VITE_GIPHY_API_KEY ?? '')
 
@@ -53,6 +56,7 @@ interface Props {
 }
 
 export function ImagePicker({ value, onChange }: Props) {
+  const { theme } = useBackground()
   const [mode, setMode] = useState<Mode | null>(null)
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
@@ -215,9 +219,14 @@ export function ImagePicker({ value, onChange }: Props) {
               />
             )}
           </Box>
-          <Typography sx={{ fontSize: '0.64rem', fontWeight: 700, color: colors.text.muted, textAlign: 'right', fontStyle: 'italic' }}>
-            Powered by GIPHY
-          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Box
+              component="img"
+              src={theme.isDark ? poweredByGiphyDark : poweredByGiphyLight}
+              alt="Powered by GIPHY"
+              sx={{ height: 14 }}
+            />
+          </Box>
         </Stack>
       )}
 
