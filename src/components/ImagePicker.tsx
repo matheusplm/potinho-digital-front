@@ -8,88 +8,6 @@ import { Input } from './ui'
 
 const gf = new GiphyFetch(import.meta.env.VITE_GIPHY_API_KEY ?? '')
 
-const TENOR_KEY = import.meta.env.VITE_TENOR_API_KEY ?? ''
-const GIF_PROVIDER: 'tenor' | 'giphy' = TENOR_KEY ? 'tenor' : 'giphy'
-
-interface TenorGif {
-  id: string
-  media_formats: { gif?: { url: string }; tinygif?: { url: string } }
-}
-
-async function tenorFetch(query: string, pos: string): Promise<{ results: TenorGif[]; next: string }> {
-  const base = query
-    ? `https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(query)}`
-    : 'https://tenor.googleapis.com/v2/featured?'
-  const url = `${base}&key=${TENOR_KEY}&limit=18&media_filter=gif,tinygif&contentfilter=high&locale=pt_BR&country=BR${pos ? `&pos=${pos}` : ''}`
-  const res = await fetch(url)
-  if (!res.ok) throw new Error('Tenor indisponível')
-  return res.json() as Promise<{ results: TenorGif[]; next: string }>
-}
-
-function TenorGrid({ query, onPick }: { query: string; onPick: (url: string) => void }) {
-  const [results, setResults] = useState<TenorGif[]>([])
-  const [next, setNext] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [failed, setFailed] = useState(false)
-
-  const load = useCallback(async (pos: string, append: boolean) => {
-    setLoading(true)
-    try {
-      const data = await tenorFetch(query, pos)
-      setResults((current) => append ? [...current, ...data.results] : data.results)
-      setNext(data.next ?? '')
-      setFailed(false)
-    } catch {
-      setFailed(true)
-    } finally {
-      setLoading(false)
-    }
-  }, [query])
-
-  useEffect(() => {
-    void load('', false)
-  }, [load])
-
-  if (failed) {
-    return (
-      <Typography sx={{ fontSize: '0.74rem', color: colors.text.muted, textAlign: 'center', py: 2 }}>
-        Não deu pra carregar os GIFs agora. Tenta de novo ou cola uma URL.
-      </Typography>
-    )
-  }
-
-  return (
-    <Stack spacing={0.8}>
-      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 0.6 }}>
-        {results.map((gif) => {
-          const thumb = gif.media_formats.tinygif?.url ?? gif.media_formats.gif?.url
-          const full = gif.media_formats.gif?.url ?? gif.media_formats.tinygif?.url
-          if (!thumb || !full) return null
-          return (
-            <Box key={gif.id} onClick={() => onPick(full)} sx={{
-              borderRadius: radius.sm, overflow: 'hidden', cursor: 'pointer', height: 88,
-              '&:hover': { outline: `2px solid ${colors.primary.main}` },
-            }}>
-              <Box component="img" src={thumb} alt="" loading="lazy" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-            </Box>
-          )
-        })}
-      </Box>
-      <Stack direction="row" alignItems="center" justifyContent="space-between">
-        <Typography sx={{ fontSize: '0.6rem', color: colors.text.muted }}>via Tenor</Typography>
-        {next && (
-          <Typography onClick={() => !loading && void load(next, true)} sx={{
-            fontSize: '0.72rem', fontWeight: 800, color: colors.primary.main,
-            cursor: 'pointer', userSelect: 'none', opacity: loading ? 0.5 : 1, '&:hover': { opacity: 0.75 },
-          }}>
-            {loading ? 'Carregando...' : 'Carregar mais'}
-          </Typography>
-        )}
-      </Stack>
-    </Stack>
-  )
-}
-
 const IMAGE_EXTS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'bmp', 'svg']
 const SAFE_HOSTS = [
   'images.unsplash.com', 'plus.unsplash.com',
@@ -97,7 +15,6 @@ const SAFE_HOSTS = [
   'media.giphy.com', 'media0.giphy.com', 'media1.giphy.com',
   'media2.giphy.com', 'media3.giphy.com', 'media4.giphy.com',
   'i.giphy.com',
-  'media.tenor.com', 'c.tenor.com',
   'i.imgur.com',
   'cdn.discordapp.com', 'media.discordapp.net',
   'pbs.twimg.com',
@@ -275,31 +192,27 @@ export function ImagePicker({ value, onChange }: Props) {
             onChange={(e) => handleSearchChange(e.target.value)}
             autoFocus
           />
-          {GIF_PROVIDER === 'tenor' ? (
-            <TenorGrid query={debouncedSearch} onPick={(url) => { onChange(url); setMode(null) }} />
-          ) : (
-            <Box
-              ref={gridRef}
-              sx={{
-                borderRadius: radius.md,
-                overflow: 'hidden',
-                background: 'rgba(0,0,0,0.03)',
-                '& *': { boxSizing: 'border-box' },
-              }}
-            >
-              {gridWidth > 0 && (
-                <Grid
-                  key={debouncedSearch}
-                  width={gridWidth}
-                  columns={4}
-                  fetchGifs={fetchGifs}
-                  onGifClick={handleGifClick}
-                  noLink
-                  hideAttribution
-                />
-              )}
-            </Box>
-          )}
+          <Box
+            ref={gridRef}
+            sx={{
+              borderRadius: radius.md,
+              overflow: 'hidden',
+              background: 'rgba(0,0,0,0.03)',
+              '& *': { boxSizing: 'border-box' },
+            }}
+          >
+            {gridWidth > 0 && (
+              <Grid
+                key={debouncedSearch}
+                width={gridWidth}
+                columns={4}
+                fetchGifs={fetchGifs}
+                onGifClick={handleGifClick}
+                noLink
+                hideAttribution
+              />
+            )}
+          </Box>
         </Stack>
       )}
 
