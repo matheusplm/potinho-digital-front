@@ -142,7 +142,7 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
     return (
       <Box onClick={onClick} sx={{ ...rarityCardSx(r), animation: `${cardIn} 0.55s cubic-bezier(0.16,1,0.3,1)`, cursor: onClick ? 'pointer' : 'default', position: 'relative', overflow: 'hidden' }}>
         {img
-          ? <Box component="img" src={img} alt={reward.title} sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'blur(18px) brightness(0.55) saturate(1.4)', transform: 'scale(1.1)', zIndex: 0 }} />
+          ? <Box component="img" src={img} alt={reward.title} sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'blur(9px) brightness(0.6) saturate(1.35)', transform: 'scale(1.1)', zIndex: 0 }} />
           : <Box sx={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.08)', zIndex: 0 }} />
         }
         <Box sx={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.22)', zIndex: 0 }} />

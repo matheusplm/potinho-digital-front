@@ -196,7 +196,9 @@ export function ImagePicker({ value, onChange }: Props) {
             ref={gridRef}
             sx={{
               borderRadius: radius.md,
-              overflow: 'hidden',
+              overflowY: 'auto',
+              overflowX: 'hidden',
+              maxHeight: 340,
               background: 'rgba(0,0,0,0.03)',
               '& *': { boxSizing: 'border-box' },
             }}
@@ -209,6 +211,7 @@ export function ImagePicker({ value, onChange }: Props) {
                 fetchGifs={fetchGifs}
                 onGifClick={handleGifClick}
                 noLink
+                loaderConfig={{ root: gridRef.current }}
               />
             )}
           </Box>

@@ -96,7 +96,7 @@ export function ShareCartinha({ note, r, t, theme }: {
   ) {
     const { x, y, w, h } = slot
     if (layout === 'bg-blur') {
-      ctx.filter = 'blur(20px) brightness(0.5) saturate(1.4)'
+      ctx.filter = 'blur(10px) brightness(0.6) saturate(1.35)'
       ctx.drawImage(src, x - BLUR_PAD, y - BLUR_PAD, w + BLUR_PAD * 2, h + BLUR_PAD * 2)
       ctx.filter = 'none'
     } else if (isCircleLayout) {
