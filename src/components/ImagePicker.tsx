@@ -215,6 +215,9 @@ export function ImagePicker({ value, onChange }: Props) {
               />
             )}
           </Box>
+          <Typography sx={{ fontSize: '0.64rem', fontWeight: 700, color: colors.text.muted, textAlign: 'right', fontStyle: 'italic' }}>
+            Powered by GIPHY
+          </Typography>
         </Stack>
       )}
 
