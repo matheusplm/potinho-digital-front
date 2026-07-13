@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { api, setAuthToken } from '../services/api'
 
 export type UserRole = 'writer' | 'reader'
@@ -30,6 +31,7 @@ const UserContext = createContext<UserContextValue | null>(null)
 const STORAGE_KEY = 'potinho-auth'
 
 export function UserProvider({ children }: { children: ReactNode }) {
+  const queryClient = useQueryClient()
   const [user, setUserState] = useState<AuthUser | null>(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY)
@@ -42,8 +44,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
   })
   const [persona, setPersonaState] = useState<UserRole>('writer')
   const [personaReady, setPersonaReady] = useState(false)
+  const userIdRef = useRef<string | null>(user?.id ?? null)
 
   const setUser = (u: AuthUser | null) => {
+    const nextId = u?.id ?? null
+    if (userIdRef.current !== nextId) {
+      queryClient.clear()
+      userIdRef.current = nextId
+    }
     setAuthToken(u?.token ?? '')
     if (u) localStorage.setItem(STORAGE_KEY, JSON.stringify(u))
     else localStorage.removeItem(STORAGE_KEY)
