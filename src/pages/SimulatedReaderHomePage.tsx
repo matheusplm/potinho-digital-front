@@ -593,6 +593,7 @@ export function SimulatedReaderHomePage() {
               isLoading={isLoading}
               isOpeningPack={isOpeningPack}
               onOpen={() => void handleOpenPack(mainPack, true)}
+              onOpenAll={() => void handleOpenPack(mainPack, true, packAvailableCounts[mainPack?.id ?? ''] ?? 1)}
               isRealReader={isRealReader}
               onResetCooldown={() => {
                 simulation.resetDailyCooldown()

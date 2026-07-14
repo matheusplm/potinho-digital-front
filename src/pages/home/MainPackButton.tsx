@@ -3,7 +3,7 @@ import { Button } from '../../components/ui'
 import { font, heartPulseAura, ink, packCtaFloat, radius } from '../../design-system'
 import type { CollectionPack } from '../../types/note'
 
-export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLabel, cooldownProgress, isLoading, isOpeningPack, onOpen, isRealReader, onResetCooldown, accent, accentMuted, accruedCount = 0 }: {
+export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLabel, cooldownProgress, isLoading, isOpeningPack, onOpen, onOpenAll, isRealReader, onResetCooldown, accent, accentMuted, accruedCount = 0 }: {
   pack: CollectionPack | undefined
   collectionEmoji: string
   mainCanOpen: boolean
@@ -12,6 +12,7 @@ export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLa
   isLoading: boolean
   isOpeningPack: boolean
   onOpen: () => void
+  onOpenAll?: () => void
   isRealReader: boolean
   onResetCooldown: () => void
   accent: string
@@ -163,6 +164,20 @@ export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLa
           <Typography sx={{ color: ink.secondary, fontSize: '0.72rem', fontWeight: 750, lineHeight: 1.2 }}>
             toque no coração
           </Typography>
+          {hasAccrued && onOpenAll && (
+            <Box
+              role="button"
+              onClick={!isOpeningPack ? onOpenAll : undefined}
+              sx={{
+                mt: 0.4, px: 1.1, py: 0.4, borderRadius: radius.full, cursor: isOpeningPack ? 'default' : 'pointer',
+                background: accent, color: '#fff', fontSize: '0.72rem', fontWeight: 800,
+                opacity: isOpeningPack ? 0.6 : 1, transition: 'opacity 0.15s, transform 0.15s',
+                '&:hover': isOpeningPack ? {} : { transform: 'scale(1.03)' },
+              }}
+            >
+              Abrir tudo ({accruedCount}x)
+            </Box>
+          )}
         </Stack>
       )}
       {!mainCanOpen && (
