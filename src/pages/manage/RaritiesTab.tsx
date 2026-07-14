@@ -1,6 +1,8 @@
 import AddIcon from '@mui/icons-material/Add'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import { Box, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, TextField, Typography } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
 import { AdvancedOptions, Button, Card, ConfirmDeleteDialog, EmojiPickerInput, Input, toast } from '../../components/ui'
@@ -104,7 +106,7 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
     setForm((current) => ({
       ...template,
       id: current.id,
-      order: current.order || template.order,
+      order: template.order,
       createdAt: current.createdAt,
       updatedAt: current.updatedAt,
     }))
@@ -253,6 +255,12 @@ export function RaritiesTab({ cid }: RaritiesTabProps) {
   const { data: rarities = [] } = useCollectionRaritiesQuery(cid)
   const deleteRarity = useDeleteCollectionRarityMutation(cid)
   const importRarities = useImportCollectionRaritiesMutation(cid)
+  const reorderMutation = useUpdateCollectionRarityMutation(cid)
+
+  function swapOrder(a: RarityConfig, b: RarityConfig) {
+    reorderMutation.mutate({ id: a.id, data: { order: b.order } })
+    reorderMutation.mutate({ id: b.id, data: { order: a.order } })
+  }
 
   const [rarityDialogOpen, setRarityDialogOpen] = useState(false)
   const [editingRarity, setEditingRarity] = useState<RarityConfig | null>(null)
@@ -291,7 +299,7 @@ export function RaritiesTab({ cid }: RaritiesTabProps) {
             Nenhuma raridade. Toque em "Nova" para criar.
           </Typography>
         )}
-        {rarities.map((r) => (
+        {rarities.map((r, i) => (
           <Card key={r.id} sx={{ p: 0, overflow: 'hidden', background: r.cardBg, border: `1.5px solid ${r.borderColor}`, boxShadow: r.shadow }}>
             <Box sx={{ py: 1.4, px: 1.8 }}>
               <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
@@ -301,6 +309,12 @@ export function RaritiesTab({ cid }: RaritiesTabProps) {
                   <Typography sx={{ fontSize: '0.78rem', color: r.captionColor, fontWeight: 600 }}>{r.odds % 1 === 0 ? r.odds : r.odds.toFixed(2)}% de chance</Typography>
                 </Box>
                 <Stack direction="row" spacing={0.5}>
+                  <IconButton size="small" aria-label="mover para cima" disabled={i === 0} onClick={() => swapOrder(r, rarities[i - 1])} sx={{ ...actionButtonSx('neutral'), '&.Mui-disabled': { opacity: 0.25 } }}>
+                    <KeyboardArrowUpIcon sx={{ fontSize: 16 }} />
+                  </IconButton>
+                  <IconButton size="small" aria-label="mover para baixo" disabled={i === rarities.length - 1} onClick={() => swapOrder(r, rarities[i + 1])} sx={{ ...actionButtonSx('neutral'), '&.Mui-disabled': { opacity: 0.25 } }}>
+                    <KeyboardArrowDownIcon sx={{ fontSize: 16 }} />
+                  </IconButton>
                   <IconButton size="small" aria-label="editar raridade" onClick={() => { setEditingRarity(r); setRarityDialogOpen(true) }} sx={actionButtonSx('primary')}>
                     <EditOutlinedIcon sx={{ fontSize: 16 }} />
                   </IconButton>
