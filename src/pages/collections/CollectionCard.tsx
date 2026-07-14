@@ -134,7 +134,7 @@ export function CollectionCardView({ col, i, onClick, onEdit, onDelete, hasNews 
             color: isOwner ? colors.primary.main : colors.rose.main,
             textTransform: 'uppercase',
           }}>
-            {isOwner ? 'minha' : 'convidada'}
+            {isOwner ? 'minha' : 'convidado'}
           </Box>
         </Stack>
         {col.description && (
@@ -193,7 +193,7 @@ export function CollectionGridItem({ col, i, onClick, onEdit, onDelete, hasNews 
           color: isOwner ? colors.primary.main : colors.rose.main,
           textTransform: 'uppercase',
         }}>
-          {isOwner ? 'minha' : 'convidada'}
+          {isOwner ? 'minha' : 'convidado'}
         </Box>
       </Box>
     </Box>
@@ -248,7 +248,7 @@ export function CollectionListItem({ col, i, onClick, onEdit, onDelete, hasNews 
               fontSize: '0.68rem', fontWeight: 800, letterSpacing: 0.4,
               color: colors.rose.main, textTransform: 'uppercase',
             }}>
-              convidada
+              convidado
             </Box>
           </Stack>
         )

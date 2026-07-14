@@ -69,7 +69,7 @@ export function CollectionsListPage() {
   }, [isActive, navigate, session])
 
   const displayedCollections = useMemo(() => {
-    let result = collections
+    let result = collections.filter((c) => c.access === (persona === 'writer' ? 'owner' : 'reader'))
     if (search.trim()) {
       const q = search.toLowerCase()
       result = result.filter((c) =>
@@ -81,7 +81,7 @@ export function CollectionsListPage() {
         ? a.name.localeCompare(b.name, 'pt-BR')
         : b.name.localeCompare(a.name, 'pt-BR')
     )
-  }, [collections, sort, search])
+  }, [collections, sort, search, persona])
 
   function changeView(v: ViewMode) {
     setView(v)
@@ -204,7 +204,7 @@ export function CollectionsListPage() {
           <LoadingState label="Carregando coleções" accent={theme.accent} textColor={theme.textOnBg} mutedColor={theme.textOnBgMuted} sx={{ minHeight: 320 }} />
         )}
 
-        {!isLoading && collections.length === 0 && !search && (
+        {!isLoading && displayedCollections.length === 0 && !search && (
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textAlign: 'center', py: isWriter ? 4 : 8 }}>
             <Box sx={{
               width: 72, height: 72, borderRadius: '50%',
@@ -241,7 +241,7 @@ export function CollectionsListPage() {
           </Box>
         )}
 
-        {!isLoading && collections.length > 0 && displayedCollections.length === 0 && (
+        {!isLoading && !!search && displayedCollections.length === 0 && (
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 6, gap: 1 }}>
             <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1rem', color: theme.textOnBg }}>
               Nenhuma coleção aqui

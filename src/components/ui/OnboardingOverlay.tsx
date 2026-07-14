@@ -249,7 +249,7 @@ function StageInvite() {
             <Typography sx={{ fontSize: '0.64rem', color: ink.secondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>amor@email.com</Typography>
           </Box>
           <Box sx={{ px: 0.8, py: 0.3, borderRadius: radius.full, background: 'rgba(220,252,231,0.9)', border: '1px solid rgba(21,128,61,0.25)', flexShrink: 0 }}>
-            <Typography sx={{ fontSize: '0.56rem', fontWeight: 900, color: '#15803d' }}>✓ convidada</Typography>
+            <Typography sx={{ fontSize: '0.56rem', fontWeight: 900, color: '#15803d' }}>✓ convidado</Typography>
           </Box>
         </Stack>
       </Box>
