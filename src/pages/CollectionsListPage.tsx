@@ -314,6 +314,7 @@ export function CollectionsListPage() {
         onClose={() => setCreateOpen(false)}
         isPending={createMutation.isPending}
         onSubmit={handleCreate}
+        onSelectTemplate={(template) => { setCreateOpen(false); setKitToConfirm(template) }}
       />
 
       <CollectionFormDialog

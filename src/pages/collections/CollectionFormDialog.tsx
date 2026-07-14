@@ -1,19 +1,24 @@
 import { Box, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { Button, EmojiPickerInput, Input } from '../../components/ui'
+import { TemplateKitRow } from '../../components/TemplateKitRow'
+import { COLLECTION_TEMPLATES } from '../../services/collectionTemplates'
+import type { CollectionTemplate } from '../../services/collectionTemplates'
 import { backgroundThemes, colors, font, radius } from '../../design-system'
 import type { Collection, CollectionFormData } from '../../types/note'
 
 const DEFAULT_FORM: CollectionFormData = { name: '', emoji: '💙', description: '', theme: 'romance' }
 
-export function CollectionFormDialog({ open, onClose, initial, onSubmit, isPending }: {
+export function CollectionFormDialog({ open, onClose, initial, onSubmit, isPending, onSelectTemplate }: {
   open: boolean
   onClose: () => void
   initial?: Collection
   onSubmit: (data: CollectionFormData) => Promise<void>
   isPending: boolean
+  onSelectTemplate?: (template: CollectionTemplate) => void
 }) {
   const [form, setForm] = useState<CollectionFormData>(DEFAULT_FORM)
+  const [showTemplates, setShowTemplates] = useState(false)
 
   useEffect(() => {
     if (open) {
@@ -21,6 +26,7 @@ export function CollectionFormDialog({ open, onClose, initial, onSubmit, isPendi
         ? { name: initial.name, emoji: initial.emoji, description: initial.description ?? '', theme: initial.theme }
         : DEFAULT_FORM
       )
+      setShowTemplates(false)
     }
   }, [open, initial])
 
@@ -36,69 +42,102 @@ export function CollectionFormDialog({ open, onClose, initial, onSubmit, isPendi
       </DialogTitle>
       <DialogContent sx={{ pt: 0 }}>
         <Stack spacing={2.5} sx={{ mt: 1 }}>
-          <Box sx={{
-            height: 60, borderRadius: radius.lg,
-            background: selectedBg.gradient,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '1.8rem', transition: 'background 0.3s ease',
-            boxShadow: `0 4px 16px ${selectedBg.accent}33`,
-          }}>
-            {form.emoji || '💙'}
-          </Box>
+          {!isEdit && onSelectTemplate && !showTemplates && (
+            <Stack direction="row" alignItems="center" spacing={1.2} sx={{
+              p: 1.3, borderRadius: radius.lg, background: `${colors.primary.main}0f`, border: `1px solid ${colors.primary.main}30`,
+            }}>
+              <Typography sx={{ fontSize: '1.4rem', flexShrink: 0 }}>😊</Typography>
+              <Typography sx={{ flex: 1, fontSize: '0.82rem', fontWeight: 700, color: colors.text.primary, lineHeight: 1.35 }}>
+                Quer usar um template pronto pra facilitar sua vida?
+              </Typography>
+              <Button variant="ghost" onClick={() => setShowTemplates(true)} sx={{ flexShrink: 0, whiteSpace: 'nowrap', fontSize: '0.76rem', px: 1.2 }}>
+                Ver templates
+              </Button>
+            </Stack>
+          )}
 
-          <EmojiPickerInput label="Emoji" value={form.emoji} onChange={(emoji) => setForm((f) => ({ ...f, emoji }))} />
-
-          <Box>
-            <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
-              <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.text.secondary }}>Nome</Typography>
-              <Typography sx={{ fontSize: '0.72rem', color: form.name.length > 50 ? colors.error.main : colors.text.muted }}>
-                {form.name.length}/50
+          {showTemplates ? (
+            <Stack spacing={0.9}>
+              {COLLECTION_TEMPLATES.map((template) => (
+                <TemplateKitRow
+                  key={template.id}
+                  template={template}
+                  onClick={() => onSelectTemplate?.(template)}
+                />
+              ))}
+              <Typography onClick={() => setShowTemplates(false)} sx={{ fontSize: '0.76rem', color: colors.text.secondary, textAlign: 'center', cursor: 'pointer', fontWeight: 700, mt: 0.5, '&:hover': { color: colors.primary.main } }}>
+                ← Prefiro criar do zero
               </Typography>
             </Stack>
-            <Input placeholder="Nosso potinho 💙" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value.slice(0, 50) }))} />
-          </Box>
+          ) : (
+            <>
+              <Box sx={{
+                height: 60, borderRadius: radius.lg,
+                background: selectedBg.gradient,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '1.8rem', transition: 'background 0.3s ease',
+                boxShadow: `0 4px 16px ${selectedBg.accent}33`,
+              }}>
+                {form.emoji || '💙'}
+              </Box>
 
-          <Box>
-            <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
-              <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.text.secondary }}>Descrição</Typography>
-              <Typography sx={{ fontSize: '0.72rem', color: colors.text.muted }}>{form.description.length}/200</Typography>
-            </Stack>
-            <TextField multiline rows={2} fullWidth placeholder="Um potinho cheio de amor..." value={form.description}
-              onChange={(e) => setForm((f) => ({ ...f, description: e.target.value.slice(0, 200) }))}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: radius.md, fontSize: '0.86rem', background: colors.surface.overlay, '& fieldset': { borderColor: colors.border.medium } } }}
-            />
-          </Box>
+              <EmojiPickerInput label="Emoji" value={form.emoji} onChange={(emoji) => setForm((f) => ({ ...f, emoji }))} />
 
-          <Box>
-            <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.text.secondary, mb: 1 }}>Cor da coleção</Typography>
-            <Stack spacing={0.8}>
-              {([false, true] as const).map((dark) => (
-                <Box key={String(dark)}>
-                  <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: 0.5, color: colors.text.muted, textTransform: 'uppercase', mb: 0.6 }}>
-                    {dark ? 'Escuros' : 'Claros'}
+              <Box>
+                <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
+                  <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.text.secondary }}>Nome</Typography>
+                  <Typography sx={{ fontSize: '0.72rem', color: form.name.length > 50 ? colors.error.main : colors.text.muted }}>
+                    {form.name.length}/50
                   </Typography>
-                  <Box sx={{ display: 'flex', gap: 0.8, flexWrap: 'wrap' }}>
-                    {backgroundThemes.filter((bg) => bg.isDark === dark).map((bg) => (
-                      <Box key={bg.key} onClick={() => setForm((f) => ({ ...f, theme: bg.key }))} title={bg.label} sx={{
-                        width: 30, height: 30, borderRadius: '50%', cursor: 'pointer',
-                        background: bg.gradient, flexShrink: 0,
-                        border: `2.5px solid ${form.theme === bg.key ? bg.accent : 'transparent'}`,
-                        boxShadow: form.theme === bg.key ? `0 2px 10px ${bg.accent}66` : 'none',
-                        transition: 'all 0.15s', '&:hover': { transform: 'scale(1.12)' },
-                      }} />
-                    ))}
-                  </Box>
-                </Box>
-              ))}
-            </Stack>
-          </Box>
+                </Stack>
+                <Input placeholder="Nosso potinho 💙" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value.slice(0, 50) }))} />
+              </Box>
+
+              <Box>
+                <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
+                  <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.text.secondary }}>Descrição</Typography>
+                  <Typography sx={{ fontSize: '0.72rem', color: colors.text.muted }}>{form.description.length}/200</Typography>
+                </Stack>
+                <TextField multiline rows={2} fullWidth placeholder="Um potinho cheio de amor..." value={form.description}
+                  onChange={(e) => setForm((f) => ({ ...f, description: e.target.value.slice(0, 200) }))}
+                  sx={{ '& .MuiOutlinedInput-root': { borderRadius: radius.md, fontSize: '0.86rem', background: colors.surface.overlay, '& fieldset': { borderColor: colors.border.medium } } }}
+                />
+              </Box>
+
+              <Box>
+                <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.text.secondary, mb: 1 }}>Cor da coleção</Typography>
+                <Stack spacing={0.8}>
+                  {([false, true] as const).map((dark) => (
+                    <Box key={String(dark)}>
+                      <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: 0.5, color: colors.text.muted, textTransform: 'uppercase', mb: 0.6 }}>
+                        {dark ? 'Escuros' : 'Claros'}
+                      </Typography>
+                      <Box sx={{ display: 'flex', gap: 0.8, flexWrap: 'wrap' }}>
+                        {backgroundThemes.filter((bg) => bg.isDark === dark).map((bg) => (
+                          <Box key={bg.key} onClick={() => setForm((f) => ({ ...f, theme: bg.key }))} title={bg.label} sx={{
+                            width: 30, height: 30, borderRadius: '50%', cursor: 'pointer',
+                            background: bg.gradient, flexShrink: 0,
+                            border: `2.5px solid ${form.theme === bg.key ? bg.accent : 'transparent'}`,
+                            boxShadow: form.theme === bg.key ? `0 2px 10px ${bg.accent}66` : 'none',
+                            transition: 'all 0.15s', '&:hover': { transform: 'scale(1.12)' },
+                          }} />
+                        ))}
+                      </Box>
+                    </Box>
+                  ))}
+                </Stack>
+              </Box>
+            </>
+          )}
         </Stack>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
         <Button variant="ghost" onClick={onClose} sx={{ flex: 1 }}>Cancelar</Button>
-        <Button variant="primary" loading={isPending} onClick={() => onSubmit(form)} disabled={!form.name.trim()} sx={{ flex: 1 }}>
-          {isEdit ? 'Salvar' : 'Criar'}
-        </Button>
+        {!showTemplates && (
+          <Button variant="primary" loading={isPending} onClick={() => onSubmit(form)} disabled={!form.name.trim()} sx={{ flex: 1 }}>
+            {isEdit ? 'Salvar' : 'Criar'}
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   )
