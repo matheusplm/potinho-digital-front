@@ -1,7 +1,9 @@
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { Box, IconButton, Stack, Typography } from '@mui/material'
+import { useEffect, useRef, useState } from 'react'
 import { Card } from '../../components/ui'
 import { RewardCard } from '../../components/collection/RewardCard'
 import { colors, font, ink, radius } from '../../design-system'
@@ -74,6 +76,18 @@ export function ManageNoteCard({ note, view, r, noteTypes = [], mask, onOpen, on
   const selectedBorder = selection?.selected ? selection.accent : undefined
   const selectedShadow = selection?.selected ? `0 8px 26px ${selection.accent}30` : undefined
 
+  const [listExpanded, setListExpanded] = useState(false)
+  const [listOverflowing, setListOverflowing] = useState(false)
+  const listTitleRef = useRef<HTMLElement>(null)
+  const listMessageRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    if (view !== 'list' || listExpanded) return
+    const titleOverflows = !!listTitleRef.current && listTitleRef.current.scrollWidth > listTitleRef.current.clientWidth
+    const messageOverflows = !!listMessageRef.current && listMessageRef.current.scrollWidth > listMessageRef.current.clientWidth
+    setListOverflowing(titleOverflows || messageOverflows)
+  }, [view, listExpanded, note.title, note.message])
+
   if (view === 'compact') {
     return (
       <Card accent={r?.borderColor} onClick={handleClick} sx={{
@@ -103,6 +117,10 @@ export function ManageNoteCard({ note, view, r, noteTypes = [], mask, onOpen, on
   }
 
   if (view === 'list') {
+    const canExpand = !!note.imageUrl || listOverflowing
+    const expanded = listExpanded && canExpand
+    const toggleExpand = (e: React.MouseEvent) => { e.stopPropagation(); setListExpanded((v) => !v) }
+
     return (
       <Card accent={r?.borderColor} onClick={handleClick} sx={{
         p: 0, overflow: 'hidden', cursor: 'pointer',
@@ -112,19 +130,34 @@ export function ManageNoteCard({ note, view, r, noteTypes = [], mask, onOpen, on
         transition: 'transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease',
         '&:hover': { transform: 'translateY(-1px)', boxShadow: selectedShadow ?? `0 8px 24px ${r?.glowColor || 'rgba(15,23,42,0.1)'}` },
       }}>
-        <Stack direction="row" alignItems="stretch" sx={{ minHeight: 74 }}>
-          {note.imageUrl ? (
-            <Box sx={{ width: 72, flexShrink: 0, overflow: 'hidden' }}>
-              <Box component="img" src={note.imageUrl} alt="" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-            </Box>
-          ) : (
-            <Box sx={{ width: 5, flexShrink: 0, background: r ? `linear-gradient(180deg,${r.borderColor},${r.glowColor || r.borderColor})` : colors.border.subtle }} />
+        {expanded && note.imageUrl && (
+          <Box sx={{ width: '100%', height: 160, overflow: 'hidden' }}>
+            <Box component="img" src={note.imageUrl} alt="" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          </Box>
+        )}
+        <Stack direction="row" alignItems={expanded ? 'flex-start' : 'stretch'} sx={{ minHeight: expanded ? undefined : 74 }}>
+          {!expanded && (
+            note.imageUrl ? (
+              <Box sx={{ width: 72, flexShrink: 0, overflow: 'hidden' }}>
+                <Box component="img" src={note.imageUrl} alt="" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              </Box>
+            ) : (
+              <Box sx={{ width: 5, flexShrink: 0, background: r ? `linear-gradient(180deg,${r.borderColor},${r.glowColor || r.borderColor})` : colors.border.subtle }} />
+            )
           )}
           <Box sx={{ flex: 1, minWidth: 0, px: 1.25, py: 1 }}>
-            <Stack direction="row" alignItems="center" spacing={1}>
+            <Stack direction="row" alignItems={expanded ? 'flex-start' : 'center'} spacing={1}>
               <Box sx={{ flex: 1, minWidth: 0 }}>
-                <Stack direction="row" spacing={0.6} alignItems="center" sx={{ minWidth: 0 }}>
-                  <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.92rem', color: ink.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <Stack direction="row" spacing={0.6} alignItems="center" sx={{ minWidth: 0, flexWrap: expanded ? 'wrap' : 'nowrap', rowGap: 0.3 }}>
+                  <Typography
+                    ref={listTitleRef}
+                    sx={{
+                      fontFamily: font.serif, fontWeight: 800, fontSize: '0.92rem', color: ink.primary,
+                      ...(expanded
+                        ? { overflowWrap: 'anywhere', wordBreak: 'break-word' }
+                        : { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }),
+                    }}
+                  >
                     {note.title}
                   </Typography>
                   {r && (
@@ -138,7 +171,15 @@ export function ManageNoteCard({ note, view, r, noteTypes = [], mask, onOpen, on
                     </Box>
                   ))}
                 </Stack>
-                <Typography sx={{ mt: 0.25, fontSize: '0.74rem', color: ink.secondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <Typography
+                  ref={listMessageRef}
+                  sx={{
+                    mt: 0.25, fontSize: '0.74rem', color: ink.secondary,
+                    ...(expanded
+                      ? { whiteSpace: 'pre-line', overflowWrap: 'anywhere', wordBreak: 'break-word' }
+                      : { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }),
+                  }}
+                >
                   {note.message}
                 </Typography>
                 <Typography sx={{ mt: 0.35, fontSize: '0.70rem', color: ink.muted, fontWeight: 700 }}>
@@ -146,6 +187,11 @@ export function ManageNoteCard({ note, view, r, noteTypes = [], mask, onOpen, on
                 </Typography>
               </Box>
               <Stack direction="row" spacing={0.4} alignItems="center" sx={{ flexShrink: 0 }}>
+                {canExpand && (
+                  <IconButton size="small" aria-label={expanded ? 'recolher bilhete' : 'expandir bilhete'} onClick={toggleExpand} sx={{ ...actionButtonSx('neutral'), width: 28, height: 28 }}>
+                    <ExpandMoreIcon sx={{ fontSize: 18, transform: expanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                  </IconButton>
+                )}
                 <NoteActions selection={selection} onOpen={onOpen} onEdit={onEdit} onDisable={onDisable} />
                 {selection && <CheckCircle selection={selection} />}
               </Stack>
