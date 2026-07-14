@@ -26,7 +26,7 @@ export function resolvePersona(
   apiRole: UserRole,
 ): UserRole {
   const { owned, reader } = partitionCollections(collections, userId)
-  const canWriter = owned.length > 0 || (reader.length === 0 && apiRole === 'writer')
+  const canWriter = owned.length > 0 || apiRole === 'writer'
   const canReader = reader.length > 0
 
   try {
@@ -48,7 +48,7 @@ export function personaCapabilities(
   apiRole: UserRole,
 ) {
   const { owned, reader } = partitionCollections(collections, userId)
-  const canWriter = owned.length > 0 || (!!userId && reader.length === 0 && apiRole === 'writer')
+  const canWriter = owned.length > 0 || (!!userId && apiRole === 'writer')
   const canReader = reader.length > 0
   const canSwitch = canWriter && canReader
   return { owned, reader, canWriter, canReader, canSwitch }
