@@ -84,7 +84,7 @@ export function NoteCard({ note, rarity, onClick }: { note: CollectionNoteView; 
           {note.message && (
             <Typography sx={{
               fontSize: '0.68rem', color: rarity?.textColor ? `${rarity.textColor}99` : ink.secondary,
-              lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+              lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', whiteSpace: 'pre-line',
             }}>
               {linkifyText(note.message)}
             </Typography>

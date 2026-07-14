@@ -71,7 +71,7 @@ function CardTextBox({ title, message, children, expanded }: { title: string; me
       <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.2rem', color: ink.primary, lineHeight: 1.3, overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampTitle }}>
         {title}
       </Typography>
-      <Typography sx={{ mt: 0.75, fontSize: '0.9rem', color: ink.secondary, lineHeight: 1.65, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampMsg }}>
+      <Typography sx={{ mt: 0.75, fontSize: '0.9rem', color: ink.secondary, lineHeight: 1.65, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word', whiteSpace: 'pre-line', ...clampMsg }}>
         &ldquo;{linkifyText(message)}&rdquo;
       </Typography>
     </Box>
@@ -130,7 +130,7 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
           </Stack>
         </Box>
         <Stack spacing={1} sx={{ p: 2, position: 'relative', zIndex: 1 }}>
-          <Typography sx={{ fontSize: '0.9rem', color: ink.secondary, lineHeight: 1.65, fontStyle: 'italic', ...clampM }}>
+          <Typography sx={{ fontSize: '0.9rem', color: ink.secondary, lineHeight: 1.65, fontStyle: 'italic', whiteSpace: 'pre-line', ...clampM }}>
             &ldquo;{linkifyText(reward.message)}&rdquo;
           </Typography>
           <CardTag t={t} all={rewardTypes} />
@@ -151,7 +151,7 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
           <CardChips r={r} isNew={reward.isNew} />
           <Box sx={{ p: 1.15, borderRadius: radius.lg, background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.7)' }}>
             <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.2rem', color: ink.primary, lineHeight: 1.3 }}>{reward.title}</Typography>
-            <Typography sx={{ mt: 0.75, fontSize: '0.9rem', color: ink.secondary, lineHeight: 1.65, fontStyle: 'italic' }}>&ldquo;{linkifyText(reward.message)}&rdquo;</Typography>
+            <Typography sx={{ mt: 0.75, fontSize: '0.9rem', color: ink.secondary, lineHeight: 1.65, fontStyle: 'italic', whiteSpace: 'pre-line' }}>&ldquo;{linkifyText(reward.message)}&rdquo;</Typography>
           </Box>
           <CardTag t={t} all={rewardTypes} />
         </Stack>
@@ -184,7 +184,7 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
           <Stack spacing={1.2} sx={{ flex: 1, p: 1.8, minWidth: 0 }}>
             <CardChips r={r} isNew={reward.isNew} />
             <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.05rem', color: ink.primary, lineHeight: 1.3, overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampT }}>{reward.title}</Typography>
-            <Typography sx={{ fontSize: '0.82rem', color: ink.secondary, lineHeight: 1.55, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampM }}>&ldquo;{linkifyText(reward.message)}&rdquo;</Typography>
+            <Typography sx={{ fontSize: '0.82rem', color: ink.secondary, lineHeight: 1.55, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word', whiteSpace: 'pre-line', ...clampM }}>&ldquo;{linkifyText(reward.message)}&rdquo;</Typography>
             <CardTag t={t} all={rewardTypes} />
           </Stack>
         </Stack>
@@ -215,7 +215,7 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
                 <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.05rem', color: ink.primary, lineHeight: 1.3, overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampT }}>
                   {reward.title}
                 </Typography>
-                <Typography sx={{ mt: 0.5, fontSize: '0.83rem', color: ink.secondary, lineHeight: 1.55, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampM }}>
+                <Typography sx={{ mt: 0.5, fontSize: '0.83rem', color: ink.secondary, lineHeight: 1.55, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word', whiteSpace: 'pre-line', ...clampM }}>
                   &ldquo;{linkifyText(reward.message)}&rdquo;
                 </Typography>
               </Box>

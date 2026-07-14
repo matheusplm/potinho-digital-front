@@ -275,7 +275,7 @@ export function ShareCartinha({ note, r, t, theme }: {
             </Stack>
             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', py: midPy, minHeight: 0 }}>
               <Typography sx={{ fontFamily: font.serif, fontWeight: 850, color: '#fff', lineHeight: 1.18, fontSize: titleFsz, overflowWrap: 'anywhere', wordBreak: 'break-word', textShadow: '0 1px 8px rgba(0,0,0,0.6)' }}>{note.title}</Typography>
-              <Typography sx={{ mt: story ? 2 : 1.5, fontStyle: 'italic', color: 'rgba(255,255,255,0.82)', lineHeight: 1.5, fontSize: msgFsz, overflowWrap: 'anywhere', wordBreak: 'break-word', textShadow: '0 1px 6px rgba(0,0,0,0.5)' }}>&ldquo;{note.message}&rdquo;</Typography>
+              <Typography sx={{ mt: story ? 2 : 1.5, fontStyle: 'italic', color: 'rgba(255,255,255,0.82)', lineHeight: 1.5, fontSize: msgFsz, overflowWrap: 'anywhere', wordBreak: 'break-word', textShadow: '0 1px 6px rgba(0,0,0,0.5)', whiteSpace: 'pre-line' }}>&ldquo;{note.message}&rdquo;</Typography>
             </Box>
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ flexShrink: 0 }}>
               {typeChip ?? <Box />}
@@ -297,7 +297,7 @@ export function ShareCartinha({ note, r, t, theme }: {
             </Stack>
             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', zIndex: 1, py: story ? 2 : 1.2, minHeight: 0 }}>
               <Typography sx={{ fontFamily: font.serif, fontWeight: 850, color: textColor, lineHeight: 1.18, fontSize: story ? '3rem' : '2rem', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{note.title}</Typography>
-              <Typography sx={{ mt: story ? 1.8 : 1.2, fontStyle: 'italic', color: caption, lineHeight: 1.5, fontSize: story ? '1.8rem' : '1.3rem', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>&ldquo;{note.message}&rdquo;</Typography>
+              <Typography sx={{ mt: story ? 1.8 : 1.2, fontStyle: 'italic', color: caption, lineHeight: 1.5, fontSize: story ? '1.8rem' : '1.3rem', overflowWrap: 'anywhere', wordBreak: 'break-word', whiteSpace: 'pre-line' }}>&ldquo;{note.message}&rdquo;</Typography>
             </Box>
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ flexShrink: 0, zIndex: 1 }}>
               {typeChip ?? <Box />}
@@ -321,7 +321,7 @@ export function ShareCartinha({ note, r, t, theme }: {
                 <Box data-img-slot="true" sx={{ flexShrink: 0, width: thumbSize, height: thumbSize, borderRadius: layout.startsWith('circle') ? '50%' : radius.md }} />
                 <Box sx={{ minWidth: 0, flex: 1, textAlign: 'left' }}>
                   <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: story ? '2rem' : '1.5rem', color: textColor, lineHeight: 1.25, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{note.title}</Typography>
-                  <Typography sx={{ mt: 0.5, fontSize: story ? '1.4rem' : '1.1rem', color: caption, lineHeight: 1.5, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>&ldquo;{note.message}&rdquo;</Typography>
+                  <Typography sx={{ mt: 0.5, fontSize: story ? '1.4rem' : '1.1rem', color: caption, lineHeight: 1.5, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word', whiteSpace: 'pre-line' }}>&ldquo;{note.message}&rdquo;</Typography>
                 </Box>
               </Stack>
             </Box>
@@ -347,7 +347,7 @@ export function ShareCartinha({ note, r, t, theme }: {
             <Typography sx={{ fontFamily: font.serif, fontWeight: 850, color: textColor, lineHeight: 1.18, fontSize: titleFsz, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
               {note.title}
             </Typography>
-            <Typography sx={{ mt: story ? 2 : 1.5, fontStyle: 'italic', color: caption, lineHeight: 1.5, fontSize: msgFsz, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+            <Typography sx={{ mt: story ? 2 : 1.5, fontStyle: 'italic', color: caption, lineHeight: 1.5, fontSize: msgFsz, overflowWrap: 'anywhere', wordBreak: 'break-word', whiteSpace: 'pre-line' }}>
               &ldquo;{note.message}&rdquo;
             </Typography>
           </Box>

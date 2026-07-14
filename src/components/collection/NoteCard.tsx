@@ -69,7 +69,7 @@ export function NoteCard({ note, r, ts = [], unread, variant, onSelect, onToggle
           <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: grid ? '0.9rem' : '0.98rem', color: ink.primary, mb: 0.3, display: '-webkit-box', WebkitLineClamp: grid ? 2 : 1, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
             {note.title ?? ''}
           </Typography>
-          <Typography sx={{ fontSize: grid ? '0.74rem' : '0.8rem', color: ink.secondary, lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: grid ? 3 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+          <Typography sx={{ fontSize: grid ? '0.74rem' : '0.8rem', color: ink.secondary, lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: grid ? 3 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', whiteSpace: 'pre-line' }}>
             {linkifyText(note.message ?? '')}
           </Typography>
           <IconButton size="small" aria-label="favoritar bilhete" onClick={(event) => { event.stopPropagation(); onToggleFavorite(note) }} sx={{ position: 'absolute', top: 6, right: 6, p: 0.5, borderRadius: radius.md, color: note.favorite ? colors.rose.main : (r?.captionColor ?? ink.muted), background: note.favorite ? 'rgba(254,243,199,0.92)' : 'rgba(255,255,255,0.74)', border: `1px solid ${note.favorite ? 'rgba(234,179,8,0.38)' : 'rgba(255,255,255,0.68)'}`, backdropFilter: 'blur(8px)', boxShadow: '0 4px 12px rgba(15,23,42,0.08)' }}>
