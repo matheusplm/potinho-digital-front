@@ -601,6 +601,7 @@ export function SimulatedReaderHomePage() {
               }}
               accent={theme.accent}
               accentMuted={theme.textOnBgMuted}
+              accruedCount={mainPack ? (packAvailableCounts[mainPack.id] ?? 0) : 0}
             />
           </Stack>
         </Box>

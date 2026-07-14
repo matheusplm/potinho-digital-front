@@ -3,7 +3,7 @@ import { Button } from '../../components/ui'
 import { font, heartPulseAura, ink, packCtaFloat, radius } from '../../design-system'
 import type { CollectionPack } from '../../types/note'
 
-export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLabel, cooldownProgress, isLoading, isOpeningPack, onOpen, isRealReader, onResetCooldown, accent, accentMuted }: {
+export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLabel, cooldownProgress, isLoading, isOpeningPack, onOpen, isRealReader, onResetCooldown, accent, accentMuted, accruedCount = 0 }: {
   pack: CollectionPack | undefined
   collectionEmoji: string
   mainCanOpen: boolean
@@ -16,7 +16,9 @@ export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLa
   onResetCooldown: () => void
   accent: string
   accentMuted: string
+  accruedCount?: number
 }) {
+  const hasAccrued = mainCanOpen && accruedCount > 1
   return (
     <Stack spacing={1.2} alignItems="center" justifyContent="center" sx={{
       flex: 1,
@@ -103,6 +105,17 @@ export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLa
             <Typography sx={{ position: 'relative', zIndex: 1, fontSize: '4.1rem', lineHeight: 1, transform: 'translateY(-3px)', filter: 'drop-shadow(0 5px 12px rgba(0,0,0,0.18))' }}>
               {pack?.emoji ?? collectionEmoji}
             </Typography>
+            {hasAccrued && (
+              <Box sx={{
+                position: 'absolute', top: 4, right: 4, zIndex: 2, minWidth: 28, height: 28, borderRadius: radius.full,
+                background: '#dc2626', border: '2px solid #fff', display: 'flex', alignItems: 'center',
+                justifyContent: 'center', px: 0.6, boxShadow: '0 2px 8px rgba(0,0,0,0.28)',
+              }}>
+                <Typography sx={{ fontSize: '0.86rem', fontWeight: 900, color: '#fff', lineHeight: 1 }}>
+                  {accruedCount}x
+                </Typography>
+              </Box>
+            )}
           </Box>
         ) : (
           <Box sx={{ width: 176, height: 176, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', pointerEvents: 'none' }}>
@@ -145,7 +158,7 @@ export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLa
           backdropFilter: 'blur(12px)', boxShadow: '0 8px 20px rgba(15,23,42,0.08)',
         }}>
           <Typography sx={{ color: ink.primary, fontFamily: font.serif, fontSize: '1rem', fontWeight: 850, lineHeight: 1.1 }}>
-            Pacotinho disponível
+            {hasAccrued ? `${accruedCount} pacotinhos disponíveis` : 'Pacotinho disponível'}
           </Typography>
           <Typography sx={{ color: ink.secondary, fontSize: '0.72rem', fontWeight: 750, lineHeight: 1.2 }}>
             toque no coração
