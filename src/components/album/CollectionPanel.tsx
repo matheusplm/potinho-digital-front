@@ -14,7 +14,7 @@ export function CollectionPanel({ play, rarities }: {
 
   const rarityRows = useMemo(() => {
     return [...rarities]
-      .sort((a, b) => a.order - b.order)
+      .sort((a, b) => b.odds - a.odds)
       .map((r) => {
         const inCollection = play.items.filter((i) => i.rarity === r.id)
         const owned = inCollection.filter((i) => i.owned).length

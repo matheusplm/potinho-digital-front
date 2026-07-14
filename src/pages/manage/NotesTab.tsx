@@ -125,7 +125,7 @@ export function NotesTab({ cid }: NotesTabProps) {
 
   const filteredNotes = useMemo(() => {
     const q = search.trim().toLowerCase()
-    const rarityOrder = new Map(rarities.map((r) => [r.id, r.order]))
+    const rarityOdds = new Map(rarities.map((r) => [r.id, r.odds]))
     const typeOrder = new Map(types.map((t) => [t.id, t.order]))
     const filtered = activeNotes.filter((note) =>
       (rarityFilter === 'all' || note.rarity === rarityFilter) &&
@@ -134,7 +134,7 @@ export function NotesTab({ cid }: NotesTabProps) {
     return filtered.sort((a, b) => {
       if (noteSort === 'oldest') return (a.createdAt ?? '').localeCompare(b.createdAt ?? '') || a.title.localeCompare(b.title, 'pt-BR')
       if (noteSort === 'az') return a.title.localeCompare(b.title, 'pt-BR')
-      if (noteSort === 'rarity') return (rarityOrder.get(b.rarity) ?? 0) - (rarityOrder.get(a.rarity) ?? 0) || a.title.localeCompare(b.title, 'pt-BR')
+      if (noteSort === 'rarity') return (rarityOdds.get(a.rarity) ?? Infinity) - (rarityOdds.get(b.rarity) ?? Infinity) || a.title.localeCompare(b.title, 'pt-BR')
       if (noteSort === 'type') return (typeOrder.get(a.typeId) ?? 0) - (typeOrder.get(b.typeId) ?? 0) || a.title.localeCompare(b.title, 'pt-BR')
       return (b.createdAt ?? '').localeCompare(a.createdAt ?? '') || a.title.localeCompare(b.title, 'pt-BR')
     })

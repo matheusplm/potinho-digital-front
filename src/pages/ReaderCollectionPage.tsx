@@ -77,7 +77,7 @@ export function ReaderCollectionPage() {
   const [packOpensDialog, setPackOpensDialog] = useState<{ pack: CollectionPack; currentOpens: number | undefined } | null>(null)
   const [revokeDialogOpen, setRevokeDialogOpen] = useState(false)
 
-  const rarityOrder = useMemo(() => Object.fromEntries(rarities.map((r) => [r.id, r.order])), [rarities])
+  const rarityOdds = useMemo(() => Object.fromEntries(rarities.map((r) => [r.id, r.odds])), [rarities])
   const rarityById = useMemo(() => new Map(rarities.map((r) => [r.id, r])), [rarities])
 
   const bonusPacks = useMemo(
@@ -98,7 +98,7 @@ export function ReaderCollectionPage() {
   }, [view?.daily?.canOpen, view?.daily?.availableAt])
 
   const ownedRarities = useMemo(
-    () => rarities.filter((r) => ownedNotes.some((n) => n.rarity === r.id)).sort((a, b) => a.order - b.order),
+    () => rarities.filter((r) => ownedNotes.some((n) => n.rarity === r.id)).sort((a, b) => b.odds - a.odds),
     [ownedNotes, rarities],
   )
 
@@ -110,8 +110,8 @@ export function ReaderCollectionPage() {
       const q = search.toLowerCase()
       notes = notes.filter((n) => n.title?.toLowerCase().includes(q) || n.message?.toLowerCase().includes(q))
     }
-    return sortNotes(notes, sort, rarityOrder)
-  }, [ownedNotes, rarityFilter, favFilter, search, sort, rarityOrder])
+    return sortNotes(notes, sort, rarityOdds)
+  }, [ownedNotes, rarityFilter, favFilter, search, sort, rarityOdds])
 
   const isLoading = collectionsLoading || viewLoading
 

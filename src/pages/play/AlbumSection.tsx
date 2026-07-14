@@ -26,10 +26,10 @@ export const ALBUM_VIEW_KEY = 'potinho-album-view'
 const SORT_LABEL: Record<AlbumSort, string> = { recent: 'Recentes', rarity: 'Raridade', az: 'A-Z' }
 const SORT_CYCLE: AlbumSort[] = ['recent', 'rarity', 'az']
 
-function sortNotes(items: CollectionNoteView[], sort: AlbumSort, order: Record<string, number>) {
+function sortNotes(items: CollectionNoteView[], sort: AlbumSort, rarityOdds: Record<string, number>) {
   const arr = [...items]
   if (sort === 'az') arr.sort((a, b) => (a.title ?? '').localeCompare(b.title ?? '', 'pt-BR'))
-  else if (sort === 'rarity') arr.sort((a, b) => (order[b.rarity] ?? 0) - (order[a.rarity] ?? 0) || (a.title ?? '').localeCompare(b.title ?? '', 'pt-BR'))
+  else if (sort === 'rarity') arr.sort((a, b) => (rarityOdds[a.rarity] ?? Infinity) - (rarityOdds[b.rarity] ?? Infinity) || (a.title ?? '').localeCompare(b.title ?? '', 'pt-BR'))
   else arr.sort((a, b) => (b.obtainedAt ?? '').localeCompare(a.obtainedAt ?? ''))
   return arr
 }
@@ -59,11 +59,11 @@ export function AlbumSection({
   unreadIds: string[]
   emptyHint: string
 }) {
-  const order = useMemo(() => Object.fromEntries(rarities.map((r) => [r.id, r.order])), [rarities])
+  const rarityOdds = useMemo(() => Object.fromEntries(rarities.map((r) => [r.id, r.odds])), [rarities])
   const rarityById = useMemo(() => new Map(rarities.map((r) => [r.id, r])), [rarities])
   const typeById = useMemo(() => new Map(types.map((t) => [t.id, t])), [types])
   const unreadSet = useMemo(() => new Set(unreadIds), [unreadIds])
-  const sorted = useMemo(() => sortNotes(items, sort, order), [items, sort, order])
+  const sorted = useMemo(() => sortNotes(items, sort, rarityOdds), [items, sort, rarityOdds])
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
   const [filterSheetOpen, setFilterSheetOpen] = useState(false)
   const activeFilterCount = (rarity !== 'all' ? 1 : 0) + (type !== 'all' ? 1 : 0) + (view === 'folders' && group !== 'rarity' ? 1 : 0)
@@ -72,7 +72,7 @@ export function AlbumSection({
     if (view !== 'folders') return []
     if (group === 'rarity') {
       return [...discoveredRarities]
-        .sort((a, b) => b.order - a.order)
+        .sort((a, b) => a.odds - b.odds)
         .map((r) => ({ key: r.id, label: `${r.emoji} ${r.label}`, accent: r.borderColor, items: sorted.filter((n) => n.rarity === r.id) }))
         .filter((g) => g.items.length > 0)
     }

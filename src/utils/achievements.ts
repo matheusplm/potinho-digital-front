@@ -25,7 +25,7 @@ export function computeAchievements(
   const ownedRarityIds = new Set(owned.map((i) => i.rarity))
   const presentRarities = rarities.filter((r) => rarityIdsInCollection.has(r.id))
   const topRarity = presentRarities.reduce<RarityConfig | undefined>(
-    (best, r) => (!best || r.order > best.order ? r : best),
+    (best, r) => (!best || r.odds < best.odds ? r : best),
     undefined,
   )
   const ownsTopRarity = topRarity ? owned.some((i) => i.rarity === topRarity.id) : false
