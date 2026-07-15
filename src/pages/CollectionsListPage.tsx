@@ -296,7 +296,7 @@ export function CollectionsListPage() {
                 <Typography sx={{ fontSize: '0.66rem', color: theme.textOnBgMuted }}>
                   {trashItem
                     ? 'some de vez quando outra coleção for excluída'
-                    : 'quando você excluir uma coleção, ela fica aqui para restaurar'}
+                    : 'coleções excluídas ficam aqui para restaurar'}
                 </Typography>
               </Box>
               {trashItem && (
@@ -343,7 +343,7 @@ export function CollectionsListPage() {
               {readersWarning}
             </Typography>
             <Typography sx={{ fontSize: '0.85rem', color: colors.text.secondary, lineHeight: 1.6 }}>
-              Ela vai para a lixeira e some para essas pessoas. Para confirmar, digite o nome exato da coleção:
+              A coleção vai para a lixeira e some para essas pessoas. Para confirmar, digite o nome exato da coleção:
             </Typography>
             <Input
               placeholder={deleting?.name ?? ''}

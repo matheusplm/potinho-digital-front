@@ -215,7 +215,7 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
           </Stack>
 
           <Box>
-            <SectionLabel sx={{ mb: 0.8 }}>Com que frequência ela recebe?</SectionLabel>
+            <SectionLabel sx={{ mb: 0.8 }}>Com que frequência a pessoa recebe?</SectionLabel>
             <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 0.7 }}>
               {PACK_RHYTHMS.map((item) => {
                 const active = rhythm === item.id

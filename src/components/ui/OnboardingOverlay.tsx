@@ -318,7 +318,7 @@ const STEPS = [
     accent: '#1d4ed8',
     stageBg: 'linear-gradient(160deg,#eff6ff 0%,#dbeafe 55%,#e0f2fe 100%)',
     title: 'Convide quem você ama',
-    desc: 'Adicione o email da pessoa na aba Acesso da coleção. E antes de enviar, use o Simular para sentir tudo como ela vai sentir.',
+    desc: 'Adicione o email da pessoa na aba Acesso da coleção. E antes de enviar, use o Simular para sentir tudo como a pessoa vai sentir.',
     stage: <StageInvite />,
   },
   {

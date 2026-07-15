@@ -48,7 +48,7 @@ export const COLLECTION_TEMPLATES: CollectionTemplate[] = [
     accent: '#d97706',
     collection: { name: 'Potinho da Amizade', emoji: '🌻' },
     notes: [
-      { title: 'Obrigada por existir', rarity: 'comum' },
+      { title: 'Que bom que você existe', rarity: 'comum' },
       { title: 'Nossa piada interna', rarity: 'raro' },
       { title: 'Aquela viagem', rarity: 'epico' },
       { title: 'Amizade rara', rarity: 'lendario' },

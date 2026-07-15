@@ -136,7 +136,7 @@ export function PacksTab({ cid }: PacksTabProps) {
                 O que é um pacotinho?
               </Typography>
               <Typography sx={{ fontSize: '0.8rem', color: theme.textOnBgMuted, lineHeight: 1.55 }}>
-                É como a pessoa recebe seus bilhetes: ela abre o pacotinho e ganha cartas surpresa. Você define quantas cartas saem e com que frequência.
+                É como a pessoa recebe seus bilhetes: abre o pacotinho e ganha cartas surpresa. Você define quantas cartas saem e com que frequência.
               </Typography>
             </Box>
 
