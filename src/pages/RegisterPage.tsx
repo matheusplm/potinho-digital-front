@@ -4,8 +4,10 @@ import { useRef, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Turnstile } from '@marsidev/react-turnstile'
 import type { TurnstileInstance } from '@marsidev/react-turnstile'
+import { useUser } from '../context/UserContext'
 import { api } from '../services/api'
 import { Button, Input, toast } from '../components/ui'
+import { GoogleSignInButton } from '../components/GoogleSignInButton'
 import { ScrollHint } from '../components/ui/ScrollHint'
 import { fadeSlide, floatHeart, font } from '../design-system'
 
@@ -24,6 +26,7 @@ const HEARTS = [
 
 export function RegisterPage() {
   const navigate = useNavigate()
+  const { setUser } = useUser()
   const [form, setForm] = useState({ name: '', email: '', username: '', password: '', confirm: '' })
   const [passwordTouched, setPasswordTouched] = useState(false)
   const [confirmTouched, setConfirmTouched] = useState(false)
@@ -75,6 +78,19 @@ export function RegisterPage() {
       const msg = err instanceof Error ? err.message : 'Erro ao criar conta.'
       toast.error(msg)
     } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleGoogle = async (idToken: string) => {
+    setLoading(true)
+    try {
+      const { token, refreshToken, user } = await api.googleLogin(idToken)
+      setUser({ id: user.id, name: user.name, email: user.email, role: user.role as 'writer' | 'reader', token, refreshToken, onboardingDone: user.onboardingDone })
+      toast.success(`Bem-vindo, ${user.name.split(' ')[0]}! 💙`)
+      navigate('/home')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Erro ao entrar com o Google.')
       setLoading(false)
     }
   }
@@ -185,6 +201,15 @@ export function RegisterPage() {
                 Criar conta
               </Button>
             </Stack>
+          </Box>
+
+          <Box sx={{ mt: 2.5 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+              <Box sx={{ flex: 1, height: '1px', background: 'rgba(30,58,95,0.15)' }} />
+              <Typography sx={{ fontSize: '0.75rem', color: 'rgba(30,58,95,0.45)', fontWeight: 600 }}>ou</Typography>
+              <Box sx={{ flex: 1, height: '1px', background: 'rgba(30,58,95,0.15)' }} />
+            </Box>
+            <GoogleSignInButton onCredential={handleGoogle} disabled={loading} />
           </Box>
         </Box>
 

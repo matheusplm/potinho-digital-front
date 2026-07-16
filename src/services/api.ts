@@ -222,6 +222,11 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ email, password, captchaToken }),
     }),
+  googleLogin: (idToken: string) =>
+    request<{ token: string; refreshToken: string; user: { id: string; name: string; role: string; email: string; onboardingDone: boolean | null } }>('/auth/google', {
+      method: 'POST',
+      body: JSON.stringify({ idToken }),
+    }),
   logout: (refreshToken: string) =>
     request<{ ok: boolean }>('/auth/logout', { method: 'POST', body: JSON.stringify({ refreshToken }) }).catch(() => {}),
   register: (name: string, email: string, password: string, captchaToken: string, username?: string) =>

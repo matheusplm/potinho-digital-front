@@ -7,6 +7,7 @@ import type { TurnstileInstance } from '@marsidev/react-turnstile'
 import { useUser } from '../context/UserContext'
 import { api, ApiRequestError } from '../services/api'
 import { Button, Input, toast } from '../components/ui'
+import { GoogleSignInButton } from '../components/GoogleSignInButton'
 import { fadeSlide, floatHeart, font } from '../design-system'
 
 const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined
@@ -55,6 +56,21 @@ export function LoginPage() {
         setError(msg)
       }
     } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleGoogle = async (idToken: string) => {
+    setError('')
+    setNotVerified(false)
+    setLoading(true)
+    try {
+      const { token, refreshToken, user } = await api.googleLogin(idToken)
+      setUser({ id: user.id, name: user.name, email: user.email, role: user.role as 'writer' | 'reader', token, refreshToken, onboardingDone: user.onboardingDone })
+      toast.success(`Bem-vindo, ${user.name.split(' ')[0]}! 💙`)
+      navigate(fromPath ?? '/home')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao entrar com o Google.')
       setLoading(false)
     }
   }
@@ -141,6 +157,15 @@ export function LoginPage() {
               </Box>
             )}
           </Stack>
+        </Box>
+
+        <Box sx={{ width: '100%', maxWidth: 320, mt: 2.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+            <Box sx={{ flex: 1, height: '1px', background: 'rgba(30,58,95,0.15)' }} />
+            <Typography sx={{ fontSize: '0.75rem', color: 'rgba(30,58,95,0.45)', fontWeight: 600 }}>ou</Typography>
+            <Box sx={{ flex: 1, height: '1px', background: 'rgba(30,58,95,0.15)' }} />
+          </Box>
+          <GoogleSignInButton onCredential={handleGoogle} disabled={loading} />
         </Box>
 
         <Typography variant="body2" sx={{ mt: 3.5, color: 'rgba(30,58,95,0.5)', fontSize: '0.85rem' }}>
