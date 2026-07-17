@@ -8,17 +8,11 @@ import { useUser } from '../context/UserContext'
 import { api, ApiRequestError } from '../services/api'
 import { Button, Input, toast } from '../components/ui'
 import { GoogleSignInButton } from '../components/GoogleSignInButton'
-import { fadeSlide, floatHeart, font } from '../design-system'
+import { FloatingParticles } from '../components/FloatingParticles'
+import { fadeSlide, font } from '../design-system'
 
 const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined
 
-const HEARTS = [
-  { size: 20, left: '7%',  delay: '0s',    dur: '12s' },
-  { size: 14, left: '23%', delay: '3.5s',  dur: '15s' },
-  { size: 24, left: '57%', delay: '1.5s',  dur: '11s' },
-  { size: 16, left: '77%', delay: '5.5s',  dur: '13s' },
-  { size: 12, left: '42%', delay: '8s',    dur: '14s' },
-]
 
 export function LoginPage() {
   const { setUser } = useUser()
@@ -88,16 +82,7 @@ export function LoginPage() {
       <Box sx={{ position: 'absolute', top: -120, right: -120, width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(29,78,216,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
       <Box sx={{ position: 'absolute', bottom: -80, left: -80, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(225,29,72,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
-      {HEARTS.map((h, i) => (
-        <FavoriteIcon key={i} sx={{
-          position: 'absolute', bottom: -8, left: h.left,
-          fontSize: h.size, zIndex: 0,
-          color: i % 2 === 0 ? '#1d4ed8' : '#e11d48',
-          filter: 'blur(0.5px)',
-          animation: `${floatHeart(i)} ${h.dur} ${h.delay} ease-in infinite`,
-          pointerEvents: 'none',
-        }} />
-      ))}
+      <FloatingParticles />
 
       <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 3, py: 2, animation: `${fadeSlide} 0.5s ease both` }} spacing={0}>
         <FavoriteIcon sx={{ fontSize: 52, color: '#e11d48', filter: 'drop-shadow(0 4px 16px rgba(225,29,72,0.4))', mb: 3 }} />

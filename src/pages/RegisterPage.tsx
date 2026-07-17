@@ -9,7 +9,8 @@ import { api } from '../services/api'
 import { Button, Input, toast } from '../components/ui'
 import { GoogleSignInButton } from '../components/GoogleSignInButton'
 import { ScrollHint } from '../components/ui/ScrollHint'
-import { fadeSlide, floatHeart, font } from '../design-system'
+import { FloatingParticles } from '../components/FloatingParticles'
+import { fadeSlide, font } from '../design-system'
 
 const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined
 
@@ -17,12 +18,6 @@ type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid'
 
 const USERNAME_RE = /^[a-z0-9_]+$/
 
-const HEARTS = [
-  { size: 18, left: '11%', delay: '0s',   dur: '13s' },
-  { size: 22, left: '33%', delay: '4s',   dur: '11s' },
-  { size: 15, left: '67%', delay: '2s',   dur: '14s' },
-  { size: 20, left: '85%', delay: '6.5s', dur: '12s' },
-]
 
 export function RegisterPage() {
   const navigate = useNavigate()
@@ -122,16 +117,7 @@ export function RegisterPage() {
       <Box sx={{ position: 'absolute', top: -120, right: -120, width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(29,78,216,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
       <Box sx={{ position: 'absolute', bottom: -80, left: -80, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
-      {HEARTS.map((h, i) => (
-        <FavoriteIcon key={i} sx={{
-          position: 'absolute', bottom: -8, left: h.left,
-          fontSize: h.size, zIndex: 0,
-          color: i % 2 === 0 ? '#1d4ed8' : '#7c3aed',
-          filter: 'blur(0.5px)',
-          animation: `${floatHeart(i)} ${h.dur} ${h.delay} ease-in infinite`,
-          pointerEvents: 'none',
-        }} />
-      ))}
+      <FloatingParticles />
 
       <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 3, py: 5, animation: `${fadeSlide} 0.5s ease both` }} spacing={0}>
         <FavoriteIcon sx={{ fontSize: 52, color: '#1d4ed8', filter: 'drop-shadow(0 4px 16px rgba(29,78,216,0.4))', mb: 3 }} />

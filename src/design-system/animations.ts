@@ -109,6 +109,13 @@ export const floatHeart = (i: number) => keyframes`
   100% { transform: translateY(-100vh) rotate(${i % 2 === 0 ? 10 : -8}deg); opacity: 0; }
 `
 
+export const floatParticle = (i: number) => keyframes`
+  0%   { transform: translateY(0) rotate(${i % 2 === 0 ? -8 : 6}deg); opacity: 0; }
+  12%  { opacity: ${0.42 + (i % 3) * 0.06}; }
+  85%  { opacity: ${0.32 + (i % 3) * 0.05}; }
+  100% { transform: translateY(-105vh) rotate(${i % 2 === 0 ? 12 : -10}deg); opacity: 0; }
+`
+
 export const floatHeartLanding = (i: number) => {
   const driftMid = i % 3 === 0 ? 16 : i % 3 === 1 ? -18 : 8
   const driftEnd = i % 2 === 0 ? -10 : 12
