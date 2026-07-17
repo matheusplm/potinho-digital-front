@@ -3,12 +3,13 @@ import { useBackground } from '../context/BackgroundContext'
 import { floatParticle } from '../design-system'
 
 const PARTICLES = [
-  { size: 22, left: '7%',  delay: '0s',   dur: '13s' },
-  { size: 15, left: '23%', delay: '3.5s', dur: '16s' },
-  { size: 26, left: '57%', delay: '1.5s', dur: '12s' },
-  { size: 17, left: '77%', delay: '5.5s', dur: '14s' },
-  { size: 13, left: '42%', delay: '8s',   dur: '15s' },
-  { size: 19, left: '89%', delay: '2.5s', dur: '13.5s' },
+  { size: 30, left: '6%',  delay: '0s',    dur: '12s' },
+  { size: 20, left: '19%', delay: '3.5s',  dur: '15s' },
+  { size: 34, left: '38%', delay: '1.2s',  dur: '11s' },
+  { size: 22, left: '54%', delay: '6s',    dur: '13.5s' },
+  { size: 28, left: '70%', delay: '2.4s',  dur: '12.5s' },
+  { size: 18, left: '84%', delay: '8s',    dur: '14.5s' },
+  { size: 25, left: '93%', delay: '4.6s',  dur: '13s' },
 ]
 
 export function FloatingParticles() {

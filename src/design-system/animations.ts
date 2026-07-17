@@ -111,9 +111,9 @@ export const floatHeart = (i: number) => keyframes`
 
 export const floatParticle = (i: number) => keyframes`
   0%   { transform: translateY(0) rotate(${i % 2 === 0 ? -8 : 6}deg); opacity: 0; }
-  12%  { opacity: ${0.42 + (i % 3) * 0.06}; }
-  85%  { opacity: ${0.32 + (i % 3) * 0.05}; }
-  100% { transform: translateY(-105vh) rotate(${i % 2 === 0 ? 12 : -10}deg); opacity: 0; }
+  12%  { opacity: ${0.82 + (i % 3) * 0.06}; }
+  85%  { opacity: ${0.66 + (i % 3) * 0.06}; }
+  100% { transform: translateY(-108vh) rotate(${i % 2 === 0 ? 14 : -12}deg); opacity: 0; }
 `
 
 export const floatHeartLanding = (i: number) => {
