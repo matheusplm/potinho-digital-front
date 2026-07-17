@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { Box } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined
 const GIS_SRC = 'https://accounts.google.com/gsi/client'
@@ -30,7 +30,7 @@ function loadGis(): Promise<void> {
     script.async = true
     script.defer = true
     script.onload = () => resolve()
-    script.onerror = () => reject(new Error('Falha ao carregar o Google'))
+    script.onerror = () => { gisPromise = null; reject(new Error('Falha ao carregar o Google')) }
     document.head.appendChild(script)
   })
   return gisPromise
@@ -69,16 +69,23 @@ export function GoogleSignInButton({ onCredential, disabled }: {
   if (!CLIENT_ID) return null
 
   return (
-    <Box
-      ref={containerRef}
-      sx={{
-        display: 'flex',
-        justifyContent: 'center',
-        minHeight: 44,
-        opacity: disabled ? 0.6 : 1,
-        pointerEvents: disabled ? 'none' : 'auto',
-        colorScheme: 'light',
-      }}
-    />
+    <Box sx={{ width: '100%', maxWidth: 320, mt: 2.5 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+        <Box sx={{ flex: 1, height: '1px', background: 'rgba(30,58,95,0.15)' }} />
+        <Typography sx={{ fontSize: '0.75rem', color: 'rgba(30,58,95,0.45)', fontWeight: 600 }}>ou</Typography>
+        <Box sx={{ flex: 1, height: '1px', background: 'rgba(30,58,95,0.15)' }} />
+      </Box>
+      <Box
+        ref={containerRef}
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          minHeight: 44,
+          opacity: disabled ? 0.6 : 1,
+          pointerEvents: disabled ? 'none' : 'auto',
+          colorScheme: 'light',
+        }}
+      />
+    </Box>
   )
 }

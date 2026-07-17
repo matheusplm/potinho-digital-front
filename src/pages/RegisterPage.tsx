@@ -203,14 +203,7 @@ export function RegisterPage() {
             </Stack>
           </Box>
 
-          <Box sx={{ mt: 2.5 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-              <Box sx={{ flex: 1, height: '1px', background: 'rgba(30,58,95,0.15)' }} />
-              <Typography sx={{ fontSize: '0.75rem', color: 'rgba(30,58,95,0.45)', fontWeight: 600 }}>ou</Typography>
-              <Box sx={{ flex: 1, height: '1px', background: 'rgba(30,58,95,0.15)' }} />
-            </Box>
-            <GoogleSignInButton onCredential={handleGoogle} disabled={loading} />
-          </Box>
+          <GoogleSignInButton onCredential={handleGoogle} disabled={loading} />
         </Box>
 
         <Typography variant="body2" sx={{ mt: 3.5, color: 'rgba(30,58,95,0.5)', fontSize: '0.85rem' }}>
