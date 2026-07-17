@@ -7,6 +7,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, LoadingState, ScrollablePage, toast } from '../components/ui'
 import { useBackground } from '../context/BackgroundContext'
+import { FloatingParticles } from '../components/FloatingParticles'
 import { useSimulation } from '../context/SimulationContext'
 import { useUser } from '../context/UserContext'
 import { useReader } from '../context/ReaderContext'
@@ -372,6 +373,7 @@ export function SimulatedReaderHomePage() {
   if (!activeSession) {
     return (
       <Box sx={{ height: '100%', background: theme.gradient }}>
+        <FloatingParticles />
         <ScrollablePage sx={{ px: 2.5, py: 2.5 }}>
           {isRealReader && !collectionsLoading ? (
             <Stack spacing={1.6} alignItems="center" justifyContent="center" sx={{ minHeight: 360, textAlign: 'center' }}>
@@ -420,6 +422,7 @@ export function SimulatedReaderHomePage() {
   if (!play) {
     return (
       <Box sx={{ height: '100%', background: theme.gradient }}>
+        <FloatingParticles />
         <ScrollablePage sx={{ px: 2.5, py: 2.5 }}>
           <LoadingState label="Carregando potinho" accent={theme.accent} textColor={theme.textOnBg} mutedColor={theme.textOnBgMuted} sx={{ minHeight: 360 }} />
         </ScrollablePage>
@@ -429,6 +432,7 @@ export function SimulatedReaderHomePage() {
 
   return (
     <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>
+      <FloatingParticles />
       <Box sx={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}>
         <FavoriteIcon sx={{ position: 'absolute', bottom: -80, right: -80, fontSize: 480, color: 'rgba(225,29,72,0.05)' }} />
       </Box>

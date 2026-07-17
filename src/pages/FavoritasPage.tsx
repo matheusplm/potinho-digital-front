@@ -5,6 +5,7 @@ import { LoadingState, ScrollablePage } from '../components/ui'
 import { NoteCard } from '../components/collection/NoteCard'
 import { NoteDetailDialog, type ReadableNote } from '../components/collection/NoteDetailDialog'
 import { useBackground } from '../context/BackgroundContext'
+import { FloatingParticles } from '../components/FloatingParticles'
 import { useReader } from '../context/ReaderContext'
 import { useActiveReaderCollection } from '../hooks/useActiveReaderCollection'
 import {
@@ -32,6 +33,7 @@ export function FavoritasPage() {
 
   return (
     <Box sx={{ height: '100%', position: 'relative', overflow: 'hidden', background: theme.gradient }}>
+      <FloatingParticles />
       <FavoriteIcon sx={{ position: 'absolute', bottom: -80, right: -70, fontSize: 460, color: 'rgba(225,29,72,0.05)', pointerEvents: 'none' }} />
       <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
         <Stack spacing={0.3} sx={{ mb: 2.2 }}>

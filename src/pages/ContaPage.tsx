@@ -10,6 +10,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import { Box, CircularProgress, Collapse, Divider, Stack, Typography } from '@mui/material'
 import { useRef, useState } from 'react'
 import { useBackground } from '../context/BackgroundContext'
+import { FloatingParticles } from '../components/FloatingParticles'
 import { useUser } from '../context/UserContext'
 import { api } from '../services/api'
 import { useRetryAfter } from '../hooks/useRetryAfter'
@@ -133,6 +134,7 @@ export function ContaPage() {
 
   return (
     <Box sx={{ height: '100%', position: 'relative', overflow: 'hidden', background: theme.gradient }}>
+      <FloatingParticles />
       <AccountCircleOutlinedIcon sx={{ position: 'absolute', bottom: -70, right: -60, fontSize: 420, color: `${theme.accent}08`, pointerEvents: 'none' }} />
 
       <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>

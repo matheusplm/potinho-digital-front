@@ -9,6 +9,7 @@ import { NoteDetailDialog } from '../components/collection/NoteDetailDialog'
 import { AnnouncementModal } from '../components/collection/AnnouncementModal'
 import { useCollectionPlayQuery, useCollectionRaritiesQuery, useCollectionTypesQuery, useCollectionsQuery, useCollectionNotesQuery, useToggleCollectionFavoriteMutation, useMyNotificationsQuery, useMarkNotificationReadMutation } from '../hooks/useNotes'
 import { useBackground } from '../context/BackgroundContext'
+import { FloatingParticles } from '../components/FloatingParticles'
 import { useUser } from '../context/UserContext'
 import { useSimulation } from '../context/SimulationContext'
 import { useReader } from '../context/ReaderContext'
@@ -123,6 +124,7 @@ export function CollectionPlayPage() {
 
   return (
     <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>
+      <FloatingParticles />
       <FavoriteIcon sx={{ position: 'absolute', bottom: -60, right: -60, fontSize: 400, color: 'rgba(225,29,72,0.04)', pointerEvents: 'none' }} />
 
       <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>

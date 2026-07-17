@@ -6,6 +6,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { LoadingState, PageTitle, ScrollablePage, SegmentedControl, toast } from '../components/ui'
 import { useCollectionsQuery } from '../hooks/useNotes'
 import { useBackground } from '../context/BackgroundContext'
+import { FloatingParticles } from '../components/FloatingParticles'
 import { useUser } from '../context/UserContext'
 import { fadeIn } from '../design-system'
 import { isCollectionOwner } from '../utils/collectionAccess'
@@ -52,6 +53,7 @@ export function CollectionManagePage() {
   if (collectionsLoading || (collection && !canManage)) {
     return (
       <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>
+        <FloatingParticles />
         <ScrollablePage sx={{ px: 2.5, py: 2.5 }}>
           <LoadingState label="Carregando coleção" accent={theme.accent} textColor={theme.textOnBg} mutedColor={theme.textOnBgMuted} sx={{ minHeight: 360 }} />
         </ScrollablePage>
@@ -61,6 +63,7 @@ export function CollectionManagePage() {
 
   return (
     <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>
+      <FloatingParticles />
       <FavoriteIcon sx={{ position: 'absolute', bottom: -60, right: -60, fontSize: 400, color: 'rgba(225,29,72,0.04)', pointerEvents: 'none' }} />
 
       <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>

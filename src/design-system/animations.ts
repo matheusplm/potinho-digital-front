@@ -109,12 +109,20 @@ export const floatHeart = (i: number) => keyframes`
   100% { transform: translateY(-100vh) rotate(${i % 2 === 0 ? 10 : -8}deg); opacity: 0; }
 `
 
-export const floatParticle = (i: number) => keyframes`
-  0%   { transform: translateY(0) rotate(${i % 2 === 0 ? -8 : 6}deg); opacity: 0; }
-  12%  { opacity: ${0.82 + (i % 3) * 0.06}; }
-  85%  { opacity: ${0.66 + (i % 3) * 0.06}; }
-  100% { transform: translateY(-108vh) rotate(${i % 2 === 0 ? 14 : -12}deg); opacity: 0; }
-`
+export const floatParticle = (i: number) => {
+  const dir = i % 2 === 0 ? 1 : -1
+  const drift = 26 + (i % 3) * 14
+  const peak = 0.82 + (i % 3) * 0.06
+  return keyframes`
+    0%   { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+    8%   { opacity: ${peak}; }
+    25%  { transform: translate(${dir * drift}px, -26vh) rotate(${dir * 130}deg); }
+    50%  { transform: translate(${-dir * drift}px, -52vh) rotate(${dir * 210}deg); }
+    75%  { transform: translate(${dir * drift * 0.6}px, -78vh) rotate(${dir * 330}deg); }
+    90%  { opacity: ${(peak * 0.7).toFixed(3)}; }
+    100% { transform: translate(0, -110vh) rotate(${dir * 400}deg); opacity: 0; }
+  `
+}
 
 export const floatHeartLanding = (i: number) => {
   const driftMid = i % 3 === 0 ? 16 : i % 3 === 1 ? -18 : 8

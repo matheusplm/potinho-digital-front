@@ -11,14 +11,8 @@ import { OnboardingOverlay } from '../components/ui/OnboardingOverlay'
 import { api } from '../services/api'
 import { colors, fadeIn, font } from '../design-system'
 import { useBackground } from '../context/BackgroundContext'
+import { FloatingParticles } from '../components/FloatingParticles'
 import { isCollectionOwner } from '../utils/collectionAccess'
-
-const FLOATING = [
-  { size: 14, left: '7%',  delay: '0s',   dur: '10s', opacity: 0.12 },
-  { size: 10, left: '22%', delay: '3s',   dur: '13s', opacity: 0.09 },
-  { size: 18, left: '70%', delay: '1.5s', dur: '11s', opacity: 0.11 },
-  { size: 11, left: '86%', delay: '5s',   dur: '12s', opacity: 0.08 },
-]
 
 export function WriterHomePage() {
   const { user, patchUser } = useUser()
@@ -38,25 +32,12 @@ export function WriterHomePage() {
 
   return (
     <Box sx={{ height: '100%', position: 'relative', overflow: 'hidden', background: theme.gradient }}>
+      <FloatingParticles />
       {user?.onboardingDone === false && <OnboardingOverlay onDismiss={handleOnboardingDismiss} />}
       <FavoriteIcon sx={{
         position: 'absolute', bottom: -80, right: -80,
         fontSize: 500, color: 'rgba(29,78,216,0.05)', pointerEvents: 'none',
       }} />
-
-      {FLOATING.map((h, i) => (
-        <FavoriteIcon key={i} sx={{
-          position: 'absolute', bottom: '-4px', left: h.left,
-          fontSize: h.size, color: theme.accent, opacity: h.opacity, pointerEvents: 'none',
-          animation: `float-w-${i} ${h.dur} ${h.delay} ease-in infinite`,
-          [`@keyframes float-w-${i}`]: {
-            '0%':   { transform: 'translateY(0) rotate(-6deg)', opacity: 0 },
-            '8%':   { opacity: h.opacity },
-            '92%':  { opacity: h.opacity * 0.5 },
-            '100%': { transform: 'translateY(-105vh) rotate(10deg)', opacity: 0 },
-          },
-        }} />
-      ))}
 
       <ScrollablePage sx={{ px: 2.5, py: 2.5, gap: 3, animation: `${fadeIn} 0.4s ease` }}>
         <Stack spacing={0.3}>

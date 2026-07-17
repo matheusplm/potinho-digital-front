@@ -17,28 +17,29 @@ export function FloatingParticles() {
   const particle = theme.particle
 
   return (
-    <>
+    <Box
+      aria-hidden
+      sx={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}
+    >
       {PARTICLES.map((p, i) => (
         <Box
           key={i}
           component="span"
-          aria-hidden
           sx={{
             position: 'absolute',
             bottom: -12,
             left: p.left,
             fontSize: p.size,
             lineHeight: 1,
-            zIndex: 0,
             userSelect: 'none',
-            pointerEvents: 'none',
+            willChange: 'transform, opacity',
             filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.08))',
-            animation: `${floatParticle(i)} ${p.dur} ${p.delay} ease-in infinite`,
+            animation: `${floatParticle(i)} ${p.dur} ${p.delay} linear infinite both`,
           }}
         >
           {particle}
         </Box>
       ))}
-    </>
+    </Box>
   )
 }

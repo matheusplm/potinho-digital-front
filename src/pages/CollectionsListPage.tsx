@@ -10,6 +10,7 @@ import {
   useDeleteCollectionMutation, useMyNotificationsQuery, useRestoreCollectionMutation, useUpdateCollectionMutation,
 } from '../hooks/useNotes'
 import { useBackground } from '../context/BackgroundContext'
+import { FloatingParticles } from '../components/FloatingParticles'
 import { useSimulation } from '../context/SimulationContext'
 import { useUser } from '../context/UserContext'
 import { colors, fadeIn, font } from '../design-system'
@@ -107,6 +108,7 @@ export function CollectionsListPage() {
   if (isActive && session) {
     return (
       <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>
+        <FloatingParticles />
         <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
           <LoadingState label="Voltando para a coleção" accent={theme.accent} textColor={theme.textOnBg} mutedColor={theme.textOnBgMuted} sx={{ minHeight: 360 }} />
         </ScrollablePage>
@@ -177,6 +179,7 @@ export function CollectionsListPage() {
 
   return (
     <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>
+      <FloatingParticles />
       <FavoriteIcon sx={{
         position: 'absolute', bottom: -80, right: -80,
         fontSize: 440, color: theme.isDark ? 'rgba(255,255,255,0.03)' : 'rgba(225,29,72,0.04)',

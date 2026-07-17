@@ -12,6 +12,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { Button, Card, LoadingState, PageTitle, ScrollablePage, ScrollHint, toast } from '../components/ui'
 import { useBackground } from '../context/BackgroundContext'
+import { FloatingParticles } from '../components/FloatingParticles'
 import { useUser } from '../context/UserContext'
 import {
   useCollectionPacksQuery,
@@ -128,6 +129,7 @@ export function ReaderCollectionPage() {
   if (!collectionsLoading && (!collection || !canManage)) {
     return (
       <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>
+        <FloatingParticles />
         <ScrollablePage sx={{ px: 2.5, py: 2.5, alignItems: 'center', justifyContent: 'center' }}>
           <Typography sx={{ color: theme.textOnBg }}>Coleção não encontrada.</Typography>
           <Button variant="primary" onClick={() => navigate('/home')} sx={{ mt: 2 }}>Voltar</Button>
@@ -140,6 +142,7 @@ export function ReaderCollectionPage() {
 
   return (
     <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>
+      <FloatingParticles />
       <FavoriteIcon sx={{ position: 'absolute', bottom: -60, right: -60, fontSize: 400, color: 'rgba(225,29,72,0.04)', pointerEvents: 'none' }} />
 
       <ScrollablePage sx={{ px: 2.5, py: 2.5 }}>
