@@ -95,23 +95,17 @@ export function GoogleSignInButton({ onCredential, disabled }: {
   if (!CLIENT_ID) return null
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 320, mt: 2.5 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-        <Box sx={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, transparent, rgba(30,58,95,0.18))' }} />
-        <Typography sx={{ fontFamily: font.sans, fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(30,58,95,0.4)' }}>ou</Typography>
-        <Box sx={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, rgba(30,58,95,0.18), transparent)' }} />
-      </Box>
-
+    <Box sx={{ width: '100%', maxWidth: 320 }}>
       <Box
         ref={wrapRef}
         sx={{
           position: 'relative',
-          minHeight: 44,
+          minHeight: 46,
           opacity: disabled ? 0.55 : 1,
           transition: 'opacity 0.16s ease',
           '&:hover .pd-google-face': disabled ? {} : {
-            boxShadow: '0 6px 20px rgba(30,58,95,0.14)',
-            borderColor: 'rgba(30,58,95,0.22)',
+            boxShadow: '0 8px 24px rgba(30,58,95,0.16)',
+            borderColor: 'rgba(30,58,95,0.24)',
             transform: 'translateY(-1px)',
           },
           '&:active .pd-google-face': disabled ? {} : { transform: 'translateY(0)' },
@@ -131,7 +125,7 @@ export function GoogleSignInButton({ onCredential, disabled }: {
             gap: 1.2,
             borderRadius: radius.full,
             background: '#ffffff',
-            border: '1.5px solid rgba(30,58,95,0.14)',
+            border: '1.5px solid rgba(30,58,95,0.16)',
             boxShadow: shadow.sm,
             transition: 'box-shadow 0.16s ease, border-color 0.16s ease, transform 0.16s ease',
           }}
@@ -141,6 +135,12 @@ export function GoogleSignInButton({ onCredential, disabled }: {
             Continuar com o Google
           </Typography>
         </Box>
+      </Box>
+
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, my: 2.5 }}>
+        <Box sx={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, transparent, rgba(30,58,95,0.18))' }} />
+        <Typography sx={{ fontFamily: font.sans, fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(30,58,95,0.4)' }}>ou entre com email</Typography>
+        <Box sx={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, rgba(30,58,95,0.18), transparent)' }} />
       </Box>
     </Box>
   )

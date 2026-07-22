@@ -132,6 +132,7 @@ export function RegisterPage() {
         <Box sx={{ width: 40, height: 3, borderRadius: 2, background: 'linear-gradient(90deg, #1d4ed8, #e11d48)', mb: 4 }} />
 
         <Box sx={{ width: '100%', maxWidth: 320 }}>
+          <GoogleSignInButton onCredential={handleGoogle} disabled={loading} />
           <Box component="form" onSubmit={handleSubmit}>
             <Stack spacing={2}>
               <Input label="Seu nome" value={form.name} onChange={set('name')} placeholder="Como te chamamos?" fullWidth required />
@@ -188,8 +189,6 @@ export function RegisterPage() {
               </Button>
             </Stack>
           </Box>
-
-          <GoogleSignInButton onCredential={handleGoogle} disabled={loading} />
         </Box>
 
         <Typography variant="body2" sx={{ mt: 3.5, color: 'rgba(30,58,95,0.5)', fontSize: '0.85rem' }}>

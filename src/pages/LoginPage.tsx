@@ -96,9 +96,11 @@ export function LoginPage() {
 
         <Box sx={{ width: 40, height: 3, borderRadius: 2, background: 'linear-gradient(90deg, #1d4ed8, #e11d48)', mb: 1.5 }} />
 
-        <Typography sx={{ fontSize: '0.88rem', color: 'rgba(30,58,95,0.5)', fontStyle: 'italic', mb: 5 }}>
+        <Typography sx={{ fontSize: '0.88rem', color: 'rgba(30,58,95,0.5)', fontStyle: 'italic', mb: 4 }}>
           sua memória afetiva
         </Typography>
+
+        <GoogleSignInButton onCredential={handleGoogle} disabled={loading} />
 
         <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%', maxWidth: 320 }}>
           <Stack spacing={2}>
@@ -144,8 +146,6 @@ export function LoginPage() {
             )}
           </Stack>
         </Box>
-
-        <GoogleSignInButton onCredential={handleGoogle} disabled={loading} />
 
         <Typography variant="body2" sx={{ mt: 3.5, color: 'rgba(30,58,95,0.5)', fontSize: '0.85rem' }}>
           Ainda não tem conta?{' '}
