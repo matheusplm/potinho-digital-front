@@ -24,19 +24,19 @@ export const defaultRarities: RarityConfig[] = [
     id: 'raro', label: 'Raro', emoji: '💙', odds: 10, order: 3,
     cardBg: 'linear-gradient(135deg,#eff6ff,#dbeafe)', textColor: '#1e3a8a', captionColor: '#3b6fb5',
     borderColor: 'rgba(59,130,246,0.35)', shadow: '0 6px 20px rgba(59,130,246,0.16)', glowColor: 'rgba(59,130,246,0.25)',
-    chipBg: '#dbeafe', chipColor: '#1d4ed8',
+    chipBg: '#dbeafe', chipColor: '#1d4ed8', revealEffect: 'sparkles',
   },
   {
     id: 'mitico', label: 'Mítico', emoji: '🔮', odds: 4, order: 4,
     cardBg: 'linear-gradient(135deg,#faf5ff,#f3e8ff)', textColor: '#581c87', captionColor: '#7e3aa8',
     borderColor: 'rgba(168,85,247,0.4)', shadow: '0 8px 24px rgba(168,85,247,0.2)', glowColor: 'rgba(168,85,247,0.32)',
-    chipBg: '#f3e8ff', chipColor: '#7c3aed',
+    chipBg: '#f3e8ff', chipColor: '#7c3aed', revealEffect: 'confetti',
   },
   {
     id: 'lendario', label: 'Lendário', emoji: '👑', odds: 1, order: 5,
     cardBg: 'linear-gradient(135deg,#fff7ed,#ffe4e6)', textColor: '#9f1239', captionColor: '#be5a6f',
     borderColor: 'rgba(244,63,94,0.45)', shadow: '0 10px 28px rgba(244,63,94,0.22)', glowColor: 'rgba(251,113,133,0.4)',
-    chipBg: 'linear-gradient(135deg,#fde68a,#fbcfe8)', chipColor: '#9f1239',
+    chipBg: 'linear-gradient(135deg,#fde68a,#fbcfe8)', chipColor: '#9f1239', revealEffect: 'fireworks',
   },
 ]
 

@@ -10,6 +10,7 @@ import { useJsonImport } from '../../hooks/useJsonImport'
 import { colors, font, radius } from '../../design-system'
 import { useBackground } from '../../context/BackgroundContext'
 import { gradientTextSx } from '../../utils/colorUtils'
+import { REVEAL_EFFECTS, REVEAL_EFFECT_MAP, runRevealEffect } from '../../utils/celebrations'
 import { uniqueConfigId } from '../../utils/slug'
 import type { RarityConfig } from '../../types/note'
 import { ColorRow, actionButtonSx } from './shared'
@@ -19,6 +20,7 @@ const NEW_RARITY: RarityConfig = {
   cardBg: '#ffffff', textColor: '#334155', captionColor: '#94a3b8',
   borderColor: '#cbd5e1', shadow: '0 4px 16px rgba(15,23,42,0.06)', glowColor: '',
   chipBg: '#f1f5f9', chipColor: '#64748b',
+  revealEffect: 'none', revealEmoji: '',
 }
 
 const DEFAULT_IMPORT_RARITIES_JSON = `[
@@ -35,7 +37,8 @@ const DEFAULT_IMPORT_RARITIES_JSON = `[
     "shadow": "0 4px 16px rgba(15,23,42,0.06)",
     "glowColor": "",
     "chipBg": "#f1f5f9",
-    "chipColor": "#64748b"
+    "chipColor": "#64748b",
+    "revealEffect": "none"
   }
 ]`
 
@@ -56,25 +59,25 @@ const RARITY_TEMPLATES: RarityConfig[] = [
     id: 'raro', label: 'Raro', emoji: '🔵', odds: 10, order: 3,
     cardBg: 'linear-gradient(135deg,#eff6ff 0%,#dbeafe 45%,#bfdbfe 100%)', textColor: '#1e3a8a', captionColor: '#2563eb',
     borderColor: '#3b82f6', shadow: '0 8px 26px rgba(59,130,246,0.2)', glowColor: 'rgba(59,130,246,0.35)',
-    chipBg: '#dbeafe', chipColor: '#1d4ed8',
+    chipBg: '#dbeafe', chipColor: '#1d4ed8', revealEffect: 'sparkles',
   },
   {
     id: 'muito_raro', label: 'Muito raro', emoji: '🟣', odds: 4, order: 4,
     cardBg: 'linear-gradient(135deg,#faf5ff 0%,#f3e8ff 42%,#ddd6fe 100%)', textColor: '#581c87', captionColor: '#7e22ce',
     borderColor: '#a855f7', shadow: '0 10px 30px rgba(168,85,247,0.22)', glowColor: 'rgba(168,85,247,0.38)',
-    chipBg: '#f3e8ff', chipColor: '#7c3aed',
+    chipBg: '#f3e8ff', chipColor: '#7c3aed', revealEffect: 'confetti',
   },
   {
     id: 'lendario', label: 'Lendário', emoji: '🟠', odds: 1, order: 5,
     cardBg: 'linear-gradient(135deg,#fff7ed 0%,#fed7aa 42%,#f97316 100%)', textColor: '#431407', captionColor: '#9a3412',
     borderColor: '#fb923c', shadow: '0 12px 32px rgba(249,115,22,0.24)', glowColor: 'rgba(251,146,60,0.42)',
-    chipBg: 'linear-gradient(135deg,#ffedd5,#fdba74)', chipColor: '#7c2d12',
+    chipBg: 'linear-gradient(135deg,#ffedd5,#fdba74)', chipColor: '#7c2d12', revealEffect: 'fireworks',
   },
   {
     id: 'artefato', label: 'Artefato', emoji: '🌈', odds: 0, order: 6,
     cardBg: 'linear-gradient(135deg,#fef3c7 0%,#fbcfe8 22%,#ddd6fe 46%,#bfdbfe 70%,#bbf7d0 100%)', textColor: '#312e81', captionColor: '#7c3aed',
     borderColor: '#c084fc', shadow: '0 14px 40px rgba(124,58,237,0.25)', glowColor: 'rgba(236,72,153,0.45)',
-    chipBg: 'linear-gradient(135deg,#f59e0b,#ec4899,#8b5cf6,#06b6d4)', chipColor: '#ffffff',
+    chipBg: 'linear-gradient(135deg,#f59e0b,#ec4899,#8b5cf6,#06b6d4)', chipColor: '#ffffff', revealEffect: 'emoji',
   },
 ]
 
@@ -98,6 +101,7 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
   const totalOdds = parseFloat((otherOdds + form.odds).toFixed(2))
   const overLimit = totalOdds > 100
   const remaining = parseFloat((100 - totalOdds).toFixed(2))
+  const selectedEffect = REVEAL_EFFECT_MAP[form.revealEffect || 'none']
 
   const applyTemplate = (template: RarityConfig) => {
     setAppliedTemplateId(template.id)
@@ -223,6 +227,58 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
                 "Aqui vai a mensagem especial que o leitor vai receber quando tirar essa raridade."
               </Typography>
             </Stack>
+          </Box>
+          <Box>
+            <Stack direction="row" alignItems="baseline" spacing={1} sx={{ mb: 1 }}>
+              <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: colors.text.secondary, textTransform: 'uppercase', letterSpacing: 0.6 }}>
+                ✨ Efeito ao revelar
+              </Typography>
+              <Typography sx={{ fontSize: '0.68rem', color: colors.text.muted }}>
+                comemora quando esta raridade sai
+              </Typography>
+            </Stack>
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 0.7 }}>
+              {REVEAL_EFFECTS.map((effect) => {
+                const active = (form.revealEffect || 'none') === effect.id
+                return (
+                  <Box
+                    key={effect.id}
+                    onClick={() => set('revealEffect', effect.id)}
+                    sx={{
+                      p: 1, borderRadius: radius.lg, cursor: 'pointer', textAlign: 'center',
+                      background: active ? `${colors.primary.main}12` : 'rgba(0,0,0,0.02)',
+                      border: `1.5px solid ${active ? colors.primary.main : 'rgba(0,0,0,0.07)'}`,
+                      transition: 'all 0.15s ease',
+                      '&:hover': { transform: 'translateY(-1px)', borderColor: `${colors.primary.main}88` },
+                    }}
+                  >
+                    <Typography sx={{ fontSize: '1.15rem', lineHeight: 1.15 }}>{effect.icon}</Typography>
+                    <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, lineHeight: 1.2, mt: 0.2, color: active ? colors.primary.main : colors.text.secondary }}>
+                      {effect.label}
+                    </Typography>
+                  </Box>
+                )
+              })}
+            </Box>
+            {selectedEffect && selectedEffect.id !== 'none' && (
+              <Stack spacing={1} sx={{ mt: 1.2 }}>
+                <Typography sx={{ fontSize: '0.7rem', color: colors.text.muted, fontStyle: 'italic' }}>
+                  {selectedEffect.description}
+                </Typography>
+                <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 1 }}>
+                  {selectedEffect.usesEmoji && (
+                    <EmojiPickerInput label="Emoji do efeito" value={form.revealEmoji || form.emoji} onChange={(emoji) => set('revealEmoji', emoji)} />
+                  )}
+                  <Button
+                    variant="ghost"
+                    onClick={() => runRevealEffect(form.revealEffect, { emoji: form.revealEmoji || form.emoji, accent: form.borderColor })}
+                    sx={{ py: 0.7, px: 1.6, fontSize: '0.78rem', whiteSpace: 'nowrap' }}
+                  >
+                    🎬 Testar efeito
+                  </Button>
+                </Stack>
+              </Stack>
+            )}
           </Box>
           <AdvancedOptions label="🎨 Cores e efeitos" spacing={1.4}>
           <ColorRow label="Fundo do card" field="cardBg" value={form.cardBg} onChange={set} />

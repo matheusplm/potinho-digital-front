@@ -1,8 +1,10 @@
 import { Box, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material'
+import { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../../components/ui'
 import { RewardCard } from '../../components/collection/RewardCard'
 import { colors, font, radius } from '../../design-system'
+import { runRevealEffect } from '../../utils/celebrations'
 import type { CollectionDailyReward, NoteTypeConfig, RarityConfig } from '../../types/note'
 
 export function RewardHighlightDialog({ open, rewards, rarities, types, collectionSlug, accent, onClose, onRewardClick }: {
@@ -16,6 +18,21 @@ export function RewardHighlightDialog({ open, rewards, rarities, types, collecti
   onRewardClick: (reward: CollectionDailyReward) => void
 }) {
   const navigate = useNavigate()
+
+  // Ao revelar, comemora a raridade MAIS RARA que veio no pacote e tem efeito configurado.
+  const firedRef = useRef(false)
+  useEffect(() => {
+    if (!open) { firedRef.current = false; return }
+    if (firedRef.current) return
+    firedRef.current = true
+    const rarest = rewards
+      .map((rw) => rarities.find((r) => r.id === rw.rarity))
+      .filter((r): r is RarityConfig => !!r && !!r.revealEffect && r.revealEffect !== 'none')
+      .sort((a, b) => a.odds - b.odds)[0]
+    if (rarest) {
+      window.setTimeout(() => runRevealEffect(rarest.revealEffect, { emoji: rarest.revealEmoji || rarest.emoji, accent }), 300)
+    }
+  }, [open, rewards, rarities, accent])
 
   return (
     <Dialog
