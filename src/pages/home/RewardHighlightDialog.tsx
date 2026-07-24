@@ -1,11 +1,33 @@
 import { Box, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material'
-import { useEffect, useRef } from 'react'
+import { keyframes } from '@emotion/react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../../components/ui'
 import { RewardCard } from '../../components/collection/RewardCard'
 import { colors, font, radius } from '../../design-system'
 import { runRevealEffect } from '../../utils/celebrations'
+import { usePartyclesRewards } from '../../hooks/usePartyclesRewards'
 import type { CollectionDailyReward, NoteTypeConfig, RarityConfig } from '../../types/note'
+
+const revealAura = keyframes`
+  0% { opacity: 0; transform: scale(0.92); }
+  35% { opacity: 0.9; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.12); }
+`
+const revealShake = keyframes`
+  0%, 100% { transform: translate3d(0,0,0) rotate(0deg); }
+  15% { transform: translate3d(-7px,2px,0) rotate(-0.7deg); }
+  30% { transform: translate3d(7px,-2px,0) rotate(0.7deg); }
+  45% { transform: translate3d(-6px,1px,0) rotate(-0.5deg); }
+  60% { transform: translate3d(6px,-1px,0) rotate(0.5deg); }
+  78% { transform: translate3d(-3px,0,0) rotate(0deg); }
+`
+
+function prefersReducedMotion(): boolean {
+  return typeof window !== 'undefined'
+    && typeof window.matchMedia === 'function'
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
 
 export function RewardHighlightDialog({ open, rewards, rarities, types, collectionSlug, accent, onClose, onRewardClick }: {
   open: boolean
@@ -19,20 +41,32 @@ export function RewardHighlightDialog({ open, rewards, rarities, types, collecti
 }) {
   const navigate = useNavigate()
 
-  // Ao revelar, comemora a raridade MAIS RARA que veio no pacote e tem efeito configurado.
+  const anchorRef = useRef<HTMLDivElement>(null)
+  const triggerPartycles = usePartyclesRewards(anchorRef)
+  const dataRef = useRef({ rewards, rarities, accent, triggerPartycles })
+  dataRef.current = { rewards, rarities, accent, triggerPartycles }
   const firedRef = useRef(false)
+  const [celebration, setCelebration] = useState<{ color: string; shake: boolean } | null>(null)
+
   useEffect(() => {
-    if (!open) { firedRef.current = false; return }
+    if (!open) { firedRef.current = false; setCelebration(null); return }
     if (firedRef.current) return
     firedRef.current = true
-    const rarest = rewards
-      .map((rw) => rarities.find((r) => r.id === rw.rarity))
+    const { rewards: rw, rarities: rs, accent: ac, triggerPartycles: trigger } = dataRef.current
+    const rarest = rw
+      .map((reward) => rs.find((r) => r.id === reward.rarity))
       .filter((r): r is RarityConfig => !!r && !!r.revealEffect && r.revealEffect !== 'none')
       .sort((a, b) => a.odds - b.odds)[0]
-    if (rarest) {
-      window.setTimeout(() => runRevealEffect(rarest.revealEffect, { emoji: rarest.revealEmoji || rarest.emoji, accent }), 300)
-    }
-  }, [open, rewards, rarities, accent])
+    if (!rarest || prefersReducedMotion()) return
+    setCelebration({ color: rarest.glowColor || rarest.borderColor || ac, shake: rarest.odds <= 5 })
+    const fireTimer = window.setTimeout(() => {
+      if (!trigger(rarest.revealEffect)) {
+        runRevealEffect(rarest.revealEffect, { emoji: rarest.revealEmoji || rarest.emoji, accent: ac })
+      }
+    }, 320)
+    const clearTimer = window.setTimeout(() => setCelebration(null), 1000)
+    return () => { window.clearTimeout(fireTimer); window.clearTimeout(clearTimer) }
+  }, [open])
 
   return (
     <Dialog
@@ -46,8 +80,10 @@ export function RewardHighlightDialog({ open, rewards, rarities, types, collecti
             mx: 2,
             borderRadius: radius.xl,
             overflow: 'hidden',
+            position: 'relative',
             background: 'rgba(255,250,247,0.98)',
             boxShadow: '0 24px 70px rgba(15,23,42,0.18)',
+            ...(celebration?.shake ? { animation: `${revealShake} 0.55s ease 0.24s both` } : {}),
           },
         },
         backdrop: {
@@ -55,7 +91,15 @@ export function RewardHighlightDialog({ open, rewards, rarities, types, collecti
         },
       }}
     >
-      <Box sx={{
+      {celebration && (
+        <Box aria-hidden sx={{
+          position: 'absolute', inset: 0, zIndex: 4, pointerEvents: 'none',
+          background: `radial-gradient(circle at 50% 42%, ${celebration.color}, transparent 68%)`,
+          mixBlendMode: 'screen',
+          animation: `${revealAura} 0.9s ease-out both`,
+        }} />
+      )}
+      <Box ref={anchorRef} sx={{
         p: 2,
         background: `radial-gradient(circle at 18% 0%, rgba(255,255,255,0.76), transparent 38%), linear-gradient(135deg, ${colors.rose.main}14, ${accent}18)`,
         position: 'relative',

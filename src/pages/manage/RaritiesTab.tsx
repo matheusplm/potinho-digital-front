@@ -11,6 +11,7 @@ import { colors, font, radius } from '../../design-system'
 import { useBackground } from '../../context/BackgroundContext'
 import { gradientTextSx } from '../../utils/colorUtils'
 import { REVEAL_EFFECTS, REVEAL_EFFECT_MAP, runRevealEffect } from '../../utils/celebrations'
+import { usePartyclesRewards } from '../../hooks/usePartyclesRewards'
 import { uniqueConfigId } from '../../utils/slug'
 import type { RarityConfig } from '../../types/note'
 import { ColorRow, actionButtonSx } from './shared'
@@ -96,6 +97,8 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
   const updateMutation = useUpdateCollectionRarityMutation(cid)
   const isPending = createMutation.isPending || updateMutation.isPending
   const set = (field: string, value: string | number) => setForm((f) => ({ ...f, [field]: value }))
+  const previewRef = useRef<HTMLDivElement>(null)
+  const triggerPartycles = usePartyclesRewards(previewRef)
 
   const otherOdds = existingRarities.filter((r) => r.id !== form.id).reduce((sum, r) => sum + r.odds, 0)
   const totalOdds = parseFloat((otherOdds + form.odds).toFixed(2))
@@ -208,7 +211,7 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
               {overLimit ? `excede em ${(totalOdds - 100).toFixed(2)}%` : `${remaining.toFixed(2)}% livres`}
             </Typography>
           </Box>
-          <Box sx={{ position: 'relative', borderRadius: radius.xl, background: form.cardBg, border: `2px solid ${form.borderColor}`, boxShadow: `${form.shadow}${form.glowColor ? `, 0 0 28px ${form.glowColor}88` : ''}`, p: 2.5, overflow: 'hidden' }}>
+          <Box ref={previewRef} sx={{ position: 'relative', borderRadius: radius.xl, background: form.cardBg, border: `2px solid ${form.borderColor}`, boxShadow: `${form.shadow}${form.glowColor ? `, 0 0 28px ${form.glowColor}88` : ''}`, p: 2.5, overflow: 'hidden' }}>
             {form.glowColor && (
               <Box sx={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse at 50% -10%, ${form.glowColor}33, transparent 65%)`, pointerEvents: 'none' }} />
             )}
@@ -271,7 +274,11 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
                   )}
                   <Button
                     variant="ghost"
-                    onClick={() => runRevealEffect(form.revealEffect, { emoji: form.revealEmoji || form.emoji, accent: form.borderColor })}
+                    onClick={() => {
+                      if (!triggerPartycles(form.revealEffect)) {
+                        runRevealEffect(form.revealEffect, { emoji: form.revealEmoji || form.emoji, accent: form.borderColor })
+                      }
+                    }}
                     sx={{ py: 0.7, px: 1.6, fontSize: '0.78rem', whiteSpace: 'nowrap' }}
                   >
                     🎬 Testar efeito

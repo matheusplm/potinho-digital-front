@@ -64,9 +64,9 @@ export function MobileLayout() {
     const byId = Object.fromEntries(readerAch.achievements.map((a) => [a.id, a]))
     readerAch.justUnlocked.forEach((id) => {
       const a = byId[id]
-      if (a) toast.love('Conquista desbloqueada! 🏆', { description: `${a.emoji} ${a.label}` })
+      if (a) toast.achievement(a.emoji, a.label, a.description)
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- só justUnlockedKey: readerAch muda a cada poll e repetiria o toast
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [justUnlockedKey])
 
   const items = useMemo<NavItem[]>(() => {

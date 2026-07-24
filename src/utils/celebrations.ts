@@ -1,34 +1,26 @@
 import confetti from 'canvas-confetti'
 
-// Efeitos de revelação de raridade.
-//
-// Para adicionar um efeito novo: basta acrescentar UM item ao array REVEAL_EFFECTS.
-// O `id` é o que fica salvo na raridade; o `run` recebe o emoji e a cor de destaque
-// e dispara a animação. Tudo o resto (galeria no editor, disparo na revelação,
-// botão de testar) lê deste array automaticamente.
+type Options = confetti.Options
 
-// canvas-confetti cria um <canvas> próprio no body. Os Dialogs do MUI ficam em
-// z-index ~1300, então subimos o canvas acima disso pra o efeito aparecer na frente.
 const Z_INDEX = 2000
 
 export interface RevealEffectContext {
-  /** Emoji que estoura nos efeitos baseados em emoji (padrão: emoji da raridade). */
   emoji: string
-  /** Cor de destaque da raridade (hex), usada para tingir confete/brilhos. */
   accent: string
 }
 
 export interface RevealEffect {
   id: string
   label: string
-  /** Emoji mostrado no seletor do editor. */
   icon: string
-  /** Descrição curtinha pro escritor. */
   description: string
-  /** true = usa o emoji configurável (mostra o seletor de emoji no editor). */
   usesEmoji?: boolean
+  isPartycles?: boolean
   run: (ctx: RevealEffectContext) => void
 }
+
+export const PARTYCLES_EFFECT_IDS = ['coins', 'crystals', 'galaxy', 'petals', 'aurora', 'fireflies'] as const
+export type PartyclesEffectId = typeof PARTYCLES_EFFECT_IDS[number]
 
 function prefersReducedMotion(): boolean {
   return typeof window !== 'undefined'
@@ -36,19 +28,24 @@ function prefersReducedMotion(): boolean {
     && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 
-/** Paleta de confete a partir da cor de destaque + dourado + branco. */
+function fire(options: Options) {
+  confetti({ zIndex: Z_INDEX, disableForReducedMotion: true, ...options })
+}
+
 function paletteFrom(accent: string): string[] {
   const base = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(accent) ? accent : '#f43f5e'
   return [base, '#ffffff', '#fde68a', '#fca5a5', '#c4b5fd']
 }
 
-function fireEmojiBurst(emoji: string) {
-  const shape = confetti.shapeFromText({ text: emoji || '✨', scalar: 3 })
-  confetti({
-    shapes: [shape], scalar: 3, flat: true,
-    particleCount: 26, spread: 110, startVelocity: 38, gravity: 1.1, decay: 0.92,
-    origin: { y: 0.42 }, zIndex: Z_INDEX,
-  })
+function realisticConfetti(colors: string[], y = 0.55) {
+  const defaults: Options = { origin: { y }, colors }
+  const burst = (ratio: number, opts: Options) =>
+    fire({ ...defaults, ...opts, particleCount: Math.floor(200 * ratio) })
+  burst(0.25, { spread: 26, startVelocity: 55 })
+  burst(0.2, { spread: 60 })
+  burst(0.35, { spread: 100, decay: 0.91, scalar: 0.8 })
+  burst(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 })
+  burst(0.1, { spread: 120, startVelocity: 45 })
 }
 
 export const REVEAL_EFFECTS: RevealEffect[] = [
@@ -59,30 +56,31 @@ export const REVEAL_EFFECTS: RevealEffect[] = [
   },
   {
     id: 'confetti', label: 'Confete', icon: '🎉',
-    description: 'Chuva de confete colorido caindo do topo.',
-    run: ({ accent }) => {
-      const colors = paletteFrom(accent)
-      confetti({ particleCount: 90, spread: 75, startVelocity: 42, origin: { y: 0.35 }, colors, zIndex: Z_INDEX })
-      window.setTimeout(() => confetti({ particleCount: 50, spread: 100, startVelocity: 30, origin: { y: 0.3 }, colors, zIndex: Z_INDEX }), 180)
-    },
+    description: 'Chuva de confete colorido, rajadas encorpadas.',
+    run: ({ accent }) => realisticConfetti(paletteFrom(accent)),
   },
   {
     id: 'emoji', label: 'Explosão de emoji', icon: '💥',
-    description: 'Estoura o emoji escolhido pra todo lado.',
+    description: 'Estoura o emoji escolhido em ondas, pra todo lado.',
     usesEmoji: true,
     run: ({ emoji }) => {
-      fireEmojiBurst(emoji)
-      window.setTimeout(() => fireEmojiBurst(emoji), 220)
+      const shape = confetti.shapeFromText({ text: emoji || '✨', scalar: 3 })
+      const wave = (particleCount: number, spread: number, startVelocity: number) =>
+        fire({ shapes: [shape], scalar: 3, flat: true, particleCount, spread, startVelocity, gravity: 1.1, decay: 0.92, ticks: 130, origin: { y: 0.42 } })
+      wave(20, 100, 42)
+      window.setTimeout(() => wave(14, 130, 32), 160)
+      window.setTimeout(() => wave(10, 80, 50), 320)
     },
   },
   {
     id: 'fireworks', label: 'Fogos', icon: '🎆',
-    description: 'Fogos de artifício em sequência.',
+    description: 'Fogos de artifício estourando em sequência.',
     run: ({ accent }) => {
       const colors = paletteFrom(accent)
-      const shots = [0, 250, 500]
-      shots.forEach((delay) => window.setTimeout(() => {
-        confetti({ particleCount: 60, spread: 360, startVelocity: 34, gravity: 0.85, decay: 0.9, ticks: 90, origin: { x: 0.2 + Math.random() * 0.6, y: 0.3 + Math.random() * 0.2 }, colors, zIndex: Z_INDEX })
+      fire({ particleCount: 30, angle: 60, spread: 60, startVelocity: 52, origin: { x: 0, y: 0.8 }, colors })
+      fire({ particleCount: 30, angle: 120, spread: 60, startVelocity: 52, origin: { x: 1, y: 0.8 }, colors })
+      ;[0, 260, 520, 760].forEach((delay) => window.setTimeout(() => {
+        fire({ particleCount: 55, spread: 360, startVelocity: 34, gravity: 0.9, decay: 0.9, ticks: 110, scalar: 1, shapes: ['circle', 'star'], colors, origin: { x: 0.2 + Math.random() * 0.6, y: 0.25 + Math.random() * 0.25 } })
       }, delay))
     },
   },
@@ -91,23 +89,62 @@ export const REVEAL_EFFECTS: RevealEffect[] = [
     description: 'Estrelinhas douradas subindo suave.',
     run: ({ accent }) => {
       const colors = [accent, '#fde68a', '#fef9c3', '#ffffff']
-      confetti({ particleCount: 60, spread: 130, startVelocity: 22, gravity: 0.45, decay: 0.93, scalar: 0.9, ticks: 140, shapes: ['star'], colors, origin: { y: 0.5 }, zIndex: Z_INDEX })
+      fire({ particleCount: 50, spread: 120, startVelocity: 24, gravity: 0.5, decay: 0.92, scalar: 0.9, ticks: 150, shapes: ['star'], colors, origin: { y: 0.5 } })
+      window.setTimeout(() => fire({ particleCount: 25, spread: 90, startVelocity: 18, gravity: 0.45, decay: 0.93, scalar: 0.7, ticks: 160, shapes: ['star'], colors, origin: { y: 0.55 } }), 200)
     },
   },
   {
     id: 'hearts', label: 'Chuva de coração', icon: '💖',
-    description: 'Corações caindo suavemente pela tela.',
+    description: 'Corações caindo rápido pela tela.',
     run: () => {
       const shape = confetti.shapeFromText({ text: '💖', scalar: 2.4 })
-      confetti({ shapes: [shape], scalar: 2.4, flat: true, particleCount: 34, spread: 120, startVelocity: 26, gravity: 0.7, decay: 0.94, ticks: 200, origin: { y: 0 }, zIndex: Z_INDEX })
+      const rain = (particleCount: number, spread: number) =>
+        fire({ shapes: [shape], scalar: 2.4, flat: true, particleCount, spread, angle: 270, startVelocity: 22, gravity: 1.6, decay: 0.95, ticks: 150, origin: { y: 0 } })
+      rain(26, 90)
+      window.setTimeout(() => rain(18, 70), 180)
     },
+  },
+  {
+    id: 'coins', label: 'Chuva de moedas', icon: '🪙',
+    description: 'Moedas caindo como um tesouro sendo revelado.',
+    isPartycles: true,
+    run: () => {},
+  },
+  {
+    id: 'crystals', label: 'Cristais', icon: '💎',
+    description: 'Cristais brilhantes se espalhando, clima de item raro.',
+    isPartycles: true,
+    run: () => {},
+  },
+  {
+    id: 'galaxy', label: 'Galáxia', icon: '🌌',
+    description: 'Explosão cósmica, estrelas e poeira estelar.',
+    isPartycles: true,
+    run: () => {},
+  },
+  {
+    id: 'petals', label: 'Pétalas', icon: '🌸',
+    description: 'Pétalas flutuando suavemente pela tela.',
+    isPartycles: true,
+    run: () => {},
+  },
+  {
+    id: 'aurora', label: 'Aurora', icon: '🌈',
+    description: 'Um brilho colorido e etéreo, tipo aurora boreal.',
+    isPartycles: true,
+    run: () => {},
+  },
+  {
+    id: 'fireflies', label: 'Vagalumes', icon: '🪲',
+    description: 'Pontinhos de luz suaves flutuando, clima noturno romântico.',
+    isPartycles: true,
+    run: () => {},
   },
 ]
 
 export const REVEAL_EFFECT_MAP: Record<string, RevealEffect> =
   Object.fromEntries(REVEAL_EFFECTS.map((e) => [e.id, e]))
 
-/** Dispara o efeito pelo id. Silencioso se id vazio/none ou se o usuário pediu menos movimento. */
 export function runRevealEffect(id: string | undefined, ctx: RevealEffectContext): void {
   if (!id || id === 'none') return
   const effect = REVEAL_EFFECT_MAP[id]
@@ -116,6 +153,6 @@ export function runRevealEffect(id: string | undefined, ctx: RevealEffectContext
   try {
     effect.run(ctx)
   } catch {
-    // canvas-confetti nunca deve derrubar a revelação
+    return
   }
 }

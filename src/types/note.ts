@@ -71,9 +71,7 @@ export interface RarityConfig {
   glowColor: string
   chipBg: string
   chipColor: string
-  /** Efeito de comemoração ao revelar esta raridade (id de REVEAL_EFFECTS). Vazio/none = nenhum. */
   revealEffect?: string
-  /** Emoji usado no efeito "explosão de emoji". Vazio = usa o emoji da raridade. */
   revealEmoji?: string
   createdAt?: string
   updatedAt?: string
