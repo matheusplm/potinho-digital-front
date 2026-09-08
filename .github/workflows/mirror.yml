@@ -1,0 +1,175 @@
+name: Mirror para o repo do Vercel
+
+on:
+  push:
+    branches: [main]        # só main; tags e outras branches não disparam
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Valida acesso e mostra o que seria enviado, sem escrever no destino"
+        type: boolean
+        default: true
+      target_branch:
+        description: "Branch de destino (use mirror-test para testar sem tocar na main)"
+        type: string
+        default: main
+
+# Dois syncs em paralelo com --force podem chegar fora de ordem: serializa.
+concurrency:
+  group: mirror-to-vercel-repo
+  cancel-in-progress: false
+
+# O GITHUB_TOKEN só precisa ler este repo; o push vai com o MIRROR_TOKEN.
+permissions:
+  contents: read
+
+env:
+  TARGET_REPO: matheusplm/matheus-amanda-projeto-mega-secreto-123
+  SOURCE_REPO: matheusplm/potinho-digital-front
+  COMMIT_NAME: Matheus Morais
+  COMMIT_EMAIL: matheusmty@gmail.com
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    # Trava anti-loop: se este arquivo acabar rodando em qualquer outro repo
+    # (ex.: alguém restaurar o workflow no destino), o job não roda.
+    # `[skip mirror]` na mensagem é a válvula de escape manual.
+    if: >-
+      github.repository == 'matheusplm/potinho-digital-front' &&
+      !contains(github.event.head_commit.message, '[skip mirror]')
+
+    steps:
+      - name: Checkout do commit de topo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1             # squash não precisa de histórico
+          persist-credentials: false # não deixa o GITHUB_TOKEN no .git/config
+
+      - name: Validar pré-requisitos
+        env:
+          MIRROR_TOKEN: ${{ secrets.MIRROR_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${MIRROR_TOKEN}" ]; then
+            echo "::error::Secret MIRROR_TOKEN não está definido em ${SOURCE_REPO}."
+            exit 1
+          fi
+          echo "::add-mask::${MIRROR_TOKEN}"
+          echo "Origem ...: ${SOURCE_REPO}"
+          echo "Destino ..: ${TARGET_REPO}"
+
+      - name: Montar a mensagem do commit
+        run: |
+          set -euo pipefail
+          SHA="$(git rev-parse HEAD)"
+          SHORT="$(git rev-parse --short HEAD)"
+          SUBJECT="$(git log -1 --pretty=%s)"
+
+          # Mensagem remontada do zero (só assunto + referência).
+          # Descarta trailers Co-Authored-By do commit original de propósito:
+          # é o que mantém a autoria única exigida pelo plano Hobby do Vercel.
+          {
+            printf 'sync: %s\n\n' "$SUBJECT"
+            printf 'Origem: %s@%s\n' "${SOURCE_REPO}" "$SHORT"
+            printf 'Commit: https://github.com/%s/commit/%s\n' "${SOURCE_REPO}" "$SHA"
+          } > "${RUNNER_TEMP}/commit-msg.txt"
+
+          echo "SOURCE_SHA=$SHA" >> "$GITHUB_ENV"
+          echo "SOURCE_SHORT=$SHORT" >> "$GITHUB_ENV"
+
+          echo "--- mensagem que será usada ---"
+          cat "${RUNNER_TEMP}/commit-msg.txt"
+
+      - name: Criar snapshot sem histórico
+        env:
+          TARGET_BRANCH: ${{ inputs.target_branch || 'main' }}
+        run: |
+          set -euo pipefail
+
+          rm -rf .git                 # descarta todo o histórico da origem
+          rm -rf .github/workflows    # trava anti-loop: o destino não recebe workflows
+          find .github -type d -empty -delete 2>/dev/null || true
+
+          git init -q -b "${TARGET_BRANCH}"
+          git config user.name  "${COMMIT_NAME}"
+          git config user.email "${COMMIT_EMAIL}"
+
+          git add -A                  # respeita o .gitignore versionado
+
+          STAGED="$(git diff --cached --name-only | wc -l)"
+          if [ "$STAGED" -eq 0 ]; then
+            echo "::error::Nada foi adicionado ao snapshot — .gitignore ou checkout errado?"
+            exit 1
+          fi
+          echo "Arquivos no snapshot: ${STAGED}"
+
+          GIT_AUTHOR_NAME="${COMMIT_NAME}"     GIT_AUTHOR_EMAIL="${COMMIT_EMAIL}" \
+          GIT_COMMITTER_NAME="${COMMIT_NAME}"  GIT_COMMITTER_EMAIL="${COMMIT_EMAIL}" \
+            git commit -q -F "${RUNNER_TEMP}/commit-msg.txt"
+
+          echo "--- autoria do commit gerado ---"
+          git log -1 --pretty='author=%an <%ae>%ncommitter=%cn <%ce>'
+
+      - name: Enviar para o destino
+        env:
+          MIRROR_TOKEN: ${{ secrets.MIRROR_TOKEN }}
+          TARGET_BRANCH: ${{ inputs.target_branch || 'main' }}
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+        run: |
+          set -euo pipefail
+          echo "::add-mask::${MIRROR_TOKEN}"
+
+          git remote add target "https://x-access-token:${MIRROR_TOKEN}@github.com/${TARGET_REPO}.git"
+
+          PUSH_ARGS="--force"
+          if [ "${DRY_RUN}" = "true" ]; then
+            PUSH_ARGS="${PUSH_ARGS} --dry-run"
+            echo "::notice::DRY-RUN: autentica e valida o ref, mas não escreve nada."
+            if git fetch -q --depth=1 target "${TARGET_BRANCH}" 2>/dev/null; then
+              echo "--- diff vs ${TARGET_REPO}@${TARGET_BRANCH} ---"
+              git diff --stat FETCH_HEAD HEAD || true
+            else
+              echo "Branch ${TARGET_BRANCH} ainda não existe no destino (ou sem acesso de leitura)."
+            fi
+          fi
+
+          set +e
+          git push ${PUSH_ARGS} target "HEAD:refs/heads/${TARGET_BRANCH}" 2>&1 | tee "${RUNNER_TEMP}/push.log"
+          RC="${PIPESTATUS[0]}"
+          set -e
+
+          if [ "$RC" -ne 0 ]; then
+            if grep -qi "workflow.*scope\|refusing to allow" "${RUNNER_TEMP}/push.log"; then
+              echo "::error::O PAT precisa da permissão 'Workflows: Read and write' (o snapshot remove .github/workflows no destino)."
+            elif grep -qi "protected branch\|cannot force-update\|non-fast-forward" "${RUNNER_TEMP}/push.log"; then
+              echo "::error::Force-push bloqueado por branch protection/ruleset na ${TARGET_BRANCH} do ${TARGET_REPO}."
+            elif grep -qi "403\|permission to .* denied" "${RUNNER_TEMP}/push.log"; then
+              echo "::error::403 — o PAT não tem 'Contents: Read and write' em ${TARGET_REPO}."
+            elif grep -qi "not found\|404" "${RUNNER_TEMP}/push.log"; then
+              echo "::error::404 — repo inexistente ou fora do escopo do PAT (repo privado sem acesso aparece como 404)."
+            elif grep -qi "authentication failed\|invalid username or password\|bad credentials" "${RUNNER_TEMP}/push.log"; then
+              echo "::error::Credencial inválida — MIRROR_TOKEN expirado ou revogado."
+            else
+              echo "::error::Push falhou (exit ${RC}). Veja o log acima."
+            fi
+            exit "$RC"
+          fi
+
+      - name: Resumo
+        if: always()
+        env:
+          TARGET_BRANCH: ${{ inputs.target_branch || 'main' }}
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+        run: |
+          {
+            echo "### Mirror ${SOURCE_REPO} → ${TARGET_REPO}"
+            echo ""
+            echo "| campo | valor |"
+            echo "| --- | --- |"
+            echo "| commit de origem | \`${SOURCE_SHORT:-?}\` |"
+            echo "| branch de destino | \`${TARGET_BRANCH}\` |"
+            echo "| dry-run | \`${DRY_RUN}\` |"
+            echo "| autoria | ${COMMIT_NAME} <${COMMIT_EMAIL}> |"
+            echo "| resultado | ${{ job.status }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
