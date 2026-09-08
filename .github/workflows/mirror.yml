@@ -64,15 +64,16 @@ jobs:
           set -euo pipefail
           SHA="$(git rev-parse HEAD)"
           SHORT="$(git rev-parse --short HEAD)"
-          SUBJECT="$(git log -1 --pretty=%s)"
+          DATE="$(TZ='America/Sao_Paulo' date +%Y-%m-%d)"
+          STAMP="$(TZ='America/Sao_Paulo' date '+%Y-%m-%d %H:%M')"
 
-          # Mensagem remontada do zero (só assunto + referência).
-          # Descarta trailers Co-Authored-By do commit original de propósito:
-          # é o que mantém a autoria única exigida pelo plano Hobby do Vercel.
+          # Mensagem genérica, escrita do zero: nada do commit original vem junto.
+          # É isso que impede trailers Co-Authored-By de vazarem para o destino,
+          # mantendo a autoria única exigida pelo plano Hobby do Vercel.
           {
-            printf 'sync: %s\n\n' "$SUBJECT"
+            printf 'release-%s\n\n' "$DATE"
+            printf 'Sync automatico em %s (America/Sao_Paulo).\n' "$STAMP"
             printf 'Origem: %s@%s\n' "${SOURCE_REPO}" "$SHORT"
-            printf 'Commit: https://github.com/%s/commit/%s\n' "${SOURCE_REPO}" "$SHA"
           } > "${RUNNER_TEMP}/commit-msg.txt"
 
           echo "SOURCE_SHA=$SHA" >> "$GITHUB_ENV"
