@@ -53,9 +53,11 @@ type Mode = 'giphy' | 'url'
 interface Props {
   value: string | null
   onChange: (url: string | null) => void
+  mediaType?: 'gifs' | 'stickers'
+  label?: string
 }
 
-export function ImagePicker({ value, onChange }: Props) {
+export function ImagePicker({ value, onChange, mediaType = 'gifs', label }: Props) {
   const { theme } = useBackground()
   const [mode, setMode] = useState<Mode | null>(null)
   const [search, setSearch] = useState('')
@@ -76,9 +78,9 @@ export function ImagePicker({ value, onChange }: Props) {
   const fetchGifs = useCallback(
     (offset: number) =>
       debouncedSearch
-        ? gf.search(debouncedSearch, { offset, limit: 12, rating: 'g' })
-        : gf.trending({ offset, limit: 12, rating: 'g' }),
-    [debouncedSearch],
+        ? gf.search(debouncedSearch, { offset, limit: 12, rating: 'g', type: mediaType })
+        : gf.trending({ offset, limit: 12, rating: 'g', type: mediaType }),
+    [debouncedSearch, mediaType],
   )
 
   function handleSearchChange(q: string) {
@@ -140,7 +142,7 @@ export function ImagePicker({ value, onChange }: Props) {
   return (
     <Stack spacing={1.5}>
       <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.secondary }}>
-        Imagem{' '}
+        {label ?? 'Imagem'}{' '}
         <Typography component="span" sx={{ fontSize: '0.68rem', fontWeight: 400, color: colors.text.muted }}>
           (opcional)
         </Typography>
@@ -148,12 +150,19 @@ export function ImagePicker({ value, onChange }: Props) {
 
       {/* Preview */}
       {value && (
-        <Box sx={{ position: 'relative', borderRadius: radius.lg, overflow: 'hidden', height: 88 }}>
+        <Box sx={{
+          position: 'relative', borderRadius: radius.lg, overflow: 'hidden', height: 88,
+          ...(mediaType === 'stickers' ? {
+            backgroundImage: 'linear-gradient(45deg, rgba(0,0,0,0.06) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.06) 75%), linear-gradient(45deg, rgba(0,0,0,0.06) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.06) 75%)',
+            backgroundSize: '14px 14px',
+            backgroundPosition: '0 0, 7px 7px',
+          } : {}),
+        }}>
           <Box
             component="img"
             src={value}
             alt="preview"
-            sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            sx={{ width: '100%', height: '100%', objectFit: mediaType === 'stickers' ? 'contain' : 'cover', display: 'block' }}
           />
           <Box
             onClick={handleClear}
@@ -177,7 +186,7 @@ export function ImagePicker({ value, onChange }: Props) {
       {/* Toggle buttons */}
       <Stack direction="row" alignItems="center" spacing={1}>
         <Box onClick={() => toggleMode('giphy')} sx={btnSx(mode === 'giphy')}>
-          🔍 GIF
+          🔍 {mediaType === 'stickers' ? 'Sticker' : 'GIF'}
         </Box>
         <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: colors.text.muted, flexShrink: 0 }}>
           ou

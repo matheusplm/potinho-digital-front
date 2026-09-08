@@ -10,8 +10,8 @@ import { useJsonImport } from '../../hooks/useJsonImport'
 import { colors, font, radius } from '../../design-system'
 import { useBackground } from '../../context/BackgroundContext'
 import { gradientTextSx } from '../../utils/colorUtils'
-import { REVEAL_EFFECTS, REVEAL_EFFECT_MAP, runRevealEffect } from '../../utils/celebrations'
-import { usePartyclesRewards } from '../../hooks/usePartyclesRewards'
+import { REVEAL_EFFECTS, REVEAL_EFFECT_MAP, isImageMedia, normalizeRevealEffect, useRevealEffect } from '../../effects'
+import { ImagePicker } from '../../components/ImagePicker'
 import { uniqueConfigId } from '../../utils/slug'
 import type { RarityConfig } from '../../types/note'
 import { ColorRow, actionButtonSx } from './shared'
@@ -21,7 +21,7 @@ const NEW_RARITY: RarityConfig = {
   cardBg: '#ffffff', textColor: '#334155', captionColor: '#94a3b8',
   borderColor: '#cbd5e1', shadow: '0 4px 16px rgba(15,23,42,0.06)', glowColor: '',
   chipBg: '#f1f5f9', chipColor: '#64748b',
-  revealEffect: 'none', revealEmoji: '',
+  revealEffect: 'none', revealMedia: '',
 }
 
 const DEFAULT_IMPORT_RARITIES_JSON = `[
@@ -39,7 +39,8 @@ const DEFAULT_IMPORT_RARITIES_JSON = `[
     "glowColor": "",
     "chipBg": "#f1f5f9",
     "chipColor": "#64748b",
-    "revealEffect": "none"
+    "revealEffect": "none",
+    "revealMedia": ""
   }
 ]`
 
@@ -60,13 +61,13 @@ const RARITY_TEMPLATES: RarityConfig[] = [
     id: 'raro', label: 'Raro', emoji: '🔵', odds: 10, order: 3,
     cardBg: 'linear-gradient(135deg,#eff6ff 0%,#dbeafe 45%,#bfdbfe 100%)', textColor: '#1e3a8a', captionColor: '#2563eb',
     borderColor: '#3b82f6', shadow: '0 8px 26px rgba(59,130,246,0.2)', glowColor: 'rgba(59,130,246,0.35)',
-    chipBg: '#dbeafe', chipColor: '#1d4ed8', revealEffect: 'sparkles',
+    chipBg: '#dbeafe', chipColor: '#1d4ed8', revealEffect: 'burst', revealMedia: '✨',
   },
   {
     id: 'muito_raro', label: 'Muito raro', emoji: '🟣', odds: 4, order: 4,
     cardBg: 'linear-gradient(135deg,#faf5ff 0%,#f3e8ff 42%,#ddd6fe 100%)', textColor: '#581c87', captionColor: '#7e22ce',
     borderColor: '#a855f7', shadow: '0 10px 30px rgba(168,85,247,0.22)', glowColor: 'rgba(168,85,247,0.38)',
-    chipBg: '#f3e8ff', chipColor: '#7c3aed', revealEffect: 'confetti',
+    chipBg: '#f3e8ff', chipColor: '#7c3aed', revealEffect: 'rain', revealMedia: '💜',
   },
   {
     id: 'lendario', label: 'Lendário', emoji: '🟠', odds: 1, order: 5,
@@ -78,7 +79,7 @@ const RARITY_TEMPLATES: RarityConfig[] = [
     id: 'artefato', label: 'Artefato', emoji: '🌈', odds: 0, order: 6,
     cardBg: 'linear-gradient(135deg,#fef3c7 0%,#fbcfe8 22%,#ddd6fe 46%,#bfdbfe 70%,#bbf7d0 100%)', textColor: '#312e81', captionColor: '#7c3aed',
     borderColor: '#c084fc', shadow: '0 14px 40px rgba(124,58,237,0.25)', glowColor: 'rgba(236,72,153,0.45)',
-    chipBg: 'linear-gradient(135deg,#f59e0b,#ec4899,#8b5cf6,#06b6d4)', chipColor: '#ffffff', revealEffect: 'emoji',
+    chipBg: 'linear-gradient(135deg,#f59e0b,#ec4899,#8b5cf6,#06b6d4)', chipColor: '#ffffff', revealEffect: 'glow',
   },
 ]
 
@@ -98,13 +99,22 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
   const isPending = createMutation.isPending || updateMutation.isPending
   const set = (field: string, value: string | number) => setForm((f) => ({ ...f, [field]: value }))
   const previewRef = useRef<HTMLDivElement>(null)
-  const triggerPartycles = usePartyclesRewards(previewRef)
+  const { play, layer } = useRevealEffect()
 
   const otherOdds = existingRarities.filter((r) => r.id !== form.id).reduce((sum, r) => sum + r.odds, 0)
   const totalOdds = parseFloat((otherOdds + form.odds).toFixed(2))
   const overLimit = totalOdds > 100
   const remaining = parseFloat((100 - totalOdds).toFixed(2))
-  const selectedEffect = REVEAL_EFFECT_MAP[form.revealEffect || 'none']
+  const effect = normalizeRevealEffect(form.revealEffect, form.revealMedia, form.revealEmoji, form.emoji)
+  const selectedEffect = REVEAL_EFFECT_MAP[effect.kind]
+  const mediaIsImage = isImageMedia(effect.media)
+
+  const testEffect = () => play({
+    kind: effect.kind,
+    media: effect.media,
+    accent: form.borderColor,
+    anchor: previewRef.current?.getBoundingClientRect() ?? null,
+  })
 
   const applyTemplate = (template: RarityConfig) => {
     setAppliedTemplateId(template.id)
@@ -142,6 +152,7 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
 
   return (
     <>
+      {layer}
       <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 700, color: colors.text.primary, pb: 1 }}>
         {isNew ? 'Nova raridade' : `Editar ${form.emoji} ${form.label}`}
       </DialogTitle>
@@ -241,12 +252,15 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
               </Typography>
             </Stack>
             <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 0.7 }}>
-              {REVEAL_EFFECTS.map((effect) => {
-                const active = (form.revealEffect || 'none') === effect.id
+              {REVEAL_EFFECTS.map((definition) => {
+                const active = effect.kind === definition.kind
                 return (
                   <Box
-                    key={effect.id}
-                    onClick={() => set('revealEffect', effect.id)}
+                    key={definition.kind}
+                    onClick={() => {
+                      set('revealEffect', definition.kind)
+                      if (definition.usesMedia && !form.revealMedia) set('revealMedia', definition.defaultMedia)
+                    }}
                     sx={{
                       p: 1, borderRadius: radius.lg, cursor: 'pointer', textAlign: 'center',
                       background: active ? `${colors.primary.main}12` : 'rgba(0,0,0,0.02)',
@@ -255,30 +269,65 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
                       '&:hover': { transform: 'translateY(-1px)', borderColor: `${colors.primary.main}88` },
                     }}
                   >
-                    <Typography sx={{ fontSize: '1.15rem', lineHeight: 1.15 }}>{effect.icon}</Typography>
+                    <Typography sx={{ fontSize: '1.15rem', lineHeight: 1.15 }}>{definition.icon}</Typography>
                     <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, lineHeight: 1.2, mt: 0.2, color: active ? colors.primary.main : colors.text.secondary }}>
-                      {effect.label}
+                      {definition.label}
                     </Typography>
                   </Box>
                 )
               })}
             </Box>
-            {selectedEffect && selectedEffect.id !== 'none' && (
-              <Stack spacing={1} sx={{ mt: 1.2 }}>
+            {selectedEffect && selectedEffect.kind !== 'none' && (
+              <Stack spacing={1.2} sx={{ mt: 1.2 }}>
                 <Typography sx={{ fontSize: '0.7rem', color: colors.text.muted, fontStyle: 'italic' }}>
                   {selectedEffect.description}
                 </Typography>
+                {selectedEffect.usesMedia && (
+                  <Box sx={{ p: 1.4, borderRadius: radius.lg, background: 'rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.06)' }}>
+                    <Stack direction="row" spacing={1} sx={{ mb: 1.2 }}>
+                      {(['emoji', 'image'] as const).map((option) => {
+                        const active = option === 'image' ? mediaIsImage : !mediaIsImage
+                        return (
+                          <Box
+                            key={option}
+                            onClick={() => set('revealMedia', option === 'emoji' ? (selectedEffect.defaultMedia || '✨') : '')}
+                            sx={{
+                              flex: 1, py: 0.7, borderRadius: radius.md, cursor: 'pointer', textAlign: 'center',
+                              fontSize: '0.76rem', fontWeight: 700, userSelect: 'none',
+                              background: active ? colors.primary.main : 'rgba(0,0,0,0.04)',
+                              color: active ? '#fff' : colors.text.secondary,
+                              border: `1.5px solid ${active ? colors.primary.main : colors.border.subtle}`,
+                              transition: 'all 0.15s',
+                            }}
+                          >
+                            {option === 'emoji' ? '😀 Emoji' : '🖼️ GIF ou imagem'}
+                          </Box>
+                        )
+                      })}
+                    </Stack>
+                    {mediaIsImage ? (
+                      <ImagePicker
+                        value={form.revealMedia || null}
+                        onChange={(url) => set('revealMedia', url ?? '')}
+                        mediaType="stickers"
+                        label="Figurinha do efeito"
+                      />
+                    ) : (
+                      <EmojiPickerInput
+                        label="Emoji do efeito"
+                        value={effect.media}
+                        onChange={(emoji) => set('revealMedia', emoji)}
+                      />
+                    )}
+                    <Typography sx={{ fontSize: '0.64rem', color: colors.text.muted, mt: 1, lineHeight: 1.4 }}>
+                      Figurinhas com fundo transparente ficam bem melhores — a busca já filtra por elas.
+                    </Typography>
+                  </Box>
+                )}
                 <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 1 }}>
-                  {selectedEffect.usesEmoji && (
-                    <EmojiPickerInput label="Emoji do efeito" value={form.revealEmoji || form.emoji} onChange={(emoji) => set('revealEmoji', emoji)} />
-                  )}
                   <Button
                     variant="ghost"
-                    onClick={() => {
-                      if (!triggerPartycles(form.revealEffect)) {
-                        runRevealEffect(form.revealEffect, { emoji: form.revealEmoji || form.emoji, accent: form.borderColor })
-                      }
-                    }}
+                    onClick={testEffect}
                     sx={{ py: 0.7, px: 1.6, fontSize: '0.78rem', whiteSpace: 'nowrap' }}
                   >
                     🎬 Testar efeito

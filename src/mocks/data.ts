@@ -24,13 +24,13 @@ export const defaultRarities: RarityConfig[] = [
     id: 'raro', label: 'Raro', emoji: '💙', odds: 10, order: 3,
     cardBg: 'linear-gradient(135deg,#eff6ff,#dbeafe)', textColor: '#1e3a8a', captionColor: '#3b6fb5',
     borderColor: 'rgba(59,130,246,0.35)', shadow: '0 6px 20px rgba(59,130,246,0.16)', glowColor: 'rgba(59,130,246,0.25)',
-    chipBg: '#dbeafe', chipColor: '#1d4ed8', revealEffect: 'sparkles',
+    chipBg: '#dbeafe', chipColor: '#1d4ed8', revealEffect: 'burst', revealMedia: '✨',
   },
   {
     id: 'mitico', label: 'Mítico', emoji: '🔮', odds: 4, order: 4,
     cardBg: 'linear-gradient(135deg,#faf5ff,#f3e8ff)', textColor: '#581c87', captionColor: '#7e3aa8',
     borderColor: 'rgba(168,85,247,0.4)', shadow: '0 8px 24px rgba(168,85,247,0.2)', glowColor: 'rgba(168,85,247,0.32)',
-    chipBg: '#f3e8ff', chipColor: '#7c3aed', revealEffect: 'confetti',
+    chipBg: '#f3e8ff', chipColor: '#7c3aed', revealEffect: 'rain', revealMedia: '💜',
   },
   {
     id: 'lendario', label: 'Lendário', emoji: '👑', odds: 1, order: 5,

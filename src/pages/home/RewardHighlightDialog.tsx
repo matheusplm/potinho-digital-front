@@ -5,8 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { Button } from '../../components/ui'
 import { RewardCard } from '../../components/collection/RewardCard'
 import { colors, font, radius } from '../../design-system'
-import { runRevealEffect } from '../../utils/celebrations'
-import { usePartyclesRewards } from '../../hooks/usePartyclesRewards'
+import { normalizeRevealEffect, useRevealEffect } from '../../effects'
 import type { CollectionDailyReward, NoteTypeConfig, RarityConfig } from '../../types/note'
 
 const revealAura = keyframes`
@@ -41,10 +40,10 @@ export function RewardHighlightDialog({ open, rewards, rarities, types, collecti
 }) {
   const navigate = useNavigate()
 
-  const anchorRef = useRef<HTMLDivElement>(null)
-  const triggerPartycles = usePartyclesRewards(anchorRef)
-  const dataRef = useRef({ rewards, rarities, accent, triggerPartycles })
-  dataRef.current = { rewards, rarities, accent, triggerPartycles }
+  const paperRef = useRef<HTMLDivElement>(null)
+  const { play, layer } = useRevealEffect()
+  const dataRef = useRef({ rewards, rarities, accent, play })
+  dataRef.current = { rewards, rarities, accent, play }
   const firedRef = useRef(false)
   const [celebration, setCelebration] = useState<{ color: string; shake: boolean } | null>(null)
 
@@ -52,7 +51,7 @@ export function RewardHighlightDialog({ open, rewards, rarities, types, collecti
     if (!open) { firedRef.current = false; setCelebration(null); return }
     if (firedRef.current) return
     firedRef.current = true
-    const { rewards: rw, rarities: rs, accent: ac, triggerPartycles: trigger } = dataRef.current
+    const { rewards: rw, rarities: rs, accent: ac, play: playEffect } = dataRef.current
     const rarest = rw
       .map((reward) => rs.find((r) => r.id === reward.rarity))
       .filter((r): r is RarityConfig => !!r && !!r.revealEffect && r.revealEffect !== 'none')
@@ -60,15 +59,16 @@ export function RewardHighlightDialog({ open, rewards, rarities, types, collecti
     if (!rarest || prefersReducedMotion()) return
     setCelebration({ color: rarest.glowColor || rarest.borderColor || ac, shake: rarest.odds <= 5 })
     const fireTimer = window.setTimeout(() => {
-      if (!trigger(rarest.revealEffect)) {
-        runRevealEffect(rarest.revealEffect, { emoji: rarest.revealEmoji || rarest.emoji, accent: ac })
-      }
+      const { kind, media } = normalizeRevealEffect(rarest.revealEffect, rarest.revealMedia, rarest.revealEmoji, rarest.emoji)
+      playEffect({ kind, media, accent: ac, anchor: paperRef.current?.getBoundingClientRect() ?? null })
     }, 320)
     const clearTimer = window.setTimeout(() => setCelebration(null), 1000)
     return () => { window.clearTimeout(fireTimer); window.clearTimeout(clearTimer) }
   }, [open])
 
   return (
+    <>
+    {layer}
     <Dialog
       open={open}
       onClose={onClose}
@@ -76,6 +76,7 @@ export function RewardHighlightDialog({ open, rewards, rarities, types, collecti
       fullWidth
       slotProps={{
         paper: {
+          ref: paperRef,
           sx: {
             mx: 2,
             borderRadius: radius.xl,
@@ -99,7 +100,7 @@ export function RewardHighlightDialog({ open, rewards, rarities, types, collecti
           animation: `${revealAura} 0.9s ease-out both`,
         }} />
       )}
-      <Box ref={anchorRef} sx={{
+      <Box sx={{
         p: 2,
         background: `radial-gradient(circle at 18% 0%, rgba(255,255,255,0.76), transparent 38%), linear-gradient(135deg, ${colors.rose.main}14, ${accent}18)`,
         position: 'relative',
@@ -135,5 +136,6 @@ export function RewardHighlightDialog({ open, rewards, rarities, types, collecti
         </Button>
       </DialogActions>
     </Dialog>
+    </>
   )
 }

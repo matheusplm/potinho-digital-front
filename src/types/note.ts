@@ -73,6 +73,7 @@ export interface RarityConfig {
   chipColor: string
   revealEffect?: string
   revealEmoji?: string
+  revealMedia?: string
   createdAt?: string
   updatedAt?: string
 }
