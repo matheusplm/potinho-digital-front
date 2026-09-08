@@ -96,7 +96,11 @@ jobs:
           git config user.name  "${COMMIT_NAME}"
           git config user.email "${COMMIT_EMAIL}"
 
-          git add -A                  # respeita o .gitignore versionado
+          # --force de propósito: o checkout contém APENAS arquivos versionados,
+          # então nada de node_modules/dist entra aqui. Sem o --force, o git init
+          # novo trata tudo como untracked e descarta arquivos que estão no repo
+          # mas casam com o .gitignore (README.md via *.md, *.tsbuildinfo).
+          git add -A --force
 
           STAGED="$(git diff --cached --name-only | wc -l)"
           if [ "$STAGED" -eq 0 ]; then
