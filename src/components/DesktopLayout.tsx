@@ -26,6 +26,7 @@ import { OnboardingOverlay, toast } from './ui'
 import { useUser, type UserRole } from '../context/UserContext'
 import { useSimulation } from '../context/SimulationContext'
 import { useReader } from '../context/ReaderContext'
+import { useNotificationToggle } from '../hooks/useNotificationToggle'
 import { useBackground } from '../context/BackgroundContext'
 import { useCollectionsQuery, useMyNotificationsQuery, usePendingInvitesQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
 import { backgroundThemes, colors, font, radius } from '../design-system'
@@ -94,26 +95,7 @@ export function DesktopLayout() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [justUnlockedKey])
 
-  const notifSupported = typeof Notification !== 'undefined'
-  const [notifEnabled, setNotifEnabled] = useState(
-    () => notifSupported && Notification.permission === 'granted' && localStorage.getItem('potinho-notif') === 'true',
-  )
-  const notifStatus = notifSupported ? Notification.permission : 'denied'
-
-  async function handleNotificationToggle() {
-    if (!notifSupported || notifStatus === 'denied') return
-    if (notifEnabled) {
-      localStorage.removeItem('potinho-notif')
-      setNotifEnabled(false)
-      return
-    }
-    const result = await Notification.requestPermission()
-    if (result === 'granted') {
-      localStorage.setItem('potinho-notif', 'true')
-      setNotifEnabled(true)
-      new Notification('Potinho Digital 🎁', { body: 'Notificações ativadas!' })
-    }
-  }
+  const { supported: notifSupported, status: notifStatus, enabled: notifEnabled, toggle: handleNotificationToggle } = useNotificationToggle()
 
   const items = useMemo<NavItem[]>(() => {
     if (isReader) {
@@ -142,7 +124,7 @@ export function DesktopLayout() {
     }
     if (isReader && location.pathname.startsWith('/colecoes/')) return readerAlbumPath
     const match = items.find((item) => item.path !== '/simular' && location.pathname.startsWith(item.path))
-    return match?.path ?? '/home'
+    return match?.path ?? null
   }, [location.pathname, items, isActive, isReader, readerAlbumPath, session])
 
   function switchPersona(next: UserRole) {

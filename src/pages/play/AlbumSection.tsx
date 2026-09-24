@@ -98,7 +98,7 @@ export function AlbumSection({
 
   return (
     <Stack spacing={1.2}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 1.3, py: 0.82, background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(14px)', border: '1.5px solid rgba(255,255,255,0.62)', borderRadius: radius.xl }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 1.3, py: 0.82, background: colors.glass.bg, backdropFilter: 'blur(14px)', border: `1.5px solid ${colors.glass.border}`, borderRadius: radius.xl }}>
         <SearchIcon sx={{ fontSize: 17, color: theme.textOnBgMuted, flexShrink: 0 }} />
         <Box component="input" value={search} onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearch(event.target.value)} placeholder="Buscar cartinha..." sx={{ flex: 1, minWidth: 0, border: 'none', outline: 'none', background: 'transparent', color: theme.textOnBg, fontFamily: 'inherit', fontSize: '0.84rem', '&::placeholder': { color: theme.textOnBgMuted } }} />
         {search && (
@@ -114,13 +114,13 @@ export function AlbumSection({
             { id: 'all' as AlbumFilter, label: 'Todas' },
             ...(hasFavorites ? [{ id: 'favorites' as AlbumFilter, label: 'Favoritas' }] : []),
           ].map((item) => (
-            <Box key={item.id} onClick={() => setFilter(item.id)} sx={{ px: 1.1, py: 0.52, borderRadius: radius.full, cursor: 'pointer', flexShrink: 0, fontSize: '0.72rem', fontWeight: 800, color: filter === item.id ? '#fff' : theme.textOnBgMuted, background: filter === item.id ? theme.accent : 'rgba(255,255,255,0.48)', border: `1px solid ${filter === item.id ? theme.accent : 'rgba(255,255,255,0.58)'}`, backdropFilter: 'blur(10px)' }}>
+            <Box key={item.id} onClick={() => setFilter(item.id)} sx={{ px: 1.1, py: 0.52, borderRadius: radius.full, cursor: 'pointer', flexShrink: 0, fontSize: '0.72rem', fontWeight: 800, color: filter === item.id ? '#fff' : theme.textOnBgMuted, background: filter === item.id ? theme.accent : colors.glass.bg, border: `1px solid ${filter === item.id ? theme.accent : colors.glass.border}`, backdropFilter: 'blur(10px)' }}>
               {item.label}
             </Box>
           ))}
         </Box>
         {(discoveredRarities.length > 0 || discoveredTypes.length > 0) && (
-          <Box onClick={() => setFilterSheetOpen(true)} sx={{ display: 'flex', alignItems: 'center', gap: 0.4, px: 1, py: 0.52, borderRadius: radius.full, cursor: 'pointer', flexShrink: 0, fontSize: '0.72rem', fontWeight: 800, color: activeFilterCount > 0 ? '#fff' : theme.textOnBgMuted, background: activeFilterCount > 0 ? theme.accent : 'rgba(255,255,255,0.48)', border: `1px solid ${activeFilterCount > 0 ? theme.accent : 'rgba(255,255,255,0.58)'}`, backdropFilter: 'blur(10px)' }}>
+          <Box onClick={() => setFilterSheetOpen(true)} sx={{ display: 'flex', alignItems: 'center', gap: 0.4, px: 1, py: 0.52, borderRadius: radius.full, cursor: 'pointer', flexShrink: 0, fontSize: '0.72rem', fontWeight: 800, color: activeFilterCount > 0 ? '#fff' : theme.textOnBgMuted, background: activeFilterCount > 0 ? theme.accent : colors.glass.bg, border: `1px solid ${activeFilterCount > 0 ? theme.accent : colors.glass.border}`, backdropFilter: 'blur(10px)' }}>
             <TuneIcon sx={{ fontSize: 14 }} />
             {activeFilterCount > 0 ? `Filtros (${activeFilterCount})` : 'Filtros'}
           </Box>
@@ -134,12 +134,12 @@ export function AlbumSection({
             { id: 'grid' as AlbumView, Icon: GridViewIcon },
             { id: 'folders' as AlbumView, Icon: FolderOutlinedIcon },
           ]).map(({ id, Icon }) => (
-            <Box key={id} role="button" aria-label={`Exibição ${id}`} onClick={() => setView(id)} sx={{ width: 32, height: 32, borderRadius: radius.md, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: view === id ? '#fff' : theme.textOnBgMuted, background: view === id ? theme.accent : 'rgba(255,255,255,0.48)', border: `1px solid ${view === id ? theme.accent : 'rgba(255,255,255,0.58)'}`, backdropFilter: 'blur(10px)', transition: 'all 0.15s' }}>
+            <Box key={id} role="button" aria-label={`Exibição ${id}`} onClick={() => setView(id)} sx={{ width: 32, height: 32, borderRadius: radius.md, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: view === id ? '#fff' : theme.textOnBgMuted, background: view === id ? theme.accent : colors.glass.bg, border: `1px solid ${view === id ? theme.accent : colors.glass.border}`, backdropFilter: 'blur(10px)', transition: 'all 0.15s' }}>
               <Icon sx={{ fontSize: 16 }} />
             </Box>
           ))}
         </Box>
-        <Box role="button" aria-label="ordenar" onClick={() => setSort(SORT_CYCLE[(SORT_CYCLE.indexOf(sort) + 1) % SORT_CYCLE.length])} sx={{ display: 'flex', alignItems: 'center', gap: 0.4, px: 1.1, py: 0.5, borderRadius: radius.full, cursor: 'pointer', fontSize: '0.72rem', fontWeight: 800, color: theme.textOnBgMuted, background: 'rgba(255,255,255,0.48)', border: '1px solid rgba(255,255,255,0.58)', backdropFilter: 'blur(10px)' }}>
+        <Box role="button" aria-label="ordenar" onClick={() => setSort(SORT_CYCLE[(SORT_CYCLE.indexOf(sort) + 1) % SORT_CYCLE.length])} sx={{ display: 'flex', alignItems: 'center', gap: 0.4, px: 1.1, py: 0.5, borderRadius: radius.full, cursor: 'pointer', fontSize: '0.72rem', fontWeight: 800, color: theme.textOnBgMuted, background: colors.glass.bg, border: `1px solid ${colors.glass.border}`, backdropFilter: 'blur(10px)' }}>
           <SwapVertIcon sx={{ fontSize: 15 }} />
           {SORT_LABEL[sort]}
         </Box>
@@ -220,7 +220,7 @@ export function AlbumSection({
             const isCollapsed = collapsed[g.key]
             return (
               <Box key={g.key}>
-                <Stack direction="row" alignItems="center" spacing={0.8} onClick={() => setCollapsed((c) => ({ ...c, [g.key]: !c[g.key] }))} sx={{ px: 1.2, py: 0.8, mb: 0.8, borderRadius: radius.lg, cursor: 'pointer', background: 'rgba(255,255,255,0.5)', border: `1px solid ${g.accent}`, backdropFilter: 'blur(10px)' }}>
+                <Stack direction="row" alignItems="center" spacing={0.8} onClick={() => setCollapsed((c) => ({ ...c, [g.key]: !c[g.key] }))} sx={{ px: 1.2, py: 0.8, mb: 0.8, borderRadius: radius.lg, cursor: 'pointer', background: colors.glass.bg, border: `1px solid ${g.accent}`, backdropFilter: 'blur(10px)' }}>
                   <ExpandMoreIcon sx={{ fontSize: 18, color: theme.textOnBgMuted, transition: 'transform 0.18s', transform: isCollapsed ? 'rotate(-90deg)' : 'none' }} />
                   <Typography sx={{ flex: 1, fontSize: '0.8rem', fontWeight: 800, color: theme.textOnBg }}>{g.label}</Typography>
                   <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: theme.textOnBgMuted }}>{g.items.length}</Typography>

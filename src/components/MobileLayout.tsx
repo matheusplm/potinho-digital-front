@@ -1,4 +1,4 @@
-﻿import HomeIcon from '@mui/icons-material/Home'
+import HomeIcon from '@mui/icons-material/Home'
 import Inventory2Icon from '@mui/icons-material/Inventory2'
 import AutoStoriesOutlinedIcon from '@mui/icons-material/AutoStoriesOutlined'
 import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined'
@@ -100,7 +100,7 @@ export function MobileLayout() {
       return readerAlbumPath
     }
     const match = items.find((item) => item.path !== '/simular' && location.pathname.startsWith(item.path))
-    return match?.path ?? '/home'
+    return match?.path ?? null
   }, [location.pathname, items, isActive, isReader, readerAlbumPath, session])
 
   const bannerOffset = isActive ? '52px' : '0px'

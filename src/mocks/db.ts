@@ -63,7 +63,7 @@ function cloneAchievements(collectionId: string): CollectionAchievement[] {
   ]
 }
 
-export interface MockDb {
+interface MockDb {
   users: MockUser[]
   collections: CollectionState[]
   sequence: number

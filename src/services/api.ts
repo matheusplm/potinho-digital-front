@@ -27,7 +27,6 @@ import type {
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? ''
 const API_SECRET = import.meta.env.VITE_API_SECRET ?? ''
-const ACCESS_PACKS_KEY = 'potinho-access-packs'
 const AUTH_STORAGE_KEY = 'potinho-auth'
 
 let authToken = ''
@@ -64,6 +63,7 @@ const FRIENDLY_ERROR_MESSAGES: Record<string, string> = {
   TOO_MANY_REQUESTS: 'Muitas tentativas seguidas. Aguarde um momento.',
   PACK_NOT_ASSIGNED: 'Este pacotinho não foi atribuído a você.',
   PACK_EXHAUSTED: 'Você já usou todas as aberturas deste pacotinho.',
+  PACK_ALREADY_OPENING: 'Esse pacotinho acabou de ser aberto em outro lugar.',
   PACK_COUNT_EXCEEDED: 'Quantidade superior ao número de aberturas disponíveis.',
   PACK_ALREADY_EXISTS: 'Já existe um pacotinho com esse identificador.',
   ALREADY_HAS_ACCESS: 'Esta pessoa já tem acesso à coleção.',
@@ -85,37 +85,6 @@ const FRIENDLY_ERROR_MESSAGES: Record<string, string> = {
   NOTE_NOT_DISABLED: 'Desative o bilhete antes de excluí-lo permanentemente.',
 }
 
-function normalizeEmail(email: string) {
-  return email.toLowerCase().trim()
-}
-
-function readAccessPackStore(): Record<string, Record<string, string[]>> {
-  try {
-    return JSON.parse(localStorage.getItem(ACCESS_PACKS_KEY) ?? '{}') as Record<string, Record<string, string[]>>
-  } catch {
-    return {}
-  }
-}
-
-function saveAccessPacksLocally(cid: string, email: string, packIds: string[]) {
-  const store = readAccessPackStore()
-  const collection = store[cid] ?? {}
-  collection[normalizeEmail(email)] = [...new Set(packIds)]
-  store[cid] = collection
-  localStorage.setItem(ACCESS_PACKS_KEY, JSON.stringify(store))
-}
-
-function mergeLocalAccessPacks(cid: string, accesses: CollectionAccess[]) {
-  const collection = readAccessPackStore()[cid] ?? {}
-  return accesses.map((access) => {
-    const localPackIds = collection[normalizeEmail(access.email)] ?? []
-    return {
-      ...access,
-      packIds: [...new Set([...(access.packIds ?? []), ...localPackIds])],
-    }
-  })
-}
-
 export function setAuthToken(token: string) {
   authToken = token
   redirectingToLogin = false
@@ -133,27 +102,22 @@ async function tryRefresh(): Promise<string | null> {
   if (refreshPromise) return refreshPromise
   refreshPromise = (async () => {
     try {
-      const raw = localStorage.getItem(AUTH_STORAGE_KEY)
-      if (!raw) return null
-      const session = JSON.parse(raw) as { refreshToken?: string }
+      let session: { refreshToken?: string }
+      try {
+        session = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY) ?? '{}') as { refreshToken?: string }
+      } catch {
+        return null
+      }
       if (!session.refreshToken) return null
-      const res = await fetch(`${BASE_URL}/auth/refresh`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(API_SECRET ? { 'x-api-key': API_SECRET } : {}),
-        },
-        body: JSON.stringify({ refreshToken: session.refreshToken }),
-      })
+      const res = await send('/auth/refresh', { method: 'POST', body: JSON.stringify({ refreshToken: session.refreshToken }) }, '')
+      if (res.status >= 500) throw new ApiRequestError('O servidor não respondeu direito. Tente novamente em instantes.', res.status)
       if (!res.ok) return null
-      const json = await res.json()
-      const data = (json?.data ?? json) as { token?: string; refreshToken?: string }
-      if (!data.token) return null
+      const json = (await readJson(res)) as { data?: { token?: string; refreshToken?: string } } | null
+      const data = json?.data ?? (json as { token?: string; refreshToken?: string } | null)
+      if (!data?.token) return null
       localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ ...session, token: data.token, refreshToken: data.refreshToken }))
       setAuthToken(data.token)
       return data.token
-    } catch {
-      return null
     } finally {
       refreshPromise = null
     }
@@ -161,46 +125,52 @@ async function tryRefresh(): Promise<string | null> {
   return refreshPromise
 }
 
-async function request<T>(url: string, init?: RequestInit): Promise<T> {
+async function send(url: string, init: RequestInit | undefined, token: string): Promise<Response> {
   const headers: Record<string, string> = {
-    ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(API_SECRET ? { 'x-api-key': API_SECRET } : {}),
   }
   if (init?.body) headers['Content-Type'] = 'application/json'
+  try {
+    return await fetch(`${BASE_URL}${url}`, { ...init, headers })
+  } catch {
+    throw new ApiRequestError('Não foi possível conectar. Verifique sua internet e tente novamente.', 0, undefined, 'NETWORK_ERROR')
+  }
+}
 
-  const response = await fetch(`${BASE_URL}${url}`, {
-    headers,
-    ...init,
-  })
+async function readJson(response: Response): Promise<unknown> {
+  try {
+    return await response.json()
+  } catch {
+    return null
+  }
+}
+
+async function request<T>(url: string, init?: RequestInit): Promise<T> {
+  let response = await send(url, init, authToken)
 
   if (response.status === 401 && !url.startsWith('/auth/')) {
     const newToken = await tryRefresh()
-    if (newToken) {
-      const retryHeaders: Record<string, string> = {
-        Authorization: `Bearer ${newToken}`,
-        ...(API_SECRET ? { 'x-api-key': API_SECRET } : {}),
-      }
-      if (init?.body) retryHeaders['Content-Type'] = 'application/json'
-      const retryRes = await fetch(`${BASE_URL}${url}`, { ...init, headers: retryHeaders })
-      if (retryRes.ok) {
-        const retryJson = await retryRes.json()
-        if (retryJson !== null && typeof retryJson === 'object' && 'data' in retryJson) return (retryJson as { data: T }).data
-        return retryJson as T
-      }
+    if (newToken) response = await send(url, init, newToken)
+    if (!newToken || response.status === 401) {
+      handleUnauthorized()
+      throw new ApiRequestError('Sessão expirada. Faça login novamente.', 401, undefined, 'UNAUTHORIZED')
     }
-    handleUnauthorized()
-    throw new Error('Sessão expirada. Faça login novamente.')
   }
 
   if (!response.ok) {
-    const payload = (await response.json()) as { message?: string; error?: string; details?: unknown; availableAt?: string; retryAfterSec?: number }
+    const payload = ((await readJson(response)) ?? {}) as { message?: string; error?: string; availableAt?: string; retryAfterSec?: number }
     const code = payload.error
-    const message = (code && FRIENDLY_ERROR_MESSAGES[code]) ?? payload.message ?? code ?? 'Erro inesperado na API.'
+    const fallback = response.status >= 500 ? 'O servidor não respondeu direito. Tente novamente em instantes.' : 'Erro inesperado na API.'
+    const message = (code && FRIENDLY_ERROR_MESSAGES[code]) ?? payload.message ?? code ?? fallback
     throw new ApiRequestError(message, response.status, payload.availableAt, code, payload.retryAfterSec)
   }
 
-  const json = await response.json()
-  if (json !== null && typeof json === 'object' && 'success' in json && 'data' in json) {
+  const json = await readJson(response)
+  if (json === null) {
+    throw new ApiRequestError('O servidor respondeu algo inesperado. Tente novamente em instantes.', response.status, undefined, 'INVALID_RESPONSE')
+  }
+  if (typeof json === 'object' && 'success' in json && 'data' in json) {
     return (json as { success: boolean; data: T }).data
   }
   return json as T
@@ -280,7 +250,7 @@ export const api = {
     request<Collection>(`/api/collections/${id}/restore`, { method: 'POST', body: JSON.stringify({}) }),
 
   listCollectionAccess: async (cid: string) =>
-    mergeLocalAccessPacks(cid, await request<CollectionAccess[]>(`/api/collections/${cid}/access`)),
+    request<CollectionAccess[]>(`/api/collections/${cid}/access`),
   grantAccess: (cid: string, email: string) =>
     request<CollectionAccess>(`/api/collections/${cid}/access`, { method: 'POST', body: JSON.stringify({ email }) }),
   revokeAccess: (cid: string, email: string) =>
@@ -308,20 +278,6 @@ export const api = {
       method: 'PATCH',
       body: JSON.stringify({ packId, opens, ...(notify ? { notify } : {}) }),
     }),
-  setAccessPacks: async (cid: string, email: string, packIds: string[]) => {
-    try {
-      const access = await request<CollectionAccess>(`/api/collections/${cid}/access/${encodeURIComponent(email)}/packs`, {
-        method: 'PUT',
-        body: JSON.stringify({ packIds }),
-      })
-      saveAccessPacksLocally(cid, email, access.packIds ?? packIds)
-      return access
-    } catch (error) {
-      if (!(error instanceof ApiRequestError) || ![404, 405].includes(error.status)) throw error
-      saveAccessPacksLocally(cid, email, packIds)
-      return { collectionId: cid, email, packIds, createdAt: new Date().toISOString() }
-    }
-  },
 
   getCollectionNotes: (cid: string) => request<NoteRecord[]>(`/api/collections/${cid}/notes`),
   createCollectionNote: (cid: string, data: NoteFormData) =>

@@ -29,6 +29,7 @@ import { isCollectionReader } from '../utils/collectionAccess'
 import { ApiRequestError } from '../services/api'
 import { simulatePackOpen } from '../utils/simulationPlay'
 import { formatRemainingTime } from '../utils/packCooldowns'
+import { isNotificationOptedOut, showLocalNotification } from '../utils/notifications'
 import { computeAchievements } from '../utils/achievements'
 import { NoteDetailDialog, type ReadableNote } from '../components/collection/NoteDetailDialog'
 import { PACK_OPEN_ANIMATION_MS, PackOpeningDialog, wait } from '../components/collection/PackOpeningDialog'
@@ -114,9 +115,9 @@ export function SimulatedReaderHomePage() {
       canOpen &&
       typeof Notification !== 'undefined' &&
       Notification.permission === 'granted' &&
-      localStorage.getItem('potinho-notif') === 'true'
+      !isNotificationOptedOut()
     ) {
-      new Notification('Potinho Digital 🎁', { body: 'Existem pacotes disponíveis para você!' })
+      void showLocalNotification('Potinho Digital 🎁', 'Existem pacotes disponíveis para você!')
     }
     prevCanOpen.current = canOpen
   }, [playFromApi])
@@ -322,8 +323,9 @@ export function SimulatedReaderHomePage() {
           description: newCount > 0 ? `${newCount} novo${newCount !== 1 ? 's' : ''} na coleção ✨` : `${pack.name} aberto!`,
         })
       } catch (error) {
-        if (error instanceof ApiRequestError && error.code === 'PACK_COUNT_EXCEEDED') {
+        if (error instanceof ApiRequestError && ['PACK_COUNT_EXCEEDED', 'PACK_ALREADY_OPENING', 'PACK_EXHAUSTED'].includes(error.code ?? '')) {
           await queryClient.invalidateQueries({ queryKey: ['col-play', cid] })
+          await queryClient.invalidateQueries({ queryKey: ['col-pack-statuses', cid] })
           setNow(Date.now())
           toast.info(error.message)
         } else if (error instanceof ApiRequestError && (error.status === 429 || error.code === 'PACK_ON_COOLDOWN')) {

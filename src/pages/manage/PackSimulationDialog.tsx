@@ -67,7 +67,7 @@ export function PackSimulationDialog({ simulation, rarities, types, onClose, onS
                 </Typography>
                 <Typography sx={{ fontSize: '0.76rem', color: colors.text.secondary }}>
                   {revealed
-                    ? `${simulation.eligibleCount} bilhete${simulation.eligibleCount === 1 ? '' : 's'} elegível${simulation.eligibleCount === 1 ? '' : 'eis'}`
+                    ? `${simulation.eligibleCount} ${simulation.eligibleCount === 1 ? 'bilhete elegível' : 'bilhetes elegíveis'}`
                     : 'Separando as cartinhas desse pacote'}
                 </Typography>
               </Box>

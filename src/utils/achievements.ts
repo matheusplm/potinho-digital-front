@@ -1,6 +1,6 @@
 import type { CollectionPlayView, RarityConfig, NoteTypeConfig } from '../types/note'
 
-export interface Achievement {
+interface Achievement {
   id: string
   emoji: string
   label: string

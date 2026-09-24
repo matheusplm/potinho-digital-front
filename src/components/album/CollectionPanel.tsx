@@ -38,7 +38,7 @@ export function CollectionPanel({ play, rarities }: {
             <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, letterSpacing: 0.8, color: colors.text.muted, textTransform: 'uppercase' }}>
               Sua coleção
             </Typography>
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.1rem', color: colors.primary.main }}>
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.1rem', color: colors.primary.text }}>
               {completion}%
             </Typography>
           </Stack>

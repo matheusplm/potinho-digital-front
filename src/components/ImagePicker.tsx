@@ -23,7 +23,7 @@ const SAFE_HOSTS = [
   'pbs.twimg.com',
 ]
 
-export function validateImageUrl(raw: string): string | null {
+function validateImageUrl(raw: string): string | null {
   const url = raw.trim()
   if (!url) return null
 

@@ -1,4 +1,4 @@
-﻿import FavoriteIcon from '@mui/icons-material/Favorite'
+import FavoriteIcon from '@mui/icons-material/Favorite'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import { Box, Typography } from '@mui/material'
 import { useState, useEffect, useRef } from 'react'
@@ -91,12 +91,18 @@ export function ScrollHint() {
             }} />
           </Box>
           <Typography sx={{
-            fontSize: '0.70rem',
-            fontWeight: 700,
+            fontSize: '0.66rem',
+            fontWeight: 800,
             letterSpacing: 0.6,
-            color: 'rgba(0,0,0,0.35)',
+            color: '#fff',
             textTransform: 'uppercase',
             whiteSpace: 'nowrap',
+            px: 1.2,
+            py: 0.4,
+            borderRadius: 99,
+            background: 'rgba(15,23,42,0.62)',
+            backdropFilter: 'blur(8px)',
+            boxShadow: '0 4px 14px rgba(0,0,0,0.18)',
           }}>
             deslize para baixo
           </Typography>

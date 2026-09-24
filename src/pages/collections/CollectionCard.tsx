@@ -131,7 +131,7 @@ export function CollectionCardView({ col, i, onClick, onEdit, onDelete, hasNews 
             background: isOwner ? `${colors.primary.main}15` : `${colors.rose.main}15`,
             border: `1px solid ${isOwner ? colors.primary.main : colors.rose.main}30`,
             fontSize: '0.68rem', fontWeight: 800, letterSpacing: 0.5,
-            color: isOwner ? colors.primary.main : colors.rose.main,
+            color: isOwner ? colors.primary.text : colors.rose.text,
             textTransform: 'uppercase',
           }}>
             {isOwner ? 'minha' : 'convidado'}
@@ -190,7 +190,7 @@ export function CollectionGridItem({ col, i, onClick, onEdit, onDelete, hasNews 
           alignSelf: 'flex-start', px: 0.7, py: 0.15, borderRadius: radius.full,
           background: isOwner ? `${colors.primary.main}15` : `${colors.rose.main}15`,
           fontSize: '0.68rem', fontWeight: 800, letterSpacing: 0.4,
-          color: isOwner ? colors.primary.main : colors.rose.main,
+          color: isOwner ? colors.primary.text : colors.rose.text,
           textTransform: 'uppercase',
         }}>
           {isOwner ? 'minha' : 'convidado'}

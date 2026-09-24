@@ -13,7 +13,7 @@ const rarityShine = keyframes`
   100% { left: 105%; opacity: 0 }
 `
 
-export function rarityCardSx(r?: RarityConfig, compact = false, isDark = false) {
+function rarityCardSx(r?: RarityConfig, compact = false, isDark = false) {
   const glow = r?.glowColor || r?.borderColor || 'rgba(244,63,94,0.2)'
   return {
     p: compact ? 1.4 : 2,

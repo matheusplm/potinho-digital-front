@@ -64,7 +64,7 @@ const LEGACY_KINDS: Record<string, { kind: RevealEffectKind; media?: string }> =
   aurora: { kind: 'glow' },
 }
 
-export function isEffectKind(value: string): value is RevealEffectKind {
+function isEffectKind(value: string): value is RevealEffectKind {
   return value in REVEAL_EFFECT_MAP
 }
 

@@ -3,7 +3,7 @@ import { colors } from '../../design-system'
 import { useBackground } from '../../context/BackgroundContext'
 import type { ReactNode } from 'react'
 
-export interface SegmentedOption<T extends string> {
+interface SegmentedOption<T extends string> {
   id: T
   label: string
   icon?: ReactNode

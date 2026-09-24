@@ -1,4 +1,4 @@
-﻿import LogoutIcon from '@mui/icons-material/Logout'
+import LogoutIcon from '@mui/icons-material/Logout'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined'
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
@@ -16,6 +16,7 @@ import { OnboardingOverlay } from './ui'
 import { useNavigate } from 'react-router-dom'
 import { useUser, type UserRole } from '../context/UserContext'
 import { isCollectionReader, personaCapabilities } from '../utils/collectionAccess'
+import { useNotificationToggle } from '../hooks/useNotificationToggle'
 import { useBackground } from '../context/BackgroundContext'
 import { useReader } from '../context/ReaderContext'
 import { useSimulation } from '../context/SimulationContext'
@@ -32,26 +33,7 @@ export function FloatingMenu() {
   const navigate = useNavigate()
 
   const isReader = persona === 'reader' && !simulating
-  const notifSupported = typeof Notification !== 'undefined'
-  const [notifEnabled, setNotifEnabled] = useState(
-    () => notifSupported && Notification.permission === 'granted' && localStorage.getItem('potinho-notif') === 'true',
-  )
-  const notifStatus = notifSupported ? Notification.permission : 'denied'
-
-  async function handleNotificationToggle() {
-    if (!notifSupported || notifStatus === 'denied') return
-    if (notifEnabled) {
-      localStorage.removeItem('potinho-notif')
-      setNotifEnabled(false)
-      return
-    }
-    const result = await Notification.requestPermission()
-    if (result === 'granted') {
-      localStorage.setItem('potinho-notif', 'true')
-      setNotifEnabled(true)
-      new Notification('Potinho Digital 🎁', { body: 'Notificações ativadas!' })
-    }
-  }
+  const { supported: notifSupported, status: notifStatus, enabled: notifEnabled, toggle: handleNotificationToggle } = useNotificationToggle()
   const { data: collections = [] } = useCollectionsQuery()
   const { data: pendingInvites = [] } = usePendingInvitesQuery({ enabled: !!user })
   const hasPendingInvites = pendingInvites.length > 0

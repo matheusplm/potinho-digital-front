@@ -117,7 +117,8 @@ function AppRoutes() {
 
 function App() {
   useEffect(() => {
-    if ('serviceWorker' in navigator) {
+    const mockMode = import.meta.env.DEV && !import.meta.env.VITE_API_URL
+    if ('serviceWorker' in navigator && !mockMode) {
       navigator.serviceWorker.register('/sw.js').catch(() => {})
     }
   }, [])

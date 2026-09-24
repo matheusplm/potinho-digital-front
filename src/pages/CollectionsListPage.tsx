@@ -190,7 +190,7 @@ export function CollectionsListPage() {
         <Box sx={{ mb: 2.5 }}>
           <PageTitle
             title="Coleções"
-            subtitle={isLoading ? 'Carregando...' : collections.length === 0 ? 'Nenhuma ainda' : `${collections.length} coleção${collections.length !== 1 ? 'ões' : ''}`}
+            subtitle={isLoading ? 'Carregando...' : collections.length === 0 ? 'Nenhuma ainda' : `${collections.length} ${collections.length === 1 ? 'coleção' : 'coleções'}`}
           />
         </Box>
 
@@ -288,7 +288,7 @@ export function CollectionsListPage() {
           <Box sx={{
             mt: 2.5, p: 1.6, borderRadius: '16px',
             border: `1.5px dashed ${theme.accent}55`,
-            background: 'rgba(255,255,255,0.35)', backdropFilter: 'blur(10px)',
+            background: colors.glass.bg, backdropFilter: 'blur(10px)',
           }}>
             <Stack direction="row" spacing={1.2} alignItems="center">
               <Typography sx={{ fontSize: '1.3rem', lineHeight: 1, flexShrink: 0, opacity: trashItem ? 1 : 0.55 }}>🗑️</Typography>

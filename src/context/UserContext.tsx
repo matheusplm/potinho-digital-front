@@ -4,7 +4,7 @@ import { api, setAuthToken } from '../services/api'
 
 export type UserRole = 'writer' | 'reader'
 
-export interface AuthUser {
+interface AuthUser {
   id: string
   name: string
   email?: string

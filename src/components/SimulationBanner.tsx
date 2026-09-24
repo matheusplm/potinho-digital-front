@@ -1,4 +1,4 @@
-﻿import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import { Box, Stack, Typography } from '@mui/material'
 import { useSimulation } from '../context/SimulationContext'
 import { useBackground } from '../context/BackgroundContext'

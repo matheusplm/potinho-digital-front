@@ -77,7 +77,7 @@ export const COLLECTION_TEMPLATES: CollectionTemplate[] = [
   },
 ]
 
-export interface TemplateCreationResult {
+interface TemplateCreationResult {
   collection: Collection
   inviteSent: boolean
 }

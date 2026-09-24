@@ -1,5 +1,4 @@
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone'
-import NotificationsOffIcon from '@mui/icons-material/NotificationsOff'
 import CloseIcon from '@mui/icons-material/Close'
 import { Box, IconButton, Stack, Typography } from '@mui/material'
 import { useState, useEffect } from 'react'
@@ -76,15 +75,3 @@ export function PushPrompt() {
   )
 }
 
-export function PushDeniedChip() {
-  const { state } = usePush()
-  if (state !== 'denied') return null
-  return (
-    <Stack direction="row" alignItems="center" spacing={0.6} sx={{ px: 2.5, mb: 1.5, opacity: 0.5 }}>
-      <NotificationsOffIcon sx={{ fontSize: 14, color: colors.text.muted }} />
-      <Typography sx={{ fontSize: '0.7rem', color: colors.text.muted }}>
-        Notificações bloqueadas nas configurações do navegador.
-      </Typography>
-    </Stack>
-  )
-}

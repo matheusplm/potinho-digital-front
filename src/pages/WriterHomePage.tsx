@@ -66,7 +66,7 @@ export function WriterHomePage() {
                 Minhas coleções
               </Typography>
               <Typography sx={{ fontSize: '0.78rem', color: colors.text.secondary }}>
-                {ownedCount > 0 ? `${ownedCount} coleção${ownedCount !== 1 ? 'ões' : ''} criada${ownedCount !== 1 ? 's' : ''}` : 'Crie sua primeira coleção'}
+                {ownedCount > 0 ? `${ownedCount} ${ownedCount === 1 ? 'coleção criada' : 'coleções criadas'}` : 'Crie sua primeira coleção'}
               </Typography>
             </Box>
             <ChevronRightIcon sx={{ color: colors.text.muted, flexShrink: 0 }} />

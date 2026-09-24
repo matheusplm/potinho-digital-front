@@ -1,6 +1,3 @@
-export type Rarity = string
-export type NoteType = string
-
 export type NoteImageLayout = 'banner' | 'thumb-left' | 'thumb-right' | 'circle-left' | 'circle-right' | 'split' | 'stripe-left' | 'hero-overlay' | 'bg-blur'
 
 export type NoteStatus = 'preview' | 'released'
@@ -29,18 +26,6 @@ export interface NoteFormData {
   typeIds?: string[]
   imageUrl: string | null
   imageLayout: NoteImageLayout | null
-}
-
-export interface PartnerReader {
-  id: string
-  name: string
-  email: string
-  createdAt: string
-  collection: {
-    total: number
-    owned: number
-    completion: number
-  }
 }
 
 export interface Note {
@@ -134,34 +119,12 @@ export interface UpdateCollectionPackResponse extends CollectionPack {
   pendingOpensWarning?: PendingOpensWarning
 }
 
-export interface CollectionResponse {
-  total: number
-  owned: number
-  items: Note[]
-}
-
 export interface PackReward {
   id: string
   rarity: string
   typeId: string
   isNew: boolean
   title: string
-}
-
-export interface OpenPackResponse {
-  rewards: PackReward[]
-  remainingOpensToday: number
-}
-
-export interface DailyNoteStatusResponse {
-  canOpen: boolean
-  availableAt: string
-  serverTime: string
-}
-
-export interface DailyNoteOpenResponse {
-  reward: PackReward
-  status: DailyNoteStatusResponse
 }
 
 export interface PackStatusResponse {
@@ -177,19 +140,6 @@ export interface CollectionPackReaderStatus {
   availableAt?: string
   nextAvailableAt?: string
 }
-
-export interface StatsResponse {
-  completion: number
-  byRarity: Record<string, { owned: number; total: number }>
-}
-
-export interface PackOddsItem {
-  rarity: string
-  label: string
-  percent: number
-}
-
-export type PackOddsResponse = PackOddsItem[]
 
 export interface Collection {
   id: string

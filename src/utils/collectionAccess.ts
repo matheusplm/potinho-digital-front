@@ -10,13 +10,13 @@ export function isCollectionReader(collection: Collection, userId?: string): boo
   return !!userId && !isCollectionOwner(collection, userId)
 }
 
-export function partitionCollections(collections: Collection[], userId?: string) {
+function partitionCollections(collections: Collection[], userId?: string) {
   const owned = collections.filter((c) => isCollectionOwner(c, userId))
   const reader = collections.filter((c) => isCollectionReader(c, userId))
   return { owned, reader }
 }
 
-export function personaStorageKey(userId: string) {
+function personaStorageKey(userId: string) {
   return `potinho-persona-${userId}`
 }
 

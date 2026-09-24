@@ -4,7 +4,7 @@ import { buildSimulatedPlayView } from '../utils/simulationPlay'
 
 export type SimulationPreset = 'new_reader' | 'new_reader_with_bonus'
 
-export interface SimulationSession {
+interface SimulationSession {
   collectionId: string
   collectionSlug: string
   collectionName: string

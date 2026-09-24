@@ -4,7 +4,7 @@ export type PackFilter = 'all' | 'active' | 'draft' | 'daily' | 'bonus' | 'guara
 export type PackView = 'cards' | 'list'
 export type PackSimulation = { pack: CollectionPack; rewards: NoteRecord[]; eligibleCount: number; guaranteedApplied: boolean }
 
-export const PACK_DEFAULT_SCHEDULE: Pick<CollectionPackFormData, 'scheduleMode' | 'scheduleTime' | 'scheduleTimezone' | 'cumulative' | 'maxAccumulated'> = {
+const PACK_DEFAULT_SCHEDULE: Pick<CollectionPackFormData, 'scheduleMode' | 'scheduleTime' | 'scheduleTimezone' | 'cumulative' | 'maxAccumulated'> = {
   scheduleMode: 'cooldown', scheduleTime: null, scheduleTimezone: 'America/Sao_Paulo', cumulative: false, maxAccumulated: 3,
 }
 
@@ -55,7 +55,7 @@ export const PACK_DISTRIBUTION_HINTS: Record<CollectionPackDistribution, string>
   selected_readers: 'Só para leitores específicos que você escolher.',
 }
 
-export type PackRhythmId = 'daily' | 'twice' | 'weekly' | 'fixed_time' | 'once' | 'manual'
+type PackRhythmId = 'daily' | 'twice' | 'weekly' | 'fixed_time' | 'once' | 'manual'
 
 export const PACK_RHYTHMS: { id: PackRhythmId; emoji: string; label: string; hint: string }[] = [
   { id: 'daily',      emoji: '☀️', label: '1x por dia',        hint: 'Libera sozinho a cada 24 horas, o clássico.' },
@@ -90,7 +90,7 @@ export function rhythmPatch(rhythm: PackRhythmId, current: Pick<CollectionPackFo
   }
 }
 
-export function formatCooldown(hours: number | null) {
+function formatCooldown(hours: number | null) {
   if (!hours) return 'Uso único'
   if (hours < 24) return `${hours}h`
   if (hours % 24 === 0) return `${hours / 24} dia${hours / 24 === 1 ? '' : 's'}`

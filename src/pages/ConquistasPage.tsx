@@ -1,4 +1,4 @@
-﻿import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined'
+import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined'
 import { Box, LinearProgress, Stack, Typography } from '@mui/material'
 import { Card, EmptyState, LoadingState, ScrollablePage } from '../components/ui'
 import { CollectionPanel } from '../components/album/CollectionPanel'

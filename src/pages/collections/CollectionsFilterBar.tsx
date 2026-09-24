@@ -6,10 +6,10 @@ import ViewAgendaIcon from '@mui/icons-material/ViewAgenda'
 import ViewListIcon from '@mui/icons-material/ViewList'
 import { Box, Stack, Typography } from '@mui/material'
 import type { ElementType } from 'react'
-import { radius } from '../../design-system'
+import { colors, radius } from '../../design-system'
 
-export type ViewMode = 'cards' | 'grid' | 'list'
-export type SortType = 'name-asc' | 'name-desc'
+type ViewMode = 'cards' | 'grid' | 'list'
+type SortType = 'name-asc' | 'name-desc'
 
 const VIEW_ICONS: { mode: ViewMode; Icon: ElementType }[] = [
   { mode: 'cards', Icon: ViewAgendaIcon },
@@ -34,13 +34,13 @@ export function CollectionsFilterBar({ sort, setSort, search, setSearch, view, c
       <Box sx={{
         display: 'flex', alignItems: 'center', gap: 1,
         px: 1.4, py: 0.85,
-        background: 'rgba(255,255,255,0.45)', backdropFilter: 'blur(12px)',
-        border: '1.5px solid rgba(255,255,255,0.6)',
+        background: colors.glass.bg, backdropFilter: 'blur(12px)',
+        border: `1.5px solid ${colors.glass.border}`,
         borderRadius: radius.xl, mb: 1.2,
         transition: 'border-color 0.15s, background 0.15s',
         '&:focus-within': {
           border: `1.5px solid ${accent}66`,
-          background: 'rgba(255,255,255,0.72)',
+          background: colors.glass.strong,
         },
       }}>
         <SearchIcon sx={{ fontSize: 17, color: textOnBgMuted, flexShrink: 0 }} />
@@ -65,8 +65,8 @@ export function CollectionsFilterBar({ sort, setSort, search, setSearch, view, c
       <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
         <Box onClick={() => setSort(sort === 'name-asc' ? 'name-desc' : 'name-asc')} sx={{
           ...chipBase, display: 'flex', alignItems: 'center', gap: 0.3,
-          background: sort !== 'name-asc' ? `${accent}1a` : 'rgba(255,255,255,0.38)',
-          border: `1.5px solid ${sort !== 'name-asc' ? accent : 'rgba(255,255,255,0.55)'}`,
+          background: sort !== 'name-asc' ? `${accent}1a` : colors.glass.bg,
+          border: `1.5px solid ${sort !== 'name-asc' ? accent : colors.glass.border}`,
           color: sort !== 'name-asc' ? accent : textOnBgMuted,
         }}>
           <SwapVertIcon sx={{ fontSize: 13 }} />
@@ -81,11 +81,11 @@ export function CollectionsFilterBar({ sort, setSort, search, setSearch, view, c
               width: 34, height: 34, borderRadius: '50%',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer', transition: 'all 0.15s', backdropFilter: 'blur(8px)',
-              background: view === mode ? 'rgba(255,255,255,0.88)' : 'rgba(255,255,255,0.38)',
-              border: `1.5px solid ${view === mode ? accent : 'rgba(255,255,255,0.55)'}`,
+              background: view === mode ? colors.glass.strong : colors.glass.bg,
+              border: `1.5px solid ${view === mode ? accent : colors.glass.border}`,
               boxShadow: view === mode ? `0 2px 8px ${accent}22` : 'none',
               color: view === mode ? accent : textOnBgMuted,
-              '&:hover': { background: 'rgba(255,255,255,0.65)' },
+              '&:hover': { background: colors.glass.strong },
             }}>
               <Icon sx={{ fontSize: 15 }} />
             </Box>

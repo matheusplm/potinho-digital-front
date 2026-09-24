@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { api } from '../services/api'
+import { isNotificationOptedOut } from '../utils/notifications'
 
 type PushState = 'unsupported' | 'default' | 'granted' | 'denied'
 
@@ -34,7 +35,7 @@ export function usePush() {
     const permission = Notification.permission as PushState
     setState(permission)
 
-    if (permission === 'granted') {
+    if (permission === 'granted' && !isNotificationOptedOut()) {
       const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY as string | undefined
       if (!vapidKey) return
       getSwRegistration().then(async (reg) => {
@@ -54,7 +55,7 @@ export function usePush() {
   }, [])
 
   const enable = useCallback(async () => {
-    if (loading || state !== 'default') return
+    if (loading || state === 'denied' || state === 'unsupported') return
     setLoading(true)
     try {
       const reg = await getSwRegistration()
@@ -80,19 +81,25 @@ export function usePush() {
           keys: json.keys as { p256dh: string; auth: string },
         })
       }
+    } catch {
+      void 0
     } finally {
       setLoading(false)
     }
   }, [loading, state])
 
   const disable = useCallback(async () => {
-    const reg = await navigator.serviceWorker.getRegistration('/sw.js')
-    if (!reg) return
-    const sub = await reg.pushManager.getSubscription()
-    if (!sub) return
-    await api.unsubscribePush(sub.endpoint).catch(() => {})
-    await sub.unsubscribe()
-    setState('default')
+    try {
+      const reg = await navigator.serviceWorker.getRegistration('/sw.js')
+      if (!reg) return
+      const sub = await reg.pushManager.getSubscription()
+      if (!sub) return
+      await api.unsubscribePush(sub.endpoint).catch(() => {})
+      await sub.unsubscribe()
+      setState('default')
+    } catch {
+      void 0
+    }
   }, [])
 
   return { state, loading, enable, disable }

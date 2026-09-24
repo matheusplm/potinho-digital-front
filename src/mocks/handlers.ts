@@ -344,6 +344,23 @@ function authorizeCollection(request: Request, cid: string, mode: 'read' | 'owne
 }
 
 const collectionHandlers = [
+  http.get('/api/invites/pending', async ({ request }) => {
+    await delay(120)
+    if (!resolveUser(tokenFrom(request))) return HttpResponse.json({ message: 'Não autenticado.' }, { status: 401 })
+    return HttpResponse.json([])
+  }),
+
+  http.get('/api/invite/:token', async () => {
+    await delay(160)
+    return HttpResponse.json({ success: false, error: 'INVITE_NOT_FOUND', message: 'Convite não encontrado ou expirado.' }, { status: 404 })
+  }),
+
+  http.get('/api/collections/trash', async ({ request }) => {
+    await delay(120)
+    if (!resolveUser(tokenFrom(request))) return HttpResponse.json({ message: 'Não autenticado.' }, { status: 401 })
+    return HttpResponse.json({ item: null })
+  }),
+
   http.get('/api/collections', async ({ request }) => {
     await delay(220)
     const user = resolveUser(tokenFrom(request))
@@ -406,20 +423,6 @@ const collectionHandlers = [
     const entry = { collectionId: collection.meta.id, email, packIds: [], createdAt: new Date().toISOString() }
     if (!collection.access.some((item) => item.email === email)) collection.access.push(entry)
     return HttpResponse.json(entry)
-  }),
-
-  http.put('/api/collections/:cid/access/:email/packs', async ({ params, request }) => {
-    await delay(180)
-    const auth = authorizeCollection(request, String(params.cid), 'owner')
-    if (!auth.ok) return auth.response
-    const { collection } = auth
-    const email = decodeURIComponent(String(params.email))
-    const access = collection.access.find((item) => item.email === email)
-    if (!access) return notFound('Acesso não encontrado.')
-    const { packIds } = (await request.json()) as { packIds: string[] }
-    const availableIds = new Set(collection.packs.map((pack) => pack.id))
-    access.packIds = [...new Set(packIds)].filter((packId) => availableIds.has(packId))
-    return HttpResponse.json(access)
   }),
 
   http.delete('/api/collections/:cid/access/:email', async ({ params, request }) => {

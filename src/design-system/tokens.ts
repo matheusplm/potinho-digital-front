@@ -1,10 +1,11 @@
 export const colors = {
-  primary:   { main: '#1d4ed8', light: '#3b82f6', glow: 'rgba(29,78,216,0.32)' },
-  rose:      { main: '#e11d48', light: '#fb7185', glow: 'rgba(225,29,72,0.32)' },
+  primary:   { main: '#1d4ed8', light: '#3b82f6', glow: 'rgba(29,78,216,0.32)', text: 'var(--pd-primary-text)' },
+  rose:      { main: '#e11d48', light: '#fb7185', glow: 'rgba(225,29,72,0.32)', text: 'var(--pd-rose-text)' },
   purple:    { main: '#4f46e5', light: '#7c3aed', glow: 'rgba(79,70,229,0.32)' },
   text:      { primary: 'var(--pd-text-primary)', secondary: 'var(--pd-text-secondary)', muted: 'var(--pd-text-muted)' },
   surface:   { base: 'var(--pd-surface-base)', overlay: 'var(--pd-surface-overlay)', paper: 'var(--pd-surface-paper)' },
   border:    { subtle: 'var(--pd-border-subtle)', medium: 'var(--pd-border-medium)' },
+  glass:     { bg: 'var(--pd-glass-bg)', border: 'var(--pd-glass-border)', strong: 'var(--pd-glass-strong)' },
   success:   { main: '#15803d', bg: 'rgba(220,252,231,0.92)', border: 'rgba(21,128,61,0.2)' },
   error:     { main: '#e11d48', bg: 'rgba(255,228,230,0.92)', border: 'rgba(225,29,72,0.2)' },
   info:      { main: '#1d4ed8', bg: 'rgba(219,234,254,0.92)', border: 'rgba(29,78,216,0.2)' },

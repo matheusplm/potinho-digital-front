@@ -34,7 +34,7 @@ const STYLES: Record<AppVariant, object> = {
     background: colors.surface.overlay,
     backdropFilter: 'blur(8px)',
     boxShadow: shadow.sm,
-    color: colors.primary.main,
+    color: colors.primary.text,
     border: `1.5px solid rgba(29,78,216,0.2)`,
     '&:hover': { background: colors.surface.base, boxShadow: shadow.md },
   },

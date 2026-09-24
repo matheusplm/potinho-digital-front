@@ -11,9 +11,9 @@ import { gradientTextSx, themedCardBg } from '../../utils/colorUtils'
 import { actionButtonSx } from './shared'
 import type { NoteRecord, NoteTypeConfig, RarityConfig } from '../../types/note'
 
-export type ManageNoteView = 'cards' | 'list' | 'compact'
+type ManageNoteView = 'cards' | 'list' | 'compact'
 
-export interface NoteSelection {
+interface NoteSelection {
   selected: boolean
   accent: string
   onToggle: () => void

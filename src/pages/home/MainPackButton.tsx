@@ -1,6 +1,6 @@
 import { Box, Stack, Typography } from '@mui/material'
 import { Button } from '../../components/ui'
-import { font, heartPulseAura, ink, packCtaFloat, radius } from '../../design-system'
+import { colors, font, heartPulseAura, packCtaFloat, radius } from '../../design-system'
 import type { CollectionPack } from '../../types/note'
 
 export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLabel, cooldownProgress, isLoading, isOpeningPack, onOpen, onOpenAll, isRealReader, onResetCooldown, accent, accentMuted, accruedCount = 0 }: {
@@ -155,13 +155,13 @@ export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLa
       {mainCanOpen && (
         <Stack spacing={0.2} alignItems="center" sx={{
           mt: -0.35, px: 1.6, py: 0.7, borderRadius: radius.xl,
-          background: 'rgba(255,255,255,0.42)', border: '1px solid rgba(255,255,255,0.5)',
+          background: colors.glass.bg, border: `1px solid ${colors.glass.border}`,
           backdropFilter: 'blur(12px)', boxShadow: '0 8px 20px rgba(15,23,42,0.08)',
         }}>
-          <Typography sx={{ color: ink.primary, fontFamily: font.serif, fontSize: '1rem', fontWeight: 850, lineHeight: 1.1 }}>
+          <Typography sx={{ color: colors.text.primary, fontFamily: font.serif, fontSize: '1rem', fontWeight: 850, lineHeight: 1.1 }}>
             {hasAccrued ? `${accruedCount} pacotinhos disponíveis` : 'Pacotinho disponível'}
           </Typography>
-          <Typography sx={{ color: ink.secondary, fontSize: '0.72rem', fontWeight: 750, lineHeight: 1.2 }}>
+          <Typography sx={{ color: colors.text.secondary, fontSize: '0.72rem', fontWeight: 750, lineHeight: 1.2 }}>
             toque no coração
           </Typography>
           {hasAccrued && onOpenAll && (
@@ -183,20 +183,20 @@ export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLa
       {!mainCanOpen && (
         <Stack spacing={0.45} alignItems="center" sx={{
           px: 1.6, py: 0.9, borderRadius: radius.xl,
-          background: 'rgba(255,255,255,0.34)', border: '1px solid rgba(255,255,255,0.44)',
+          background: colors.glass.bg, border: `1px solid ${colors.glass.border}`,
           backdropFilter: 'blur(12px)',
         }}>
-          <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1rem', color: ink.primary, textAlign: 'center', maxWidth: 280, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1rem', color: colors.text.primary, textAlign: 'center', maxWidth: 280, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
             Novo pacotinho em
           </Typography>
-          <Typography sx={{ fontSize: '0.78rem', color: ink.secondary, textAlign: 'center', maxWidth: 280, lineHeight: 1.45 }}>
+          <Typography sx={{ fontSize: '0.78rem', color: colors.text.secondary, textAlign: 'center', maxWidth: 280, lineHeight: 1.45 }}>
             {remainingLabel}
           </Typography>
           {!isRealReader && (
             <Button
               variant="ghost"
               onClick={onResetCooldown}
-              sx={{ mt: 0.45, py: 0.58, px: 1.25, fontSize: '0.72rem', background: 'rgba(255,255,255,0.42)', color: ink.primary, border: '1px solid rgba(255,255,255,0.48)', '&:hover': { background: 'rgba(255,255,255,0.56)' } }}
+              sx={{ mt: 0.45, py: 0.58, px: 1.25, fontSize: '0.72rem', background: colors.glass.bg, color: colors.text.primary, border: `1px solid ${colors.glass.border}`, '&:hover': { background: colors.glass.strong } }}
             >
               Resetar cooldown
             </Button>

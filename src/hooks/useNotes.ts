@@ -273,27 +273,10 @@ export function useCollectionAccessQuery(cid: string) {
   return useQuery({ queryKey: queryKeys.access(cid), queryFn: () => api.listCollectionAccess(cid), enabled: !!cid })
 }
 
-export function useGrantAccessMutation(cid: string) {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: (email: string) => api.grantAccess(cid, email),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.access(cid) }) },
-  })
-}
-
 export function useRevokeAccessMutation(cid: string) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (email: string) => api.revokeAccess(cid, email),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.access(cid) }) },
-  })
-}
-
-export function useSetAccessPacksMutation(cid: string) {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: ({ email, packIds }: { email: string; packIds: string[] }) =>
-      api.setAccessPacks(cid, email, packIds),
     onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.access(cid) }) },
   })
 }
