@@ -39,7 +39,6 @@ export function ContaPage() {
   const [emailForm, setEmailForm] = useState({ newEmail: '', password: '' })
   const [emailLoading, setEmailLoading] = useState(false)
   const [emailSent, setEmailSent] = useState(false)
-  const [emailSentTo, setEmailSentTo] = useState('')
   const [pendingNewEmail, setPendingNewEmail] = useState('')
   const emailRetry = useRetryAfter()
 
@@ -105,7 +104,6 @@ export function ContaPage() {
     setEmailLoading(true)
     try {
       await api.changeEmail(newEmail.trim(), password)
-      setEmailSentTo(user?.email ?? '')
       setPendingNewEmail(newEmail.trim())
       setEmailSent(true)
     } catch (err: unknown) {
@@ -263,7 +261,7 @@ export function ContaPage() {
                 <Box component="form" onSubmit={handleEmailChange} sx={{ px: 2, py: 2 }}>
                   <Stack spacing={1.5}>
                     <Typography sx={{ fontSize: '0.8rem', color: theme.textOnBgMuted, lineHeight: 1.5 }}>
-                      Você receberá um link de confirmação no email atual. Após confirmar, o email será trocado.
+                      Você receberá um link de confirmação no novo email. Após confirmar, o email será trocado.
                     </Typography>
                     <Input
                       label="Novo email"
@@ -300,7 +298,7 @@ export function ContaPage() {
                   <Stack direction="row" alignItems="flex-start" spacing={1}>
                     <CheckCircleIcon sx={{ fontSize: 18, color: '#22c55e', mt: 0.1, flexShrink: 0 }} />
                     <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBg, lineHeight: 1.55 }}>
-                      Email enviado para <strong>{emailSentTo}</strong>. Clique no link para confirmar a troca para <strong>{pendingNewEmail}</strong>.
+                      Email enviado para <strong>{pendingNewEmail}</strong>. Abra esse email e clique no link para confirmar a troca.
                     </Typography>
                   </Stack>
                   <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted }}>
