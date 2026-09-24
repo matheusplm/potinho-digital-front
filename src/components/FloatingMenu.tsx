@@ -120,7 +120,9 @@ export function FloatingMenu() {
             background: theme.surfaceBg, backdropFilter: 'blur(24px)',
             borderRadius: radius.lg,
             boxShadow: `0 16px 48px rgba(0,0,0,${theme.isDark ? '0.48' : '0.16'}), 0 2px 8px rgba(0,0,0,0.08)`,
-            border: `1px solid ${theme.surfaceBorder}`, overflow: 'hidden',
+            border: `1px solid ${theme.surfaceBorder}`,
+            maxHeight: 'calc(100dvh - 60px - 64px - 12px - env(safe-area-inset-bottom, 0px))',
+            overflowX: 'hidden', overflowY: 'auto', overscrollBehavior: 'contain',
             animation: `${menuIn} 0.2s cubic-bezier(0.16,1,0.3,1)`,
             transformOrigin: 'top right',
           }}>
@@ -265,7 +267,7 @@ export function FloatingMenu() {
                     <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: 0.5, color: theme.textOnBgMuted, textTransform: 'uppercase', mb: 0.6 }}>
                       {dark ? 'Escuros' : 'Claros'}
                     </Typography>
-                    <Box sx={{ display: 'flex', gap: 0.8 }}>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
                       {backgroundThemes.filter((bg) => bg.isDark === dark).map((bg) => {
                         const active = bg.key === themeKey
                         return (
