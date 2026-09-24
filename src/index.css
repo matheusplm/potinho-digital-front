@@ -30,6 +30,10 @@
   --pd-glass-strong: rgba(255, 255, 255, 0.14);
 }
 
+.pd-prerendered .pd-enter {
+  animation: none !important;
+}
+
 [data-pd-theme='dark'] .MuiOutlinedInput-root {
   color: var(--pd-text-primary);
 }

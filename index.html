@@ -3,7 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/potinho-icon.svg" />
-    <link rel="apple-touch-icon" href="/potinho-icon.svg" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="canonical" href="https://www.potinhodigital.com.br/" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -30,16 +33,22 @@
       property="og:description"
       content="Escreva bilhetes especiais, monte pacotinhos surpresa e presenteie quem você ama com novas descobertas todo dia. Como um álbum de figurinhas, só que com mensagens de verdade."
     />
-    <meta property="og:image" content="/potinho-icon.svg" />
+    <meta property="og:url" content="https://www.potinhodigital.com.br/" />
+    <meta property="og:image" content="https://www.potinhodigital.com.br/og-image.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Potinho Digital: bilhetes de amor em pacotinhos surpresa" />
     <meta property="og:site_name" content="Potinho Digital" />
 
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Potinho Digital — Álbum afetivo de bilhetes" />
     <meta
       name="twitter:description"
       content="Crie bilhetes digitais personalizados e presenteie quem você ama com pacotinhos surpresa todo dia."
     />
-    <meta name="twitter:image" content="/potinho-icon.svg" />
+    <meta name="twitter:image" content="https://www.potinhodigital.com.br/og-image.jpg" />
+    <meta name="twitter:image:alt" content="Potinho Digital: bilhetes de amor em pacotinhos surpresa" />
 
     <title>Potinho Digital — Álbum afetivo de bilhetes para quem você ama</title>
 
@@ -48,17 +57,31 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "Potinho Digital",
-      "description": "Plataforma para criar álbuns afetivos digitais com bilhetes personalizados, raridades e pacotinhos surpresa.",
-      "applicationCategory": "LifestyleApplication",
-      "operatingSystem": "Web",
-      "inLanguage": "pt-BR",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "BRL"
-      }
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://www.potinhodigital.com.br/#website",
+          "url": "https://www.potinhodigital.com.br/",
+          "name": "Potinho Digital",
+          "inLanguage": "pt-BR"
+        },
+        {
+          "@type": "WebApplication",
+          "name": "Potinho Digital",
+          "url": "https://www.potinhodigital.com.br/",
+          "image": "https://www.potinhodigital.com.br/og-image.jpg",
+          "description": "Plataforma para criar álbuns afetivos digitais com bilhetes personalizados, raridades e pacotinhos surpresa.",
+          "applicationCategory": "LifestyleApplication",
+          "operatingSystem": "Web",
+          "inLanguage": "pt-BR",
+          "isPartOf": { "@id": "https://www.potinhodigital.com.br/#website" },
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "BRL"
+          }
+        }
+      ]
     }
     </script>
   </head>

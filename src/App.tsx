@@ -7,6 +7,7 @@ import { MobileLayout } from './components/MobileLayout'
 import { DesktopLayout } from './components/DesktopLayout'
 import { PersonaBootstrap } from './components/PersonaBootstrap'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import { RouteMeta } from './components/RouteMeta'
 import { UserProvider, useUser, type UserRole } from './context/UserContext'
 import { BackgroundProvider } from './context/BackgroundContext'
 import { SimulationProvider, useSimulation } from './context/SimulationContext'
@@ -126,6 +127,7 @@ function App() {
   return (
     <ErrorBoundary>
       <BrowserRouter>
+        <RouteMeta />
         <UserProvider>
           <PersonaBootstrap />
           <BackgroundProvider>

@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Disallow: /home
+Disallow: /colecoes
+Disallow: /conquistas
+Disallow: /favoritas
+Disallow: /notificacoes
+Disallow: /conta
+Disallow: /convite/
+Disallow: /verificar-email
+Disallow: /redefinir-senha
+Disallow: /confirmar-troca-email
+Disallow: /esqueci-minha-senha
+Disallow: /test
+
+Sitemap: https://www.potinhodigital.com.br/sitemap.xml

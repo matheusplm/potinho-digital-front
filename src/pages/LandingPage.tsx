@@ -37,6 +37,14 @@ const LANDING_HEARTS = [
 
 export function LandingPage() {
   const navigate = useNavigate()
+  const linkTo = (path: string) => ({
+    href: path,
+    onClick: (e: React.MouseEvent) => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return
+      e.preventDefault()
+      navigate(path)
+    },
+  })
   const isDesktop = useMediaQuery('(min-width: 900px)', { noSsr: true })
   const [activeRarity, setActiveRarity] = useState('Todos')
 
@@ -111,10 +119,10 @@ export function LandingPage() {
           </Typography>
         </Stack>
         <Stack direction="row" spacing={1}>
-          <Button variant="ghost" onClick={() => navigate('/login')} sx={{ py: 0.7, px: isDesktop ? 2 : 1.2, fontSize: '0.84rem' }}>
+          <Button variant="ghost" {...linkTo('/login')} sx={{ py: 0.7, px: isDesktop ? 2 : 1.2, fontSize: '0.84rem' }}>
             Entrar
           </Button>
-          <Button variant="primary" onClick={() => navigate('/register')} sx={{ py: 0.7, px: isDesktop ? 2 : 1.2, fontSize: '0.84rem' }}>
+          <Button variant="primary" {...linkTo('/register')} sx={{ py: 0.7, px: isDesktop ? 2 : 1.2, fontSize: '0.84rem' }}>
             {isDesktop ? 'Criar conta grátis' : 'Criar conta'}
           </Button>
         </Stack>
@@ -127,28 +135,26 @@ export function LandingPage() {
           {isDesktop ? (
             <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, alignItems: 'center' }}>
               <Box ref={parallaxTextRef} sx={{ transition: 'transform 0.14s ease-out', willChange: 'transform' }}>
-              <Box sx={{ animation: `${fadeInHero} 0.6s ease both` }}>
+              <Box className="pd-enter" sx={{ animation: `${fadeInHero} 0.6s ease both` }}>
                 <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.8, px: 1.4, py: 0.5, mb: 2.5, borderRadius: radius.full, background: 'rgba(29,78,216,0.08)', border: '1px solid rgba(29,78,216,0.18)' }}>
                   <AutoStoriesOutlinedIcon sx={{ fontSize: 13, color: colors.primary.main }} />
                   <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.primary.main, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
                     Álbum afetivo digital
                   </Typography>
                 </Box>
-                <Typography component="h1" sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '3.4rem', lineHeight: 1.08, color: '#1e3a5f', letterSpacing: '-0.5px', mb: 1 }}>
+                <Typography component="h1" sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '3.4rem', lineHeight: 1.08, color: '#1e3a5f', letterSpacing: '-0.5px', mb: 2 }}>
                   O presente que
-                </Typography>
-                <Typography component="h1" sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '3.4rem', lineHeight: 1.08, color: '#1d4ed8', letterSpacing: '-0.5px', mb: 2 }}>
-                  cresce todo dia.
+                  <Box component="span" sx={{ display: 'block', mt: 1, color: '#1d4ed8' }}>cresce todo dia.</Box>
                 </Typography>
                 <Box sx={{ width: 56, height: 3, borderRadius: 2, background: 'linear-gradient(90deg,#1d4ed8,#e11d48)', mb: 3 }} />
                 <Typography sx={{ fontSize: '1.05rem', color: colors.text.secondary, lineHeight: 1.75, mb: 4, maxWidth: 440 }}>
                   Escreva bilhetes especiais, monte pacotinhos surpresa e presenteie quem você ama com uma nova descoberta todo dia, como um álbum de figurinhas, só que com mensagens de verdade.
                 </Typography>
                 <Stack direction="row" spacing={1.5} sx={{ mb: 2 }}>
-                  <Button variant="primary" onClick={() => navigate('/register')} sx={{ py: 1.4, px: 3.5, fontSize: '0.97rem' }}>
+                  <Button variant="primary" {...linkTo('/register')} sx={{ py: 1.4, px: 3.5, fontSize: '0.97rem' }}>
                     Criar conta grátis
                   </Button>
-                  <Button variant="ghost" onClick={() => navigate('/login')} sx={{ py: 1.4, px: 2.5, fontSize: '0.92rem' }}>
+                  <Button variant="ghost" {...linkTo('/login')} sx={{ py: 1.4, px: 2.5, fontSize: '0.92rem' }}>
                     Já tenho conta
                   </Button>
                 </Stack>
@@ -158,34 +164,32 @@ export function LandingPage() {
               </Box>
               </Box>
               <Box ref={parallaxCardRef} sx={{ transition: 'transform 0.14s ease-out', willChange: 'transform' }}>
-              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', animation: `${fadeInRight} 0.7s 0.2s ease both` }}>
+              <Box className="pd-enter" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', animation: `${fadeInRight} 0.7s 0.2s ease both` }}>
                 <HeroCardStack />
               </Box>
               </Box>
             </Box>
           ) : (
-            <Stack alignItems="center" sx={{ animation: `${fadeInHero} 0.6s ease both` }}>
+            <Stack className="pd-enter" alignItems="center" sx={{ animation: `${fadeInHero} 0.6s ease both` }}>
               <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.8, px: 1.4, py: 0.5, mb: 2.5, borderRadius: radius.full, background: 'rgba(29,78,216,0.08)', border: '1px solid rgba(29,78,216,0.18)' }}>
                 <AutoStoriesOutlinedIcon sx={{ fontSize: 13, color: colors.primary.main }} />
                 <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.primary.main, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Álbum afetivo digital
                 </Typography>
               </Box>
-              <Typography component="h1" sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '2.8rem', lineHeight: 1.0, color: '#1e3a5f', textAlign: 'center', letterSpacing: '-0.5px' }}>
+              <Typography component="h1" sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '2.8rem', lineHeight: 1.0, color: '#1e3a5f', textAlign: 'center', letterSpacing: '-0.5px', mb: 1.5 }}>
                 O presente que
-              </Typography>
-              <Typography component="h1" sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '2.8rem', lineHeight: 1.0, color: '#1d4ed8', textAlign: 'center', letterSpacing: '-0.5px', mb: 1.5 }}>
-                cresce todo dia.
+                <Box component="span" sx={{ display: 'block', color: '#1d4ed8' }}>cresce todo dia.</Box>
               </Typography>
               <Box sx={{ width: 44, height: 3, borderRadius: 2, background: 'linear-gradient(90deg,#1d4ed8,#e11d48)', mb: 2.5 }} />
               <Typography sx={{ fontSize: '0.9rem', color: colors.text.secondary, textAlign: 'center', lineHeight: 1.72, mb: 3.5, maxWidth: 310 }}>
                 Escreva bilhetes, monte pacotinhos surpresa e presenteie quem você ama com novas descobertas todo dia, como um álbum de figurinhas.
               </Typography>
               <Stack spacing={1.2} sx={{ width: '100%', maxWidth: 320 }}>
-                <Button variant="primary" fullWidth onClick={() => navigate('/register')} sx={{ py: 1.35, fontSize: '0.97rem' }}>
+                <Button variant="primary" fullWidth {...linkTo('/register')} sx={{ py: 1.35, fontSize: '0.97rem' }}>
                   Criar conta grátis
                 </Button>
-                <Button variant="ghost" fullWidth onClick={() => navigate('/login')} sx={{ py: 1.1, fontSize: '0.9rem' }}>
+                <Button variant="ghost" fullWidth {...linkTo('/login')} sx={{ py: 1.1, fontSize: '0.9rem' }}>
                   Já tenho conta · Entrar
                 </Button>
               </Stack>
@@ -204,7 +208,7 @@ export function LandingPage() {
 
         {/* Concept pitch */}
         <Box sx={{ background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(255,255,255,0.8)', borderBottom: '1px solid rgba(255,255,255,0.8)', py: isDesktop ? 7 : 5, px: isDesktop ? 5 : 2.5 }}>
-          <Box sx={{ maxWidth: isDesktop ? 760 : 480, mx: 'auto', textAlign: 'center', animation: `${fadeInHero} 0.6s 0.1s ease both` }}>
+          <Box className="pd-enter" sx={{ maxWidth: isDesktop ? 760 : 480, mx: 'auto', textAlign: 'center', animation: `${fadeInHero} 0.6s 0.1s ease both` }}>
             <Typography sx={{ fontSize: isDesktop ? '2rem' : '1.5rem', fontFamily: font.serif, fontWeight: 800, color: '#1e3a5f', lineHeight: 1.3, mb: 2 }}>
               Pense num álbum de figurinhas.
             </Typography>
@@ -477,19 +481,19 @@ export function LandingPage() {
             </Typography>
             {isDesktop ? (
               <Stack direction="row" spacing={1.5} justifyContent="center">
-                <Button variant="primary" onClick={() => navigate('/register')} sx={{ py: 1.4, px: 3.5, fontSize: '0.97rem' }}>
+                <Button variant="primary" {...linkTo('/register')} sx={{ py: 1.4, px: 3.5, fontSize: '0.97rem' }}>
                   Criar conta grátis
                 </Button>
-                <Button variant="ghost" onClick={() => navigate('/login')} sx={{ py: 1.4, px: 2.5, fontSize: '0.9rem' }}>
+                <Button variant="ghost" {...linkTo('/login')} sx={{ py: 1.4, px: 2.5, fontSize: '0.9rem' }}>
                   Entrar
                 </Button>
               </Stack>
             ) : (
               <Stack spacing={1.2}>
-                <Button variant="primary" fullWidth onClick={() => navigate('/register')} sx={{ py: 1.35, fontSize: '0.97rem' }}>
+                <Button variant="primary" fullWidth {...linkTo('/register')} sx={{ py: 1.35, fontSize: '0.97rem' }}>
                   Criar conta agora
                 </Button>
-                <Button variant="ghost" fullWidth onClick={() => navigate('/login')} sx={{ py: 1.1, fontSize: '0.9rem' }}>
+                <Button variant="ghost" fullWidth {...linkTo('/login')} sx={{ py: 1.1, fontSize: '0.9rem' }}>
                   Já tenho conta · Entrar
                 </Button>
               </Stack>

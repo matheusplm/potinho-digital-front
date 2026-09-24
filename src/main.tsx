@@ -23,7 +23,9 @@ async function enableMocking() {
 }
 
 enableMocking().then(() => {
-  createRoot(document.getElementById('root')!).render(
+  const root = document.getElementById('root')!
+  if (root.hasAttribute('data-prerendered')) document.documentElement.classList.add('pd-prerendered')
+  createRoot(root).render(
     <StrictMode>
       <ThemeProvider theme={appTheme}>
         <CssBaseline />
