@@ -1,204 +1,369 @@
 import { Box, Stack, Typography } from '@mui/material'
 import IosShareIcon from '@mui/icons-material/IosShare'
-import { useRef, useState, useEffect } from 'react'
-import { toPng } from 'html-to-image'
-import { parseGIF, decompressFrames } from 'gifuct-js'
+import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react'
+import { createPortal } from 'react-dom'
+import { toCanvas } from 'html-to-image'
+import { parseGIF, decompressFrame, type ParsedGif } from 'gifuct-js'
 import { GIFEncoder, quantize, applyPalette } from 'gifenc'
 import { Button, toast } from '../ui'
-import { font, ink, radius } from '../../design-system'
+import { font } from '../../design-system'
 import type { BackgroundTheme } from '../../design-system'
-import type { RarityConfig, NoteTypeConfig, NoteImageLayout } from '../../types/note'
-import { gradientTextSx } from '../../utils/colorUtils'
+import type { CollectionDailyReward, NoteImageLayout, NoteTypeConfig, RarityConfig } from '../../types/note'
+import { RewardCard } from '../collection/RewardCard'
 
-interface ShareNote {
-  title: string | null
-  message: string | null
-  rarity: string
-  typeId: string
-  imageUrl?: string | null
-  imageLayout?: NoteImageLayout | null
+type Format = 'card' | 'story'
+type Mode = 'full' | 'base' | 'shell' | 'content'
+interface Rect { x: number; y: number; w: number; h: number }
+interface Job { format: Format; imageSrc: string | null }
+type GifImageFrame = Extract<ParsedGif['frames'][number], { image: unknown }>
+
+const FRAME: Record<Format, { w: number; h: number; top: number }> = {
+  card: { w: 540, h: 540, top: 28 },
+  story: { w: 540, h: 960, top: 64 },
 }
+const SIDE_PAD = 28
+const BRAND_SPACE = 70
+const MAX_SCALE = 1.7
+const MIN_CARD_W = 340
+const MAX_CARD_W = 760
+const CARD_W_STEP = 20
+const KEEP_SCREEN_WIDTH = 0.85
+const PNG_SCALE = 2
+const GIF_SCALE = 4 / 3
+const MAX_GIF_FRAMES = 150
+const PALETTE_SAMPLES = 16
+const BAYER_4 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]
+const DITHER_STRENGTH = 12
+const IMAGE_UNDER_CONTENT: NoteImageLayout[] = ['hero-overlay', 'bg-blur']
 
-const BLUR_PAD = 32
+let fontCssPromise: Promise<string> | null = null
 
-function loadImgEl(src: string, cors?: boolean): Promise<HTMLImageElement> {
+function blobToDataUrl(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
-    const el = new Image()
-    if (cors) el.crossOrigin = 'anonymous'
-    el.onload = () => resolve(el)
-    el.onerror = reject
-    el.src = src
+    const reader = new FileReader()
+    reader.onloadend = () => resolve(reader.result as string)
+    reader.onerror = reject
+    reader.readAsDataURL(blob)
   })
 }
 
-function dataUrlToBuffer(dataUrl: string): ArrayBuffer {
-  const binary = atob(dataUrl.split(',')[1])
-  const buf = new Uint8Array(binary.length)
-  for (let i = 0; i < binary.length; i++) buf[i] = binary.charCodeAt(i)
-  return buf.buffer
+function loadFontCss(): Promise<string> {
+  fontCssPromise ??= (async () => {
+    const link = document.querySelector<HTMLLinkElement>('link[href*="fonts.googleapis.com/css"]')
+    if (!link) return ''
+    const css = await (await fetch(link.href)).text()
+    const latin = (css.match(/@font-face\s*{[^}]*}/g) ?? []).filter((block) => /U\+0000-00FF/i.test(block))
+    const embedded = await Promise.all(latin.map(async (block) => {
+      const url = block.match(/url\((https:[^)]+)\)/)?.[1]
+      if (!url) return ''
+      return block.replace(url, await blobToDataUrl(await (await fetch(url)).blob()))
+    }))
+    return embedded.join('\n')
+  })().catch(() => {
+    fontCssPromise = null
+    return ''
+  })
+  return fontCssPromise
 }
 
-export function ShareCartinha({ note, r, t, theme }: {
-  note: ShareNote
-  r?: RarityConfig
-  t?: NoteTypeConfig
+function nextPaint(): Promise<void> {
+  return new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
+}
+
+function relRect(el: Element, origin: DOMRect, k: number): Rect {
+  const r = el.getBoundingClientRect()
+  return { x: (r.left - origin.left) * k, y: (r.top - origin.top) * k, w: r.width * k, h: r.height * k }
+}
+
+function findClip(img: HTMLElement, cardRoot: HTMLElement, origin: DOMRect, k: number, cardScale: number) {
+  let el: HTMLElement | null = img.parentElement
+  while (el) {
+    const cs = getComputedStyle(el)
+    if (cs.overflowX !== 'visible' || cs.overflowY !== 'visible') {
+      const rect = relRect(el, origin, k)
+      const raw = cs.borderTopLeftRadius
+      const radius = raw.endsWith('%') ? (parseFloat(raw) / 100) * Math.min(rect.w, rect.h) : (parseFloat(raw) || 0) * cardScale * k
+      return { rect, radius: Math.min(radius, rect.w / 2, rect.h / 2) }
+    }
+    if (el === cardRoot) break
+    el = el.parentElement
+  }
+  return null
+}
+
+function roundedPath(ctx: CanvasRenderingContext2D, r: Rect, radius: number) {
+  const rad = Math.max(0, radius)
+  ctx.beginPath()
+  ctx.moveTo(r.x + rad, r.y)
+  ctx.arcTo(r.x + r.w, r.y, r.x + r.w, r.y + r.h, rad)
+  ctx.arcTo(r.x + r.w, r.y + r.h, r.x, r.y + r.h, rad)
+  ctx.arcTo(r.x, r.y + r.h, r.x, r.y, rad)
+  ctx.arcTo(r.x, r.y, r.x + r.w, r.y, rad)
+  ctx.closePath()
+}
+
+function drawCover(ctx: CanvasRenderingContext2D, src: CanvasImageSource, sw: number, sh: number, r: Rect) {
+  const scale = Math.max(r.w / sw, r.h / sh)
+  const cw = r.w / scale
+  const ch = r.h / scale
+  ctx.drawImage(src, (sw - cw) / 2, (sh - ch) / 2, cw, ch, r.x, r.y, r.w, r.h)
+}
+
+function buildImageDrawer(frameEl: HTMLElement, k: number, cardScale: number) {
+  const img = frameEl.querySelector<HTMLImageElement>('[data-share-card] img')
+  const cardRoot = frameEl.querySelector<HTMLElement>('[data-share-card] > *')
+  if (!img || !cardRoot) return null
+  const origin = frameEl.getBoundingClientRect()
+  const rect = relRect(img, origin, k)
+  const clip = findClip(img, cardRoot, origin, k, cardScale)
+  const rawFilter = getComputedStyle(img).filter
+  const filter = rawFilter === 'none' ? 'none' : rawFilter.replace(/blur\(([\d.]+)px\)/g, (_, v: string) => `blur(${parseFloat(v) * cardScale * k}px)`)
+  const brightness = parseFloat(rawFilter.match(/brightness\(([\d.]+)\)/)?.[1] ?? '1')
+  const blurred = /blur\(/.test(filter)
+
+  return (ctx: CanvasRenderingContext2D, src: CanvasImageSource, sw: number, sh: number) => {
+    ctx.save()
+    if (clip) {
+      roundedPath(ctx, clip.rect, clip.radius)
+      ctx.clip()
+    }
+    if (filter === 'none') {
+      drawCover(ctx, src, sw, sh, rect)
+    } else if (typeof ctx.filter === 'string') {
+      ctx.filter = filter
+      drawCover(ctx, src, sw, sh, rect)
+      ctx.filter = 'none'
+    } else {
+      const small = document.createElement('canvas')
+      small.width = Math.max(1, Math.round(rect.w / (blurred ? 14 : 1)))
+      small.height = Math.max(1, Math.round(rect.h / (blurred ? 14 : 1)))
+      drawCover(small.getContext('2d')!, src, sw, sh, { x: 0, y: 0, w: small.width, h: small.height })
+      ctx.imageSmoothingQuality = 'high'
+      ctx.drawImage(small, rect.x, rect.y, rect.w, rect.h)
+      if (brightness < 1) {
+        ctx.fillStyle = `rgba(0,0,0,${1 - brightness})`
+        ctx.fillRect(rect.x, rect.y, rect.w, rect.h)
+      }
+    }
+    ctx.restore()
+  }
+}
+
+async function capture(frameEl: HTMLElement, mode: Mode, scale: number, fontEmbedCSS: string) {
+  frameEl.dataset.mode = mode
+  const { w, h } = { w: frameEl.offsetWidth, h: frameEl.offsetHeight }
+  return toCanvas(frameEl, { pixelRatio: scale, width: w, height: h, fontEmbedCSS, skipAutoScale: true })
+}
+
+function fitCard(cardBox: HTMLElement, screenWidth: number, availW: number, availH: number) {
+  const measure = (w: number) => {
+    cardBox.style.width = `${w}px`
+    const h = cardBox.offsetHeight
+    return { w, h, scale: Math.min(availW / w, availH / h, MAX_SCALE) }
+  }
+  const screen = measure(screenWidth)
+  let best = screen
+  for (let w = MIN_CARD_W; w <= MAX_CARD_W; w += CARD_W_STEP) {
+    const candidate = measure(w)
+    if (candidate.scale > best.scale) best = candidate
+  }
+  const pick = screen.scale >= best.scale * KEEP_SCREEN_WIDTH ? screen : best
+  cardBox.style.width = `${pick.w}px`
+  return pick
+}
+
+function orderedDither(data: Uint8ClampedArray, width: number) {
+  for (let i = 0, p = 0; i < data.length; i += 4, p++) {
+    const x = p % width
+    const y = (p - x) / width
+    const offset = (BAYER_4[(y & 3) * 4 + (x & 3)] / 16 - 0.47) * DITHER_STRENGTH
+    data[i] += offset
+    data[i + 1] += offset
+    data[i + 2] += offset
+  }
+  return data
+}
+
+function normalizedDelay(ms: number) {
+  return ms < 20 ? 100 : ms
+}
+
+async function renderGif(
+  frameEl: HTMLElement,
+  gifDataUrl: string,
+  layout: NoteImageLayout,
+  cardScale: number,
+  fontEmbedCSS: string,
+  onProgress: (pct: number) => void,
+): Promise<Blob> {
+  const W = Math.round(frameEl.offsetWidth * GIF_SCALE)
+  const H = Math.round(frameEl.offsetHeight * GIF_SCALE)
+  const drawImage = buildImageDrawer(frameEl, GIF_SCALE, cardScale)
+  if (!drawImage) throw new Error('imagem do card não encontrada')
+
+  const under = IMAGE_UNDER_CONTENT.includes(layout)
+  const [bottom, top] = under
+    ? [await capture(frameEl, 'shell', GIF_SCALE, fontEmbedCSS), await capture(frameEl, 'content', GIF_SCALE, fontEmbedCSS)]
+    : [await capture(frameEl, 'base', GIF_SCALE, fontEmbedCSS), null]
+  frameEl.dataset.mode = 'full'
+
+  const buffer = await (await fetch(gifDataUrl)).arrayBuffer()
+  const gifData = parseGIF(buffer)
+  const gifW = gifData.lsd.width
+  const gifH = gifData.lsd.height
+  const imageFrames = gifData.frames.filter((f): f is GifImageFrame => 'image' in f)
+  const total = imageFrames.length
+  const step = Math.max(1, Math.ceil(total / MAX_GIF_FRAMES))
+
+  const gifCanvas = document.createElement('canvas')
+  gifCanvas.width = gifW
+  gifCanvas.height = gifH
+  const gifCtx = gifCanvas.getContext('2d', { willReadFrequently: true })!
+  const patchCanvas = document.createElement('canvas')
+  const out = document.createElement('canvas')
+  out.width = W
+  out.height = H
+  const outCtx = out.getContext('2d', { willReadFrequently: true })!
+
+  const compose = () => {
+    outCtx.clearRect(0, 0, W, H)
+    outCtx.drawImage(bottom, 0, 0, W, H)
+    drawImage(outCtx, gifCanvas, gifW, gifH)
+    if (top) outCtx.drawImage(top, 0, 0, W, H)
+    return outCtx.getImageData(0, 0, W, H).data
+  }
+
+  async function walk(onFrame: (delay: number, index: number) => Promise<void> | void) {
+    gifCtx.clearRect(0, 0, gifW, gifH)
+    let pendingDelay = 0
+    for (let i = 0; i < total; i++) {
+      const frame = decompressFrame(imageFrames[i], gifData.gct, true)
+      const saved = frame.disposalType === 3 ? gifCtx.getImageData(0, 0, gifW, gifH) : null
+      patchCanvas.width = frame.dims.width
+      patchCanvas.height = frame.dims.height
+      patchCanvas.getContext('2d')!.putImageData(new ImageData(new Uint8ClampedArray(frame.patch), frame.dims.width, frame.dims.height), 0, 0)
+      gifCtx.drawImage(patchCanvas, frame.dims.left, frame.dims.top)
+      pendingDelay += normalizedDelay(frame.delay)
+      if (i % step === step - 1 || i === total - 1) {
+        await onFrame(pendingDelay, i)
+        pendingDelay = 0
+      }
+      if (frame.disposalType === 2) gifCtx.clearRect(frame.dims.left, frame.dims.top, frame.dims.width, frame.dims.height)
+      else if (saved) gifCtx.putImageData(saved, 0, 0)
+    }
+  }
+
+  const sampleEvery = Math.max(1, Math.floor(total / PALETTE_SAMPLES))
+  const samples: Uint8ClampedArray[] = []
+  await walk((_, i) => {
+    if (i % sampleEvery === 0 || samples.length === 0) samples.push(new Uint8ClampedArray(compose()))
+  })
+  const merged = new Uint8ClampedArray(samples.reduce((sum, s) => sum + s.length, 0))
+  samples.reduce((offset, s) => { merged.set(s, offset); return offset + s.length }, 0)
+  const palette = quantize(merged, 255)
+  const transparentIndex = palette.length
+
+  const gif = GIFEncoder()
+  let previous: Uint8Array | null = null
+  let written = 0
+  const outputs = Math.ceil(total / step)
+  await walk(async (delay) => {
+    const index = applyPalette(orderedDither(compose(), W), palette)
+    if (previous) {
+      const diff = new Uint8Array(index.length)
+      for (let p = 0; p < index.length; p++) diff[p] = index[p] === previous[p] ? transparentIndex : index[p]
+      gif.writeFrame(diff, W, H, { delay, transparent: true, transparentIndex, dispose: 1 })
+    } else {
+      gif.writeFrame(index, W, H, { palette: [...palette, [0, 0, 0]], delay, dispose: 1 })
+    }
+    previous = index
+    written++
+    onProgress(Math.round((written / outputs) * 100))
+    await new Promise((resolve) => setTimeout(resolve, 0))
+  })
+  gif.finish()
+  return new Blob([gif.bytes().buffer as ArrayBuffer], { type: 'image/gif' })
+}
+
+export function ShareCartinha({ reward, rarities, types, theme, sourceRef }: {
+  reward: CollectionDailyReward
+  rarities: RarityConfig[]
+  types: NoteTypeConfig[]
   theme: BackgroundTheme
+  sourceRef?: RefObject<HTMLElement>
 }) {
-  const cardRef = useRef<HTMLDivElement>(null)
-  const storyRef = useRef<HTMLDivElement>(null)
-  const [busy, setBusy] = useState<null | 'card' | 'story'>(null)
-  const [imgDataUrl, setImgDataUrl] = useState<string | null>(null)
-  const [isGif, setIsGif] = useState(false)
+  const [busy, setBusy] = useState<Format | null>(null)
+  const [progress, setProgress] = useState<number | null>(null)
+  const [job, setJob] = useState<Job | null>(null)
+  const [media, setMedia] = useState<{ url: string; dataUrl: string | null; isGif: boolean } | null>(null)
+  const frameRef = useRef<HTMLDivElement>(null)
+  const cardBoxRef = useRef<HTMLDivElement>(null)
+  const mountedRef = useRef<(() => void) | null>(null)
 
   useEffect(() => {
-    if (!note.imageUrl) { setImgDataUrl(null); setIsGif(false); return }
+    const url = reward.imageUrl
+    if (!url) { setMedia(null); return }
     let cancelled = false
-    fetch(note.imageUrl, { mode: 'cors' })
-      .then((res) => res.blob())
-      .then((blob) => new Promise<string>((resolve, reject) => {
-        const reader = new FileReader()
-        reader.onloadend = () => resolve(reader.result as string)
-        reader.onerror = reject
-        reader.readAsDataURL(blob)
-      }))
-      .then((url) => {
-        if (!cancelled) { setImgDataUrl(url); setIsGif(url.startsWith('data:image/gif')) }
+    fetch(url, { mode: 'cors' })
+      .then((res) => {
+        if (!res.ok) throw new Error(String(res.status))
+        return res.blob()
       })
-      .catch(() => { if (!cancelled) { setImgDataUrl(null); setIsGif(false) } })
+      .then(blobToDataUrl)
+      .then((dataUrl) => { if (!cancelled) setMedia({ url, dataUrl, isGif: dataUrl.startsWith('data:image/gif') }) })
+      .catch(() => { if (!cancelled) setMedia({ url, dataUrl: null, isGif: false }) })
     return () => { cancelled = true }
-  }, [note.imageUrl])
+  }, [reward.imageUrl])
 
-  const hasImg = !!(note.imageUrl && note.imageLayout)
-  const layout = (note.imageLayout ?? 'banner') as NoteImageLayout
-  const isImmersive = hasImg && (layout === 'hero-overlay' || layout === 'bg-blur')
-  const showBannerImg = hasImg && !isImmersive
-  const isCircleLayout = layout.startsWith('circle')
-  const isThumbLayout = layout === 'thumb-left' || layout === 'thumb-right' || layout === 'circle-left' || layout === 'circle-right'
-  const isStripeLayout = layout === 'stripe-left'
-
-  function measureSlot(baseNode: HTMLElement, W: number, H: number) {
-    const slotEl = baseNode.querySelector('[data-img-slot]') as HTMLElement | null
-    if (!slotEl || !hasImg) return { x: 0, y: 0, w: W, h: H }
-    const cardRect = baseNode.getBoundingClientRect()
-    const slotRect = slotEl.getBoundingClientRect()
-    return {
-      x: slotRect.left - cardRect.left,
-      y: slotRect.top - cardRect.top,
-      w: slotRect.width,
-      h: slotRect.height,
+  useLayoutEffect(() => {
+    if (job && mountedRef.current) {
+      mountedRef.current()
+      mountedRef.current = null
     }
-  }
+  }, [job])
 
-  function drawAtSlot(
-    ctx: CanvasRenderingContext2D,
-    src: HTMLImageElement | HTMLCanvasElement,
-    slot: { x: number; y: number; w: number; h: number }
-  ) {
-    const { x, y, w, h } = slot
-    if (layout === 'bg-blur') {
-      ctx.filter = 'blur(10px) brightness(0.6) saturate(1.35)'
-      ctx.drawImage(src, x - BLUR_PAD, y - BLUR_PAD, w + BLUR_PAD * 2, h + BLUR_PAD * 2)
-      ctx.filter = 'none'
-    } else if (isCircleLayout) {
-      ctx.save()
-      ctx.beginPath()
-      ctx.arc(x + w / 2, y + h / 2, Math.min(w, h) / 2, 0, Math.PI * 2)
-      ctx.clip()
-      ctx.drawImage(src, x, y, w, h)
-      ctx.restore()
-    } else {
-      ctx.drawImage(src, x, y, w, h)
-    }
-  }
+  const hasImage = !!(reward.imageUrl && reward.imageLayout)
+  const isGif = hasImage && !!media?.isGif
 
-  async function share(format: 'card' | 'story') {
-    const baseNode = format === 'card' ? cardRef.current : storyRef.current
-    if (!baseNode || busy) return
+  async function share(format: Format) {
+    if (busy) return
     setBusy(format)
+    setProgress(null)
     try {
-      const W = 540
-      const H = format === 'story' ? 960 : 540
-      const slot = measureSlot(baseNode, W, H)
+      const imageSrc = hasImage ? media?.dataUrl ?? null : null
+      const imageDropped = hasImage && !imageSrc
+      const screenWidth = Math.round(sourceRef?.current?.getBoundingClientRect().width || 360)
+      await new Promise<void>((resolve) => {
+        mountedRef.current = resolve
+        setJob({ format, imageSrc })
+      })
+      const [fontEmbedCSS] = await Promise.all([loadFontCss(), document.fonts.ready])
+      await nextPaint()
+      const frameEl = frameRef.current
+      const cardBox = cardBoxRef.current
+      if (!frameEl || !cardBox) throw new Error('moldura não montada')
+      await Promise.all(Array.from(frameEl.querySelectorAll('img')).map((img) => img.decode().catch(() => undefined)))
 
-      const baseDataUrl = await toPng(baseNode, { pixelRatio: 2, cacheBust: true })
+      const spec = FRAME[format]
+      const availW = spec.w - SIDE_PAD * 2
+      const availH = spec.h - spec.top - BRAND_SPACE
+      const { w: cardWidth, h: naturalH, scale } = fitCard(cardBox, screenWidth, availW, availH)
+      cardBox.style.transform = `scale(${scale})`
+      cardBox.style.left = `${(spec.w - cardWidth * scale) / 2}px`
+      cardBox.style.top = `${spec.top + (availH - naturalH * scale) / 2}px`
+      await nextPaint()
 
       let blob: Blob
       let filename: string
-
-      if (hasImg && isGif && imgDataUrl) {
-        const parsedGif = parseGIF(dataUrlToBuffer(imgDataUrl))
-        const frames = decompressFrames(parsedGif, true)
-        const gifW = parsedGif.lsd.width
-        const gifH = parsedGif.lsd.height
-
-        const baseImg = await loadImgEl(baseDataUrl)
-        const gifStateCanvas = document.createElement('canvas')
-        gifStateCanvas.width = gifW
-        gifStateCanvas.height = gifH
-        const gifStateCtx = gifStateCanvas.getContext('2d')!
-
-        const gif = GIFEncoder()
-        const outCanvas = document.createElement('canvas')
-        outCanvas.width = W
-        outCanvas.height = H
-        const outCtx = outCanvas.getContext('2d')!
-
-        for (const frame of frames) {
-          const patchCanvas = document.createElement('canvas')
-          patchCanvas.width = frame.dims.width
-          patchCanvas.height = frame.dims.height
-          patchCanvas.getContext('2d')!.putImageData(
-            new ImageData(new Uint8ClampedArray(frame.patch), frame.dims.width, frame.dims.height), 0, 0
-          )
-          gifStateCtx.drawImage(patchCanvas, frame.dims.left, frame.dims.top)
-
-          outCtx.clearRect(0, 0, W, H)
-          if (isImmersive) {
-            drawAtSlot(outCtx, gifStateCanvas, slot)
-            outCtx.drawImage(baseImg, 0, 0, W, H)
-          } else {
-            outCtx.drawImage(baseImg, 0, 0, W, H)
-            drawAtSlot(outCtx, gifStateCanvas, slot)
-          }
-
-          const { data } = outCtx.getImageData(0, 0, W, H)
-          const palette = quantize(data, 256)
-          const index = applyPalette(data, palette)
-          gif.writeFrame(index, W, H, { palette, delay: Math.max(frame.delay ?? 10, 2) })
-
-          if (frame.disposalType === 2) {
-            gifStateCtx.clearRect(frame.dims.left, frame.dims.top, frame.dims.width, frame.dims.height)
-          }
-        }
-
-        gif.finish()
-        blob = new Blob([gif.bytesView().buffer as ArrayBuffer], { type: 'image/gif' })
+      if (isGif && imageSrc) {
+        blob = await renderGif(frameEl, imageSrc, reward.imageLayout ?? 'banner', scale, fontEmbedCSS, setProgress)
         filename = `cartinha-${format}.gif`
-
-      } else if (hasImg) {
-        const srcImg = await loadImgEl(note.imageUrl!, true)
-        const baseImg = await loadImgEl(baseDataUrl)
-        const canvas = document.createElement('canvas')
-        canvas.width = W * 2
-        canvas.height = H * 2
-        const ctx = canvas.getContext('2d')!
-        ctx.scale(2, 2)
-
-        if (isImmersive) {
-          drawAtSlot(ctx, srcImg, slot)
-          ctx.drawImage(baseImg, 0, 0, W, H)
-        } else {
-          ctx.drawImage(baseImg, 0, 0, W, H)
-          drawAtSlot(ctx, srcImg, slot)
-        }
-
-        blob = await new Promise<Blob>((res) => canvas.toBlob((b) => res(b!), 'image/png'))
-        filename = `cartinha-${format}.png`
-
       } else {
-        blob = await (await fetch(baseDataUrl)).blob()
+        const canvas = await capture(frameEl, 'full', PNG_SCALE, fontEmbedCSS)
+        blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('png vazio'))), 'image/png'))
         filename = `cartinha-${format}.png`
       }
+      setJob(null)
 
       const file = new File([blob], filename, { type: blob.type })
       const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean }
@@ -209,172 +374,70 @@ export function ShareCartinha({ note, r, t, theme }: {
         a.href = URL.createObjectURL(blob)
         a.download = filename
         a.click()
-        URL.revokeObjectURL(a.href)
-        toast.success('Imagem baixada! 💌')
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000)
+        toast.success(isGif ? 'GIF baixado! 💌' : 'Imagem baixada! 💌')
       }
+      if (imageDropped) toast.info('A imagem desse bilhete vem de um site que não permite cópia, então ela ficou de fora.')
     } catch (error) {
       console.error('[ShareCartinha]', error)
       if ((error as Error).name !== 'AbortError') toast.error('Não consegui gerar a imagem.')
     } finally {
+      setJob(null)
       setBusy(null)
+      setProgress(null)
     }
   }
 
-  const accent = r?.borderColor || theme.accent
-  const bg = r?.cardBg || 'linear-gradient(135deg,#fff7ed,#fff1f2,#eef2ff)'
-  const textColor = r?.textColor || ink.primary
-  const caption = r?.captionColor || ink.secondary
-
-  const inner = (story: boolean) => {
-    const thumbSize = layout.startsWith('circle') ? 56 : 64
-    const thumbRight = layout === 'thumb-right' || layout === 'circle-right'
-
-    const emojiSz    = story ? 52 : 42
-    const emojiFsz   = story ? '1.8rem' : '1.5rem'
-    const titleFsz   = story ? '3.8rem' : '3.1rem'
-    const msgFsz     = story ? '2.2rem' : '1.7rem'
-    const chipFsz    = story ? '1.1rem' : '0.96rem'
-    const chipTypFsz = story ? '1rem'   : '0.88rem'
-    const padX       = story ? 3.5 : 2.5
-    const padY       = story ? 4   : 3
-    const footerFsz  = story ? '1rem' : '0.88rem'
-    const midPy      = story ? 2.5 : 1.5
-
-    const emojiCircle = (
-      <Box sx={{ width: emojiSz, height: emojiSz, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: emojiFsz, flexShrink: 0, background: isImmersive ? 'rgba(0,0,0,0.35)' : 'rgba(255,255,255,0.7)', border: `2px solid ${isImmersive ? 'rgba(255,255,255,0.4)' : `${accent}66`}` }}>
-        {r?.emoji || '💌'}
-      </Box>
-    )
-    const rarityChip = r && (
-      <Box sx={{ px: 1.6, py: 0.6, borderRadius: radius.full, fontWeight: 800, fontSize: chipFsz, background: isImmersive ? 'rgba(0,0,0,0.4)' : r.chipBg, border: `1px solid ${isImmersive ? 'rgba(255,255,255,0.35)' : r.borderColor}` }}>
-        <Box component="span" sx={isImmersive ? { color: '#fff' } : gradientTextSx(r.chipColor)}>{r.emoji} {r.label}</Box>
-      </Box>
-    )
-    const typeChip = t && (
-      <Box sx={{ px: 1.4, py: 0.5, borderRadius: radius.full, fontWeight: 700, fontSize: chipTypFsz, background: isImmersive ? 'rgba(0,0,0,0.35)' : t.tagBg, color: isImmersive ? '#fff' : t.tagColor }}>
-        {t.emoji} {t.label}
-      </Box>
-    )
-    const radialBg = (
-      <Box sx={{ position: 'absolute', inset: 0, background: `radial-gradient(circle at 20% 0%, rgba(255,255,255,0.6), transparent 42%), radial-gradient(circle at 90% 100%, ${accent}33, transparent 46%)`, pointerEvents: 'none' }} />
-    )
-    const brand = (
-      <Typography sx={{ fontFamily: font.serif, fontWeight: 700, color: isImmersive ? 'rgba(255,255,255,0.7)' : accent, opacity: 0.75, fontSize: footerFsz }}>
-        Potinho Digital 💌
-      </Typography>
-    )
-
-    if (isImmersive) {
-      return (
-        <Box sx={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}>
-          <Box data-img-slot="true" sx={{ position: 'absolute', inset: 0 }} />
-          <Box sx={{ position: 'absolute', inset: 0, background: layout === 'bg-blur' ? 'rgba(0,0,0,0.28)' : 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.08) 100%)' }} />
-          <Box sx={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', px: padX, pt: padY, pb: padY, boxSizing: 'border-box' }}>
-            <Stack direction="row" alignItems="center" spacing={1.5} sx={{ flexShrink: 0 }}>
-              {emojiCircle}{rarityChip}
-            </Stack>
-            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', py: midPy, minHeight: 0 }}>
-              <Typography sx={{ fontFamily: font.serif, fontWeight: 850, color: '#fff', lineHeight: 1.18, fontSize: titleFsz, overflowWrap: 'anywhere', wordBreak: 'break-word', textShadow: '0 1px 8px rgba(0,0,0,0.6)' }}>{note.title}</Typography>
-              <Typography sx={{ mt: story ? 2 : 1.5, fontStyle: 'italic', color: 'rgba(255,255,255,0.82)', lineHeight: 1.5, fontSize: msgFsz, overflowWrap: 'anywhere', wordBreak: 'break-word', textShadow: '0 1px 6px rgba(0,0,0,0.5)', whiteSpace: 'pre-line' }}>&ldquo;{note.message}&rdquo;</Typography>
-            </Box>
-            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ flexShrink: 0 }}>
-              {typeChip ?? <Box />}
-              {brand}
-            </Stack>
-          </Box>
-        </Box>
-      )
-    }
-
-    if (isStripeLayout) {
-      return (
-        <Box sx={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: bg, display: 'flex', flexDirection: 'row', boxSizing: 'border-box' }}>
-          <Box data-img-slot="true" sx={{ width: 90, flexShrink: 0, alignSelf: 'stretch' }} />
-          <Box sx={{ flex: 1, position: 'relative', display: 'flex', flexDirection: 'column', px: 2, pt: story ? 2.5 : 1.8, pb: story ? 2.5 : 1.8, minWidth: 0, boxSizing: 'border-box' }}>
-            {radialBg}
-            <Stack direction="row" alignItems="center" spacing={1.5} sx={{ flexShrink: 0, zIndex: 1 }}>
-              {emojiCircle}{rarityChip}
-            </Stack>
-            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', zIndex: 1, py: story ? 2 : 1.2, minHeight: 0 }}>
-              <Typography sx={{ fontFamily: font.serif, fontWeight: 850, color: textColor, lineHeight: 1.18, fontSize: story ? '3rem' : '2rem', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{note.title}</Typography>
-              <Typography sx={{ mt: story ? 1.8 : 1.2, fontStyle: 'italic', color: caption, lineHeight: 1.5, fontSize: story ? '1.8rem' : '1.3rem', overflowWrap: 'anywhere', wordBreak: 'break-word', whiteSpace: 'pre-line' }}>&ldquo;{note.message}&rdquo;</Typography>
-            </Box>
-            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ flexShrink: 0, zIndex: 1 }}>
-              {typeChip ?? <Box />}
-              {brand}
-            </Stack>
-          </Box>
-        </Box>
-      )
-    }
-
-    if (isThumbLayout) {
-      return (
-        <Box sx={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: bg, display: 'flex', flexDirection: 'column', px: padX, pt: padY, pb: padY, boxSizing: 'border-box' }}>
-          {radialBg}
-          <Stack direction="row" alignItems="center" spacing={1.5} sx={{ flexShrink: 0, zIndex: 1 }}>
-            {emojiCircle}{rarityChip}
-          </Stack>
-          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', zIndex: 1, py: midPy, minHeight: 0 }}>
-            <Box sx={{ p: 1.15, borderRadius: radius.lg, background: 'rgba(255,255,255,0.68)', border: '1px solid rgba(255,255,255,0.58)', backdropFilter: 'blur(8px)' }}>
-              <Stack direction={thumbRight ? 'row-reverse' : 'row'} spacing={1.2} alignItems="flex-start">
-                <Box data-img-slot="true" sx={{ flexShrink: 0, width: thumbSize, height: thumbSize, borderRadius: layout.startsWith('circle') ? '50%' : radius.md }} />
-                <Box sx={{ minWidth: 0, flex: 1, textAlign: 'left' }}>
-                  <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: story ? '2rem' : '1.5rem', color: textColor, lineHeight: 1.25, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{note.title}</Typography>
-                  <Typography sx={{ mt: 0.5, fontSize: story ? '1.4rem' : '1.1rem', color: caption, lineHeight: 1.5, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word', whiteSpace: 'pre-line' }}>&ldquo;{note.message}&rdquo;</Typography>
-                </Box>
-              </Stack>
-            </Box>
-          </Box>
-          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ flexShrink: 0, zIndex: 1 }}>
-            {typeChip ?? <Box />}
-            {brand}
-          </Stack>
-        </Box>
-      )
-    }
-
-    return (
-      <Box sx={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: bg, display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
-        {showBannerImg && <Box data-img-slot="true" sx={{ width: '100%', height: story ? 300 : 195, flexShrink: 0 }} />}
-        {radialBg}
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', px: padX, pt: showBannerImg ? 1.5 : padY, pb: padY, boxSizing: 'border-box', minHeight: 0 }}>
-          <Stack direction="row" alignItems="center" spacing={1.5} sx={{ flexShrink: 0, zIndex: 1 }}>
-            {!showBannerImg && emojiCircle}
-            {rarityChip}
-          </Stack>
-          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', zIndex: 1, py: midPy, minHeight: 0 }}>
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 850, color: textColor, lineHeight: 1.18, fontSize: titleFsz, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
-              {note.title}
-            </Typography>
-            <Typography sx={{ mt: story ? 2 : 1.5, fontStyle: 'italic', color: caption, lineHeight: 1.5, fontSize: msgFsz, overflowWrap: 'anywhere', wordBreak: 'break-word', whiteSpace: 'pre-line' }}>
-              &ldquo;{note.message}&rdquo;
-            </Typography>
-          </Box>
-          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ flexShrink: 0, zIndex: 1 }}>
-            {typeChip ?? <Box />}
-            {brand}
-          </Stack>
-        </Box>
-      </Box>
-    )
-  }
+  const label = (format: Format, text: string) => (busy === format && progress !== null ? `Gerando ${progress}%` : `${text}${isGif ? ' (GIF)' : ''}`)
+  const spec = job ? FRAME[job.format] : null
 
   return (
     <>
       <Stack direction="row" spacing={1} sx={{ width: '100%' }}>
-        <Button variant="ghost" loading={busy === 'card'} onClick={() => share('card')} sx={{ flex: 1, py: 0.7, fontSize: '0.82rem' }}>
-          <IosShareIcon sx={{ fontSize: 16, mr: 0.5 }} /> Card {isGif ? '(GIF)' : ''}
+        <Button variant="ghost" loading={busy === 'card' && progress === null} disabled={!!busy} onClick={() => share('card')} sx={{ flex: 1, py: 0.7, fontSize: '0.82rem' }}>
+          <IosShareIcon sx={{ fontSize: 16, mr: 0.5 }} /> {label('card', 'Card')}
         </Button>
-        <Button variant="ghost" loading={busy === 'story'} onClick={() => share('story')} sx={{ flex: 1, py: 0.7, fontSize: '0.82rem' }}>
-          <IosShareIcon sx={{ fontSize: 16, mr: 0.5 }} /> Story {isGif ? '(GIF)' : ''}
+        <Button variant="ghost" loading={busy === 'story' && progress === null} disabled={!!busy} onClick={() => share('story')} sx={{ flex: 1, py: 0.7, fontSize: '0.82rem' }}>
+          <IosShareIcon sx={{ fontSize: 16, mr: 0.5 }} /> {label('story', 'Story')}
         </Button>
       </Stack>
 
-      <Box aria-hidden sx={{ position: 'fixed', left: -99999, top: 0, pointerEvents: 'none', opacity: 0 }}>
-        <Box ref={cardRef} sx={{ width: 540, height: 540 }}>{inner(false)}</Box>
-        <Box ref={storyRef} sx={{ width: 540, height: 960 }}>{inner(true)}</Box>
-      </Box>
+      {job && spec && createPortal(
+        <Box aria-hidden sx={{ position: 'fixed', left: -100000, top: 0, pointerEvents: 'none' }}>
+          <Box
+            ref={frameRef}
+            data-mode="full"
+            sx={{
+              width: spec.w,
+              height: spec.h,
+              position: 'relative',
+              overflow: 'hidden',
+              background: theme.gradient,
+              '& *, & *::before, & *::after': { animation: 'none !important', transition: 'none !important' },
+              '&[data-mode="base"] [data-share-card] img': { visibility: 'hidden' },
+              '&[data-mode="shell"] [data-share-card] > * > *': { visibility: 'hidden' },
+              '&[data-mode="content"]': { background: 'transparent !important' },
+              '&[data-mode="content"] [data-share-brand]': { visibility: 'hidden' },
+              '&[data-mode="content"] [data-share-card] img': { visibility: 'hidden' },
+              '&[data-mode="content"] [data-share-card] > *': { background: 'transparent !important', borderColor: 'transparent !important', boxShadow: 'none !important' },
+              '&[data-mode="content"] [data-share-card] > *::before, &[data-mode="content"] [data-share-card] > *::after': { display: 'none' },
+            }}
+          >
+            <Box ref={cardBoxRef} data-share-card sx={{ position: 'absolute', left: 0, top: 0, transformOrigin: 'top left' }}>
+              <RewardCard reward={{ ...reward, imageUrl: job.imageSrc, isNew: false }} rarities={rarities} types={types} expanded />
+            </Box>
+            <Stack data-share-brand alignItems="center" spacing={0.2} sx={{ position: 'absolute', left: 0, right: 0, bottom: 22 }}>
+              <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: 17, color: theme.textOnBg, opacity: 0.9 }}>
+                Potinho Digital 💌
+              </Typography>
+              <Typography sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.4, color: theme.textOnBgMuted }}>
+                potinhodigital.com.br
+              </Typography>
+            </Stack>
+          </Box>
+        </Box>,
+        document.body,
+      )}
     </>
   )
 }

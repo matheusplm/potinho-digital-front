@@ -1,5 +1,5 @@
-import { Dialog, DialogActions, DialogContent, Stack, Typography } from '@mui/material'
-import { Suspense, lazy } from 'react'
+import { Box, Dialog, DialogActions, DialogContent, Stack, Typography } from '@mui/material'
+import { Suspense, lazy, useRef } from 'react'
 import { Button, LoadingState } from '../ui'
 import { ink, radius } from '../../design-system'
 import { useBackground } from '../../context/BackgroundContext'
@@ -14,38 +14,35 @@ export function NoteDetailDialog({ note, rarities, types, onClose }: {
   note: ReadableNote | null; rarities: RarityConfig[]; types: NoteTypeConfig[]; onClose: () => void
 }) {
   const { theme } = useBackground()
+  const cardRef = useRef<HTMLDivElement>(null)
   const rarity = note ? rarities.find((item) => item.id === note.rarity) : undefined
-  const noteTypes = note ? (note.typeIds?.length ? note.typeIds : [note.typeId]).map((id) => types.find((item) => item.id === id)).filter((x): x is NoteTypeConfig => !!x) : []
-  const type = noteTypes[0]
+  const reward: CollectionDailyReward | null = note && {
+    id: note.id,
+    title: note.title ?? '',
+    message: note.message ?? '',
+    rarity: note.rarity,
+    typeId: note.typeId,
+    typeIds: note.typeIds,
+    imageUrl: note.imageUrl ?? null,
+    imageLayout: note.imageLayout,
+    isNew: 'isNew' in note ? note.isNew : false,
+  }
 
   return (
     <Dialog open={!!note} onClose={onClose} maxWidth="sm" fullWidth slotProps={{ paper: { sx: { mx: 2, borderRadius: radius.xl, overflow: 'hidden' } } }}>
-      {note && (
+      {reward && (
         <>
           <DialogContent sx={{ pt: 2 }}>
             <Stack spacing={1.4}>
-              <RewardCard
-                reward={{
-                  id: note.id,
-                  title: note.title ?? '',
-                  message: note.message ?? '',
-                  rarity: note.rarity,
-                  typeId: note.typeId,
-                  typeIds: note.typeIds,
-                  imageUrl: note.imageUrl ?? null,
-                  imageLayout: note.imageLayout,
-                  isNew: 'isNew' in note ? note.isNew : false,
-                }}
-                rarities={rarities}
-                types={types}
-                expanded
-              />
+              <Box ref={cardRef}>
+                <RewardCard reward={reward} rarities={rarities} types={types} expanded />
+              </Box>
               <Stack spacing={0.7}>
                 <Typography sx={{ fontSize: '0.70rem', fontWeight: 900, letterSpacing: 0.8, color: rarity?.captionColor ?? ink.muted, textTransform: 'uppercase' }}>
                   Compartilhar
                 </Typography>
                 <Suspense fallback={<LoadingState compact label="Preparando compartilhamento" />}>
-                  <ShareCartinha note={note} r={rarity} t={type} theme={theme} />
+                  <ShareCartinha reward={reward} rarities={rarities} types={types} theme={theme} sourceRef={cardRef} />
                 </Suspense>
               </Stack>
             </Stack>
