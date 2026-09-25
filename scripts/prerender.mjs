@@ -18,14 +18,14 @@ const vite = await createServer({
 })
 
 try {
-  const { renderLanding } = await vite.ssrLoadModule('/src/entry-prerender.tsx')
+  const { renderLanding, themeBootScript } = await vite.ssrLoadModule('/src/entry-prerender.tsx')
   const { mobile, desktop, styles } = renderLanding()
 
   const variantCss = '<style>@media (min-width:900px){[data-prerender=mobile]{display:none}}@media (max-width:899.98px){[data-prerender=desktop]{display:none}}.pd-authed [data-prerender]{display:none}</style>'
   const authScript = "<script>try{if(localStorage.getItem('potinho-auth'))document.documentElement.classList.add('pd-authed')}catch(e){}</script>"
 
   const html = shell
-    .replace('</head>', `${styles}${variantCss}${authScript}</head>`)
+    .replace('</head>', `${themeBootScript()}${styles}${variantCss}${authScript}</head>`)
     .replace('<div id="root"></div>', `<div id="root" data-prerendered><div data-prerender="mobile">${mobile}</div><div data-prerender="desktop">${desktop}</div></div>`)
 
   if (!html.includes('data-prerendered') || !html.includes('<h1')) {

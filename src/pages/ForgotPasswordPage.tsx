@@ -9,7 +9,8 @@ import type { TurnstileInstance } from '@marsidev/react-turnstile'
 import { api } from '../services/api'
 import { useRetryAfter } from '../hooks/useRetryAfter'
 import { Button, Input } from '../components/ui'
-import { fadeSlide, floatHeart, font } from '../design-system'
+import { useBackground } from '../context/BackgroundContext'
+import { colors, fadeSlide, floatHeart, font, gradients } from '../design-system'
 
 const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined
 
@@ -21,6 +22,7 @@ const HEARTS = [
 ]
 
 export function ForgotPasswordPage() {
+  const darkTheme = useBackground().theme.isDark
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
@@ -52,7 +54,7 @@ export function ForgotPasswordPage() {
     <Box sx={{
       height: '100dvh', display: 'flex', flexDirection: 'column', position: 'relative',
       overflow: 'hidden',
-      background: 'linear-gradient(160deg, #dbeafe 0%, #fce7f3 55%, #ede9fe 100%)',
+      background: gradients.page,
     }}>
       <Box sx={{ position: 'absolute', top: -120, right: -120, width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(29,78,216,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
       <Box sx={{ position: 'absolute', bottom: -80, left: -80, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(225,29,72,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
@@ -67,31 +69,31 @@ export function ForgotPasswordPage() {
       <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 3, py: 5, animation: `${fadeSlide} 0.5s ease both` }} spacing={0}>
         {sent ? (
           <Stack alignItems="center" spacing={2.5} sx={{ maxWidth: 320, width: '100%' }}>
-            <MarkEmailReadIcon sx={{ fontSize: 64, color: '#1d4ed8', filter: 'drop-shadow(0 4px 16px rgba(29,78,216,0.3))' }} />
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.8rem', color: '#1e3a5f', textAlign: 'center' }}>
+            <MarkEmailReadIcon sx={{ fontSize: 64, color: colors.primary.text, filter: 'drop-shadow(0 4px 16px rgba(29,78,216,0.3))' }} />
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.8rem', color: colors.text.primary, textAlign: 'center' }}>
               Email enviado!
             </Typography>
-            <Typography sx={{ fontSize: '0.88rem', color: 'rgba(30,58,95,0.65)', textAlign: 'center', lineHeight: 1.6 }}>
+            <Typography sx={{ fontSize: '0.88rem', color: colors.text.secondary, textAlign: 'center', lineHeight: 1.6 }}>
               Se existe uma conta com <strong>{email}</strong>, você receberá um link para redefinir sua senha.
             </Typography>
-            <Typography sx={{ fontSize: '0.8rem', color: 'rgba(30,58,95,0.4)', textAlign: 'center' }}>
+            <Typography sx={{ fontSize: '0.8rem', color: colors.text.muted, textAlign: 'center' }}>
               Verifique também a pasta de spam.
             </Typography>
-            <Typography sx={{ mt: 1, fontSize: '0.85rem', color: 'rgba(30,58,95,0.5)' }}>
-              <Link to="/login" style={{ color: '#1d4ed8', fontWeight: 700, textDecoration: 'none' }}>Voltar ao login</Link>
+            <Typography sx={{ mt: 1, fontSize: '0.85rem', color: colors.text.secondary }}>
+              <Link to="/login" style={{ color: colors.primary.text, fontWeight: 700, textDecoration: 'none' }}>Voltar ao login</Link>
             </Typography>
           </Stack>
         ) : (
           <Stack alignItems="center" spacing={0} sx={{ maxWidth: 320, width: '100%' }}>
-            <LockResetIcon sx={{ fontSize: 52, color: '#1d4ed8', filter: 'drop-shadow(0 4px 16px rgba(29,78,216,0.35))', mb: 3 }} />
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2rem', lineHeight: 1, color: '#1e3a5f', textAlign: 'center', letterSpacing: '-0.5px' }}>
+            <LockResetIcon sx={{ fontSize: 52, color: colors.primary.text, filter: 'drop-shadow(0 4px 16px rgba(29,78,216,0.35))', mb: 3 }} />
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2rem', lineHeight: 1, color: colors.text.primary, textAlign: 'center', letterSpacing: '-0.5px' }}>
               Esqueci minha
             </Typography>
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2rem', lineHeight: 1, color: '#1d4ed8', textAlign: 'center', letterSpacing: '-0.5px', mb: 1.5 }}>
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2rem', lineHeight: 1, color: colors.primary.text, textAlign: 'center', letterSpacing: '-0.5px', mb: 1.5 }}>
               senha
             </Typography>
             <Box sx={{ width: 40, height: 3, borderRadius: 2, background: 'linear-gradient(90deg, #1d4ed8, #e11d48)', mb: 3 }} />
-            <Typography sx={{ fontSize: '0.88rem', color: 'rgba(30,58,95,0.6)', textAlign: 'center', mb: 3, lineHeight: 1.6 }}>
+            <Typography sx={{ fontSize: '0.88rem', color: colors.text.secondary, textAlign: 'center', mb: 3, lineHeight: 1.6 }}>
               Digite seu email e enviaremos um link para criar uma nova senha.
             </Typography>
             <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
@@ -105,7 +107,7 @@ export function ForgotPasswordPage() {
                       onSuccess={setCaptchaToken}
                       onError={() => setCaptchaToken(null)}
                       onExpire={() => setCaptchaToken(null)}
-                      options={{ size: 'normal', language: 'pt-BR', theme: 'light' }}
+                      options={{ size: 'normal', language: 'pt-BR', theme: darkTheme ? 'dark' : 'light' }}
                     />
                   </Box>
                 )}
@@ -114,14 +116,14 @@ export function ForgotPasswordPage() {
                 </Button>
                 {error && (
                   <Box sx={{ px: 1.5, py: 1, borderRadius: '10px', background: 'rgba(225,29,72,0.08)', border: '1px solid rgba(225,29,72,0.2)' }}>
-                    <Typography sx={{ fontSize: '0.8rem', color: '#e11d48', fontWeight: 600 }}>{error}</Typography>
+                    <Typography sx={{ fontSize: '0.8rem', color: colors.rose.text, fontWeight: 600 }}>{error}</Typography>
                   </Box>
                 )}
               </Stack>
             </Box>
-            <Typography sx={{ mt: 3.5, fontSize: '0.85rem', color: 'rgba(30,58,95,0.5)' }}>
+            <Typography sx={{ mt: 3.5, fontSize: '0.85rem', color: colors.text.secondary }}>
               Lembrou?{' '}
-              <Link to="/login" style={{ color: '#1d4ed8', fontWeight: 700, textDecoration: 'none' }}>Entrar</Link>
+              <Link to="/login" style={{ color: colors.primary.text, fontWeight: 700, textDecoration: 'none' }}>Entrar</Link>
             </Typography>
           </Stack>
         )}

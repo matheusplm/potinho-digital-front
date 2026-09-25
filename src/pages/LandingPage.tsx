@@ -8,11 +8,13 @@ import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined'
 import LinkedInIcon from '@mui/icons-material/LinkedIn'
 import InstagramIcon from '@mui/icons-material/Instagram'
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
-import { Box, Chip, IconButton, Stack, Tooltip, Typography, useMediaQuery } from '@mui/material'
+import { Box, Chip, IconButton, Popover, Stack, Tooltip, Typography, useMediaQuery } from '@mui/material'
 import { useEffect, useRef, useState, type FC } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, ScrollHint } from '../components/ui'
-import { backgroundThemes, colors, fadeInHero, fadeInRight, floatHeartLanding, font, radius } from '../design-system'
+import { backgroundThemes, colors, fadeInHero, fadeInRight, floatHeartLanding, font, getBackgroundTheme, gradients, liftOnDark, radius, shadow } from '../design-system'
+import { useBackground } from '../context/BackgroundContext'
+import { ThemeSwatches } from '../components/ThemeSwatches'
 import { AUDIENCES, CUSTOMIZATIONS, DEMO_NOTES, FEATURES, RARITY_COLOR, RARITY_FILTERS, STEPS } from './landing/landingData'
 import { SectionTitle } from './landing/SectionTitle'
 import { DemoNoteCard } from './landing/DemoNoteCard'
@@ -76,7 +78,7 @@ export function LandingPage() {
   return (
     <Box sx={{
       minHeight: '100dvh',
-      background: 'linear-gradient(160deg,#dbeafe 0%,#fce7f3 55%,#ede9fe 100%)',
+      background: gradients.page,
       overflowX: 'hidden', overflowY: 'auto', position: 'relative',
     }}>
       <Box sx={{ position: 'fixed', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}>
@@ -100,10 +102,11 @@ export function LandingPage() {
       {/* Navbar */}
       <Box component="nav" sx={{
         position: 'sticky', top: 0, zIndex: 100,
-        background: 'rgba(255,253,251,0.88)', backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(0,0,0,0.06)',
-        px: isDesktop ? 5 : 2.5, py: 0,
+        background: colors.surface.overlay, backdropFilter: 'blur(20px)',
+        borderBottom: `1px solid ${colors.border.subtle}`,
+        px: isDesktop ? 5 : 2, py: 0,
         height: isDesktop ? 64 : 56,
+        '@media (max-width: 359.98px)': { px: 1.5 },
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <Stack direction="row" spacing={1.2} alignItems="center">
@@ -114,15 +117,16 @@ export function LandingPage() {
           }}>
             <FavoriteIcon sx={{ fontSize: 15, color: '#fff' }} />
           </Box>
-          <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1rem', color: '#1e3a5f' }}>
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1rem', color: colors.text.primary, whiteSpace: 'nowrap', '@media (max-width: 359.98px)': { fontSize: '0.92rem' } }}>
             Potinho Digital
           </Typography>
         </Stack>
-        <Stack direction="row" spacing={1}>
-          <Button variant="ghost" {...linkTo('/login')} sx={{ py: 0.7, px: isDesktop ? 2 : 1.2, fontSize: '0.84rem' }}>
+        <Stack direction="row" spacing={isDesktop ? 1 : 0.75} alignItems="center">
+          <ThemeButton />
+          <Button variant="ghost" {...linkTo('/login')} sx={{ py: 0.7, px: isDesktop ? 2 : 1.2, fontSize: '0.84rem', whiteSpace: 'nowrap', '@media (max-width: 399.98px)': { display: 'none' } }}>
             Entrar
           </Button>
-          <Button variant="primary" {...linkTo('/register')} sx={{ py: 0.7, px: isDesktop ? 2 : 1.2, fontSize: '0.84rem' }}>
+          <Button variant="primary" {...linkTo('/register')} sx={{ py: 0.7, px: isDesktop ? 2 : 1.2, fontSize: '0.84rem', whiteSpace: 'nowrap' }}>
             {isDesktop ? 'Criar conta grátis' : 'Criar conta'}
           </Button>
         </Stack>
@@ -137,14 +141,14 @@ export function LandingPage() {
               <Box ref={parallaxTextRef} sx={{ transition: 'transform 0.14s ease-out', willChange: 'transform' }}>
               <Box className="pd-enter" sx={{ animation: `${fadeInHero} 0.6s ease both` }}>
                 <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.8, px: 1.4, py: 0.5, mb: 2.5, borderRadius: radius.full, background: 'rgba(29,78,216,0.08)', border: '1px solid rgba(29,78,216,0.18)' }}>
-                  <AutoStoriesOutlinedIcon sx={{ fontSize: 13, color: colors.primary.main }} />
-                  <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.primary.main, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                  <AutoStoriesOutlinedIcon sx={{ fontSize: 13, color: colors.primary.text }} />
+                  <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.primary.text, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
                     Álbum afetivo digital
                   </Typography>
                 </Box>
-                <Typography component="h1" sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '3.4rem', lineHeight: 1.08, color: '#1e3a5f', letterSpacing: '-0.5px', mb: 2 }}>
+                <Typography component="h1" sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '3.4rem', lineHeight: 1.08, color: colors.text.primary, letterSpacing: '-0.5px', mb: 2 }}>
                   O presente que
-                  <Box component="span" sx={{ display: 'block', mt: 1, color: '#1d4ed8' }}>cresce todo dia.</Box>
+                  <Box component="span" sx={{ display: 'block', mt: 1, color: colors.primary.text }}>cresce todo dia.</Box>
                 </Typography>
                 <Box sx={{ width: 56, height: 3, borderRadius: 2, background: 'linear-gradient(90deg,#1d4ed8,#e11d48)', mb: 3 }} />
                 <Typography sx={{ fontSize: '1.05rem', color: colors.text.secondary, lineHeight: 1.75, mb: 4, maxWidth: 440 }}>
@@ -172,14 +176,14 @@ export function LandingPage() {
           ) : (
             <Stack className="pd-enter" alignItems="center" sx={{ animation: `${fadeInHero} 0.6s ease both` }}>
               <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.8, px: 1.4, py: 0.5, mb: 2.5, borderRadius: radius.full, background: 'rgba(29,78,216,0.08)', border: '1px solid rgba(29,78,216,0.18)' }}>
-                <AutoStoriesOutlinedIcon sx={{ fontSize: 13, color: colors.primary.main }} />
-                <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.primary.main, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <AutoStoriesOutlinedIcon sx={{ fontSize: 13, color: colors.primary.text }} />
+                <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.primary.text, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Álbum afetivo digital
                 </Typography>
               </Box>
-              <Typography component="h1" sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '2.8rem', lineHeight: 1.0, color: '#1e3a5f', textAlign: 'center', letterSpacing: '-0.5px', mb: 1.5 }}>
+              <Typography component="h1" sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '2.8rem', lineHeight: 1.0, color: colors.text.primary, textAlign: 'center', letterSpacing: '-0.5px', mb: 1.5 }}>
                 O presente que
-                <Box component="span" sx={{ display: 'block', color: '#1d4ed8' }}>cresce todo dia.</Box>
+                <Box component="span" sx={{ display: 'block', color: colors.primary.text }}>cresce todo dia.</Box>
               </Typography>
               <Box sx={{ width: 44, height: 3, borderRadius: 2, background: 'linear-gradient(90deg,#1d4ed8,#e11d48)', mb: 2.5 }} />
               <Typography sx={{ fontSize: '0.9rem', color: colors.text.secondary, textAlign: 'center', lineHeight: 1.72, mb: 3.5, maxWidth: 310 }}>
@@ -207,13 +211,13 @@ export function LandingPage() {
         </Box>
 
         {/* Concept pitch */}
-        <Box sx={{ background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(255,255,255,0.8)', borderBottom: '1px solid rgba(255,255,255,0.8)', py: isDesktop ? 7 : 5, px: isDesktop ? 5 : 2.5 }}>
+        <Box sx={{ background: colors.glass.band, backdropFilter: 'blur(20px)', borderTop: `1px solid ${colors.glass.bandBorder}`, borderBottom: `1px solid ${colors.glass.bandBorder}`, py: isDesktop ? 7 : 5, px: isDesktop ? 5 : 2.5 }}>
           <Box className="pd-enter" sx={{ maxWidth: isDesktop ? 760 : 480, mx: 'auto', textAlign: 'center', animation: `${fadeInHero} 0.6s 0.1s ease both` }}>
-            <Typography sx={{ fontSize: isDesktop ? '2rem' : '1.5rem', fontFamily: font.serif, fontWeight: 800, color: '#1e3a5f', lineHeight: 1.3, mb: 2 }}>
+            <Typography sx={{ fontSize: isDesktop ? '2rem' : '1.5rem', fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, lineHeight: 1.3, mb: 2 }}>
               Pense num álbum de figurinhas.
             </Typography>
             <Typography sx={{ fontSize: isDesktop ? '1.15rem' : '0.92rem', color: colors.text.secondary, lineHeight: 1.8, maxWidth: 580, mx: 'auto' }}>
-              Só que em vez de figurinhas, são <strong style={{ color: '#1e3a5f' }}>bilhetes escritos por você</strong>. Com raridades, tipos e surpresas. A pessoa descobre aos poucos, abrindo um pacotinho por dia, como receber uma carta esperada todo dia.
+              Só que em vez de figurinhas, são <strong style={{ color: colors.text.primary }}>bilhetes escritos por você</strong>. Com raridades, tipos e surpresas. A pessoa descobre aos poucos, abrindo um pacotinho por dia, como receber uma carta esperada todo dia.
             </Typography>
             <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', gap: 1.5, flexWrap: 'wrap' }}>
               {[
@@ -221,9 +225,9 @@ export function LandingPage() {
                 { icon: <Inventory2OutlinedIcon sx={{ fontSize: 16 }} />, label: 'Pacotinhos diários' },
                 { icon: <EmojiEventsOutlinedIcon sx={{ fontSize: 16 }} />, label: 'Conquistas' },
               ].map((item) => (
-                <Box key={item.label} sx={{ display: 'flex', alignItems: 'center', gap: 0.7, px: 1.4, py: 0.6, borderRadius: radius.full, background: 'rgba(29,78,216,0.06)', border: '1px solid rgba(29,78,216,0.14)', color: colors.primary.main }}>
+                <Box key={item.label} sx={{ display: 'flex', alignItems: 'center', gap: 0.7, px: 1.4, py: 0.6, borderRadius: radius.full, background: 'rgba(29,78,216,0.06)', border: '1px solid rgba(29,78,216,0.14)', color: colors.primary.text }}>
                   {item.icon}
-                  <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, color: colors.primary.main }}>{item.label}</Typography>
+                  <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, color: colors.primary.text }}>{item.label}</Typography>
                 </Box>
               ))}
             </Box>
@@ -237,9 +241,9 @@ export function LandingPage() {
           </Box>
           <Box sx={{ display: 'grid', gridTemplateColumns: isDesktop ? 'repeat(4,1fr)' : '1fr 1fr', gap: isDesktop ? 2 : 1.5 }}>
             {FEATURES.map((f) => (
-              <Box key={f.title} sx={{ background: 'rgba(255,255,255,0.68)', backdropFilter: 'blur(14px)', border: '1.5px solid rgba(255,255,255,0.88)', borderRadius: radius.xl, p: isDesktop ? 2.5 : 2, transition: 'transform 0.18s', '&:hover': { transform: 'translateY(-3px)' } }}>
+              <Box key={f.title} sx={{ background: colors.glass.card, backdropFilter: 'blur(14px)', border: `1.5px solid ${colors.glass.cardBorder}`, borderRadius: radius.xl, p: isDesktop ? 2.5 : 2, transition: 'transform 0.18s', '&:hover': { transform: 'translateY(-3px)' } }}>
                 <Box sx={{ fontSize: isDesktop ? '2rem' : '1.6rem', mb: 1 }}>{f.emoji}</Box>
-                <Typography sx={{ fontSize: '0.82rem', fontWeight: 700, color: f.color, mb: 0.4 }}>{f.title}</Typography>
+                <Typography sx={{ fontSize: '0.82rem', fontWeight: 700, color: liftOnDark(f.color), mb: 0.4 }}>{f.title}</Typography>
                 <Typography sx={{ fontSize: '0.74rem', color: colors.text.secondary, lineHeight: 1.6 }}>{f.desc}</Typography>
               </Box>
             ))}
@@ -247,7 +251,7 @@ export function LandingPage() {
         </Box>
 
         {/* Interactive demo */}
-        <Box sx={{ background: 'rgba(255,255,255,0.45)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(255,255,255,0.75)', borderBottom: '1px solid rgba(255,255,255,0.75)', py: isDesktop ? 8 : 5, px: isDesktop ? 5 : 2.5 }}>
+        <Box sx={{ background: colors.glass.band, backdropFilter: 'blur(20px)', borderTop: `1px solid ${colors.glass.bandBorder}`, borderBottom: `1px solid ${colors.glass.bandBorder}`, py: isDesktop ? 8 : 5, px: isDesktop ? 5 : 2.5 }}>
           <Box sx={{ maxWidth: isDesktop ? 1200 : 480, mx: 'auto' }}>
             {isDesktop ? (
               <Box sx={{ display: 'grid', gridTemplateColumns: '380px 1fr', gap: 7, alignItems: 'flex-start' }}>
@@ -270,7 +274,7 @@ export function LandingPage() {
                         }}
                       >
                         <Box sx={{ width: 10, height: 10, borderRadius: '50%', background: RARITY_COLOR[r], flexShrink: 0 }} />
-                        <Typography sx={{ fontSize: '0.9rem', fontWeight: activeRarity === r ? 700 : 500, color: activeRarity === r ? RARITY_COLOR[r] : colors.text.secondary }}>
+                        <Typography sx={{ fontSize: '0.9rem', fontWeight: activeRarity === r ? 700 : 500, color: activeRarity === r ? liftOnDark(RARITY_COLOR[r]) : colors.text.secondary }}>
                           {r}
                         </Typography>
                         {activeRarity === r && (
@@ -307,9 +311,9 @@ export function LandingPage() {
                       size="small"
                       sx={{
                         fontSize: '0.74rem', fontWeight: activeRarity === r ? 700 : 500,
-                        background: activeRarity === r ? `${RARITY_COLOR[r]}14` : 'rgba(255,255,255,0.65)',
-                        color: activeRarity === r ? RARITY_COLOR[r] : colors.text.secondary,
-                        border: `1.5px solid ${activeRarity === r ? `${RARITY_COLOR[r]}40` : 'rgba(0,0,0,0.08)'}`,
+                        background: activeRarity === r ? `${RARITY_COLOR[r]}14` : colors.glass.card,
+                        color: activeRarity === r ? liftOnDark(RARITY_COLOR[r]) : colors.text.secondary,
+                        border: `1.5px solid ${activeRarity === r ? `${RARITY_COLOR[r]}40` : colors.border.medium}`,
                         '& .MuiChip-label': { px: 1.2 },
                       }}
                     />
@@ -345,7 +349,7 @@ export function LandingPage() {
                       <Box sx={{ width: 18, height: 18, borderRadius: '50%', background: s.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, color: '#fff' }}>{s.n}</Typography>
                       </Box>
-                      <Typography sx={{ fontSize: '0.94rem', fontWeight: 700, color: '#1e3a5f', fontFamily: font.serif }}>{s.title}</Typography>
+                      <Typography sx={{ fontSize: '0.94rem', fontWeight: 700, color: colors.text.primary, fontFamily: font.serif }}>{s.title}</Typography>
                     </Box>
                     <Typography sx={{ fontSize: '0.78rem', color: colors.text.secondary, lineHeight: 1.65, textAlign: 'center' }}>{s.desc}</Typography>
                   </Stack>
@@ -355,7 +359,7 @@ export function LandingPage() {
           ) : (
             <Stack spacing={1.5}>
               {STEPS.map((s, i) => (
-                <Box key={s.n} sx={{ background: 'rgba(255,255,255,0.62)', backdropFilter: 'blur(14px)', border: '1.5px solid rgba(255,255,255,0.82)', borderRadius: radius.xl, p: 2.2, display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                <Box key={s.n} sx={{ background: colors.glass.card, backdropFilter: 'blur(14px)', border: `1.5px solid ${colors.glass.cardBorder}`, borderRadius: radius.xl, p: 2.2, display: 'flex', gap: 2, alignItems: 'flex-start' }}>
                   <Stack alignItems="center" spacing={0.6} sx={{ flexShrink: 0 }}>
                     <Box sx={{ width: 36, height: 36, borderRadius: '50%', background: s.color, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 4px 14px ${s.color}50`, fontSize: '1rem' }}>
                       {s.emoji}
@@ -367,7 +371,7 @@ export function LandingPage() {
                       <Box sx={{ minWidth: 16, height: 16, borderRadius: '50%', background: s.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <Typography sx={{ fontSize: '0.68rem', fontWeight: 800, color: '#fff', lineHeight: 1 }}>{s.n}</Typography>
                       </Box>
-                      <Typography sx={{ fontSize: '0.88rem', fontWeight: 700, color: '#1e3a5f', fontFamily: font.serif }}>{s.title}</Typography>
+                      <Typography sx={{ fontSize: '0.88rem', fontWeight: 700, color: colors.text.primary, fontFamily: font.serif }}>{s.title}</Typography>
                     </Stack>
                     <Typography sx={{ fontSize: '0.78rem', color: colors.text.secondary, lineHeight: 1.6 }}>{s.desc}</Typography>
                   </Box>
@@ -378,11 +382,11 @@ export function LandingPage() {
         </Box>
 
         {/* Customization */}
-        <Box sx={{ background: 'rgba(255,255,255,0.45)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(255,255,255,0.75)', borderBottom: '1px solid rgba(255,255,255,0.75)', py: isDesktop ? 8 : 5, px: isDesktop ? 5 : 2.5 }}>
+        <Box sx={{ background: colors.glass.band, backdropFilter: 'blur(20px)', borderTop: `1px solid ${colors.glass.bandBorder}`, borderBottom: `1px solid ${colors.glass.bandBorder}`, py: isDesktop ? 8 : 5, px: isDesktop ? 5 : 2.5 }}>
           <Box sx={{ maxWidth: isDesktop ? 1200 : 480, mx: 'auto' }}>
             <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.8, px: 1.4, py: 0.5, borderRadius: radius.full, background: 'linear-gradient(90deg,rgba(29,78,216,0.08),rgba(225,29,72,0.06))', border: '1px solid rgba(29,78,216,0.15)', mb: 1.5 }}>
-              <PaletteOutlinedIcon sx={{ fontSize: 13, color: colors.primary.main }} />
-              <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.primary.main, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+              <PaletteOutlinedIcon sx={{ fontSize: 13, color: colors.primary.text }} />
+              <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.primary.text, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
                 100% personalizável
               </Typography>
             </Box>
@@ -395,11 +399,11 @@ export function LandingPage() {
                   <Stack direction="row" alignItems="flex-start" spacing={1.4}>
                     <Box sx={{ fontSize: '1.4rem', lineHeight: 1, pt: 0.2, flexShrink: 0 }}>{c.emoji}</Box>
                     <Box sx={{ flex: 1 }}>
-                      <Typography sx={{ fontSize: '0.9rem', fontWeight: 700, color: c.color, mb: 0.4, fontFamily: font.serif }}>{c.title}</Typography>
+                      <Typography sx={{ fontSize: '0.9rem', fontWeight: 700, color: liftOnDark(c.color), mb: 0.4, fontFamily: font.serif }}>{c.title}</Typography>
                       <Typography sx={{ fontSize: '0.78rem', color: colors.text.secondary, lineHeight: 1.6, mb: 1.2 }}>{c.desc}</Typography>
                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6 }}>
                         {c.chips.map((chip) => (
-                          <Chip key={chip} label={chip} size="small" sx={{ fontSize: '0.68rem', height: 22, background: `${c.color}12`, color: c.color, border: `1px solid ${c.color}25`, fontWeight: 600, '& .MuiChip-label': { px: 1 } }} />
+                          <Chip key={chip} label={chip} size="small" sx={{ fontSize: '0.68rem', height: 22, background: `${c.color}12`, color: liftOnDark(c.color), border: `1px solid ${c.color}25`, fontWeight: 600, '& .MuiChip-label': { px: 1 } }} />
                         ))}
                       </Box>
                     </Box>
@@ -414,21 +418,21 @@ export function LandingPage() {
         <ThemesSection isDesktop={isDesktop} />
 
         {/* For whom */}
-        <Box sx={{ background: 'rgba(255,255,255,0.45)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(255,255,255,0.75)', borderBottom: '1px solid rgba(255,255,255,0.75)', py: isDesktop ? 7 : 5, px: isDesktop ? 5 : 2.5 }}>
+        <Box sx={{ background: colors.glass.band, backdropFilter: 'blur(20px)', borderTop: `1px solid ${colors.glass.bandBorder}`, borderBottom: `1px solid ${colors.glass.bandBorder}`, py: isDesktop ? 7 : 5, px: isDesktop ? 5 : 2.5 }}>
           <Box sx={{ maxWidth: isDesktop ? 1200 : 480, mx: 'auto' }}>
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: isDesktop ? 6 : 0, flexDirection: isDesktop ? 'row' : 'column' }}>
               <Box sx={{ flexShrink: 0, minWidth: isDesktop ? 280 : undefined, mb: isDesktop ? 0 : 3 }}>
                 <Stack direction="row" alignItems="center" gap={1} sx={{ mb: 0.5 }}>
-                  <GroupOutlinedIcon sx={{ fontSize: 18, color: colors.primary.main }} />
+                  <GroupOutlinedIcon sx={{ fontSize: 18, color: colors.primary.text }} />
                   <SectionTitle>Para quem é?</SectionTitle>
                 </Stack>
               </Box>
               {isDesktop ? (
                 <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 1.5, flex: 1 }}>
                   {AUDIENCES.map((a) => (
-                    <Box key={a.label} sx={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(14px)', border: '1.5px solid rgba(255,255,255,0.88)', borderRadius: radius.xl, p: 2.5, textAlign: 'center' }}>
+                    <Box key={a.label} sx={{ background: colors.glass.card, backdropFilter: 'blur(14px)', border: `1.5px solid ${colors.glass.cardBorder}`, borderRadius: radius.xl, p: 2.5, textAlign: 'center' }}>
                       <Box sx={{ fontSize: '2.2rem', mb: 0.8 }}>{a.emoji}</Box>
-                      <Typography sx={{ fontSize: '0.82rem', fontWeight: 700, color: '#1e3a5f', mb: 0.4 }}>{a.label}</Typography>
+                      <Typography sx={{ fontSize: '0.82rem', fontWeight: 700, color: colors.text.primary, mb: 0.4 }}>{a.label}</Typography>
                       <Typography sx={{ fontSize: '0.72rem', color: colors.text.secondary, lineHeight: 1.55 }}>{a.desc}</Typography>
                     </Box>
                   ))}
@@ -436,10 +440,10 @@ export function LandingPage() {
               ) : (
                 <Stack spacing={1.2} sx={{ width: '100%' }}>
                   {AUDIENCES.map((a) => (
-                    <Box key={a.label} sx={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(14px)', border: '1.5px solid rgba(255,255,255,0.88)', borderRadius: radius.xl, p: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Box key={a.label} sx={{ background: colors.glass.card, backdropFilter: 'blur(14px)', border: `1.5px solid ${colors.glass.cardBorder}`, borderRadius: radius.xl, p: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
                       <Box sx={{ fontSize: '2rem', flexShrink: 0 }}>{a.emoji}</Box>
                       <Box>
-                        <Typography sx={{ fontSize: '0.88rem', fontWeight: 700, color: '#1e3a5f', mb: 0.2 }}>{a.label}</Typography>
+                        <Typography sx={{ fontSize: '0.88rem', fontWeight: 700, color: colors.text.primary, mb: 0.2 }}>{a.label}</Typography>
                         <Typography sx={{ fontSize: '0.78rem', color: colors.text.secondary, lineHeight: 1.55 }}>{a.desc}</Typography>
                       </Box>
                     </Box>
@@ -452,13 +456,13 @@ export function LandingPage() {
 
         {/* Access control highlight */}
         <Box sx={{ py: isDesktop ? 7 : 5, px: isDesktop ? 5 : 2.5 }}>
-          <Box sx={{ maxWidth: isDesktop ? 900 : 480, mx: 'auto', background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(18px)', border: '1.5px solid rgba(255,255,255,0.88)', borderRadius: radius.xl, p: isDesktop ? 4 : 2.5 }}>
+          <Box sx={{ maxWidth: isDesktop ? 900 : 480, mx: 'auto', background: colors.glass.card, backdropFilter: 'blur(18px)', border: `1.5px solid ${colors.glass.cardBorder}`, borderRadius: radius.xl, p: isDesktop ? 4 : 2.5 }}>
             <Stack direction={isDesktop ? 'row' : 'column'} spacing={isDesktop ? 4 : 2} alignItems={isDesktop ? 'center' : 'flex-start'}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: isDesktop ? 72 : 48, height: isDesktop ? 72 : 48, borderRadius: radius.xl, background: 'linear-gradient(135deg,rgba(29,78,216,0.12),rgba(225,29,72,0.08))', border: '1.5px solid rgba(29,78,216,0.15)', flexShrink: 0 }}>
-                <LockOpenOutlinedIcon sx={{ fontSize: isDesktop ? 32 : 22, color: colors.primary.main }} />
+                <LockOpenOutlinedIcon sx={{ fontSize: isDesktop ? 32 : 22, color: colors.primary.text }} />
               </Box>
               <Box>
-                <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: isDesktop ? '1.3rem' : '1.1rem', color: '#1e3a5f', mb: 0.6 }}>
+                <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: isDesktop ? '1.3rem' : '1.1rem', color: colors.text.primary, mb: 0.6 }}>
                   Você decide quem recebe o quê
                 </Typography>
                 <Typography sx={{ fontSize: '0.84rem', color: colors.text.secondary, lineHeight: 1.7 }}>
@@ -471,9 +475,9 @@ export function LandingPage() {
 
         {/* CTA */}
         <Box sx={{ pb: isDesktop ? 10 : 8, px: isDesktop ? 5 : 2.5 }}>
-          <Box sx={{ maxWidth: isDesktop ? 640 : 480, mx: 'auto', background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(18px)', border: '1.5px solid rgba(255,255,255,0.9)', borderRadius: radius.xl, p: isDesktop ? 5 : 3.5, textAlign: 'center' }}>
+          <Box sx={{ maxWidth: isDesktop ? 640 : 480, mx: 'auto', background: colors.glass.card, backdropFilter: 'blur(18px)', border: `1.5px solid ${colors.glass.cardBorder}`, borderRadius: radius.xl, p: isDesktop ? 5 : 3.5, textAlign: 'center' }}>
             <FavoriteIcon sx={{ fontSize: isDesktop ? 44 : 36, color: '#e11d48', mb: 1.5, filter: 'drop-shadow(0 4px 14px rgba(225,29,72,0.4))' }} />
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: isDesktop ? '1.9rem' : '1.55rem', color: '#1e3a5f', mb: 0.8 }}>
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: isDesktop ? '1.9rem' : '1.55rem', color: colors.text.primary, mb: 0.8 }}>
               Pronto para começar?
             </Typography>
             <Typography sx={{ fontSize: '0.88rem', color: colors.text.secondary, lineHeight: 1.7, mb: 3.5, maxWidth: 400, mx: 'auto' }}>
@@ -503,10 +507,10 @@ export function LandingPage() {
             </Typography>
           </Box>
           <Box component="footer" sx={{ mt: 4, textAlign: 'center' }}>
-            <Typography sx={{ fontSize: '0.74rem', color: 'rgba(30,58,95,0.35)', fontStyle: 'italic', mb: 1.2 }}>
+            <Typography sx={{ fontSize: '0.74rem', color: colors.text.muted, fontStyle: 'italic', mb: 1.2 }}>
               Feito com ❤️ para guardar o que importa.
             </Typography>
-            <Typography sx={{ fontSize: '0.72rem', color: 'rgba(30,58,95,0.38)', mb: 1 }}>
+            <Typography sx={{ fontSize: '0.72rem', color: colors.text.muted, mb: 1 }}>
               Criado por <strong style={{ fontWeight: 600 }}>Matheus Pereira Lopes de Morais</strong>
             </Typography>
             <Stack direction="row" spacing={0.5} justifyContent="center">
@@ -517,7 +521,7 @@ export function LandingPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   size="small"
-                  sx={{ color: 'rgba(30,58,95,0.35)', transition: 'color 0.18s', '&:hover': { color: '#0a66c2', background: 'rgba(10,102,194,0.08)' } }}
+                  sx={{ color: colors.text.muted, transition: 'color 0.18s', '&:hover': { color: '#0a66c2', background: 'rgba(10,102,194,0.08)' } }}
                 >
                   <LinkedInIcon sx={{ fontSize: 18 }} />
                 </IconButton>
@@ -529,7 +533,7 @@ export function LandingPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   size="small"
-                  sx={{ color: 'rgba(30,58,95,0.35)', transition: 'color 0.18s', '&:hover': { color: '#e1306c', background: 'rgba(225,48,108,0.08)' } }}
+                  sx={{ color: colors.text.muted, transition: 'color 0.18s', '&:hover': { color: '#e1306c', background: 'rgba(225,48,108,0.08)' } }}
                 >
                   <InstagramIcon sx={{ fontSize: 18 }} />
                 </IconButton>
@@ -539,7 +543,7 @@ export function LandingPage() {
                   component="a"
                   href="mailto:matheusmty@gmail.com"
                   size="small"
-                  sx={{ color: 'rgba(30,58,95,0.35)', transition: 'color 0.18s', '&:hover': { color: '#1d4ed8', background: 'rgba(29,78,216,0.08)' } }}
+                  sx={{ color: colors.text.muted, transition: 'color 0.18s', '&:hover': { color: colors.primary.text, background: 'rgba(29,78,216,0.08)' } }}
                 >
                   <AlternateEmailIcon sx={{ fontSize: 18 }} />
                 </IconButton>
@@ -554,9 +558,39 @@ export function LandingPage() {
   )
 }
 
+function ThemeButton() {
+  const [anchor, setAnchor] = useState<HTMLElement | null>(null)
+  return (
+    <>
+      <Tooltip title="Trocar tema">
+        <IconButton
+          aria-label="Trocar tema"
+          onClick={(e) => setAnchor(e.currentTarget)}
+          sx={{ width: 36, height: 36, color: colors.primary.text, background: colors.glass.card, border: `1.5px solid ${colors.border.medium}`, '&:hover': { background: colors.glass.strong } }}
+        >
+          <PaletteOutlinedIcon sx={{ fontSize: 18 }} />
+        </IconButton>
+      </Tooltip>
+      <Popover
+        open={!!anchor}
+        anchorEl={anchor}
+        onClose={() => setAnchor(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        slotProps={{ paper: { sx: { mt: 1, p: 1.8, maxWidth: 260, borderRadius: radius.xl, background: colors.surface.paper, border: `1px solid ${colors.border.subtle}`, boxShadow: shadow.lg } } }}
+      >
+        <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.6, color: colors.text.secondary, textTransform: 'uppercase', mb: 1.2 }}>
+          Tema de fundo
+        </Typography>
+        <ThemeSwatches labelColor={colors.text.muted} />
+      </Popover>
+    </>
+  )
+}
+
 const ThemesSection: FC<{ isDesktop: boolean }> = ({ isDesktop }) => {
-  const [activeKey, setActiveKey] = useState('romance')
-  const active = backgroundThemes.find((t) => t.key === activeKey) ?? backgroundThemes[0]
+  const { themeKey: activeKey, setThemeKey: setActiveKey } = useBackground()
+  const active = getBackgroundTheme(activeKey)
 
   return (
     <Box sx={{ py: isDesktop ? 8 : 5, px: isDesktop ? 5 : 2.5, maxWidth: isDesktop ? 1200 : 480, mx: 'auto' }}>

@@ -9,12 +9,14 @@ import { api, ApiRequestError } from '../services/api'
 import { Button, Input, toast } from '../components/ui'
 import { GoogleSignInButton } from '../components/GoogleSignInButton'
 import { FloatingParticles } from '../components/FloatingParticles'
-import { fadeSlide, font } from '../design-system'
+import { useBackground } from '../context/BackgroundContext'
+import { colors, fadeSlide, font, gradients } from '../design-system'
 
 const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined
 
 
 export function LoginPage() {
+  const darkTheme = useBackground().theme.isDark
   const { setUser } = useUser()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -77,7 +79,7 @@ export function LoginPage() {
       position: 'relative',
       overflowX: 'hidden',
       overflowY: 'auto',
-      background: 'linear-gradient(160deg, #dbeafe 0%, #fce7f3 55%, #ede9fe 100%)',
+      background: gradients.page,
     }}>
       <Box sx={{ position: 'absolute', top: -120, right: -120, width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(29,78,216,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
       <Box sx={{ position: 'absolute', bottom: -80, left: -80, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(225,29,72,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
@@ -87,16 +89,16 @@ export function LoginPage() {
       <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 3, py: 2, animation: `${fadeSlide} 0.5s ease both` }} spacing={0}>
         <FavoriteIcon sx={{ fontSize: 52, color: '#e11d48', filter: 'drop-shadow(0 4px 16px rgba(225,29,72,0.4))', mb: 3 }} />
 
-        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2.8rem', lineHeight: 1, color: '#1e3a5f', textAlign: 'center', letterSpacing: '-0.5px' }}>
+        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2.8rem', lineHeight: 1, color: colors.text.primary, textAlign: 'center', letterSpacing: '-0.5px' }}>
           Potinho
         </Typography>
-        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2.8rem', lineHeight: 1, color: '#1d4ed8', textAlign: 'center', letterSpacing: '-0.5px', mb: 1.5 }}>
+        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2.8rem', lineHeight: 1, color: colors.primary.text, textAlign: 'center', letterSpacing: '-0.5px', mb: 1.5 }}>
           Digital
         </Typography>
 
         <Box sx={{ width: 40, height: 3, borderRadius: 2, background: 'linear-gradient(90deg, #1d4ed8, #e11d48)', mb: 1.5 }} />
 
-        <Typography sx={{ fontSize: '0.88rem', color: 'rgba(30,58,95,0.5)', fontStyle: 'italic', mb: 4 }}>
+        <Typography sx={{ fontSize: '0.88rem', color: colors.text.secondary, fontStyle: 'italic', mb: 4 }}>
           sua memória afetiva
         </Typography>
 
@@ -108,7 +110,7 @@ export function LoginPage() {
             <Box>
               <Input label="Senha" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" fullWidth required />
               <Typography sx={{ mt: 0.5, textAlign: 'right' }}>
-                <Link to="/esqueci-minha-senha" style={{ color: '#1d4ed8', fontSize: '0.78rem', textDecoration: 'none', fontWeight: 600 }}>
+                <Link to="/esqueci-minha-senha" style={{ color: colors.primary.text, fontSize: '0.78rem', textDecoration: 'none', fontWeight: 600 }}>
                   Esqueci minha senha
                 </Link>
               </Typography>
@@ -121,7 +123,7 @@ export function LoginPage() {
                   onSuccess={setCaptchaToken}
                   onError={() => setCaptchaToken(null)}
                   onExpire={() => setCaptchaToken(null)}
-                  options={{ size: 'normal', language: 'pt-BR', theme: 'light' }}
+                  options={{ size: 'normal', language: 'pt-BR', theme: darkTheme ? 'dark' : 'light' }}
                 />
               </Box>
             )}
@@ -130,14 +132,14 @@ export function LoginPage() {
             </Button>
             {error && (
               <Box sx={{ mt: 0.5, px: 1.5, py: 1, borderRadius: '10px', background: 'rgba(225,29,72,0.08)', border: '1px solid rgba(225,29,72,0.2)' }}>
-                <Typography sx={{ fontSize: '0.8rem', color: '#e11d48', fontWeight: 600 }}>
+                <Typography sx={{ fontSize: '0.8rem', color: colors.rose.text, fontWeight: 600 }}>
                   {error}
                 </Typography>
                 {notVerified && (
                   <Typography
                     component="span"
                     onClick={() => { navigate(`/verificar-email?email=${encodeURIComponent(email)}`) }}
-                    sx={{ display: 'block', mt: 0.5, fontSize: '0.78rem', color: '#1d4ed8', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline' }}
+                    sx={{ display: 'block', mt: 0.5, fontSize: '0.78rem', color: colors.primary.text, fontWeight: 700, cursor: 'pointer', textDecoration: 'underline' }}
                   >
                     Reenviar email de confirmação
                   </Typography>
@@ -147,9 +149,9 @@ export function LoginPage() {
           </Stack>
         </Box>
 
-        <Typography variant="body2" sx={{ mt: 3.5, color: 'rgba(30,58,95,0.5)', fontSize: '0.85rem' }}>
+        <Typography variant="body2" sx={{ mt: 3.5, color: colors.text.secondary, fontSize: '0.85rem' }}>
           Ainda não tem conta?{' '}
-          <Link to="/register" style={{ color: '#1d4ed8', fontWeight: 700, textDecoration: 'none' }}>Criar conta</Link>
+          <Link to="/register" style={{ color: colors.primary.text, fontWeight: 700, textDecoration: 'none' }}>Criar conta</Link>
         </Typography>
       </Stack>
     </Box>

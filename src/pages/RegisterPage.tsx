@@ -10,7 +10,8 @@ import { Button, Input, toast } from '../components/ui'
 import { GoogleSignInButton } from '../components/GoogleSignInButton'
 import { ScrollHint } from '../components/ui/ScrollHint'
 import { FloatingParticles } from '../components/FloatingParticles'
-import { fadeSlide, font } from '../design-system'
+import { useBackground } from '../context/BackgroundContext'
+import { colors, fadeSlide, font, gradients } from '../design-system'
 
 const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined
 
@@ -20,6 +21,7 @@ const USERNAME_RE = /^[a-z0-9_]+$/
 
 
 export function RegisterPage() {
+  const darkTheme = useBackground().theme.isDark
   const navigate = useNavigate()
   const { setUser } = useUser()
   const [form, setForm] = useState({ name: '', email: '', username: '', password: '', confirm: '' })
@@ -101,7 +103,7 @@ export function RegisterPage() {
   const usernameHelperColor = () => {
     if (usernameStatus === 'available') return '#22c55e'
     if (usernameStatus === 'taken' || usernameStatus === 'invalid') return '#e11d48'
-    return 'rgba(30,58,95,0.45)'
+    return colors.text.muted
   }
 
   return (
@@ -112,7 +114,7 @@ export function RegisterPage() {
       position: 'relative',
       overflowX: 'hidden',
       overflowY: 'auto',
-      background: 'linear-gradient(160deg, #dbeafe 0%, #fce7f3 55%, #ede9fe 100%)',
+      background: gradients.page,
     }}>
       <Box sx={{ position: 'absolute', top: -120, right: -120, width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(29,78,216,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
       <Box sx={{ position: 'absolute', bottom: -80, left: -80, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
@@ -120,12 +122,12 @@ export function RegisterPage() {
       <FloatingParticles />
 
       <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 3, py: 5, animation: `${fadeSlide} 0.5s ease both` }} spacing={0}>
-        <FavoriteIcon sx={{ fontSize: 52, color: '#1d4ed8', filter: 'drop-shadow(0 4px 16px rgba(29,78,216,0.4))', mb: 3 }} />
+        <FavoriteIcon sx={{ fontSize: 52, color: colors.primary.text, filter: 'drop-shadow(0 4px 16px rgba(29,78,216,0.4))', mb: 3 }} />
 
-        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2.8rem', lineHeight: 1, color: '#1e3a5f', textAlign: 'center', letterSpacing: '-0.5px' }}>
+        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2.8rem', lineHeight: 1, color: colors.text.primary, textAlign: 'center', letterSpacing: '-0.5px' }}>
           Criar
         </Typography>
-        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2.8rem', lineHeight: 1, color: '#1d4ed8', textAlign: 'center', letterSpacing: '-0.5px', mb: 1.5 }}>
+        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2.8rem', lineHeight: 1, color: colors.primary.text, textAlign: 'center', letterSpacing: '-0.5px', mb: 1.5 }}>
           Conta
         </Typography>
 
@@ -147,7 +149,7 @@ export function RegisterPage() {
                   inputProps={{ maxLength: 30 }}
                   error={usernameStatus === 'taken' || usernameStatus === 'invalid'}
                   InputProps={usernameStatus === 'checking' ? {
-                    endAdornment: <CircularProgress size={14} sx={{ color: 'rgba(30,58,95,0.35)', mr: 0.5 }} />,
+                    endAdornment: <CircularProgress size={14} sx={{ color: colors.text.muted, mr: 0.5 }} />,
                   } : undefined}
                 />
                 <Typography sx={{ fontSize: '0.72rem', color: usernameHelperColor(), mt: 0.5, pl: 0.5, fontWeight: usernameStatus === 'idle' ? 400 : 600 }}>
@@ -176,7 +178,7 @@ export function RegisterPage() {
                     onSuccess={setCaptchaToken}
                     onError={() => setCaptchaToken(null)}
                     onExpire={() => setCaptchaToken(null)}
-                    options={{ size: 'normal', language: 'pt-BR', theme: 'light' }}
+                    options={{ size: 'normal', language: 'pt-BR', theme: darkTheme ? 'dark' : 'light' }}
                   />
                 </Box>
               )}
@@ -191,9 +193,9 @@ export function RegisterPage() {
           </Box>
         </Box>
 
-        <Typography variant="body2" sx={{ mt: 3.5, color: 'rgba(30,58,95,0.5)', fontSize: '0.85rem' }}>
+        <Typography variant="body2" sx={{ mt: 3.5, color: colors.text.secondary, fontSize: '0.85rem' }}>
           Já tem conta?{' '}
-          <Link to="/login" style={{ color: '#1d4ed8', fontWeight: 700, textDecoration: 'none' }}>Entrar</Link>
+          <Link to="/login" style={{ color: colors.primary.text, fontWeight: 700, textDecoration: 'none' }}>Entrar</Link>
         </Typography>
       </Stack>
       <ScrollHint />

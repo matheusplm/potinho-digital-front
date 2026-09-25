@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useLayoutEffect, useState, type ReactNode } from 'react'
 import { defaultBackgroundKey, getBackgroundTheme, type BackgroundTheme } from '../design-system'
 
 interface BackgroundContextValue {
@@ -10,13 +10,14 @@ interface BackgroundContextValue {
 }
 
 const BackgroundContext = createContext<BackgroundContextValue | null>(null)
-const STORAGE_KEY = 'potinho-bg-theme'
+export const THEME_STORAGE_KEY = 'potinho-bg-theme'
 const MASK_KEY = 'potinho-mask-cards'
+const useIsomorphicLayoutEffect = typeof document === 'undefined' ? useEffect : useLayoutEffect
 
 export function BackgroundProvider({ children }: { children: ReactNode }) {
   const [themeKey, setThemeKeyState] = useState<string>(() => {
     try {
-      return localStorage.getItem(STORAGE_KEY) ?? defaultBackgroundKey
+      return localStorage.getItem(THEME_STORAGE_KEY) ?? defaultBackgroundKey
     } catch {
       return defaultBackgroundKey
     }
@@ -40,14 +41,17 @@ export function BackgroundProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, themeKey)
+      localStorage.setItem(THEME_STORAGE_KEY, themeKey)
     } catch {
       void 0
     }
   }, [themeKey])
 
-  useEffect(() => {
-    document.documentElement.setAttribute('data-pd-theme', getBackgroundTheme(themeKey).isDark ? 'dark' : 'light')
+  useIsomorphicLayoutEffect(() => {
+    const theme = getBackgroundTheme(themeKey)
+    const root = document.documentElement
+    root.setAttribute('data-pd-theme', theme.isDark ? 'dark' : 'light')
+    root.style.setProperty('--pd-page-bg', theme.gradient)
   }, [themeKey])
 
   const value: BackgroundContextValue = {

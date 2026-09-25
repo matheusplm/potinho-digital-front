@@ -5,7 +5,11 @@ export const colors = {
   text:      { primary: 'var(--pd-text-primary)', secondary: 'var(--pd-text-secondary)', muted: 'var(--pd-text-muted)' },
   surface:   { base: 'var(--pd-surface-base)', overlay: 'var(--pd-surface-overlay)', paper: 'var(--pd-surface-paper)' },
   border:    { subtle: 'var(--pd-border-subtle)', medium: 'var(--pd-border-medium)' },
-  glass:     { bg: 'var(--pd-glass-bg)', border: 'var(--pd-glass-border)', strong: 'var(--pd-glass-strong)' },
+  glass:     {
+    bg: 'var(--pd-glass-bg)', border: 'var(--pd-glass-border)', strong: 'var(--pd-glass-strong)',
+    card: 'var(--pd-glass-card)', cardBorder: 'var(--pd-glass-card-border)',
+    band: 'var(--pd-glass-band)', bandBorder: 'var(--pd-glass-band-border)',
+  },
   success:   { main: '#15803d', bg: 'rgba(220,252,231,0.92)', border: 'rgba(21,128,61,0.2)' },
   error:     { main: '#e11d48', bg: 'rgba(255,228,230,0.92)', border: 'rgba(225,29,72,0.2)' },
   info:      { main: '#1d4ed8', bg: 'rgba(219,234,254,0.92)', border: 'rgba(29,78,216,0.2)' },
@@ -27,6 +31,11 @@ export const gradients = {
   purple:  `linear-gradient(135deg, ${colors.purple.main} 0%, ${colors.purple.light} 100%)`,
   brand:   'linear-gradient(160deg, #dbeafe 0%, #fce7f3 55%, #ede9fe 100%)',
   accent:  `linear-gradient(90deg, ${colors.primary.main}, ${colors.rose.main})`,
+  page:    'var(--pd-page-bg)',
+}
+
+export function liftOnDark(color: string) {
+  return `color-mix(in srgb, ${color}, #fff var(--pd-lift))`
 }
 
 export const radius = {

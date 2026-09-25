@@ -18,6 +18,7 @@ import { useUser, type UserRole } from '../context/UserContext'
 import { isCollectionReader, personaCapabilities } from '../utils/collectionAccess'
 import { useNotificationToggle } from '../hooks/useNotificationToggle'
 import { useBackground } from '../context/BackgroundContext'
+import { ThemeSwatches } from './ThemeSwatches'
 import { useReader } from '../context/ReaderContext'
 import { useSimulation } from '../context/SimulationContext'
 import { useCollectionsQuery, usePendingInvitesQuery } from '../hooks/useNotes'
@@ -27,7 +28,7 @@ export function FloatingMenu() {
   const [open, setOpen] = useState(false)
   const [showTutorial, setShowTutorial] = useState(false)
   const { user, persona, setPersona, logout } = useUser()
-  const { themeKey, setThemeKey, theme, maskLightCards, setMaskLightCards } = useBackground()
+  const { theme, maskLightCards, setMaskLightCards } = useBackground()
   const { activeCollectionId, setActiveCollectionId, unreadFor } = useReader()
   const { isActive: simulating } = useSimulation()
   const navigate = useNavigate()
@@ -243,35 +244,7 @@ export function FloatingMenu() {
                   Tema de fundo
                 </Typography>
               </Stack>
-              <Stack spacing={1}>
-                {([false, true] as const).map((dark) => (
-                  <Box key={String(dark)}>
-                    <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: 0.5, color: theme.textOnBgMuted, textTransform: 'uppercase', mb: 0.6 }}>
-                      {dark ? 'Escuros' : 'Claros'}
-                    </Typography>
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
-                      {backgroundThemes.filter((bg) => bg.isDark === dark).map((bg) => {
-                        const active = bg.key === themeKey
-                        return (
-                          <Tooltip key={bg.key} title={bg.label} enterTouchDelay={0} leaveTouchDelay={1500} placement="top" arrow>
-                            <Box onClick={() => setThemeKey(bg.key)} sx={{
-                              width: 28, height: 28, borderRadius: '50%',
-                              background: bg.gradient, cursor: 'pointer', flexShrink: 0,
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              border: `2px solid ${active ? bg.accent : 'rgba(0,0,0,0.08)'}`,
-                              boxShadow: active ? `0 2px 8px ${bg.accent}55` : 'none',
-                              transition: 'all 0.18s',
-                              '&:hover': { transform: 'scale(1.12)' },
-                            }}>
-                              {active && <CheckIcon sx={{ fontSize: 14, color: bg.accent }} />}
-                            </Box>
-                          </Tooltip>
-                        )
-                      })}
-                    </Box>
-                  </Box>
-                ))}
-              </Stack>
+              <ThemeSwatches size={28} labelColor={theme.textOnBgMuted} />
               {theme.isDark && (
                 <Stack direction="row" spacing={1} alignItems="center" onClick={() => setMaskLightCards(!maskLightCards)} sx={{ mt: 1.2, cursor: 'pointer', userSelect: 'none' }}>
                   <Box sx={{

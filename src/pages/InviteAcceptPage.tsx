@@ -9,7 +9,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { api, ApiRequestError } from '../services/api'
 import { Button, ConfirmDeleteDialog, toast } from '../components/ui'
-import { fadeSlide, floatHeart, font, radius, shimmer } from '../design-system'
+import { colors, fadeSlide, floatHeart, font, gradients, radius, shimmer } from '../design-system'
 
 const HEARTS = [
   { size: 18, left: '6%',  delay: '0s',   dur: '14s' },
@@ -163,7 +163,7 @@ export function InviteAcceptPage() {
   return (
     <Box sx={{
       minHeight: '100dvh', position: 'relative', overflowX: 'hidden', overflowY: 'auto',
-      background: 'linear-gradient(160deg, #dbeafe 0%, #fce7f3 55%, #ede9fe 100%)',
+      background: gradients.page,
     }}>
       {HEARTS.map((h, i) => (
         <FavoriteIcon key={i} sx={{
@@ -174,7 +174,7 @@ export function InviteAcceptPage() {
       ))}
 
       <Box sx={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', p: { xs: 2, md: 4 }, position: 'relative', zIndex: 1 }}>
-        <Box sx={{
+        <Box data-pd-theme="light" sx={{
           width: '100%', maxWidth: 880, borderRadius: '26px', overflow: 'hidden',
           background: '#fff', boxShadow: '0 32px 90px rgba(30,58,95,0.2)',
           display: 'flex', flexDirection: { xs: 'column', md: 'row' },
@@ -360,8 +360,8 @@ export function InviteAcceptPage() {
         open={rejectConfirmOpen}
         title="Recusar este convite?"
         description={
-          <Typography sx={{ fontSize: '0.88rem', color: 'rgba(30,58,95,0.65)', lineHeight: 1.6 }}>
-            O link ficará inválido e <strong style={{ color: '#1e3a5f' }}>{invite?.inviterName || 'o criador'}</strong> precisará enviar um novo convite se você mudar de ideia.
+          <Typography sx={{ fontSize: '0.88rem', color: colors.text.secondary, lineHeight: 1.6 }}>
+            O link ficará inválido e <strong style={{ color: colors.text.primary }}>{invite?.inviterName || 'o criador'}</strong> precisará enviar um novo convite se você mudar de ideia.
           </Typography>
         }
         isPending={rejectMutation.isPending}

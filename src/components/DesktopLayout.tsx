@@ -8,7 +8,6 @@ import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import StopCircleOutlinedIcon from '@mui/icons-material/StopCircleOutlined'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined'
-import CheckIcon from '@mui/icons-material/Check'
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined'
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
 import BlockIcon from '@mui/icons-material/Block'
@@ -16,7 +15,7 @@ import LogoutIcon from '@mui/icons-material/Logout'
 import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined'
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
-import { Box, Divider, Stack, Tooltip, Typography } from '@mui/material'
+import { Box, Divider, Stack, Typography } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { PushPrompt } from './PushPrompt'
@@ -28,6 +27,7 @@ import { useSimulation } from '../context/SimulationContext'
 import { useReader } from '../context/ReaderContext'
 import { useNotificationToggle } from '../hooks/useNotificationToggle'
 import { useBackground } from '../context/BackgroundContext'
+import { ThemeSwatches } from './ThemeSwatches'
 import { useCollectionsQuery, useMyNotificationsQuery, usePendingInvitesQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
 import { backgroundThemes, colors, font, radius } from '../design-system'
 import { slugify } from '../utils/slug'
@@ -52,7 +52,7 @@ export function DesktopLayout() {
   const location = useLocation()
   const navigate = useNavigate()
   const { user, persona, setPersona, logout } = useUser()
-  const { theme, themeKey, setThemeKey, maskLightCards, setMaskLightCards } = useBackground()
+  const { theme, maskLightCards, setMaskLightCards } = useBackground()
   const { isActive, session, endSimulation, hasUnreadNotes } = useSimulation()
   const { hasUnread: readerHasUnread, activeCollectionId, setActiveCollectionId, unreadFor } = useReader()
   const [simulateOpen, setSimulateOpen] = useState(false)
@@ -363,33 +363,7 @@ export function DesktopLayout() {
           <Typography sx={{ fontSize: '0.68rem', fontWeight: 800, letterSpacing: 0.5, color: theme.textOnBgMuted, textTransform: 'uppercase', mb: 0.9 }}>
             Tema de fundo
           </Typography>
-          {([false, true] as const).map((dark) => (
-            <Box key={String(dark)} sx={{ mb: 0.8 }}>
-              <Typography sx={{ fontSize: '0.62rem', fontWeight: 700, color: theme.textOnBgMuted, textTransform: 'uppercase', letterSpacing: 0.4, mb: 0.5 }}>
-                {dark ? 'Escuros' : 'Claros'}
-              </Typography>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.7 }}>
-                {backgroundThemes.filter((bg) => bg.isDark === dark).map((bg) => {
-                  const active = bg.key === themeKey
-                  return (
-                    <Tooltip key={bg.key} title={bg.label} enterTouchDelay={0} placement="top" arrow>
-                      <Box onClick={() => setThemeKey(bg.key)} sx={{
-                        width: 24, height: 24, borderRadius: '50%',
-                        background: bg.gradient, cursor: 'pointer', flexShrink: 0,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        border: `2px solid ${active ? bg.accent : 'rgba(0,0,0,0.08)'}`,
-                        boxShadow: active ? `0 2px 6px ${bg.accent}55` : 'none',
-                        transition: 'all 0.16s',
-                        '&:hover': { transform: 'scale(1.14)' },
-                      }}>
-                        {active && <CheckIcon sx={{ fontSize: 12, color: bg.accent }} />}
-                      </Box>
-                    </Tooltip>
-                  )
-                })}
-              </Box>
-            </Box>
-          ))}
+          <ThemeSwatches size={24} labelColor={theme.textOnBgMuted} />
           {theme.isDark && (
             <Stack direction="row" spacing={0.9} alignItems="center" onClick={() => setMaskLightCards(!maskLightCards)} sx={{ mt: 0.6, cursor: 'pointer', userSelect: 'none' }}>
               <Box sx={{

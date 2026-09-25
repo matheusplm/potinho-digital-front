@@ -2,6 +2,7 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import { Box, Stack, Typography } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui'
+import { colors, gradients } from '../design-system'
 
 export function NotFoundPage() {
   const navigate = useNavigate()
@@ -9,7 +10,7 @@ export function NotFoundPage() {
     <Box
       sx={{
         height: '100dvh',
-        background: 'linear-gradient(145deg, #f4f8ff 0%, #eef4ff 45%, #f7efff 100%)',
+        background: gradients.page,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -32,10 +33,10 @@ export function NotFoundPage() {
         </Box>
 
         <Stack spacing={0.5}>
-          <Typography variant="h5" sx={{ color: '#1f2a44' }}>
+          <Typography variant="h5" sx={{ color: colors.text.primary }}>
             Ops, essa tela não existe
           </Typography>
-          <Typography variant="body2" sx={{ color: '#4a5568', maxWidth: 260 }}>
+          <Typography variant="body2" sx={{ color: colors.text.secondary, maxWidth: 260 }}>
             Parece que você se perdeu no caminho...
           </Typography>
         </Stack>

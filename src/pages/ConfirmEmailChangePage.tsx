@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { api } from '../services/api'
-import { fadeSlide, floatHeart, font } from '../design-system'
+import { colors, fadeSlide, floatHeart, font, gradients } from '../design-system'
 
 const HEARTS = [
   { size: 18, left: '10%', delay: '0s',   dur: '13s' },
@@ -47,7 +47,7 @@ export function ConfirmEmailChangePage() {
     <Box sx={{
       height: '100dvh', display: 'flex', flexDirection: 'column', position: 'relative',
       overflow: 'hidden',
-      background: 'linear-gradient(160deg, #dbeafe 0%, #fce7f3 55%, #ede9fe 100%)',
+      background: gradients.page,
     }}>
       <Box sx={{ position: 'absolute', top: -120, right: -120, width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(29,78,216,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
       <Box sx={{ position: 'absolute', bottom: -80, left: -80, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(34,197,94,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
@@ -62,8 +62,8 @@ export function ConfirmEmailChangePage() {
       <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 3, py: 5, animation: `${fadeSlide} 0.5s ease both` }}>
         {status === 'verifying' && (
           <Stack alignItems="center" spacing={2}>
-            <CircularProgress sx={{ color: '#1d4ed8' }} />
-            <Typography sx={{ fontFamily: font.serif, fontSize: '1.2rem', color: '#1e3a5f' }}>
+            <CircularProgress sx={{ color: colors.primary.text }} />
+            <Typography sx={{ fontFamily: font.serif, fontSize: '1.2rem', color: colors.text.primary }}>
               Confirmando troca de email...
             </Typography>
           </Stack>
@@ -72,15 +72,15 @@ export function ConfirmEmailChangePage() {
         {status === 'success' && (
           <Stack alignItems="center" spacing={2.5} sx={{ maxWidth: 320, textAlign: 'center' }}>
             <MarkEmailReadIcon sx={{ fontSize: 64, color: '#22c55e', filter: 'drop-shadow(0 4px 16px rgba(34,197,94,0.3))' }} />
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.8rem', color: '#1e3a5f' }}>
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.8rem', color: colors.text.primary }}>
               Email atualizado!
             </Typography>
             {newEmail && (
-              <Typography sx={{ fontSize: '0.88rem', color: 'rgba(30,58,95,0.65)', lineHeight: 1.6 }}>
+              <Typography sx={{ fontSize: '0.88rem', color: colors.text.secondary, lineHeight: 1.6 }}>
                 Seu novo email é <strong>{newEmail}</strong>.
               </Typography>
             )}
-            <Typography sx={{ fontSize: '0.82rem', color: 'rgba(30,58,95,0.45)' }}>
+            <Typography sx={{ fontSize: '0.82rem', color: colors.text.muted }}>
               Redirecionando para sua conta...
             </Typography>
           </Stack>
@@ -89,14 +89,14 @@ export function ConfirmEmailChangePage() {
         {status === 'error' && (
           <Stack alignItems="center" spacing={2.5} sx={{ maxWidth: 320, textAlign: 'center' }}>
             <FavoriteIcon sx={{ fontSize: 52, color: '#e11d48', filter: 'drop-shadow(0 4px 16px rgba(225,29,72,0.3))' }} />
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.8rem', color: '#1e3a5f' }}>
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.8rem', color: colors.text.primary }}>
               Link inválido
             </Typography>
-            <Typography sx={{ fontSize: '0.88rem', color: 'rgba(30,58,95,0.6)', lineHeight: 1.6 }}>
+            <Typography sx={{ fontSize: '0.88rem', color: colors.text.secondary, lineHeight: 1.6 }}>
               {errorMsg}
             </Typography>
             <Typography sx={{ fontSize: '0.85rem' }}>
-              <Link to="/conta" style={{ color: '#1d4ed8', fontWeight: 700, textDecoration: 'none' }}>
+              <Link to="/conta" style={{ color: colors.primary.text, fontWeight: 700, textDecoration: 'none' }}>
                 Voltar para minha conta
               </Link>
             </Typography>

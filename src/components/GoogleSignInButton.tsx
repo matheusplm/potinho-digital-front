@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Box, Typography } from '@mui/material'
-import { font, radius, shadow } from '../design-system'
+import { colors, font, radius, shadow } from '../design-system'
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined
 const GIS_SRC = 'https://accounts.google.com/gsi/client?hl=pt-BR'
@@ -138,9 +138,9 @@ export function GoogleSignInButton({ onCredential, disabled }: {
       </Box>
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, my: 2.5 }}>
-        <Box sx={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, transparent, rgba(30,58,95,0.18))' }} />
-        <Typography sx={{ fontFamily: font.sans, fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(30,58,95,0.4)' }}>ou entre com email</Typography>
-        <Box sx={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, rgba(30,58,95,0.18), transparent)' }} />
+        <Box sx={{ flex: 1, height: '1px', background: `linear-gradient(90deg, transparent, ${colors.border.medium})` }} />
+        <Typography sx={{ fontFamily: font.sans, fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: colors.text.muted }}>ou entre com email</Typography>
+        <Box sx={{ flex: 1, height: '1px', background: `linear-gradient(90deg, ${colors.border.medium}, transparent)` }} />
       </Box>
     </Box>
   )

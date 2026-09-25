@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../services/api'
 import { Button, Input, toast } from '../components/ui'
-import { fadeSlide, floatHeart, font } from '../design-system'
+import { colors, fadeSlide, floatHeart, font, gradients } from '../design-system'
 
 const HEARTS = [
   { size: 16, left: '6%',  delay: '0s',   dur: '13s' },
@@ -50,7 +50,7 @@ export function ResetPasswordPage() {
     <Box sx={{
       height: '100dvh', display: 'flex', flexDirection: 'column', position: 'relative',
       overflow: 'hidden',
-      background: 'linear-gradient(160deg, #dbeafe 0%, #fce7f3 55%, #ede9fe 100%)',
+      background: gradients.page,
     }}>
       <Box sx={{ position: 'absolute', top: -120, right: -120, width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(29,78,216,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
       <Box sx={{ position: 'absolute', bottom: -80, left: -80, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(225,29,72,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
@@ -64,21 +64,21 @@ export function ResetPasswordPage() {
 
       <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 3, py: 5, animation: `${fadeSlide} 0.5s ease both` }} spacing={0}>
         <Stack alignItems="center" spacing={0} sx={{ maxWidth: 320, width: '100%' }}>
-          <LockResetIcon sx={{ fontSize: 52, color: '#1d4ed8', filter: 'drop-shadow(0 4px 16px rgba(29,78,216,0.35))', mb: 3 }} />
-          <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2rem', lineHeight: 1, color: '#1e3a5f', textAlign: 'center', letterSpacing: '-0.5px' }}>
+          <LockResetIcon sx={{ fontSize: 52, color: colors.primary.text, filter: 'drop-shadow(0 4px 16px rgba(29,78,216,0.35))', mb: 3 }} />
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2rem', lineHeight: 1, color: colors.text.primary, textAlign: 'center', letterSpacing: '-0.5px' }}>
             Nova
           </Typography>
-          <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2rem', lineHeight: 1, color: '#1d4ed8', textAlign: 'center', letterSpacing: '-0.5px', mb: 1.5 }}>
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2rem', lineHeight: 1, color: colors.primary.text, textAlign: 'center', letterSpacing: '-0.5px', mb: 1.5 }}>
             senha
           </Typography>
           <Box sx={{ width: 40, height: 3, borderRadius: 2, background: 'linear-gradient(90deg, #1d4ed8, #e11d48)', mb: 3.5 }} />
 
           {!token ? (
             <Stack alignItems="center" spacing={2}>
-              <Typography sx={{ fontSize: '0.88rem', color: '#e11d48', textAlign: 'center' }}>
+              <Typography sx={{ fontSize: '0.88rem', color: colors.rose.text, textAlign: 'center' }}>
                 Link inválido. Solicite um novo link de recuperação.
               </Typography>
-              <Link to="/esqueci-minha-senha" style={{ color: '#1d4ed8', fontWeight: 700, textDecoration: 'none', fontSize: '0.9rem' }}>
+              <Link to="/esqueci-minha-senha" style={{ color: colors.primary.text, fontWeight: 700, textDecoration: 'none', fontSize: '0.9rem' }}>
                 Solicitar novo link
               </Link>
             </Stack>
@@ -106,15 +106,15 @@ export function ResetPasswordPage() {
                 </Button>
                 {error && (
                   <Box sx={{ px: 1.5, py: 1, borderRadius: '10px', background: 'rgba(225,29,72,0.08)', border: '1px solid rgba(225,29,72,0.2)' }}>
-                    <Typography sx={{ fontSize: '0.8rem', color: '#e11d48', fontWeight: 600 }}>{error}</Typography>
+                    <Typography sx={{ fontSize: '0.8rem', color: colors.rose.text, fontWeight: 600 }}>{error}</Typography>
                   </Box>
                 )}
               </Stack>
             </Box>
           )}
 
-          <Typography sx={{ mt: 3.5, fontSize: '0.85rem', color: 'rgba(30,58,95,0.5)' }}>
-            <Link to="/login" style={{ color: '#1d4ed8', fontWeight: 700, textDecoration: 'none' }}>Voltar ao login</Link>
+          <Typography sx={{ mt: 3.5, fontSize: '0.85rem', color: colors.text.secondary }}>
+            <Link to="/login" style={{ color: colors.primary.text, fontWeight: 700, textDecoration: 'none' }}>Voltar ao login</Link>
           </Typography>
         </Stack>
       </Stack>
