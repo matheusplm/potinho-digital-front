@@ -129,14 +129,14 @@ export const floatParticle = (i: number) => {
   `
 }
 
-export const floatHeartLanding = (i: number) => {
+export const floatParticleLanding = (i: number) => {
   const driftMid = i % 3 === 0 ? 16 : i % 3 === 1 ? -18 : 8
   const driftEnd = i % 2 === 0 ? -10 : 12
   const rotateMid = (i * 11) % 20 - 10
   const rotateStart = (i * 13 + 5) % 22 - 11
   const rotateEnd = (i * 7) % 18 - 9
-  const opacityPeak = 0.14 + (i % 5) * 0.04
-  const opacityLate = 0.06 + (i % 3) * 0.03
+  const opacityPeak = 0.34 + (i % 5) * 0.06
+  const opacityLate = 0.12 + (i % 3) * 0.05
   return keyframes`
     0%   { transform: translateY(0) translateX(0) rotate(${rotateStart}deg) scale(0.82); opacity: 0; }
     14%  { opacity: ${opacityPeak}; }

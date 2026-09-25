@@ -101,9 +101,10 @@ function buildOverview(): AdminOverview {
   const collections = [...realCollections, ...fakeCollections]
     .sort((a, b) => Number(a.deleted) - Number(b.deleted) || (b.lastActivityAt ?? '').localeCompare(a.lastActivityAt ?? ''))
 
-  const daily: AdminDailyPoint[] = Array.from({ length: 30 }, (_, i) => {
-    const time = now - (29 - i) * DAY_MS
-    const trend = 0.6 + (i / 29) * 0.8
+  const daily: AdminDailyPoint[] = Array.from({ length: 90 }, (_, i) => {
+    const time = now - (89 - i) * DAY_MS
+    const weekend = [0, 6].includes(new Date(time).getDay()) ? 1.35 : 1
+    const trend = (0.35 + (i / 89) * 1.1) * weekend
     const openers = Math.round((3 + rand() * 6) * trend)
     return {
       date: dayKey(time),
@@ -112,6 +113,12 @@ function buildOverview(): AdminOverview {
       collected: Math.round(openers * (1.2 + rand() * 1.6)),
     }
   })
+
+  const hourWeights = [2, 1, 1, 0, 0, 1, 3, 7, 9, 6, 5, 6, 9, 8, 6, 5, 6, 8, 11, 14, 17, 19, 15, 7]
+  const rhythm = {
+    hours: hourWeights.map((weight) => Math.round(weight * (6 + rand() * 3))),
+    weekdays: [1.4, 0.9, 0.95, 1, 1.05, 1.1, 1.3].map((weight) => Math.round(weight * (60 + rand() * 15))),
+  }
 
   const since = (days: number) => (iso: string | null) => !!iso && Date.parse(iso) >= now - days * DAY_MS
   const live = collections.filter((collection) => !collection.deleted)
@@ -139,6 +146,7 @@ function buildOverview(): AdminOverview {
       invitesAccepted: 11,
     },
     daily,
+    rhythm,
     users,
     collections,
   }

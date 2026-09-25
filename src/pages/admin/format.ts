@@ -13,9 +13,16 @@ export const TONE_COLOR: Record<ActivityTone, string> = {
   none: 'transparent',
 }
 
+function validTime(iso: string | null): number | null {
+  if (!iso) return null
+  const time = Date.parse(iso)
+  return Number.isNaN(time) ? null : time
+}
+
 export function timeAgo(iso: string | null): string {
-  if (!iso) return 'nunca'
-  const seconds = Math.round((Date.parse(iso) - Date.now()) / 1000)
+  const time = validTime(iso)
+  if (time === null) return 'nunca'
+  const seconds = Math.round((time - Date.now()) / 1000)
   for (const [unit, size] of UNITS) {
     if (Math.abs(seconds) >= size) return relative.format(Math.round(seconds / size), unit)
   }
@@ -23,16 +30,17 @@ export function timeAgo(iso: string | null): string {
 }
 
 export function shortDate(iso: string | null): string {
-  if (!iso) return '—'
-  const date = new Date(iso)
+  const time = validTime(iso)
+  if (time === null) return '—'
+  const date = new Date(time)
   const sameYear = date.getFullYear() === new Date().getFullYear()
   return `${date.getDate()} ${MONTHS[date.getMonth()]}${sameYear ? '' : ` ${date.getFullYear()}`}`
 }
 
 export function dateTime(iso: string | null): string {
-  if (!iso) return '—'
-  const date = new Date(iso)
-  return `${shortDate(iso)}, ${date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`
+  const time = validTime(iso)
+  if (time === null) return '—'
+  return `${shortDate(iso)}, ${new Date(time).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`
 }
 
 export function dayLabel(day: string): string {
@@ -41,8 +49,9 @@ export function dayLabel(day: string): string {
 }
 
 export function activityTone(iso: string | null): ActivityTone {
-  if (!iso) return 'none'
-  const age = Date.now() - Date.parse(iso)
+  const time = validTime(iso)
+  if (time === null) return 'none'
+  const age = Date.now() - time
   if (age < 86_400_000) return 'hot'
   if (age < 7 * 86_400_000) return 'warm'
   return 'cold'
@@ -54,4 +63,31 @@ export function plural(count: number, singular: string, pluralForm = `${singular
 
 export function normalize(value: string): string {
   return value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+}
+
+export const WEEKDAYS_SHORT = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb']
+export const WEEKDAYS_LONG = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado']
+
+export function dayLabelLong(day: string): string {
+  const [year, month, date] = day.split('-').map(Number)
+  return `${WEEKDAYS_SHORT[new Date(year, month - 1, date).getDay()]}, ${date} ${MONTHS[month - 1]}`
+}
+
+export function formatNumber(value: number): string {
+  return value.toLocaleString('pt-BR')
+}
+
+export function share(part: number, total: number): number {
+  return total > 0 ? part / total : 0
+}
+
+export function percentLabel(ratio: number): string {
+  return `${Math.round(ratio * 100)}%`
+}
+
+export function niceCeil(value: number): number {
+  if (value <= 5) return Math.max(1, Math.ceil(value))
+  const magnitude = 10 ** Math.floor(Math.log10(value))
+  const step = [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10].find((candidate) => candidate * magnitude >= value) ?? 10
+  return step * magnitude
 }

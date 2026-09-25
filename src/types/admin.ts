@@ -65,10 +65,16 @@ export interface AdminTotals {
   invitesAccepted: number
 }
 
+export interface AdminRhythm {
+  hours: number[]
+  weekdays: number[]
+}
+
 export interface AdminOverview {
   generatedAt: string
   totals: AdminTotals
   daily: AdminDailyPoint[]
+  rhythm?: AdminRhythm
   users: AdminUserRow[]
   collections: AdminCollectionRow[]
 }

@@ -1,73 +1,106 @@
 import { Box, Stack, Typography } from '@mui/material'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useBackground } from '../../context/BackgroundContext'
-import { ActivityChart } from './ActivityChart'
+import type { AdminOverview } from '../../types/admin'
 import { AdminShell } from './AdminShell'
-import { CollectionRow } from './CollectionsPanel'
-import { Panel, StatCard } from './Panel'
-import { UserRow } from './UsersPanel'
-import { plural } from './format'
+import { ProgressBar, Ring, Sparkline, DeltaBadge } from './charts'
+import { StatCard } from './Panel'
+import { UserDrawer } from './UserDrawer'
+import { CompositionPanel, FunnelPanel, RecentUsersPanel, RhythmPanel, TodayHero, TopCollectionsPanel, TrendPanel } from './OverviewSections'
+import { formatNumber, percentLabel, plural, share } from './format'
+import { cumulativeUsers, movingAverage, periodChange } from './insights'
 
-const PREVIEW_SIZE = 5
-
-function SeeAll({ to, label }: { to: string; label: string }) {
+function KpiGrid({ data }: { data: AdminOverview }) {
   const { theme } = useBackground()
-  const navigate = useNavigate()
+  const last30 = data.daily.slice(-30)
+  const trend = (metric: 'collected' | 'signups' | 'openers') => movingAverage(data.daily.map((point) => point[metric]), 7).slice(-30)
+  const totals = data.totals
+  const live = data.collections.filter((collection) => !collection.deleted)
+  const withReaders = live.filter((collection) => collection.readers > 0).length
+  const signups30 = last30.reduce((sum, point) => sum + point.signups, 0)
+  const growth = cumulativeUsers(data.users, data.daily).slice(-30)
+
   return (
-    <Box
-      component="button"
-      type="button"
-      onClick={() => navigate(to)}
-      sx={{ all: 'unset', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 700, color: theme.accent, '&:focus-visible': { outline: `2px solid ${theme.accent}`, borderRadius: '4px' } }}
-    >
-      {label} →
+    <Box sx={{ display: 'grid', gap: { xs: 1, md: 1.5 }, gridTemplateColumns: { xs: 'repeat(2, minmax(0,1fr))', lg: 'repeat(4, minmax(0,1fr))' } }}>
+      <StatCard
+        emoji="👥" label="Usuários" value={totals.users}
+        detail={`+${formatNumber(totals.newUsers7d)} nos últimos 7 dias`}
+        footer={<Sparkline values={growth} color={theme.accent} />}
+      />
+      <StatCard
+        emoji="🟢" label="Ativos no mês" value={totals.active30d}
+        detail={`hoje ${formatNumber(totals.activeToday)} · semana ${formatNumber(totals.active7d)}`}
+        aside={<Ring ratio={share(totals.active30d, totals.users)} color="#22c55e" />}
+      />
+      <StatCard
+        emoji="📦" label="Bilhetes abertos" value={totals.collected}
+        badge={<DeltaBadge change={periodChange(data.daily, 'collected', 7)} />}
+        detail={`+${formatNumber(totals.collected7d)} nos últimos 7 dias`}
+        footer={<Sparkline values={trend('collected')} color={theme.accent} />}
+      />
+      <StatCard
+        emoji="✨" label="Cadastros no mês" value={signups30}
+        badge={<DeltaBadge change={periodChange(data.daily, 'signups', 30)} />}
+        detail="comparado aos 30 dias anteriores"
+        footer={<Sparkline values={trend('signups')} color={theme.accent} />}
+      />
+      <StatCard
+        emoji="🫙" label="Coleções" value={totals.collections}
+        detail={`${plural(totals.owners, 'pessoa escrevendo', 'pessoas escrevendo')}${totals.deletedCollections ? ` · ${totals.deletedCollections} na lixeira` : ''}`}
+        footer={<ProgressBar ratio={share(withReaders, live.length)} color={theme.accent} label={`${percentLabel(share(withReaders, live.length))} já têm leitor`} />}
+      />
+      <StatCard
+        emoji="✍️" label="Bilhetes escritos" value={totals.notes}
+        detail={`${formatNumber(totals.releasedNotes)} já lançados`}
+        footer={<ProgressBar ratio={share(totals.releasedNotes, totals.notes)} color={theme.accent} label={`${percentLabel(share(totals.releasedNotes, totals.notes))} liberados pros leitores`} />}
+      />
+      <StatCard
+        emoji="📖" label="Leitores" value={totals.readers}
+        detail={`${plural(totals.invitesPending, 'convite pendente', 'convites pendentes')} · ${formatNumber(totals.invitesAccepted)} aceitos`}
+        footer={<Sparkline values={trend('openers')} color={theme.accent} />}
+      />
+      <StatCard
+        emoji="🔔" label="Notificação ligada" value={totals.pushUsers}
+        detail={`de ${plural(totals.users, 'pessoa', 'pessoas')}`}
+        aside={<Ring ratio={share(totals.pushUsers, totals.users)} color="#f59e0b" />}
+      />
     </Box>
   )
 }
 
-export function AdminOverviewPage() {
+function Overview({ data }: { data: AdminOverview }) {
   const { theme } = useBackground()
   const [openId, setOpenId] = useState<string | null>(null)
+  const openUser = data.users.find((user) => user.id === openId) ?? null
 
   return (
-    <AdminShell title="Como está o Potinho">
-      {(data) => (
-        <Stack spacing={2}>
-          <Box sx={{ display: 'grid', gap: { xs: 1, md: 1.4 }, gridTemplateColumns: { xs: 'repeat(2, minmax(0,1fr))', md: 'repeat(4, minmax(0,1fr))' } }}>
-            <StatCard emoji="👥" label="Usuários" value={data.totals.users} detail={`+${data.totals.newUsers7d} nos últimos 7 dias`} />
-            <StatCard emoji="🟢" label="Ativos hoje" value={data.totals.activeToday} detail={`${data.totals.active7d} em 7 dias · ${data.totals.active30d} em 30`} />
-            <StatCard emoji="🫙" label="Coleções" value={data.totals.collections} detail={`${plural(data.totals.owners, 'pessoa escrevendo', 'pessoas escrevendo')}${data.totals.deletedCollections ? ` · ${data.totals.deletedCollections} na lixeira` : ''}`} />
-            <StatCard emoji="📖" label="Leitores" value={data.totals.readers} detail={plural(data.totals.invitesPending, 'convite pendente', 'convites pendentes')} />
-            <StatCard emoji="✍️" label="Bilhetes escritos" value={data.totals.notes} detail={`${data.totals.releasedNotes.toLocaleString('pt-BR')} já lançados`} />
-            <StatCard emoji="📦" label="Bilhetes abertos" value={data.totals.collected} detail={`+${data.totals.collected7d.toLocaleString('pt-BR')} nos últimos 7 dias`} />
-            <StatCard emoji="❤️" label="Favoritados" value={data.totals.favorites} detail={plural(data.totals.achievementsUnlocked, 'conquista desbloqueada', 'conquistas desbloqueadas')} />
-            <StatCard emoji="🔔" label="Com notificação" value={data.totals.pushUsers} detail={data.totals.users ? `${Math.round((data.totals.pushUsers / data.totals.users) * 100)}% dos usuários` : undefined} />
-          </Box>
+    <Stack spacing={{ xs: 1.4, md: 2 }}>
+      <TodayHero data={data} />
+      <KpiGrid data={data} />
+      <Box sx={{ display: 'grid', gap: { xs: 1.4, md: 2 }, gridTemplateColumns: { xs: 'minmax(0,1fr)', lg: 'minmax(0,1.7fr) minmax(0,1fr)' } }}>
+        <TrendPanel daily={data.daily} />
+        <RhythmPanel rhythm={data.rhythm} />
+      </Box>
+      <Box sx={{ display: 'grid', gap: { xs: 1.4, md: 2 }, gridTemplateColumns: { xs: 'minmax(0,1fr)', md: 'repeat(2, minmax(0,1fr))' } }}>
+        <FunnelPanel users={data.users} />
+        <CompositionPanel data={data} />
+      </Box>
+      <Box sx={{ display: 'grid', gap: { xs: 1.4, md: 2 }, gridTemplateColumns: { xs: 'minmax(0,1fr)', md: 'repeat(2, minmax(0,1fr))' } }}>
+        <RecentUsersPanel users={data.users} onOpen={setOpenId} />
+        <TopCollectionsPanel collections={data.collections} />
+      </Box>
+      <Typography sx={{ fontSize: '0.68rem', color: theme.textOnBgMuted, textAlign: 'center', px: 2 }}>
+        "Acesso" conta login, volta ao app e abertura de pacotinho. Emails aparecem mascarados e o conteúdo dos bilhetes nunca sai do servidor.
+      </Typography>
+      <UserDrawer user={openUser} onClose={() => setOpenId(null)} />
+    </Stack>
+  )
+}
 
-          <ActivityChart daily={data.daily} />
-
-          <Panel title="Acessaram por último" actions={<SeeAll to="/admin/usuarios" label={`ver os ${data.users.length}`} />}>
-            <Stack divider={<Box sx={{ height: '1px', background: theme.surfaceBorder, mx: 1.2 }} />}>
-              {data.users.slice(0, PREVIEW_SIZE).map((user) => (
-                <UserRow key={user.id} user={user} open={openId === user.id} onToggle={() => setOpenId((current) => (current === user.id ? null : user.id))} />
-              ))}
-            </Stack>
-          </Panel>
-
-          <Panel title="Coleções mais movimentadas" actions={<SeeAll to="/admin/colecoes" label={`ver as ${data.collections.length}`} />}>
-            <Stack divider={<Box sx={{ height: '1px', background: theme.surfaceBorder, mx: 1.2 }} />}>
-              {data.collections.filter((collection) => !collection.deleted).slice(0, PREVIEW_SIZE).map((collection) => (
-                <CollectionRow key={collection.id} collection={collection} />
-              ))}
-            </Stack>
-          </Panel>
-
-          <Typography sx={{ fontSize: '0.68rem', color: theme.textOnBgMuted, textAlign: 'center' }}>
-            "Acesso" conta login, volta ao app e abertura de pacotinho. Emails aparecem mascarados e o conteúdo dos bilhetes nunca sai do servidor.
-          </Typography>
-        </Stack>
-      )}
+export function AdminOverviewPage() {
+  return (
+    <AdminShell title="Como está o Potinho" subtitle="Visão geral do sistema">
+      {(data) => <Overview data={data} />}
     </AdminShell>
   )
 }

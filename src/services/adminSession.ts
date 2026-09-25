@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from 'react'
 import { api } from './api'
 
-export interface AdminSession {
+interface AdminSession {
   token: string
   expiresAt: number
 }
