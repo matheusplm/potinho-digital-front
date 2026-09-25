@@ -1,6 +1,7 @@
 import LogoutIcon from '@mui/icons-material/Logout'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined'
+import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined'
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
 import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined'
 import CheckIcon from '@mui/icons-material/Check'
@@ -14,7 +15,7 @@ import { Box, Stack, Typography, Backdrop, IconButton, Tooltip } from '@mui/mate
 import { useMemo, useState } from 'react'
 import { OnboardingOverlay } from './ui'
 import { useNavigate } from 'react-router-dom'
-import { useUser, type UserRole } from '../context/UserContext'
+import { useUser, type Persona } from '../context/UserContext'
 import { isCollectionReader, personaCapabilities } from '../utils/collectionAccess'
 import { useNotificationToggle } from '../hooks/useNotificationToggle'
 import { useBackground } from '../context/BackgroundContext'
@@ -54,8 +55,9 @@ export function FloatingMenu() {
     navigate('/home')
   }
 
-  function switchPersona(next: UserRole) {
+  function switchPersona(next: Persona) {
     if (next === persona) return
+    if (next === 'admin' && !user?.isAdmin) return
     if (next === 'writer' && !canWriter) return
     if (next === 'reader' && !canReader && !hasPendingInvites) return
     setPersona(next)
@@ -122,14 +124,14 @@ export function FloatingMenu() {
                   {user?.name?.split(' ')[0]}
                 </Typography>
                 <Typography sx={{ fontSize: '0.68rem', color: theme.textOnBgMuted, lineHeight: 1.2 }}>
-                  {persona === 'writer' ? 'escritor' : 'leitor'}
+                  {persona === 'writer' ? 'escritor' : persona === 'admin' ? 'admin' : 'leitor'}
                 </Typography>
               </Box>
             </Stack>
 
             <Box sx={{ height: '1px', bgcolor: theme.surfaceBorder, mx: 1.5 }} />
 
-            {(canSwitch || canWriter || canReader) && (
+            {(canSwitch || canWriter || canReader || user?.isAdmin) && (
               <Box sx={{ px: 1.8, py: 1.4 }}>
                 <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.6, color: theme.textOnBgMuted, textTransform: 'uppercase', mb: 1 }}>
                   Modo de uso
@@ -138,7 +140,8 @@ export function FloatingMenu() {
                   {([
                     { role: 'reader' as const, label: 'Leitor', icon: <MenuBookOutlinedIcon sx={{ fontSize: 15 }} />, enabled: canReader || hasPendingInvites, disabledTip: 'Você ainda não tem acesso a nenhuma coleção como leitor' },
                     { role: 'writer' as const, label: 'Escritor', icon: <EditOutlinedIcon sx={{ fontSize: 15 }} />, enabled: canWriter, disabledTip: 'Crie uma coleção para usar o modo escritor' },
-                  ]).map(({ role, label, icon, enabled, disabledTip }) => {
+                    ...(user?.isAdmin ? [{ role: 'admin' as const, label: 'Admin', icon: <AdminPanelSettingsOutlinedIcon sx={{ fontSize: 15 }} />, enabled: true, disabledTip: '' }] : []),
+                  ] satisfies Array<{ role: Persona; label: string; icon: React.ReactNode; enabled: boolean; disabledTip: string }>).map(({ role, label, icon, enabled, disabledTip }) => {
                     const active = persona === role
                     const showInviteDot = role === 'reader' && hasPendingInvites && persona !== 'reader'
                     const btn = (
@@ -175,7 +178,7 @@ export function FloatingMenu() {
               </Box>
             )}
 
-            {(canSwitch || canWriter || canReader) && (
+            {(canSwitch || canWriter || canReader || user?.isAdmin) && (
               <Box sx={{ height: '1px', bgcolor: theme.surfaceBorder, mx: 1.5 }} />
             )}
 

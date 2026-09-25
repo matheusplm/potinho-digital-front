@@ -1,5 +1,5 @@
 import type { Collection } from '../types/note'
-import type { UserRole } from '../context/UserContext'
+import type { Persona, UserRole } from '../context/UserContext'
 
 export function isCollectionOwner(collection: Collection, userId?: string): boolean {
   if (!userId) return false
@@ -20,17 +20,27 @@ function personaStorageKey(userId: string) {
   return `potinho-persona-${userId}`
 }
 
+export function savedPersona(userId: string): Persona | null {
+  try {
+    return localStorage.getItem(personaStorageKey(userId)) as Persona | null
+  } catch {
+    return null
+  }
+}
+
 export function resolvePersona(
   collections: Collection[],
   userId: string,
   apiRole: UserRole,
-): UserRole {
+  isAdmin = false,
+): Persona {
   const { owned, reader } = partitionCollections(collections, userId)
   const canWriter = owned.length > 0 || apiRole === 'writer'
   const canReader = reader.length > 0
 
   try {
-    const saved = localStorage.getItem(personaStorageKey(userId)) as UserRole | null
+    const saved = localStorage.getItem(personaStorageKey(userId)) as Persona | null
+    if (saved === 'admin' && isAdmin) return 'admin'
     if (saved === 'reader' && canReader) return 'reader'
     if (saved === 'writer' && canWriter) return 'writer'
   } catch {

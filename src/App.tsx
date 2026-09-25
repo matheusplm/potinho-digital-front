@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react'
 import { Suspense, lazy, useEffect } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { useMediaQuery } from '@mui/material'
@@ -13,6 +14,8 @@ import { BackgroundProvider } from './context/BackgroundContext'
 import { SimulationProvider, useSimulation } from './context/SimulationContext'
 import { ReaderProvider } from './context/ReaderContext'
 import { LoadingState } from './components/ui'
+import { clearAdminSession, useAdminSession } from './services/adminSession'
+import { ADMIN_QUERY_ROOT } from './hooks/useAdmin'
 import { Box } from '@mui/material'
 
 const WriterHomePage = lazy(() => import('./pages/WriterHomePage').then((m) => ({ default: m.WriterHomePage })))
@@ -35,6 +38,9 @@ const ContaPage = lazy(() => import('./pages/ContaPage').then((m) => ({ default:
 const ConfirmEmailChangePage = lazy(() => import('./pages/ConfirmEmailChangePage').then((m) => ({ default: m.ConfirmEmailChangePage })))
 const InviteAcceptPage = lazy(() => import('./pages/InviteAcceptPage').then((m) => ({ default: m.InviteAcceptPage })))
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage').then((m) => ({ default: m.NotificationsPage })))
+const AdminOverviewPage = lazy(() => import('./pages/admin/AdminOverviewPage').then((m) => ({ default: m.AdminOverviewPage })))
+const AdminUsersPage = lazy(() => import('./pages/admin/AdminUsersPage').then((m) => ({ default: m.AdminUsersPage })))
+const AdminCollectionsPage = lazy(() => import('./pages/admin/AdminCollectionsPage').then((m) => ({ default: m.AdminCollectionsPage })))
 
 function RouteFallback() {
   return (
@@ -45,9 +51,10 @@ function RouteFallback() {
 }
 
 function HomeRoute() {
-  const { persona } = useUser()
+  const { user, persona } = useUser()
   const simulation = useSimulation()
   if (simulation.isActive) return <SimulatedReaderHomePage />
+  if (persona === 'admin' && user?.isAdmin) return <AdminOverviewPage />
   return persona === 'writer' ? <WriterHomePage /> : <SimulatedReaderHomePage />
 }
 
@@ -55,6 +62,28 @@ function RequireRole({ role, children }: { role: UserRole; children: ReactElemen
   const { persona } = useUser()
   if (persona !== role) return <Navigate to="/home" replace />
   return children
+}
+
+function RequireAdmin({ children }: { children: ReactElement }) {
+  const { user, persona } = useUser()
+  if (persona !== 'admin' || !user?.isAdmin) return <Navigate to="/home" replace />
+  return children
+}
+
+function AdminSessionSync() {
+  const { user, persona } = useUser()
+  const session = useAdminSession()
+  const queryClient = useQueryClient()
+
+  useEffect(() => {
+    if (persona !== 'admin' || !user?.isAdmin) clearAdminSession(true)
+  }, [persona, user?.isAdmin])
+
+  useEffect(() => {
+    if (!session) queryClient.removeQueries({ queryKey: [ADMIN_QUERY_ROOT] })
+  }, [session, queryClient])
+
+  return null
 }
 
 function AppRoutes() {
@@ -91,6 +120,7 @@ function AppRoutes() {
 
   return (
     <Suspense fallback={<RouteFallback />}>
+      <AdminSessionSync />
       <Routes>
         <Route path="/verificar-email" element={<VerifyEmailPage />} />
         <Route path="/esqueci-minha-senha" element={<ForgotPasswordPage />} />
@@ -108,6 +138,8 @@ function AppRoutes() {
           <Route path="colecoes/:slug/gerenciar" element={<RequireRole role="writer"><CollectionManagePage /></RequireRole>} />
           <Route path="colecoes/:slug/gerenciar/leitores/:email" element={<RequireRole role="writer"><ReaderCollectionPage /></RequireRole>} />
           <Route path="conta" element={<ContaPage />} />
+          <Route path="admin/usuarios" element={<RequireAdmin><AdminUsersPage /></RequireAdmin>} />
+          <Route path="admin/colecoes" element={<RequireAdmin><AdminCollectionsPage /></RequireAdmin>} />
         </Route>
         {import.meta.env.DEV && <Route path="test" element={<TestPage />} />}
         <Route path="*" element={<NotFoundPage />} />

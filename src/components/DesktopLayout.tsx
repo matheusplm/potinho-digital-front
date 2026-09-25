@@ -13,6 +13,9 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
 import BlockIcon from '@mui/icons-material/Block'
 import LogoutIcon from '@mui/icons-material/Logout'
 import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined'
+import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined'
+import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined'
+import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined'
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import { Box, Divider, Stack, Typography } from '@mui/material'
@@ -22,7 +25,7 @@ import { PushPrompt } from './PushPrompt'
 import { SimulateReaderSheet } from './SimulateReaderSheet'
 import { SimulationBanner } from './SimulationBanner'
 import { OnboardingOverlay, toast } from './ui'
-import { useUser, type UserRole } from '../context/UserContext'
+import { useUser, type Persona } from '../context/UserContext'
 import { useSimulation } from '../context/SimulationContext'
 import { useReader } from '../context/ReaderContext'
 import { useNotificationToggle } from '../hooks/useNotificationToggle'
@@ -41,6 +44,12 @@ interface NavItem {
   icon: React.ReactNode
   action?: 'simulate' | 'end-simulation'
 }
+
+const ADMIN_NAV: NavItem[] = [
+  { label: 'Visão geral', path: '/home', icon: <InsightsOutlinedIcon /> },
+  { label: 'Usuários', path: '/admin/usuarios', icon: <PeopleAltOutlinedIcon /> },
+  { label: 'Coleções', path: '/admin/colecoes', icon: <Inventory2Icon /> },
+]
 
 const WRITER_NAV: NavItem[] = [
   { label: 'Início', path: '/home', icon: <HomeIcon /> },
@@ -107,6 +116,7 @@ export function DesktopLayout() {
         { label: 'Novidades', path: '/notificacoes', icon: <NotificationsNoneOutlinedIcon /> },
       ]
     }
+    if (persona === 'admin') return ADMIN_NAV
     if (persona !== 'writer') return [{ label: 'Início', path: '/home', icon: <HomeIcon /> }]
     if (isActive) {
       return [
@@ -127,8 +137,9 @@ export function DesktopLayout() {
     return match?.path ?? null
   }, [location.pathname, items, isActive, isReader, readerAlbumPath, session])
 
-  function switchPersona(next: UserRole) {
+  function switchPersona(next: Persona) {
     if (next === persona) return
+    if (next === 'admin' && !user?.isAdmin) return
     if (next === 'writer' && !canWriter) return
     if (next === 'reader' && !canReader && !hasPendingInvites) return
     setPersona(next)
@@ -170,7 +181,7 @@ export function DesktopLayout() {
             {user?.name}
           </Typography>
           <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted, mt: 0.2 }}>
-            {persona === 'writer' ? 'escritor' : 'leitor'}
+            {persona === 'writer' ? 'escritor' : persona === 'admin' ? 'admin' : 'leitor'}
           </Typography>
         </Box>
 
@@ -317,7 +328,7 @@ export function DesktopLayout() {
         <Divider sx={{ borderColor: theme.surfaceBorder }} />
 
         {/* Persona switch */}
-        {(canWriter || canReader) && (
+        {(canWriter || canReader || user?.isAdmin) && (
           <Box sx={{ px: 1.5, pt: 1.4, pb: 0.6 }}>
             <Typography sx={{ fontSize: '0.68rem', fontWeight: 800, letterSpacing: 0.5, color: theme.textOnBgMuted, textTransform: 'uppercase', mb: 0.8, px: 0.3 }}>
               Modo
@@ -326,7 +337,8 @@ export function DesktopLayout() {
               {([
                 { role: 'reader' as const, label: 'Leitor', icon: <MenuBookOutlinedIcon sx={{ fontSize: 13 }} />, enabled: canReader || hasPendingInvites },
                 { role: 'writer' as const, label: 'Escritor', icon: <EditOutlinedIcon sx={{ fontSize: 13 }} />, enabled: canWriter },
-              ]).map(({ role, label, icon, enabled }) => {
+                ...(user?.isAdmin ? [{ role: 'admin' as const, label: 'Admin', icon: <AdminPanelSettingsOutlinedIcon sx={{ fontSize: 13 }} />, enabled: true }] : []),
+              ] satisfies Array<{ role: Persona; label: string; icon: React.ReactNode; enabled: boolean }>).map(({ role, label, icon, enabled }) => {
                 const active = persona === role
                 const showInviteDot = role === 'reader' && hasPendingInvites && persona !== 'reader'
                 return (
@@ -497,7 +509,7 @@ export function DesktopLayout() {
       {/* ── Content area ── */}
       <Box sx={{ flex: 1, height: '100%', overflow: 'hidden', position: 'relative' }}>
         <SimulationBanner />
-        {location.pathname === '/home' && !isActive && <PushPrompt />}
+        {location.pathname === '/home' && !isActive && persona !== 'admin' && <PushPrompt />}
         <Outlet />
       </Box>
 

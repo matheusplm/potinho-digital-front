@@ -1,3 +1,4 @@
+import type { AdminOverview } from '../types/admin'
 import type {
   Collection,
   CollectionAccess,
@@ -83,6 +84,9 @@ const FRIENDLY_ERROR_MESSAGES: Record<string, string> = {
   ACHIEVEMENT_ALREADY_EXISTS: 'Já existe uma conquista com esse identificador.',
   ACHIEVEMENT_INVALID_CONDITION: 'Condição inválida para esta conquista.',
   NOTE_NOT_DISABLED: 'Desative o bilhete antes de excluí-lo permanentemente.',
+  ADMIN_REAUTH_REQUIRED: 'Confirme sua identidade para continuar no modo admin.',
+  ADMIN_REAUTH_FAILED: 'Não deu pra confirmar que é você. Confira a senha e tente de novo.',
+  ADMIN_USE_GOOGLE: 'Essa conta entra com o Google. Confirme pelo botão do Google.',
 }
 
 export function setAuthToken(token: string) {
@@ -127,6 +131,7 @@ async function tryRefresh(): Promise<string | null> {
 
 async function send(url: string, init: RequestInit | undefined, token: string): Promise<Response> {
   const headers: Record<string, string> = {
+    ...((init?.headers ?? {}) as Record<string, string>),
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(API_SECRET ? { 'x-api-key': API_SECRET } : {}),
   }
@@ -204,7 +209,7 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ name, email, password, captchaToken, ...(username ? { username } : {}) }),
     }),
-  me: () => request<{ id: string; name: string; role: string; email: string; username?: string; emailVerified?: boolean; onboardingDone: boolean | null }>('/auth/me'),
+  me: () => request<{ id: string; name: string; role: string; email: string; username?: string; emailVerified?: boolean; onboardingDone: boolean | null; isAdmin?: boolean }>('/auth/me'),
   markOnboardingDone: () => request<{ ok: boolean }>('/auth/onboarding-done', { method: 'PATCH' }),
   updateMe: (data: { name?: string; username?: string }) =>
     request<{ id: string; name: string; email: string; username?: string }>('/auth/me', { method: 'PATCH', body: JSON.stringify(data) }),
@@ -364,4 +369,11 @@ export const api = {
     request<CollectionAchievement>(`/api/collections/${cid}/achievements/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteCollectionAchievement: (cid: string, id: string) =>
     request<{ deleted: boolean }>(`/api/collections/${cid}/achievements/${id}`, { method: 'DELETE' }),
+
+  startAdminSession: (proof: { password: string } | { googleIdToken: string }) =>
+    request<{ adminToken: string; expiresAt: string }>('/api/admin/session', { method: 'POST', body: JSON.stringify(proof) }),
+  revokeAdminSession: (adminToken: string) =>
+    send('/api/admin/session', { method: 'DELETE', headers: { 'X-Admin-Token': adminToken } }, authToken).then(() => undefined, () => undefined),
+  adminOverview: (adminToken: string) =>
+    request<AdminOverview>('/api/admin/overview', { headers: { 'X-Admin-Token': adminToken } }),
 }

@@ -5,6 +5,11 @@ export const fadeIn = keyframes`
   to   { opacity: 1; transform: translateY(0); }
 `
 
+export const spin = keyframes`
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+`
+
 export const fadeInHero = keyframes`
   from { opacity: 0; transform: translateY(22px); }
   to   { opacity: 1; transform: translateY(0); }

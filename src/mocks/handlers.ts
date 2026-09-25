@@ -12,6 +12,7 @@ import type {
 } from '../types/note'
 import { toConfigId } from '../utils/slug'
 import { buildNoteView, drawReward } from './data'
+import { adminHandlers, MOCK_ADMIN_EMAIL } from './admin'
 import {
   createEmptyCollection,
   db,
@@ -223,6 +224,7 @@ const authHandlers = [
     if (!user) return HttpResponse.json({ message: 'Não autenticado.' }, { status: 401 })
     return HttpResponse.json({
       id: user.id, name: user.name, role: inferMockRole(user), email: user.email, onboardingDone: true,
+      isAdmin: user.email === MOCK_ADMIN_EMAIL,
     })
   }),
 
@@ -1016,4 +1018,4 @@ const collectionHandlers = [
   }),
 ]
 
-export const handlers = [...authHandlers, ...collectionHandlers]
+export const handlers = [...authHandlers, ...collectionHandlers, ...adminHandlers]

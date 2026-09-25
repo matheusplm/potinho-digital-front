@@ -48,9 +48,10 @@ function GoogleGlyph() {
   )
 }
 
-export function GoogleSignInButton({ onCredential, disabled }: {
+export function GoogleSignInButton({ onCredential, disabled, dividerLabel = 'ou entre com email' }: {
   onCredential: (idToken: string) => void
   disabled?: boolean
+  dividerLabel?: string
 }) {
   const hostRef = useRef<HTMLDivElement>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
@@ -139,7 +140,7 @@ export function GoogleSignInButton({ onCredential, disabled }: {
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, my: 2.5 }}>
         <Box sx={{ flex: 1, height: '1px', background: `linear-gradient(90deg, transparent, ${colors.border.medium})` }} />
-        <Typography sx={{ fontFamily: font.sans, fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: colors.text.muted }}>ou entre com email</Typography>
+        <Typography sx={{ fontFamily: font.sans, fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: colors.text.muted }}>{dividerLabel}</Typography>
         <Box sx={{ flex: 1, height: '1px', background: `linear-gradient(90deg, ${colors.border.medium}, transparent)` }} />
       </Box>
     </Box>

@@ -1,8 +1,10 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { api, setAuthToken } from '../services/api'
+import { clearAdminSession } from '../services/adminSession'
 
 export type UserRole = 'writer' | 'reader'
+export type Persona = UserRole | 'admin'
 
 interface AuthUser {
   id: string
@@ -14,15 +16,16 @@ interface AuthUser {
   token: string
   refreshToken?: string
   onboardingDone?: boolean | null
+  isAdmin?: boolean
 }
 
 interface UserContextValue {
   user: AuthUser | null
-  persona: UserRole
+  persona: Persona
   personaReady: boolean
   setUser: (user: AuthUser | null) => void
   patchUser: (patch: Partial<AuthUser>) => void
-  setPersona: (role: UserRole) => void
+  setPersona: (role: Persona) => void
   markPersonaReady: () => void
   logout: () => void
 }
@@ -42,7 +45,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       return null
     }
   })
-  const [persona, setPersonaState] = useState<UserRole>('writer')
+  const [persona, setPersonaState] = useState<Persona>('writer')
   const [personaReady, setPersonaReady] = useState(false)
   const userIdRef = useRef<string | null>(user?.id ?? null)
 
@@ -64,7 +67,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const setPersona = (role: UserRole) => {
+  const setPersona = (role: Persona) => {
     setPersonaState(role)
     if (user?.id) {
       try {
@@ -87,6 +90,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const markPersonaReady = () => setPersonaReady(true)
 
   const logout = () => {
+    clearAdminSession(true)
     if (user?.refreshToken) api.logout(user.refreshToken)
     setUser(null)
   }
@@ -109,6 +113,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
             username: profile.username,
             emailVerified: profile.emailVerified,
             onboardingDone: profile.onboardingDone,
+            isAdmin: profile.isAdmin === true,
             token: current.token,
           }
           localStorage.setItem(STORAGE_KEY, JSON.stringify(merged))

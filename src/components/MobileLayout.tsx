@@ -6,6 +6,8 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone'
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import StopCircleOutlinedIcon from '@mui/icons-material/StopCircleOutlined'
+import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined'
+import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined'
 import { Box, Tooltip, Typography } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
@@ -29,6 +31,12 @@ interface NavItem {
   icon: React.ReactNode
   action?: 'simulate' | 'end-simulation'
 }
+
+const ADMIN_NAV: NavItem[] = [
+  { label: 'Visão geral', path: '/home', icon: <InsightsOutlinedIcon /> },
+  { label: 'Usuários', path: '/admin/usuarios', icon: <PeopleAltOutlinedIcon /> },
+  { label: 'Coleções', path: '/admin/colecoes', icon: <Inventory2Icon /> },
+]
 
 const WRITER_NAV: NavItem[] = [
   { label: 'Início', path: '/home', icon: <HomeIcon /> },
@@ -79,6 +87,7 @@ export function MobileLayout() {
         { label: 'Novidades', path: '/notificacoes', icon: <NotificationsNoneIcon /> },
       ]
     }
+    if (persona === 'admin') return ADMIN_NAV
     if (persona !== 'writer') {
       return [{ label: 'Início', path: '/home', icon: <HomeIcon /> }]
     }
@@ -110,7 +119,7 @@ export function MobileLayout() {
     <Box sx={{ width: '100%', maxWidth: 480, height: '100dvh', mx: 'auto', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <FloatingMenu />
       <SimulationBanner />
-      {location.pathname === '/home' && !isActive && <PushPrompt />}
+      {location.pathname === '/home' && !isActive && persona !== 'admin' && <PushPrompt />}
 
       <Box component="main" sx={{
         flex: 1,

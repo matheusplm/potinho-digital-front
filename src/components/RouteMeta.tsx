@@ -25,6 +25,7 @@ const SECTION_TITLES: Array<[string, string]> = [
   ['/favoritas', 'Favoritas'],
   ['/notificacoes', 'Novidades'],
   ['/conta', 'Minha conta'],
+  ['/admin', 'Painel admin'],
   ['/convite', 'Convite'],
   ['/esqueci-minha-senha', 'Recuperar senha'],
   ['/redefinir-senha', 'Nova senha'],
