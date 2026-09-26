@@ -54,6 +54,12 @@ export function MobileLayout() {
   const [simulateOpen, setSimulateOpen] = useState(false)
   const isReader = persona === 'reader' && !isActive
 
+  useEffect(() => {
+    const root = document.documentElement
+    root.classList.add('pd-app-shell')
+    return () => root.classList.remove('pd-app-shell')
+  }, [])
+
   const { data: collections = [] } = useCollectionsQuery()
   const readerActive = useMemo(() => {
     if (!isReader) return undefined
