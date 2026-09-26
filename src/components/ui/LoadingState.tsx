@@ -41,8 +41,8 @@ export function LoadingState({
           alignItems: 'center',
           justifyContent: 'center',
           position: 'relative',
-          background: 'rgba(255,255,255,0.48)',
-          border: '1px solid rgba(255,255,255,0.62)',
+          background: colors.glass.bg,
+          border: `1px solid ${colors.glass.border}`,
           boxShadow: `0 10px 30px ${accent}22`,
           backdropFilter: 'blur(14px)',
         }}>

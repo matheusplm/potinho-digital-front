@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useLayoutEffect, useState, type ReactNode } from 'react'
-import { defaultBackgroundKey, getBackgroundTheme, type BackgroundTheme } from '../design-system'
+import { defaultBackgroundKey, getBackgroundTheme, THEME_STORAGE_KEY, type BackgroundTheme } from '../design-system'
 
 interface BackgroundContextValue {
   theme: BackgroundTheme
@@ -10,7 +10,6 @@ interface BackgroundContextValue {
 }
 
 const BackgroundContext = createContext<BackgroundContextValue | null>(null)
-export const THEME_STORAGE_KEY = 'potinho-bg-theme'
 const MASK_KEY = 'potinho-mask-cards'
 const useIsomorphicLayoutEffect = typeof document === 'undefined' ? useEffect : useLayoutEffect
 
