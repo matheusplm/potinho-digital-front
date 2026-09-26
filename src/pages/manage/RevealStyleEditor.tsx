@@ -1,4 +1,4 @@
-import { Box, Stack, Typography } from '@mui/material'
+import { Box, Stack, Typography, type SxProps, type Theme } from '@mui/material'
 import { useMemo, useRef, useState, type ReactNode } from 'react'
 import { AdvancedOptions, Button, EmojiPickerInput, Input } from '../../components/ui'
 import { ImagePicker } from '../../components/ImagePicker'
@@ -39,7 +39,7 @@ function Heading({ title, hint }: { title: string; hint?: string }) {
   )
 }
 
-function Tile({ active, onClick, label, children }: { active: boolean; onClick: () => void; label: string; children: ReactNode }) {
+function Tile({ active, onClick, label, children, sx }: { active: boolean; onClick: () => void; label: string; children: ReactNode; sx?: SxProps<Theme> }) {
   return (
     <Box
       role="button"
@@ -48,14 +48,14 @@ function Tile({ active, onClick, label, children }: { active: boolean; onClick: 
       aria-label={label}
       onClick={onClick}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick() } }}
-      sx={{
+      sx={[{
         position: 'relative', p: 1, borderRadius: radius.lg, cursor: 'pointer', userSelect: 'none', outline: 'none',
         background: active ? activeTint : 'transparent',
         border: `1.5px solid ${active ? colors.primary.text : colors.border.subtle}`,
         transition: 'transform 0.15s ease, border-color 0.15s ease, background 0.15s ease',
         '&:hover': { transform: 'translateY(-1px)', borderColor: colors.primary.text },
         '&:focus-visible': { boxShadow: `0 0 0 3px ${activeTint}`, borderColor: colors.primary.text },
-      }}
+      }, ...(Array.isArray(sx) ? sx : [sx])]}
     >
       {children}
     </Box>
@@ -63,7 +63,29 @@ function Tile({ active, onClick, label, children }: { active: boolean; onClick: 
 }
 
 function Swatch({ fill }: { fill: string }) {
-  return <Box sx={{ width: 26, height: 26, mx: 'auto', borderRadius: '50%', background: fill, boxShadow: `0 0 0 2px ${colors.surface.base}, 0 2px 8px rgba(15,23,42,0.18)` }} />
+  return <Box sx={{ width: { xs: 22, sm: 26 }, height: { xs: 22, sm: 26 }, flexShrink: 0, borderRadius: '50%', background: fill, boxShadow: `0 0 0 2px ${colors.surface.base}, 0 2px 8px rgba(15,23,42,0.18)` }} />
+}
+
+function ColorOption({ active, onClick, label, text, swatch }: { active: boolean; onClick: () => void; label: string; text: string; swatch: ReactNode }) {
+  return (
+    <Tile
+      active={active}
+      onClick={onClick}
+      label={label}
+      sx={{
+        display: 'flex', alignItems: 'center', flexDirection: { xs: 'row', sm: 'column' },
+        justifyContent: { xs: 'flex-start', sm: 'center' }, gap: { xs: 0.8, sm: 0.6 }, px: { xs: 0.9, sm: 1 },
+      }}
+    >
+      {swatch}
+      <Typography sx={{
+        minWidth: 0, fontSize: '0.68rem', fontWeight: 700, lineHeight: 1.2, overflowWrap: 'anywhere',
+        textAlign: { xs: 'left', sm: 'center' }, color: active ? colors.primary.text : colors.text.secondary,
+      }}>
+        {text}
+      </Typography>
+    </Tile>
+  )
 }
 
 export function RevealStyleEditor({ cid, form, rarities, onStyle, onField }: {
@@ -137,35 +159,31 @@ export function RevealStyleEditor({ cid, form, rarities, onStyle, onField }: {
 
         <Box>
           <Heading title="Cor da luz" hint="brilho, raios e faíscas" />
-          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 0.7 }}>
-            <Tile active={colorChoice === 'rarity'} onClick={() => chooseColor('rarity')} label="Cor da raridade">
-              <Swatch fill={rarityColor(form, theme.accent)} />
-              <Typography sx={{ fontSize: '0.64rem', fontWeight: 700, textAlign: 'center', mt: 0.6, color: colors.text.secondary }}>Da raridade</Typography>
-            </Tile>
-            <Tile active={colorChoice === 'gold'} onClick={() => chooseColor('gold')} label="Dourado">
-              <Swatch fill={`radial-gradient(circle at 35% 30%, #fff7cc, ${GOLD} 55%, #d97706)`} />
-              <Typography sx={{ fontSize: '0.64rem', fontWeight: 700, textAlign: 'center', mt: 0.6, color: colors.text.secondary }}>Dourado</Typography>
-            </Tile>
-            <Tile active={colorChoice === 'rainbow'} onClick={() => chooseColor('rainbow')} label="Arco-íris">
-              <Swatch fill={rainbowConic()} />
-              <Typography sx={{ fontSize: '0.64rem', fontWeight: 700, textAlign: 'center', mt: 0.6, color: colors.text.secondary }}>Arco-íris</Typography>
-            </Tile>
-            <Tile active={colorChoice === 'custom'} onClick={() => { chooseColor(customColor); colorInput.current?.click() }} label="Escolher cor">
-              <Box sx={{ position: 'relative', width: 26, mx: 'auto' }}>
-                <Swatch fill={customColor} />
-                <input
-                  ref={colorInput}
-                  type="color"
-                  value={customColor}
-                  tabIndex={-1}
-                  aria-hidden
-                  onClick={(e) => e.stopPropagation()}
-                  onChange={(e) => { setCustomColor(e.target.value); chooseColor(e.target.value) }}
-                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0, pointerEvents: 'none', border: 0, padding: 0 }}
-                />
-              </Box>
-              <Typography sx={{ fontSize: '0.64rem', fontWeight: 700, textAlign: 'center', mt: 0.6, color: colors.text.secondary }}>Escolher</Typography>
-            </Tile>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, minmax(0, 1fr))', sm: 'repeat(4, minmax(0, 1fr))' }, gap: 0.7 }}>
+            <ColorOption active={colorChoice === 'rarity'} onClick={() => chooseColor('rarity')} label="Cor da raridade" text="Da raridade" swatch={<Swatch fill={rarityColor(form, theme.accent)} />} />
+            <ColorOption active={colorChoice === 'gold'} onClick={() => chooseColor('gold')} label="Dourado" text="Dourado" swatch={<Swatch fill={`radial-gradient(circle at 35% 30%, #fff7cc, ${GOLD} 55%, #d97706)`} />} />
+            <ColorOption active={colorChoice === 'rainbow'} onClick={() => chooseColor('rainbow')} label="Arco-íris" text="Arco-íris" swatch={<Swatch fill={rainbowConic()} />} />
+            <ColorOption
+              active={colorChoice === 'custom'}
+              onClick={() => { chooseColor(customColor); colorInput.current?.click() }}
+              label="Escolher cor"
+              text="Escolher"
+              swatch={(
+                <Box sx={{ position: 'relative', flexShrink: 0, display: 'flex' }}>
+                  <Swatch fill={customColor} />
+                  <input
+                    ref={colorInput}
+                    type="color"
+                    value={customColor}
+                    tabIndex={-1}
+                    aria-hidden
+                    onClick={(e) => e.stopPropagation()}
+                    onChange={(e) => { setCustomColor(e.target.value); chooseColor(e.target.value) }}
+                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0, pointerEvents: 'none', border: 0, padding: 0 }}
+                  />
+                </Box>
+              )}
+            />
           </Box>
         </Box>
 
@@ -239,8 +257,13 @@ export function RevealStyleEditor({ cid, form, rarities, onStyle, onField }: {
                 {(['emoji', 'image'] as const).map((option) => {
                   const active = option === 'image' ? mediaIsImage : !mediaIsImage
                   return (
-                    <Box key={option} sx={{ flex: 1 }}>
-                      <Tile active={active} label={option === 'emoji' ? 'Emoji' : 'GIF ou imagem'} onClick={() => onField('revealMedia', option === 'emoji' ? (selectedEffect.defaultMedia || '✨') : '')}>
+                    <Box key={option} sx={{ flex: 1, minWidth: 0, display: 'flex' }}>
+                      <Tile
+                        active={active}
+                        label={option === 'emoji' ? 'Emoji' : 'GIF ou imagem'}
+                        onClick={() => onField('revealMedia', option === 'emoji' ? (selectedEffect.defaultMedia || '✨') : '')}
+                        sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
                         <Typography sx={{ fontSize: '0.74rem', fontWeight: 700, textAlign: 'center', color: active ? colors.primary.text : colors.text.secondary }}>
                           {option === 'emoji' ? '😀 Emoji' : '🖼️ GIF ou imagem'}
                         </Typography>
@@ -262,13 +285,13 @@ export function RevealStyleEditor({ cid, form, rarities, onStyle, onField }: {
         </Box>
 
         <Box>
-          <Stack direction="row" spacing={1}>
+          <Stack direction={{ xs: 'column-reverse', sm: 'row' }} sx={{ gap: 1 }}>
             {customized && (
-              <Button variant="ghost" onClick={reset} sx={{ flex: 1, py: 1, whiteSpace: 'nowrap' }}>
+              <Button variant="ghost" onClick={reset} sx={{ flex: { sm: 1 }, py: 1, lineHeight: 1.25 }}>
                 ↺ Deixar tranquila
               </Button>
             )}
-            <Button variant="primary" onClick={() => setTesting(true)} sx={{ flex: 1.4, py: 1, whiteSpace: 'nowrap' }}>
+            <Button variant="primary" onClick={() => setTesting(true)} sx={{ flex: { sm: 1.4 }, py: 1, lineHeight: 1.25 }}>
               🎬 Testar abertura
             </Button>
           </Stack>
