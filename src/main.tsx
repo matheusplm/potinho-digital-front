@@ -16,10 +16,24 @@ async function enableMocking() {
     return
   }
 
+  const isMockWorker = (url?: string) => !!url?.endsWith('/mockServiceWorker.js')
+  const registrations = await navigator.serviceWorker?.getRegistrations() ?? []
+  await Promise.all(registrations
+    .filter((registration) => !isMockWorker((registration.active ?? registration.waiting ?? registration.installing)?.scriptURL))
+    .map((registration) => registration.unregister()))
+
   const { worker } = await import('./mocks/browser.ts')
   await worker.start({
     onUnhandledRequest: 'bypass',
   })
+
+  const reloadKey = 'pd-mock-reload'
+  if (!isMockWorker(navigator.serviceWorker?.controller?.scriptURL) && sessionStorage.getItem(reloadKey) !== '1') {
+    sessionStorage.setItem(reloadKey, '1')
+    window.location.reload()
+    await new Promise(() => {})
+  }
+  sessionStorage.removeItem(reloadKey)
 }
 
 enableMocking().then(() => {

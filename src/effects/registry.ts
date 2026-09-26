@@ -3,9 +3,9 @@ import type { RevealEffectDefinition, RevealEffectKind } from './types'
 export const REVEAL_EFFECTS: RevealEffectDefinition[] = [
   {
     kind: 'none',
-    label: 'Nenhum',
+    label: 'Nada',
     icon: '🚫',
-    description: 'Sem efeito especial na revelação.',
+    description: 'Só a abertura, sem chuva nem explosão.',
     usesMedia: false,
     defaultMedia: '',
     durationMs: 0,
@@ -14,7 +14,7 @@ export const REVEAL_EFFECTS: RevealEffectDefinition[] = [
     kind: 'rain',
     label: 'Chuva',
     icon: '🌧️',
-    description: 'Chove o emoji, GIF ou imagem que você escolher pela tela inteira.',
+    description: 'Depois de virar, chove o emoji, GIF ou imagem que você escolher pela tela inteira.',
     usesMedia: true,
     defaultMedia: '💖',
     durationMs: 4200,
@@ -23,28 +23,10 @@ export const REVEAL_EFFECTS: RevealEffectDefinition[] = [
     kind: 'burst',
     label: 'Explosão',
     icon: '💥',
-    description: 'Explode o emoji, GIF ou imagem do centro da tela para todos os lados.',
+    description: 'Depois de virar, o emoji, GIF ou imagem explode do bilhete para todos os lados.',
     usesMedia: true,
     defaultMedia: '✨',
     durationMs: 2400,
-  },
-  {
-    kind: 'fireworks',
-    label: 'Fogos de artifício',
-    icon: '🎆',
-    description: 'Fogos coloridos estourando em sequência pela tela.',
-    usesMedia: false,
-    defaultMedia: '',
-    durationMs: 3400,
-  },
-  {
-    kind: 'glow',
-    label: 'Brilho lendário',
-    icon: '🌟',
-    description: 'Raios de luz girando em volta do bilhete, estilo carta lendária.',
-    usesMedia: false,
-    defaultMedia: '',
-    durationMs: 3000,
   },
 ]
 
@@ -61,7 +43,6 @@ const LEGACY_KINDS: Record<string, { kind: RevealEffectKind; media?: string }> =
   crystals: { kind: 'burst', media: '💎' },
   galaxy: { kind: 'burst', media: '🌌' },
   fireflies: { kind: 'rain', media: '✨' },
-  aurora: { kind: 'glow' },
 }
 
 function isEffectKind(value: string): value is RevealEffectKind {

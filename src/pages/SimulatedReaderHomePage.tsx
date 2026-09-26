@@ -32,12 +32,11 @@ import { formatRemainingTime } from '../utils/packCooldowns'
 import { isNotificationOptedOut, showLocalNotification } from '../utils/notifications'
 import { computeAchievements } from '../utils/achievements'
 import { NoteDetailDialog, type ReadableNote } from '../components/collection/NoteDetailDialog'
-import { PACK_OPEN_ANIMATION_MS, PackOpeningDialog, wait } from '../components/collection/PackOpeningDialog'
+import { PackOpeningStage } from '../components/pack-opening/PackOpeningStage'
 import type { CollectionDailyReward, CollectionPack } from '../types/note'
 import { slugify } from '../utils/slug'
 import { MainPackButton } from './home/MainPackButton'
 import { BonusPackRow } from './home/BonusPackRow'
-import { RewardHighlightDialog } from './home/RewardHighlightDialog'
 import { BonusPackDialog } from './home/BonusPackDialog'
 
 export function SimulatedReaderHomePage() {
@@ -141,10 +140,10 @@ export function SimulatedReaderHomePage() {
     [relerIndex, ownedItems],
   )
   const [isOpeningPack, setIsOpeningPack] = useState(false)
-  const [rewards, setRewards] = useState<CollectionDailyReward[]>([])
-  const [highlightOpen, setHighlightOpen] = useState(false)
+  const [stage, setStage] = useState<{ pack: CollectionPack; rewards: CollectionDailyReward[] | null } | null>(null)
+  const [stageOpen, setStageOpen] = useState(false)
+  const achievementsPending = useRef(false)
   const [selectedNote, setSelectedNote] = useState<ReadableNote | null>(null)
-  const [openingPack, setOpeningPack] = useState<CollectionPack | null>(null)
   const [selectedBonusPack, setSelectedBonusPack] = useState<CollectionPack | null>(null)
   const [openedBonusPackIds, setOpenedBonusPackIds] = useState<string[]>([])
   const [packCooldowns, setPackCooldowns] = useState<Record<string, string>>({})
@@ -286,15 +285,15 @@ export function SimulatedReaderHomePage() {
     }
 
     if (isRealReader) {
+      if (isMain && !mainPack) {
+        toast.error('Nenhum pacotinho diário configurado.')
+        return
+      }
       setSelectedBonusPack(null)
-      setOpeningPack(pack)
+      setStage({ pack, rewards: null })
+      setStageOpen(true)
       setIsOpeningPack(true)
-      const startedAt = Date.now()
       try {
-        if (isMain && !mainPack) {
-          toast.error('Nenhum pacotinho diário configurado.')
-          return
-        }
         let rewards: CollectionDailyReward[]
         {
           const result = await openPackMutation.mutateAsync({ packId: pack.id, count })
@@ -312,17 +311,12 @@ export function SimulatedReaderHomePage() {
           }
           rewards = result.rewards
         }
-        await wait(Math.max(0, PACK_OPEN_ANIMATION_MS - (Date.now() - startedAt)))
-        await queryClient.invalidateQueries({ queryKey: ['reader-achievements', cid] })
         setNow(Date.now())
-        setRewards(rewards)
         addUnread(cid, rewards.map((r) => r.id))
-        setHighlightOpen(true)
-        const newCount = rewards.filter((r) => r.isNew).length
-        toast.love(`${rewards.length} bilhete${rewards.length !== 1 ? 's' : ''}!`, {
-          description: newCount > 0 ? `${newCount} novo${newCount !== 1 ? 's' : ''} na coleção ✨` : `${pack.name} aberto!`,
-        })
+        achievementsPending.current = true
+        setStage((current) => (current ? { ...current, rewards } : current))
       } catch (error) {
+        setStageOpen(false)
         if (error instanceof ApiRequestError && ['PACK_COUNT_EXCEEDED', 'PACK_ALREADY_OPENING', 'PACK_EXHAUSTED'].includes(error.code ?? '')) {
           await queryClient.invalidateQueries({ queryKey: ['col-play', cid] })
           await queryClient.invalidateQueries({ queryKey: ['col-pack-statuses', cid] })
@@ -340,7 +334,6 @@ export function SimulatedReaderHomePage() {
         }
       } finally {
         setIsOpeningPack(false)
-        setOpeningPack(null)
       }
       return
     }
@@ -353,23 +346,23 @@ export function SimulatedReaderHomePage() {
     }
 
     setSelectedBonusPack(null)
-    setOpeningPack(pack)
-    setIsOpeningPack(true)
-    await wait(PACK_OPEN_ANIMATION_MS)
     const revealedRewards = isMain
       ? simulation.commitDailyOpen(pendingRewards, pack.cooldownHours)
       : simulation.commitRewards(pendingRewards)
     setNow(Date.now())
-    setRewards(revealedRewards)
-    setIsOpeningPack(false)
-    setOpeningPack(null)
     if (!isMain) {
       setOpenedBonusPackIds((current) => [...new Set([...current, pack.id])])
     }
-    setHighlightOpen(true)
-    toast.love(`${revealedRewards.length} bilhete${revealedRewards.length !== 1 ? 's' : ''}!`, {
-      description: `${pack.name} aberto na prévia ✨`,
-    })
+    setStage({ pack, rewards: revealedRewards })
+    setStageOpen(true)
+  }
+
+  function closeStage() {
+    setStageOpen(false)
+    if (achievementsPending.current) {
+      achievementsPending.current = false
+      void queryClient.invalidateQueries({ queryKey: ['reader-achievements', cid] })
+    }
   }
 
   if (!activeSession) {
@@ -625,17 +618,15 @@ export function SimulatedReaderHomePage() {
         />
       )}
 
-      <PackOpeningDialog open={isOpeningPack} emoji={openingPack?.emoji ?? activeSession.collectionEmoji} accent={openingPack?.accent ?? theme.accent} />
-
-      <RewardHighlightDialog
-        open={highlightOpen}
-        rewards={rewards}
+      <PackOpeningStage
+        open={stageOpen}
+        pack={stage ? { name: stage.pack.name, emoji: stage.pack.emoji || activeSession.collectionEmoji, gradient: stage.pack.gradient, accent: stage.pack.accent || theme.accent } : null}
+        rewards={stage?.rewards ?? null}
         rarities={rarities}
         types={types}
-        collectionSlug={activeSession.collectionSlug}
-        accent={theme.accent}
-        onClose={() => setHighlightOpen(false)}
-        onRewardClick={(reward) => {
+        onClose={closeStage}
+        onViewCollection={() => { closeStage(); navigate(`/colecoes/${activeSession.collectionSlug}`) }}
+        onOpenReward={(reward) => {
           simulation.markNoteViewed(reward.id)
           setSelectedNote(reward)
         }}
