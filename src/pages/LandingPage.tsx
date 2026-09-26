@@ -12,34 +12,17 @@ import { Box, Chip, IconButton, Popover, Stack, Tooltip, Typography, useMediaQue
 import { useEffect, useRef, useState, type FC } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, ScrollHint } from '../components/ui'
-import { backgroundThemes, colors, fadeInHero, fadeInRight, floatParticleLanding, font, getBackgroundTheme, gradients, liftOnDark, radius, shadow } from '../design-system'
+import { backgroundThemes, colors, fadeInHero, fadeInRight, font, getBackgroundTheme, gradients, liftOnDark, radius, shadow } from '../design-system'
 import { useBackground } from '../context/BackgroundContext'
 import { ThemeSwatches } from '../components/ThemeSwatches'
+import { FloatingParticles } from '../components/FloatingParticles'
 import { AUDIENCES, CUSTOMIZATIONS, DEMO_NOTES, FEATURES, RARITY_COLOR, RARITY_FILTERS, STEPS } from './landing/landingData'
 import { SectionTitle } from './landing/SectionTitle'
 import { DemoNoteCard } from './landing/DemoNoteCard'
 import { HeroCardStack } from './landing/HeroCardStack'
 
-const LANDING_PARTICLES = [
-  { size: 34, left: '4%',   delay: '0s',    dur: '18s', blur: '1px',   bottom: '-12px' },
-  { size: 13, left: '11%',  delay: '0s',    dur: '12s', blur: '0px',   bottom: '42vh'  },
-  { size: 22, left: '19%',  delay: '6s',    dur: '16s', blur: '0.5px', bottom: '-12px' },
-  { size: 10, left: '28%',  delay: '0s',    dur: '10s', blur: '0px',   bottom: '28vh'  },
-  { size: 18, left: '36%',  delay: '9s',    dur: '14s', blur: '0.5px', bottom: '-12px' },
-  { size: 28, left: '46%',  delay: '0s',    dur: '17s', blur: '1.5px', bottom: '58vh'  },
-  { size: 11, left: '55%',  delay: '7s',    dur: '11s', blur: '0px',   bottom: '-12px' },
-  { size: 20, left: '63%',  delay: '0s',    dur: '15s', blur: '0.5px', bottom: '20vh'  },
-  { size: 15, left: '72%',  delay: '11s',   dur: '13s', blur: '0px',   bottom: '-12px' },
-  { size: 30, left: '80%',  delay: '0s',    dur: '19s', blur: '1.5px', bottom: '38vh'  },
-  { size: 10, left: '89%',  delay: '5.5s',  dur: '9s',  blur: '0px',   bottom: '-12px' },
-  { size: 24, left: '15%',  delay: '0s',    dur: '14s', blur: '1px',   bottom: '65vh'  },
-  { size: 16, left: '33%',  delay: '15s',   dur: '16s', blur: '0.5px', bottom: '-12px' },
-  { size: 12, left: '58%',  delay: '0s',    dur: '12s', blur: '0px',   bottom: '48vh'  },
-]
-
 export function LandingPage() {
   const navigate = useNavigate()
-  const { theme } = useBackground()
   const linkTo = (path: string) => ({
     href: path,
     onClick: (e: React.MouseEvent) => {
@@ -87,19 +70,7 @@ export function LandingPage() {
         <Box ref={blobBotRef} sx={{ position: 'absolute', bottom: 80, left: -80, width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle,rgba(225,29,72,0.07) 0%,transparent 70%)', transition: 'transform 0.12s ease-out', willChange: 'transform' }} />
       </Box>
 
-      {LANDING_PARTICLES.map((p, i) => (
-        <Box key={i} component="span" aria-hidden sx={{
-          position: 'fixed', bottom: p.bottom, left: p.left,
-          fontSize: p.size, lineHeight: 1, zIndex: 0, opacity: 0, userSelect: 'none',
-          filter: p.blur !== '0px'
-            ? `blur(${p.blur}) drop-shadow(0 0 6px ${theme.accent}55)`
-            : `drop-shadow(0 0 5px ${theme.accent}44)`,
-          animation: `${floatParticleLanding(i)} ${p.dur} ${p.delay} ease-in infinite`,
-          pointerEvents: 'none', willChange: 'transform, opacity',
-        }}>
-          {theme.particle}
-        </Box>
-      ))}
+      <FloatingParticles fixed />
 
       {/* Navbar */}
       <Box component="nav" sx={{
