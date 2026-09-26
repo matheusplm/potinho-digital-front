@@ -1,4 +1,4 @@
-export type RevealEffectKind = 'none' | 'rain' | 'burst' | 'fireworks' | 'glow'
+export type RevealEffectKind = 'none' | 'rain' | 'burst'
 
 export interface RevealEffectDefinition {
   kind: RevealEffectKind
@@ -13,6 +13,4 @@ export interface RevealEffectDefinition {
 export interface RevealEffectPlayback {
   kind: RevealEffectKind
   media: string
-  accent: string
-  anchor?: DOMRect | null
 }

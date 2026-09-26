@@ -167,7 +167,10 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
     const payload = ((await readJson(response)) ?? {}) as { message?: string; error?: string; availableAt?: string; retryAfterSec?: number }
     const code = payload.error
     const fallback = response.status >= 500 ? 'O servidor não respondeu direito. Tente novamente em instantes.' : 'Erro inesperado na API.'
-    const message = (code && FRIENDLY_ERROR_MESSAGES[code]) ?? payload.message ?? code ?? fallback
+    const mockMissed = import.meta.env.DEV && !BASE_URL && response.status === 404 && !code && !payload.message
+    const message = mockMissed
+      ? 'O modo local não respondeu. Recarregue a página com F5 normal (sem Ctrl+Shift).'
+      : (code && FRIENDLY_ERROR_MESSAGES[code]) ?? payload.message ?? code ?? fallback
     throw new ApiRequestError(message, response.status, payload.availableAt, code, payload.retryAfterSec)
   }
 

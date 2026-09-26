@@ -42,6 +42,18 @@ export interface Note {
   obtainedAt: string | null
 }
 
+export type RevealTier = 'common' | 'rare' | 'epic' | 'legendary'
+
+export interface RarityRevealStyle {
+  tier?: RevealTier
+  color?: string
+  rays?: boolean
+  shake?: boolean
+  tremble?: boolean
+  vibrate?: boolean
+  caption?: string
+}
+
 export interface RarityConfig {
   id: string
   label: string
@@ -59,6 +71,7 @@ export interface RarityConfig {
   revealEffect?: string
   revealEmoji?: string
   revealMedia?: string
+  revealStyle?: RarityRevealStyle
   createdAt?: string
   updatedAt?: string
 }
