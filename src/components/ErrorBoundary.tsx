@@ -1,7 +1,7 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
 import { Box, CircularProgress, Stack, Typography } from '@mui/material'
 import { Button } from './ui'
-import { font, ink } from '../design-system'
+import { colors, font, gradients } from '../design-system'
 import { isChunkLoadError, reloadForNewVersion } from '../utils/chunkReload'
 
 interface Props {
@@ -40,25 +40,25 @@ export class ErrorBoundary extends Component<Props, State> {
     return (
       <Box sx={{
         minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: 'linear-gradient(160deg, #dbeafe 0%, #fce7f3 55%, #ede9fe 100%)', p: 3,
+        background: gradients.page, p: 3,
       }}>
         {this.state.screen === 'updating' ? (
           <Stack spacing={2} alignItems="center" sx={{ maxWidth: 340, textAlign: 'center' }}>
-            <CircularProgress size={34} sx={{ color: ink.primary }} />
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.3rem', color: ink.primary }}>
+            <CircularProgress size={34} sx={{ color: colors.primary.text }} />
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.3rem', color: colors.text.primary }}>
               Atualizando o Potinho…
             </Typography>
-            <Typography variant="lg" sx={{ color: 'rgba(30,58,95,0.65)' }}>
+            <Typography variant="lg" sx={{ color: colors.text.secondary }}>
               Tem uma versão nova no ar, é rapidinho.
             </Typography>
           </Stack>
         ) : (
           <Stack spacing={2} alignItems="center" sx={{ maxWidth: 340, textAlign: 'center' }}>
             <Typography sx={{ fontSize: '2.6rem', lineHeight: 1 }}>{this.state.screen === 'offline' ? '📶' : '😵‍💫'}</Typography>
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.4rem', color: ink.primary }}>
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.4rem', color: colors.text.primary }}>
               {this.state.screen === 'offline' ? 'Sem internet' : 'Algo deu errado'}
             </Typography>
-            <Typography variant="lg" sx={{ color: 'rgba(30,58,95,0.65)' }}>
+            <Typography variant="lg" sx={{ color: colors.text.secondary }}>
               {this.state.screen === 'offline'
                 ? 'Confere a conexão e toca em recarregar quando ela voltar.'
                 : 'Tenta recarregar a página. Se continuar, avise a gente.'}
