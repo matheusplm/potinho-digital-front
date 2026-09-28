@@ -78,6 +78,11 @@ export function paint(style: RevealStyle, index: number): string {
   return style.rainbow ? RAINBOW[index % RAINBOW.length] : style.color
 }
 
+export function showPalette(style: RevealStyle): string[] {
+  if (style.rainbow) return RAINBOW
+  return [style.color, `color-mix(in srgb, ${style.color} 55%, white)`, '#ffffff', `color-mix(in srgb, ${style.color} 78%, black)`, GOLD]
+}
+
 export function rainbowConic(from = 0): string {
   return `conic-gradient(from ${from}deg, ${RAINBOW.join(', ')}, ${RAINBOW[0]})`
 }
