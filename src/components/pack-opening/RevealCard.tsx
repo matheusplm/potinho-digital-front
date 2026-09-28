@@ -1,10 +1,10 @@
 import { Box, Typography } from '@mui/material'
-import { font } from '../../design-system'
 import type { NoteTypeConfig, RarityConfig } from '../../types/note'
 import { RewardCard } from '../collection/RewardCard'
 import { badgePop, edgeGlow, haloPulse, hueSpin, ringBurst, tremble } from './motion'
 import { withAlpha } from '../../utils/colorUtils'
 import { CARD_WIDTH, rainbowConic, type RevealItem, type Tier } from './tiers'
+import { BrandName } from '../Brand'
 
 const GLOW_STRENGTH: Record<Tier, number> = { common: 18, rare: 45, epic: 70, legendary: 90 }
 const RING_MASK = 'radial-gradient(circle, transparent 63%, black 65%, black 69%, transparent 71%)'
@@ -75,7 +75,7 @@ export function RevealCard({ item, flipped, backFill, accent, emoji, rarities, t
             }}>
               {emoji}
             </Box>
-            <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: 'rgba(30,41,59,0.75)' }}>Potinho Digital</Typography>
+            <BrandName size="1.1rem" color="rgba(30,41,59,0.75)" onLight />
             <Typography variant="sm" sx={{ fontWeight: 700, color: 'rgba(30,41,59,0.55)' }}>toque pra virar</Typography>
           </Box>
         </Box>

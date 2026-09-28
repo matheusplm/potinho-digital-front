@@ -6,9 +6,9 @@ import { toCanvas } from 'html-to-image'
 import { parseGIF, decompressFrame, type ParsedGif } from 'gifuct-js'
 import { GIFEncoder, quantize, applyPalette } from 'gifenc'
 import { Button, toast } from '../ui'
-import { font } from '../../design-system'
 import type { BackgroundTheme } from '../../design-system'
 import type { CollectionDailyReward, NoteImageLayout, NoteTypeConfig, RarityConfig } from '../../types/note'
+import { BrandLogo, BrandName } from '../Brand'
 import { RewardCard } from '../collection/RewardCard'
 
 type Format = 'card' | 'story'
@@ -435,9 +435,10 @@ export function ShareCartinha({ reward, rarities, types, theme, sourceRef }: {
               <RewardCard reward={{ ...reward, imageUrl: job.imageSrc, isNew: false }} rarities={rarities} types={types} expanded />
             </Box>
             <Stack data-share-brand alignItems="center" spacing={0.2} sx={{ position: 'absolute', left: 0, right: 0, bottom: 22 }}>
-              <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: 17, color: theme.textOnBg, opacity: 0.9 }}>
-                Potinho Digital 💌
-              </Typography>
+              <Stack direction="row" alignItems="center" spacing={0.8}>
+                <BrandLogo size={22} sx={{ filter: 'none' }} />
+                <BrandName size={17} color={theme.textOnBg} />
+              </Stack>
               <Typography sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.4, color: theme.textOnBgMuted }}>
                 potinhodigital.com.br
               </Typography>

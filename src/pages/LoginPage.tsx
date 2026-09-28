@@ -1,4 +1,3 @@
-import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, Stack, Typography } from '@mui/material'
 import { useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
@@ -11,7 +10,8 @@ import { Button, Input, toast } from '../components/ui'
 import { GoogleSignInButton } from '../components/GoogleSignInButton'
 import { FloatingParticles } from '../components/FloatingParticles'
 import { useBackground } from '../context/BackgroundContext'
-import { colors, fadeSlide, font, gradients } from '../design-system'
+import { BrandLogo, Copyright } from '../components/Brand'
+import { BRAND_TAGLINE, brandAccent, brandGradient, colors, fadeSlide, font, gradients } from '../design-system'
 
 const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined
 
@@ -88,19 +88,19 @@ export function LoginPage() {
       <FloatingParticles />
 
       <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 3, py: 2, animation: `${fadeSlide} 0.5s ease both` }} spacing={0}>
-        <FavoriteIcon sx={{ fontSize: 52, color: colors.rose.main, filter: 'drop-shadow(0 4px 16px rgba(225,29,72,0.4))', mb: 3 }} />
+        <BrandLogo size={72} sx={{ mb: 3 }} />
 
         <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2.8rem', lineHeight: 1, color: colors.text.primary, textAlign: 'center', letterSpacing: '-0.5px' }}>
           Potinho
         </Typography>
-        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2.8rem', lineHeight: 1, color: colors.primary.text, textAlign: 'center', letterSpacing: '-0.5px', mb: 1.5 }}>
+        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2.8rem', lineHeight: 1.05, textAlign: 'center', letterSpacing: '-0.5px', mb: 1.5, ...brandAccent() }}>
           Digital
         </Typography>
 
-        <Box sx={{ width: 40, height: 3, borderRadius: 2, background: 'linear-gradient(90deg, #1d4ed8, #e11d48)', mb: 1.5 }} />
+        <Box sx={{ width: 40, height: 3, borderRadius: 2, background: brandGradient(), mb: 1.5 }} />
 
         <Typography variant="lg" sx={{ color: colors.text.secondary, fontStyle: 'italic', mb: 4 }}>
-          sua memória afetiva
+          {BRAND_TAGLINE}
         </Typography>
 
         <GoogleSignInButton onCredential={handleGoogle} disabled={loading} />
@@ -155,6 +155,7 @@ export function LoginPage() {
           Ainda não tem conta?{' '}
           <Link to="/register" style={{ color: colors.primary.text, fontWeight: 700, textDecoration: 'none' }}>Criar conta</Link>
         </Typography>
+        <Copyright sx={{ mt: 4 }} />
       </Stack>
     </Box>
   )

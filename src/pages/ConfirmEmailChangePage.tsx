@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { api } from '../services/api'
+import { BrandLogo } from '../components/Brand'
 import { colors, fadeSlide, floatHeart, font, gradients } from '../design-system'
 
 const HEARTS = [
@@ -88,7 +89,7 @@ export function ConfirmEmailChangePage() {
 
         {status === 'error' && (
           <Stack alignItems="center" spacing={2.5} sx={{ maxWidth: 320, textAlign: 'center' }}>
-            <FavoriteIcon sx={{ fontSize: 52, color: colors.rose.main, filter: 'drop-shadow(0 4px 16px rgba(225,29,72,0.3))' }} />
+            <BrandLogo size={64} />
             <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.8rem', color: colors.text.primary }}>
               Link inválido
             </Typography>
