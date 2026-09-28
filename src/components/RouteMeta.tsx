@@ -3,17 +3,17 @@ import { useLocation } from 'react-router-dom'
 
 const SITE_URL = 'https://www.potinhodigital.com.br'
 const BRAND = 'Potinho Digital'
-const DEFAULT_TITLE = 'Potinho Digital — Álbum afetivo de bilhetes para quem você ama'
-const DEFAULT_DESCRIPTION = 'Crie bilhetes digitais personalizados e presenteie quem você ama com pacotinhos surpresa — como um álbum de figurinhas, só que com mensagens de verdade. Gratuito.'
+const DEFAULT_TITLE = 'Potinho Digital | Álbum de bilhetes para quem você ama'
+const DEFAULT_DESCRIPTION = 'Crie bilhetes digitais personalizados e presenteie quem você ama com pacotinhos surpresa, como um álbum de figurinhas feito de mensagens. Grátis.'
 
 const PUBLIC_PAGES: Record<string, { title: string; description: string }> = {
   '/': { title: DEFAULT_TITLE, description: DEFAULT_DESCRIPTION },
   '/login': {
-    title: `Entrar — ${BRAND}`,
+    title: `Entrar | ${BRAND}`,
     description: 'Entre na sua conta do Potinho Digital para abrir seus pacotinhos e reler os bilhetes de quem você ama.',
   },
   '/register': {
-    title: `Criar conta grátis — ${BRAND}`,
+    title: `Criar conta grátis | ${BRAND}`,
     description: 'Crie sua conta grátis e monte um álbum de bilhetes com pacotinhos surpresa para quem você ama.',
   },
 }
