@@ -5,7 +5,7 @@ import StarIcon from '@mui/icons-material/Star'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import { Box, Chip, IconButton, Stack, Typography } from '@mui/material'
 import { Card } from '../../components/ui'
-import { colors, font, radius } from '../../design-system'
+import { colors, font, radius, ink } from '../../design-system'
 import { actionButtonSx } from './shared'
 import { buildPackRules, formatPackSchedule, PACK_DISTRIBUTION_LABELS, PACK_STATUS_LABELS } from './packData'
 import type { CollectionPack } from '../../types/note'
@@ -33,13 +33,13 @@ export function PackPreviewCard({ pack, view, onEdit, onDelete, onSimulate, onSe
           </Box>
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <Stack direction="row" spacing={0.7} alignItems="flex-start" sx={{ mb: 0.25 }}>
-              <Typography sx={{ flex: 1, minWidth: 0, fontFamily: font.serif, fontWeight: 800, fontSize: compact ? '0.92rem' : '1rem', color: colors.text.primary, lineHeight: 1.15, display: '-webkit-box', WebkitLineClamp: compact ? 1 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+              <Typography sx={{ flex: 1, minWidth: 0, fontFamily: font.serif, fontWeight: 800, fontSize: compact ? '0.92rem' : '1rem', color: ink.primary, lineHeight: 1.15, display: '-webkit-box', WebkitLineClamp: compact ? 1 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                 {pack.name}
               </Typography>
               <Chip label={isPrimary ? 'Principal' : PACK_STATUS_LABELS[pack.status]} size="small"
-                sx={{ height: 19, fontSize: '0.68rem', fontWeight: 900, background: isPrimary ? '#fef3c7' : isActive ? '#dcfce7' : 'rgba(255,255,255,0.62)', color: isPrimary ? '#b45309' : isActive ? '#15803d' : colors.text.secondary, flexShrink: 0, '& .MuiChip-label': { px: 0.75 } }} />
+                sx={{ height: 19, fontSize: '0.68rem', fontWeight: 900, background: isPrimary ? '#fef3c7' : isActive ? '#dcfce7' : 'rgba(255,255,255,0.62)', color: isPrimary ? '#b45309' : isActive ? '#15803d' : ink.secondary, flexShrink: 0, '& .MuiChip-label': { px: 0.75 } }} />
             </Stack>
-            <Typography sx={{ fontSize: compact ? '0.7rem' : '0.76rem', color: colors.text.secondary, lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: compact ? 2 : 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+            <Typography sx={{ fontSize: compact ? '0.7rem' : '0.76rem', color: ink.secondary, lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: compact ? 2 : 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
               {pack.description}
             </Typography>
           </Box>
@@ -50,7 +50,7 @@ export function PackPreviewCard({ pack, view, onEdit, onDelete, onSimulate, onSe
         <Box sx={{ display: 'grid', gridTemplateColumns: compact ? '1fr' : 'repeat(3, 1fr)', gap: 0.8, mb: compact ? 1 : 1.2 }}>
           {[['Cartas', `${pack.cardsPerOpen}`], ['Disponib.', formatPackSchedule(pack)], ['Distribuição', PACK_DISTRIBUTION_LABELS[pack.distribution]]].map(([label, value]) => (
             <Box key={label} sx={{ p: compact ? 0.75 : 0.9, borderRadius: radius.md, background: `${pack.accent}0f`, border: `1px solid ${pack.accent}18`, display: compact ? 'flex' : 'block', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
-              <Typography sx={{ fontSize: '0.68rem', fontWeight: 900, color: colors.text.muted, textTransform: 'uppercase', letterSpacing: 0.5, mb: 0.25 }}>{label}</Typography>
+              <Typography variant="label" sx={{ color: colors.text.muted, mb: 0.25 }}>{label}</Typography>
               <Typography sx={{ fontSize: compact ? '0.68rem' : '0.7rem', fontWeight: 800, color: pack.accent, lineHeight: 1.15, textAlign: compact ? 'right' : 'left', minWidth: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                 {value}
               </Typography>
@@ -59,10 +59,10 @@ export function PackPreviewCard({ pack, view, onEdit, onDelete, onSimulate, onSe
         </Box>
 
         <Stack spacing={0.75}>
-          <Typography sx={{ fontSize: '0.70rem', fontWeight: 900, color: colors.text.muted, textTransform: 'uppercase', letterSpacing: 0.8 }}>Regras</Typography>
+          <Typography variant="label" sx={{ color: colors.text.muted }}>Regras</Typography>
           <Box sx={{ display: 'flex', gap: 0.55, flexWrap: 'wrap' }}>
             {rules.map((rule) => (
-              <Box key={rule} sx={{ px: 0.9, py: 0.35, borderRadius: radius.full, background: 'rgba(0,0,0,0.035)', border: '1px solid rgba(0,0,0,0.045)', color: colors.text.secondary, fontSize: '0.72rem', fontWeight: 750, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <Box key={rule} sx={{ px: 0.9, py: 0.35, borderRadius: radius.full, background: colors.fill.subtle, border: `1px solid ${colors.border.subtle}`, color: colors.text.secondary, fontSize: '0.72rem', fontWeight: 750, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {rule}
               </Box>
             ))}

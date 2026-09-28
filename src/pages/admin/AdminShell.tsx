@@ -97,13 +97,13 @@ export function AdminShell({ title, subtitle, children }: { title: string; subti
                 <Box sx={{ px: 1, py: 0.2, borderRadius: radius.full, background: `${theme.accent}1f`, color: theme.textOnBg, fontSize: '0.68rem', fontWeight: 800, letterSpacing: 0.5, textTransform: 'uppercase' }}>
                   🛠️ Modo admin
                 </Box>
-                {subtitle && <Typography sx={{ fontSize: '0.76rem', color: theme.textOnBgMuted, fontWeight: 600 }}>{subtitle}</Typography>}
+                {subtitle && <Typography variant="sm" sx={{ color: theme.textOnBgMuted, fontWeight: 600 }}>{subtitle}</Typography>}
               </Stack>
               <Typography component="h1" sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: { xs: '1.75rem', md: '2.3rem' }, color: theme.textOnBg, lineHeight: 1.05, letterSpacing: '-0.5px' }}>
                 {title}
               </Typography>
               {data && (
-                <Typography sx={{ mt: 0.6, fontSize: '0.76rem', color: theme.textOnBgMuted, fontStyle: 'italic' }}>
+                <Typography variant="sm" sx={{ mt: 0.6, color: theme.textOnBgMuted, fontStyle: 'italic' }}>
                   dados de {timeAgo(data.generatedAt)}
                 </Typography>
               )}
@@ -136,7 +136,7 @@ export function AdminShell({ title, subtitle, children }: { title: string; subti
             <Stack alignItems="center" spacing={1.5} sx={{ py: 6, textAlign: 'center' }}>
               <Typography sx={{ fontSize: '2.2rem' }}>😵</Typography>
               <Typography sx={{ fontFamily: font.serif, fontWeight: 700, color: theme.textOnBg }}>Não consegui carregar o painel</Typography>
-              <Typography sx={{ fontSize: '0.8rem', color: theme.textOnBgMuted }}>{error.message}</Typography>
+              <Typography variant="md" sx={{ color: theme.textOnBgMuted }}>{error.message}</Typography>
               <Button variant="ghost" onClick={() => { void refetch() }} sx={{ px: 3 }}>Tentar de novo</Button>
             </Stack>
           )}

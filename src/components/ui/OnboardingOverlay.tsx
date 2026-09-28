@@ -4,7 +4,7 @@ import { keyframes } from '@emotion/react'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
-import { cardIn, font, ink, overlayIn, packCtaFloat, radius, shimmer, slideL, slideR } from '../../design-system'
+import { cardIn, font, ink, overlayIn, packCtaFloat, radius, shimmer, slideL, slideR, colors } from '../../design-system'
 import { queryKeys } from '../../hooks/useNotes'
 import { useUser } from '../../context/UserContext'
 import { COLLECTION_TEMPLATES, createCollectionFromTemplate } from '../../services/collectionTemplates'
@@ -107,10 +107,10 @@ function MiniNote({ r, message, sx }: { r: RarityLook; message: string; sx?: obj
             {r.legendary ? '★' : '◆'} {r.label}
           </Typography>
         </Box>
-        <Typography sx={{ fontSize: '0.66rem', opacity: 0.4, lineHeight: 1 }}>💌</Typography>
+        <Typography variant="xs" sx={{ opacity: 0.4, lineHeight: 1 }}>💌</Typography>
       </Stack>
       <Box sx={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-        <Typography sx={{ fontFamily: font.serif, fontSize: '0.78rem', color: ink.primary, lineHeight: 1.55 }}>
+        <Typography variant="md" sx={{ fontFamily: font.serif, color: ink.primary, lineHeight: 1.55 }}>
           {message}
         </Typography>
       </Box>
@@ -183,7 +183,7 @@ function StagePack() {
             }} />
             <Typography sx={{ fontSize: '2.4rem', lineHeight: 1, userSelect: 'none' }}>💌</Typography>
           </Box>
-          <Typography sx={{ mt: 1.7, fontSize: '0.74rem', fontWeight: 800, color: '#b45309', letterSpacing: 0.4, animation: `${pulseHint} 1.6s ease-in-out infinite`, userSelect: 'none' }}>
+          <Typography variant="sm" sx={{ mt: 1.7, fontWeight: 800, color: '#b45309', letterSpacing: 0.4, animation: `${pulseHint} 1.6s ease-in-out infinite`, userSelect: 'none' }}>
             👆 toque no pacotinho para abrir
           </Typography>
         </>
@@ -214,15 +214,15 @@ function StagePack() {
             {HEART_BURST.map((h, i) => (
               <FavoriteIcon key={i} sx={{
                 position: 'absolute', left: '50%', top: '50%', ml: `-${h.size / 2}px`, mt: `-${h.size / 2}px`,
-                fontSize: h.size, color: '#e11d48',
+                fontSize: h.size, color: colors.rose.main,
                 animation: `${h.anim} 0.9s ease-out ${h.delay} both`, pointerEvents: 'none',
               }} />
             ))}
           </Box>
-          <Typography sx={{ mt: 1.2, fontSize: '0.72rem', fontWeight: 700, color: ink.secondary }}>
+          <Typography variant="sm" sx={{ mt: 1.2, fontWeight: 700, color: ink.secondary }}>
             ✨ Veio até um Lendário!
           </Typography>
-          <Typography onClick={() => setOpened(false)} sx={{ mt: 0.3, fontSize: '0.66rem', fontWeight: 800, color: '#d97706', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>
+          <Typography variant="xs" onClick={() => setOpened(false)} sx={{ mt: 0.3, fontWeight: 800, color: '#d97706', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>
             abrir de novo
           </Typography>
         </>
@@ -242,11 +242,11 @@ function StageInvite() {
       }}>
         <Stack direction="row" spacing={1} alignItems="center">
           <Box sx={{ width: 34, height: 34, borderRadius: '50%', flexShrink: 0, background: 'linear-gradient(135deg,#1d4ed8,#7c3aed)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Typography sx={{ fontSize: '0.95rem', lineHeight: 1 }}>💙</Typography>
+            <Typography variant="xl" sx={{ lineHeight: 1 }}>💙</Typography>
           </Box>
           <Box sx={{ minWidth: 0, flex: 1 }}>
-            <Typography sx={{ fontSize: '0.78rem', fontWeight: 800, color: ink.primary, lineHeight: 1.2 }}>Pessoa amada</Typography>
-            <Typography sx={{ fontSize: '0.64rem', color: ink.secondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>amor@email.com</Typography>
+            <Typography variant="md" sx={{ fontWeight: 800, color: ink.primary, lineHeight: 1.2 }}>Pessoa amada</Typography>
+            <Typography variant="xxs" sx={{ color: ink.secondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>amor@email.com</Typography>
           </Box>
           <Box sx={{ px: 0.8, py: 0.3, borderRadius: radius.full, background: 'rgba(220,252,231,0.9)', border: '1px solid rgba(21,128,61,0.25)', flexShrink: 0 }}>
             <Typography sx={{ fontSize: '0.56rem', fontWeight: 900, color: '#15803d' }}>✓ convidado</Typography>
@@ -257,9 +257,9 @@ function StageInvite() {
         display: 'inline-flex', alignItems: 'center', gap: 0.6, px: 1.5, py: 0.65, borderRadius: radius.full,
         background: 'linear-gradient(135deg,#4f46e5,#7c3aed)', boxShadow: '0 8px 22px rgba(79,70,229,0.32)',
       }}>
-        <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, color: '#fff' }}>👀 Simular como leitor</Typography>
+        <Typography variant="xs" sx={{ fontWeight: 800, color: '#fff' }}>👀 Simular como leitor</Typography>
       </Box>
-      <Typography sx={{ fontSize: '0.6rem', color: ink.muted }}>o Simular fica no menu principal</Typography>
+      <Typography variant="xxs" sx={{ color: ink.muted }}>o Simular fica no menu principal</Typography>
     </Box>
   )
 }
@@ -274,16 +274,16 @@ function StageStart() {
             <Typography sx={{ fontSize: '1.1rem', lineHeight: 1 }}>💙</Typography>
           </Box>
           <Box sx={{ minWidth: 0 }}>
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.92rem', color: '#fff', lineHeight: 1.2, textShadow: '0 1px 4px rgba(0,0,0,0.18)' }}>
+            <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: '#fff', lineHeight: 1.2, textShadow: '0 1px 4px rgba(0,0,0,0.18)' }}>
               Nosso Potinho
             </Typography>
-            <Typography sx={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.88)' }}>pronta em segundos ✨</Typography>
+            <Typography variant="xxs" sx={{ color: 'rgba(255,255,255,0.88)' }}>pronta em segundos ✨</Typography>
           </Box>
         </Box>
         <Box sx={{ px: 1.2, py: 1, background: 'rgba(255,255,255,0.95)', display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
           {['✉️ 4 bilhetes', '🎁 2 pacotinhos', '⭐ 4 raridades'].map((chip) => (
             <Box key={chip} sx={{ px: 0.7, py: 0.3, borderRadius: radius.full, background: 'rgba(225,29,72,0.08)', border: '1px solid rgba(225,29,72,0.16)' }}>
-              <Typography sx={{ fontSize: '0.6rem', fontWeight: 800, color: '#be123c' }}>{chip}</Typography>
+              <Typography variant="xxs" sx={{ fontWeight: 800, color: '#be123c' }}>{chip}</Typography>
             </Box>
           ))}
         </Box>
@@ -487,17 +487,18 @@ export function OnboardingOverlay({ onDismiss }: Props) {
           <Box key={`stage${step}`} sx={{ height: '100%', animation: `${anim} 0.22s ease both` }}>
             {s.stage}
           </Box>
-          <Typography sx={{
+          <Typography variant="xxs" sx={{
             position: 'absolute', top: 13, right: 15,
-            fontSize: '0.64rem', fontWeight: 700, color: 'rgba(30,58,95,0.45)', letterSpacing: 0.4,
+            fontWeight: 700, color: 'rgba(30,58,95,0.45)', letterSpacing: 0.4,
           }}>
             {step + 1} / {STEPS.length}
           </Typography>
           <Typography
+            variant="xxs"
             onClick={dismiss}
             sx={{
               position: 'absolute', top: 13, left: 15,
-              fontSize: '0.64rem', fontWeight: 700, color: 'rgba(30,58,95,0.45)',
+              fontWeight: 700, color: 'rgba(30,58,95,0.45)',
               cursor: 'pointer', letterSpacing: 0.3,
               '&:hover': { color: 'rgba(30,58,95,0.8)' },
             }}
@@ -510,7 +511,7 @@ export function OnboardingOverlay({ onDismiss }: Props) {
           <Box key={`body${step}${isPicker && selectedKit ? '-kit' : ''}`} sx={{ animation: `${anim} 0.22s ease both`, mb: isPicker ? 1.6 : 2.4 }}>
             <Typography sx={{
               fontFamily: font.serif, fontWeight: 700, fontSize: '1.15rem',
-              color: '#1e3a5f', lineHeight: 1.3, mb: 1,
+              color: ink.primary, lineHeight: 1.3, mb: 1,
             }}>
               {displayTitle}
             </Typography>
@@ -539,16 +540,16 @@ export function OnboardingOverlay({ onDismiss }: Props) {
                     <Typography sx={{ fontSize: '1.15rem', lineHeight: 1 }}>{selectedKit.collection.emoji}</Typography>
                   </Box>
                   <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography sx={{ fontFamily: font.serif, fontSize: '0.9rem', fontWeight: 800, color: ink.primary, lineHeight: 1.2 }}>
+                    <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: ink.primary, lineHeight: 1.2 }}>
                       {selectedKit.collection.name}
                     </Typography>
-                    <Typography sx={{ fontSize: '0.64rem', color: ink.secondary }}>
+                    <Typography variant="xxs" sx={{ color: ink.secondary }}>
                       nome da coleção, dá para renomear depois
                     </Typography>
                   </Box>
                 </Box>
                 <Box sx={{ px: 1.3, py: 1.1, background: 'rgba(255,255,255,0.97)', borderTop: '1px solid rgba(0,0,0,0.05)' }}>
-                  <Typography sx={{ fontSize: '0.6rem', fontWeight: 900, letterSpacing: 0.8, color: ink.muted, textTransform: 'uppercase', mb: 0.7 }}>
+                  <Typography variant="xxs" sx={{ fontWeight: 900, letterSpacing: 0.8, color: ink.muted, textTransform: 'uppercase', mb: 0.7 }}>
                     Vem dentro
                   </Typography>
                   <Stack spacing={0.55}>
@@ -557,7 +558,7 @@ export function OnboardingOverlay({ onDismiss }: Props) {
                       return (
                         <Stack key={note.title} direction="row" spacing={0.8} alignItems="center">
                           <Box sx={{ width: 7, height: 7, borderRadius: '50%', flexShrink: 0, background: look.color, boxShadow: `0 0 6px ${look.color}66` }} />
-                          <Typography sx={{ flex: 1, minWidth: 0, fontSize: '0.74rem', color: ink.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <Typography variant="sm" sx={{ flex: 1, minWidth: 0, color: ink.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {note.title}
                           </Typography>
                           <Typography sx={{ fontSize: '0.56rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 0.5, color: look.color, flexShrink: 0 }}>
@@ -574,7 +575,7 @@ export function OnboardingOverlay({ onDismiss }: Props) {
                       `🎁 ${selectedKit.packsCount} pacotinhos`,
                     ].map((chip) => (
                       <Box key={chip} sx={{ px: 0.75, py: 0.3, borderRadius: radius.full, background: `${selectedKit.accent}0f`, border: `1px solid ${selectedKit.accent}22` }}>
-                        <Typography sx={{ fontSize: '0.6rem', fontWeight: 800, color: selectedKit.accent }}>{chip}</Typography>
+                        <Typography variant="xxs" sx={{ fontWeight: 800, color: selectedKit.accent }}>{chip}</Typography>
                       </Box>
                     ))}
                   </Box>
@@ -582,7 +583,7 @@ export function OnboardingOverlay({ onDismiss }: Props) {
               </Box>
 
               <Box>
-                <Typography sx={{ fontSize: '0.76rem', fontWeight: 800, color: ink.primary, mb: 0.7 }}>
+                <Typography variant="sm" sx={{ fontWeight: 800, color: ink.primary, mb: 0.7 }}>
                   Quer convidar alguém agora?{' '}
                   <Box component="span" sx={{ color: ink.muted, fontWeight: 600 }}>(opcional)</Box>
                 </Typography>
@@ -594,7 +595,7 @@ export function OnboardingOverlay({ onDismiss }: Props) {
                   disabled={!!creating}
                   sx={{ '& .MuiOutlinedInput-root': { fontSize: '0.82rem' }, '& input': { py: 0.9 } }}
                 />
-                <Typography sx={{ fontSize: '0.64rem', color: ink.muted, mt: 0.5 }}>
+                <Typography variant="xxs" sx={{ color: ink.muted, mt: 0.5 }}>
                   A pessoa recebe um convite por email para colecionar seus bilhetes.
                 </Typography>
               </Box>
@@ -633,9 +634,10 @@ export function OnboardingOverlay({ onDismiss }: Props) {
                   Prefiro criar do zero
                 </Button>
                 <Typography
+                  variant="xs"
                   onClick={dismiss}
                   sx={{
-                    textAlign: 'center', fontSize: '0.7rem', fontWeight: 700, color: ink.muted,
+                    textAlign: 'center', fontWeight: 700, color: ink.muted,
                     cursor: creating ? 'default' : 'pointer', py: 0.3,
                     '&:hover': creating ? {} : { color: ink.secondary, textDecoration: 'underline' },
                   }}

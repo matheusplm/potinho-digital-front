@@ -10,7 +10,7 @@ import { Box, Chip, IconButton, Stack, Typography } from '@mui/material'
 import { useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
-import { Button, Card, LoadingState, PageTitle, ScrollablePage, ScrollHint, toast } from '../components/ui'
+import { Button, Card, ChoiceChip, LoadingState, PageTitle, ScrollablePage, ScrollHint, toast } from '../components/ui'
 import { useBackground } from '../context/BackgroundContext'
 import { FloatingParticles } from '../components/FloatingParticles'
 import { useUser } from '../context/UserContext'
@@ -25,7 +25,6 @@ import {
 import { colors, font, radius } from '../design-system'
 import { slugify } from '../utils/slug'
 import { isCollectionOwner } from '../utils/collectionAccess'
-import { gradientTextSx } from '../utils/colorUtils'
 import { formatRemainingTime } from '../utils/packCooldowns'
 import { NoteDetailDialog } from '../components/collection/NoteDetailDialog'
 import { NoteCard, NoteRow } from './reader/NoteCard'
@@ -33,17 +32,18 @@ import { BonusPackDialog } from '../components/manage/BonusPackDialog'
 import { RevokeAccessDialog } from './reader/RevokeAccessDialog'
 import { SORT_CYCLE, SORT_LABEL, sortNotes } from './reader/readerUtils'
 import type { SortKey } from './reader/readerUtils'
+import { rarityTone } from '../components/collection/rarityTone'
 import type { CollectionNoteView, CollectionPack } from '../types/note'
 
 const glassBtn = {
   width: 38, height: 38,
-  background: 'rgba(255,255,255,0.5)',
-  border: '1.5px solid rgba(255,255,255,0.66)',
+  background: colors.glass.bg,
+  border: `1.5px solid ${colors.glass.border}`,
   backdropFilter: 'blur(14px)',
   boxShadow: '0 8px 24px rgba(15,23,42,0.08)',
   transition: 'transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease',
   '&:hover': {
-    background: 'rgba(255,255,255,0.76)',
+    background: colors.glass.strong,
     boxShadow: '0 10px 28px rgba(15,23,42,0.12)',
     transform: 'scale(1.04)',
   },
@@ -153,7 +153,7 @@ export function ReaderCollectionPage() {
           <Box sx={{ flex: 1 }}>
             <PageTitle title={collection?.name ?? 'Coleção'} subtitle={email} />
           </Box>
-          <IconButton size="small" aria-label="remover acesso" onClick={() => setRevokeDialogOpen(true)} sx={{ ...glassBtn, color: colors.rose.main }}>
+          <IconButton size="small" aria-label="remover acesso" onClick={() => setRevokeDialogOpen(true)} sx={{ ...glassBtn, color: colors.rose.text }}>
             <PersonRemoveIcon sx={{ fontSize: 18 }} />
           </IconButton>
         </Stack>
@@ -164,7 +164,7 @@ export function ReaderCollectionPage() {
 
         {isError && !isLoading && (
           <Card sx={{ p: 2, textAlign: 'center', borderColor: `${colors.rose.main}22`, background: `${colors.rose.main}06` }}>
-            <Typography sx={{ fontSize: '0.85rem', color: colors.rose.main }}>
+            <Typography variant="lg" sx={{ color: colors.rose.text }}>
               Não foi possível carregar a coleção deste leitor.
             </Typography>
           </Card>
@@ -180,11 +180,11 @@ export function ReaderCollectionPage() {
                   { label: 'favoritas', value: favCount },
                   { label: 'pacote hoje', value: dailyPackLabel },
                 ].map((s) => (
-                  <Box key={s.label} sx={{ p: 1.2, borderRadius: radius.lg, background: 'rgba(0,0,0,0.03)', border: `1px solid ${colors.border.subtle}`, textAlign: 'center' }}>
+                  <Box key={s.label} sx={{ p: 1.2, borderRadius: radius.lg, background: colors.fill.subtle, border: `1px solid ${colors.border.subtle}`, textAlign: 'center' }}>
                     <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.1rem', color: colors.text.primary }}>
                       {s.value}
                     </Typography>
-                    <Typography sx={{ fontSize: '0.70rem', fontWeight: 700, color: colors.text.muted, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                    <Typography variant="label" sx={{ color: colors.text.muted }}>
                       {s.label}
                     </Typography>
                   </Box>
@@ -193,7 +193,7 @@ export function ReaderCollectionPage() {
             </Card>
             {bonusPacks.length > 0 && (
               <Card sx={{ p: 2 }}>
-                <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.8, color: colors.text.muted, textTransform: 'uppercase', mb: 1 }}>
+                <Typography variant="label" sx={{ color: colors.text.muted, mb: 1 }}>
                   🎁 Brindes
                 </Typography>
                 <Stack direction="row" spacing={0.7} sx={{ flexWrap: 'wrap', rowGap: 0.7 }}>
@@ -220,13 +220,13 @@ export function ReaderCollectionPage() {
               </Card>
             )}
             <Box>
-              <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: theme.textOnBgMuted, mb: 1.2 }}>
+              <Typography variant="sm" sx={{ fontWeight: 700, color: theme.textOnBgMuted, mb: 1.2 }}>
                 {ownedNotes.length} bilhete{ownedNotes.length !== 1 ? 's' : ''}
               </Typography>
               <Box sx={{
                 display: 'flex', alignItems: 'center', gap: 1, px: 1.4, py: 0.75, mb: 1,
-                background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(12px)',
-                border: '1.5px solid rgba(255,255,255,0.6)', borderRadius: radius.lg,
+                background: colors.glass.bg, backdropFilter: 'blur(12px)',
+                border: `1.5px solid ${colors.glass.border}`, borderRadius: radius.lg,
               }}>
                 <SearchIcon sx={{ fontSize: 17, color: theme.textOnBgMuted, flexShrink: 0 }} />
                 <Box
@@ -241,20 +241,20 @@ export function ReaderCollectionPage() {
                     <CloseIcon sx={{ fontSize: 15 }} />
                   </Box>
                 )}
-                <Box sx={{ width: 1, height: 18, background: 'rgba(0,0,0,0.1)', mx: 0.5 }} />
+                <Box sx={{ width: 1, height: 18, background: colors.border.medium, mx: 0.5 }} />
                 <IconButton
                   size="small"
                   onClick={() => setSort((s) => SORT_CYCLE[(SORT_CYCLE.indexOf(s) + 1) % SORT_CYCLE.length])}
                   title={SORT_LABEL[sort]}
-                  sx={{ p: 0.5, gap: 0.3, borderRadius: radius.sm, '&:hover': { background: 'rgba(0,0,0,0.06)' } }}
+                  sx={{ p: 0.5, gap: 0.3, borderRadius: radius.sm, '&:hover': { background: colors.fill.medium } }}
                 >
                   <SwapVertIcon sx={{ fontSize: 15, color: theme.textOnBgMuted }} />
-                  <Typography sx={{ fontSize: '0.70rem', fontWeight: 700, color: theme.textOnBgMuted }}>{SORT_LABEL[sort]}</Typography>
+                  <Typography variant="xs" sx={{ fontWeight: 700, color: theme.textOnBgMuted }}>{SORT_LABEL[sort]}</Typography>
                 </IconButton>
                 <IconButton
                   size="small"
                   onClick={() => setViewMode((m) => (m === 'list' ? 'grid' : 'list'))}
-                  sx={{ p: 0.5, borderRadius: radius.sm, '&:hover': { background: 'rgba(0,0,0,0.06)' } }}
+                  sx={{ p: 0.5, borderRadius: radius.sm, '&:hover': { background: colors.fill.medium } }}
                 >
                   {viewMode === 'list'
                     ? <GridViewIcon sx={{ fontSize: 17, color: theme.textOnBgMuted }} />
@@ -263,50 +263,36 @@ export function ReaderCollectionPage() {
               </Box>
               {(ownedRarities.length > 1 || favCount > 0) && (
                 <Box sx={{ display: 'flex', gap: 0.6, flexWrap: 'wrap', mb: 1.2 }}>
-                  <Chip
-                    label={`Todos (${ownedNotes.length})`}
-                    size="small"
-                    onClick={() => { setRarityFilter(null); setFavFilter(false) }}
-                    sx={{
-                      height: 26, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer',
-                      bgcolor: noFilter ? theme.accent : 'rgba(255,255,255,0.5)',
-                      color: noFilter ? '#fff' : theme.textOnBgMuted,
-                    }}
-                  />
+                  <ChoiceChip label={`Todos (${ownedNotes.length})`} size="md" surface="page" selected={noFilter} onClick={() => { setRarityFilter(null); setFavFilter(false) }} />
                   {favCount > 0 && (
-                    <Chip
+                    <ChoiceChip
                       label={`♥ Favoritas (${favCount})`}
-                      size="small"
+                      size="md"
+                      surface="page"
+                      selected={favFilter}
+                      tone={{ bg: colors.rose.main, border: colors.rose.main, text: '#fff' }}
                       onClick={() => { setFavFilter((f) => !f); setRarityFilter(null) }}
-                      sx={{
-                        height: 26, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer',
-                        bgcolor: favFilter ? colors.rose.main : 'rgba(255,255,255,0.5)',
-                        color: favFilter ? '#fff' : theme.textOnBgMuted,
-                      }}
                     />
                   )}
                   {ownedRarities.map((r) => {
                     const active = rarityFilter === r.id
                     const count = ownedNotes.filter((n) => n.rarity === r.id).length
                     return (
-                      <Chip
+                      <ChoiceChip
                         key={r.id}
                         label={`${r.emoji} ${r.label} (${count})`}
-                        size="small"
+                        size="md"
+                        surface="page"
+                        selected={active}
+                        tone={rarityTone(r)}
                         onClick={() => { setRarityFilter(active ? null : r.id); setFavFilter(false) }}
-                        sx={{
-                          height: 26, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer',
-                          background: active ? r.chipBg : 'rgba(255,255,255,0.5)',
-                          border: `1.5px solid ${active ? r.borderColor : 'transparent'}`,
-                          '& .MuiChip-label': active ? gradientTextSx(r.chipColor) : { color: theme.textOnBgMuted },
-                        }}
                       />
                     )
                   })}
                 </Box>
               )}
               {filteredNotes.length === 0 ? (
-                <Typography sx={{ py: 4, textAlign: 'center', fontSize: '0.85rem', color: theme.textOnBgMuted }}>
+                <Typography variant="lg" sx={{ py: 4, textAlign: 'center', color: theme.textOnBgMuted }}>
                   {search || rarityFilter || favFilter ? 'Nenhum bilhete encontrado.' : 'Ainda não coletou nenhum bilhete.'}
                 </Typography>
               ) : viewMode === 'grid' ? (

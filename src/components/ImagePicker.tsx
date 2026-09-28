@@ -4,7 +4,7 @@ import { Grid } from '@giphy/react-components'
 import { GiphyFetch } from '@giphy/js-fetch-api'
 import type { IGif } from '@giphy/js-types'
 import { colors, radius } from '../design-system'
-import { Input } from './ui'
+import { Input, OptionTile } from './ui'
 import { useBackground } from '../context/BackgroundContext'
 import poweredByGiphyLight from '../assets/giphy/powered-by-giphy-light.png'
 import poweredByGiphyDark from '../assets/giphy/powered-by-giphy-dark.png'
@@ -119,31 +119,11 @@ export function ImagePicker({ value, onChange, mediaType = 'gifs', label }: Prop
     setMode(null)
   }
 
-  const btnSx = (active: boolean) => ({
-    flex: 1,
-    py: 0.9,
-    px: 1,
-    borderRadius: radius.md,
-    cursor: 'pointer',
-    textAlign: 'center' as const,
-    fontSize: '0.78rem',
-    fontWeight: 700,
-    transition: 'all 0.15s',
-    userSelect: 'none' as const,
-    background: active ? colors.primary.main : 'rgba(0,0,0,0.04)',
-    color: active ? '#fff' : colors.text.secondary,
-    border: `1.5px solid ${active ? colors.primary.main : colors.border.subtle}`,
-    '&:hover': {
-      background: active ? colors.primary.light : 'rgba(0,0,0,0.08)',
-      borderColor: active ? colors.primary.light : colors.border.medium,
-    },
-  })
-
   return (
     <Stack spacing={1.5}>
-      <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.secondary }}>
+      <Typography variant="sm" sx={{ fontWeight: 700, color: colors.text.secondary }}>
         {label ?? 'Imagem'}{' '}
-        <Typography component="span" sx={{ fontSize: '0.68rem', fontWeight: 400, color: colors.text.muted }}>
+        <Typography variant="xs" component="span" sx={{ fontWeight: 400, color: colors.text.muted }}>
           (opcional)
         </Typography>
       </Typography>
@@ -183,17 +163,12 @@ export function ImagePicker({ value, onChange, mediaType = 'gifs', label }: Prop
         </Box>
       )}
 
-      {/* Toggle buttons */}
       <Stack direction="row" alignItems="center" spacing={1}>
-        <Box onClick={() => toggleMode('giphy')} sx={btnSx(mode === 'giphy')}>
-          🔍 {mediaType === 'stickers' ? 'Sticker' : 'GIF'}
-        </Box>
-        <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: colors.text.muted, flexShrink: 0 }}>
+        <OptionTile variant="solid" size="md" active={mode === 'giphy'} onClick={() => toggleMode('giphy')} title={`🔍 ${mediaType === 'stickers' ? 'Sticker' : 'GIF'}`} sx={{ flex: 1 }} />
+        <Typography variant="xs" sx={{ fontWeight: 700, color: colors.text.muted, flexShrink: 0 }}>
           ou
         </Typography>
-        <Box onClick={() => toggleMode('url')} sx={btnSx(mode === 'url')}>
-          🔗 URL
-        </Box>
+        <OptionTile variant="solid" size="md" active={mode === 'url'} onClick={() => toggleMode('url')} title="🔗 URL" sx={{ flex: 1 }} />
       </Stack>
 
       {/* GIF panel */}
@@ -212,7 +187,7 @@ export function ImagePicker({ value, onChange, mediaType = 'gifs', label }: Prop
               overflowY: 'auto',
               overflowX: 'hidden',
               maxHeight: 340,
-              background: 'rgba(0,0,0,0.03)',
+              background: colors.fill.subtle,
               '& *': { boxSizing: 'border-box' },
             }}
           >
@@ -251,7 +226,7 @@ export function ImagePicker({ value, onChange, mediaType = 'gifs', label }: Prop
             helperText={urlError ?? undefined}
             autoFocus
           />
-          <Typography sx={{ fontSize: '0.62rem', color: colors.text.muted, pl: 0.5 }}>
+          <Typography variant="xxs" sx={{ color: colors.text.muted, pl: 0.5 }}>
             .jpg · .png · .gif · .webp · .avif · apenas HTTPS
           </Typography>
         </Stack>

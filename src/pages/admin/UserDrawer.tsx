@@ -25,7 +25,7 @@ function Tile({ value, label }: { value: number; label: string }) {
   return (
     <Box sx={{ p: 1.1, borderRadius: radius.lg, background: `${theme.accent}10`, border: `1px solid ${theme.accent}22`, textAlign: 'center', minWidth: 0 }}>
       <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.25rem', color: theme.textOnBg, lineHeight: 1.1 }}>{formatNumber(value)}</Typography>
-      <Typography sx={{ mt: 0.3, fontSize: '0.64rem', fontWeight: 700, color: theme.textOnBgMuted, textTransform: 'uppercase', letterSpacing: 0.4 }}>{label}</Typography>
+      <Typography variant="xxs" sx={{ mt: 0.3, fontWeight: 700, color: theme.textOnBgMuted, textTransform: 'uppercase', letterSpacing: 0.4 }}>{label}</Typography>
     </Box>
   )
 }
@@ -34,7 +34,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   const { theme } = useBackground()
   return (
     <Box sx={{ mt: 2.4 }}>
-      <Typography sx={{ mb: 1, fontSize: '0.66rem', fontWeight: 800, letterSpacing: 0.6, textTransform: 'uppercase', color: theme.textOnBgMuted }}>{title}</Typography>
+      <Typography variant="label" sx={{ mb: 1, color: theme.textOnBgMuted }}>{title}</Typography>
       {children}
     </Box>
   )
@@ -51,7 +51,7 @@ function Timeline({ user }: { user: AdminUserRow }) {
     .sort((a, b) => b.at.localeCompare(a.at))
 
   if (!events.length) {
-    return <Typography sx={{ fontSize: '0.8rem', color: theme.textOnBgMuted }}>Sem registros ainda.</Typography>
+    return <Typography variant="md" sx={{ color: theme.textOnBgMuted }}>Sem registros ainda.</Typography>
   }
 
   return (
@@ -64,8 +64,8 @@ function Timeline({ user }: { user: AdminUserRow }) {
               position: 'absolute', left: -21, top: 4, width: 12, height: 12, borderRadius: '50%',
               background: i === 0 ? theme.accent : theme.surfaceBg, border: `2px solid ${theme.accent}`,
             }} />
-            <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: theme.textOnBg }}>{event.label}</Typography>
-            <Typography sx={{ fontSize: '0.74rem', color: theme.textOnBgMuted }}>
+            <Typography variant="md" sx={{ fontWeight: 700, color: theme.textOnBg }}>{event.label}</Typography>
+            <Typography variant="sm" sx={{ color: theme.textOnBgMuted }}>
               {dateTime(event.at)} · {timeAgo(event.at)}
             </Typography>
           </Box>
@@ -79,8 +79,8 @@ function Row({ label, value }: { label: string; value: string }) {
   const { theme } = useBackground()
   return (
     <Stack direction="row" justifyContent="space-between" sx={{ py: 0.8, borderBottom: `1px solid ${theme.surfaceBorder}`, '&:last-of-type': { borderBottom: 'none' } }}>
-      <Typography sx={{ fontSize: '0.8rem', color: theme.textOnBgMuted }}>{label}</Typography>
-      <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: theme.textOnBg }}>{value}</Typography>
+      <Typography variant="md" sx={{ color: theme.textOnBgMuted }}>{label}</Typography>
+      <Typography variant="md" sx={{ fontWeight: 700, color: theme.textOnBg }}>{value}</Typography>
     </Stack>
   )
 }
@@ -97,8 +97,8 @@ function UserProfile({ user, onClose, handle }: { user: AdminUserRow; onClose: (
           <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.3rem', color: theme.textOnBg, lineHeight: 1.15, wordBreak: 'break-word' }}>
             {user.name}
           </Typography>
-          {user.username && <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: theme.textOnBgMuted }}>@{user.username}</Typography>}
-          <Typography sx={{ fontSize: '0.8rem', color: theme.textOnBgMuted }}>{user.emailMasked}</Typography>
+          {user.username && <Typography variant="md" sx={{ fontWeight: 600, color: theme.textOnBgMuted }}>@{user.username}</Typography>}
+          <Typography variant="md" sx={{ color: theme.textOnBgMuted }}>{user.emailMasked}</Typography>
         </Box>
         <IconButton aria-label="Fechar" onClick={onClose} size="small" sx={{ color: theme.textOnBgMuted, mt: -0.5 }}>
           <CloseIcon fontSize="small" />
@@ -107,7 +107,7 @@ function UserProfile({ user, onClose, handle }: { user: AdminUserRow; onClose: (
 
       <Stack direction="row" alignItems="center" spacing={0.8} sx={{ mt: 1.6 }}>
         <Box sx={{ width: 8, height: 8, borderRadius: '50%', background: tone === 'none' ? theme.textOnBgMuted : TONE_COLOR[tone] }} />
-        <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: theme.textOnBg }}>
+        <Typography variant="md" sx={{ fontWeight: 700, color: theme.textOnBg }}>
           {user.lastActiveAt ? `Ativo ${timeAgo(user.lastActiveAt)}` : 'Nunca apareceu depois do cadastro'}
         </Typography>
       </Stack>
@@ -135,7 +135,7 @@ function UserProfile({ user, onClose, handle }: { user: AdminUserRow; onClose: (
         <Row label="Tutorial" value={user.onboardingDone ? 'Concluído' : 'Não concluído'} />
       </Section>
 
-      <Typography sx={{ mt: 2.4, fontSize: '0.66rem', color: theme.textOnBgMuted, textAlign: 'center' }}>
+      <Typography variant="xs" sx={{ mt: 2.4, color: theme.textOnBgMuted, textAlign: 'center' }}>
         Email mascarado por segurança · ref. {user.id.slice(0, 8)}
       </Typography>
     </Box>

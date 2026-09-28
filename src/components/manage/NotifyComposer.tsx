@@ -1,6 +1,7 @@
 import { Box, Stack, TextField, Typography } from '@mui/material'
 import { ImagePicker } from '../ImagePicker'
 import { colors, radius } from '../../design-system'
+import { OptionTile } from '../ui'
 import type { NotificationChannels, NotifyConfig } from '../../types/note'
 
 export interface NotifyDraft {
@@ -46,8 +47,8 @@ export function ToggleRow({ checked, onToggle, title, subtitle }: { checked: boo
         }} />
       </Box>
       <Box>
-        <Typography sx={{ fontSize: '0.84rem', fontWeight: 800, color: colors.text.primary, lineHeight: 1.25 }}>{title}</Typography>
-        <Typography sx={{ fontSize: '0.7rem', color: colors.text.muted }}>{subtitle}</Typography>
+        <Typography variant="lg" sx={{ fontWeight: 800, color: colors.text.primary, lineHeight: 1.25 }}>{title}</Typography>
+        <Typography variant="xs" sx={{ color: colors.text.muted }}>{subtitle}</Typography>
       </Box>
     </Stack>
   )
@@ -75,31 +76,30 @@ export function NotifyComposer({ value, onChange, toggleTitle, toggleSubtitle, m
       {value.enabled && (
         <Stack spacing={1.6} sx={{ pl: 0.3 }}>
           <Box>
-            <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: colors.text.secondary, mb: 0.7 }}>
+            <Typography variant="sm" sx={{ fontWeight: 800, color: colors.text.secondary, mb: 0.7 }}>
               Por onde avisar?
             </Typography>
             <Stack direction="row" spacing={0.7} sx={{ flexWrap: 'wrap', rowGap: 0.7 }}>
               {CHANNEL_OPTIONS.map((option) => {
                 const active = value.channels[option.id]
                 return (
-                  <Box key={option.id} onClick={() => toggleChannel(option.id)} sx={{
-                    px: 1.2, py: 0.7, borderRadius: radius.lg, cursor: 'pointer', flex: '1 1 30%', minWidth: 120,
-                    background: active ? `${colors.primary.main}14` : 'rgba(0,0,0,0.04)',
-                    border: `1.5px solid ${active ? colors.primary.main : 'transparent'}`,
-                    transition: 'all 0.14s',
-                  }}>
-                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 800, color: active ? colors.primary.main : colors.text.secondary }}>
-                      {option.emoji} {option.label}
-                    </Typography>
-                    <Typography sx={{ fontSize: '0.64rem', color: colors.text.muted, lineHeight: 1.3 }}>{option.hint}</Typography>
-                  </Box>
+                  <OptionTile
+                    key={option.id}
+                    active={active}
+                    onClick={() => toggleChannel(option.id)}
+                    layout="row"
+                    size="md"
+                    title={`${option.emoji} ${option.label}`}
+                    hint={option.hint}
+                    sx={{ flex: '1 1 30%', minWidth: 120, px: 1.2, py: 0.7 }}
+                  />
                 )
               })}
             </Stack>
           </Box>
 
           <Box>
-            <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: colors.text.secondary, mb: 0.7 }}>
+            <Typography variant="sm" sx={{ fontWeight: 800, color: colors.text.secondary, mb: 0.7 }}>
               Mensagem (opcional)
             </Typography>
             <TextField

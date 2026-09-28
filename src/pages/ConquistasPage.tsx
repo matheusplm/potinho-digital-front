@@ -31,16 +31,16 @@ export function ConquistasPage() {
       <EmojiEventsOutlinedIcon sx={{ position: 'absolute', bottom: -70, right: -60, fontSize: 420, color: 'rgba(225,29,72,0.05)', pointerEvents: 'none' }} />
       <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
         <Stack spacing={0.3} sx={{ mb: 2.2 }}>
-          <Typography sx={{ fontSize: '0.78rem', color: theme.textOnBgMuted, fontWeight: 700 }}>
+          <Typography variant="md" sx={{ color: theme.textOnBgMuted, fontWeight: 700 }}>
             🏅 Conquistas
           </Typography>
           <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.6rem', color: theme.textOnBg, lineHeight: 1.1 }}>
             Suas conquistas
           </Typography>
           {collection && (
-            <Typography sx={{
+            <Typography variant="sm" sx={{
               display: 'inline-flex', alignItems: 'center', gap: 0.5, mt: 0.4,
-              fontSize: '0.74rem', fontWeight: 700, color: theme.textOnBgMuted,
+              fontWeight: 700, color: theme.textOnBgMuted,
               bgcolor: `${theme.accent}14`, border: `1px solid ${theme.accent}28`,
               borderRadius: '20px', px: 1, py: 0.25, alignSelf: 'flex-start',
             }}>
@@ -48,7 +48,7 @@ export function ConquistasPage() {
             </Typography>
           )}
           {achData && (
-            <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBgMuted, fontStyle: 'italic', mt: 0.3 }}>
+            <Typography variant="md" sx={{ color: theme.textOnBgMuted, fontStyle: 'italic', mt: 0.3 }}>
               {unlocked} de {achievements.length} desbloqueadas
             </Typography>
           )}
@@ -63,7 +63,7 @@ export function ConquistasPage() {
             <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.2rem', color: theme.textOnBg }}>
               Nenhum potinho ativo
             </Typography>
-            <Typography sx={{ fontSize: '0.84rem', color: theme.textOnBgMuted, maxWidth: 260 }}>
+            <Typography variant="lg" sx={{ color: theme.textOnBgMuted, maxWidth: 260 }}>
               Abra um potinho pra começar a colecionar conquistas.
             </Typography>
           </Stack>
@@ -93,34 +93,34 @@ export function ConquistasPage() {
                     <Box sx={{
                       width: 48, height: 48, borderRadius: radius.full, flexShrink: 0, fontSize: '1.5rem',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      background: a.unlocked ? `linear-gradient(135deg, ${theme.accent}22, ${theme.accent}44)` : 'rgba(0,0,0,0.05)',
-                      border: `1.5px solid ${a.unlocked ? `${theme.accent}88` : 'rgba(0,0,0,0.08)'}`,
+                      background: a.unlocked ? `linear-gradient(135deg, ${theme.accent}22, ${theme.accent}44)` : colors.fill.medium,
+                      border: `1.5px solid ${a.unlocked ? `${theme.accent}88` : colors.border.subtle}`,
                       filter: a.unlocked ? 'none' : 'grayscale(1)', opacity: a.unlocked ? 1 : 0.45,
                     }}>
                       {a.emoji}
                     </Box>
                     <Box sx={{ flex: 1, minWidth: 0 }}>
                       <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.94rem', color: colors.text.primary }}>
+                        <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary }}>
                           {a.label}
                         </Typography>
-                        {a.unlocked && <Typography sx={{ fontSize: '0.8rem', fontWeight: 900, color: colors.success.main }}>✓</Typography>}
+                        {a.unlocked && <Typography variant="md" sx={{ fontWeight: 900, color: colors.success.main }}>✓</Typography>}
                       </Stack>
-                      <Typography sx={{ fontSize: '0.76rem', color: colors.text.secondary, mb: a.unlocked ? 0 : 0.5 }}>
+                      <Typography variant="sm" sx={{ color: colors.text.secondary, mb: a.unlocked ? 0 : 0.5 }}>
                         {a.description}
                       </Typography>
                       {a.unlocked && a.unlockedAt && (
-                        <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: theme.accent }}>
+                        <Typography variant="sm" sx={{ fontWeight: 700, color: theme.accent }}>
                           🏆 desbloqueada em {formatDate(a.unlockedAt)}
                         </Typography>
                       )}
                       {!a.unlocked && (
                         <Stack direction="row" alignItems="center" spacing={0.8}>
                           <LinearProgress variant="determinate" value={pct} sx={{
-                            flex: 1, height: 5, borderRadius: radius.full, bgcolor: 'rgba(0,0,0,0.06)',
+                            flex: 1, height: 5, borderRadius: radius.full, bgcolor: colors.fill.medium,
                             '& .MuiLinearProgress-bar': { borderRadius: radius.full, background: theme.accent },
                           }} />
-                          <Typography sx={{ fontSize: '0.68rem', fontWeight: 800, color: colors.text.muted }}>
+                          <Typography variant="xs" sx={{ fontWeight: 800, color: colors.text.muted }}>
                             {a.current}/{a.target}
                           </Typography>
                         </Stack>

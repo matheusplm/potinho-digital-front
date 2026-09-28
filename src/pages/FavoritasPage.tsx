@@ -37,16 +37,16 @@ export function FavoritasPage() {
       <FavoriteIcon sx={{ position: 'absolute', bottom: -80, right: -70, fontSize: 460, color: 'rgba(225,29,72,0.05)', pointerEvents: 'none' }} />
       <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
         <Stack spacing={0.3} sx={{ mb: 2.2 }}>
-          <Typography sx={{ fontSize: '0.78rem', color: theme.textOnBgMuted, fontWeight: 700 }}>
+          <Typography variant="md" sx={{ color: theme.textOnBgMuted, fontWeight: 700 }}>
             ❤️ Favoritas
           </Typography>
           <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.6rem', color: theme.textOnBg, lineHeight: 1.1 }}>
             Suas favoritas
           </Typography>
           {collection && (
-            <Typography sx={{
+            <Typography variant="sm" sx={{
               display: 'inline-flex', alignItems: 'center', gap: 0.5, mt: 0.4,
-              fontSize: '0.74rem', fontWeight: 700, color: theme.textOnBgMuted,
+              fontWeight: 700, color: theme.textOnBgMuted,
               bgcolor: `${theme.accent}14`, border: `1px solid ${theme.accent}28`,
               borderRadius: '20px', px: 1, py: 0.25, alignSelf: 'flex-start',
             }}>
@@ -54,7 +54,7 @@ export function FavoritasPage() {
             </Typography>
           )}
           {favorites.length > 0 && (
-            <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBgMuted, fontStyle: 'italic', mt: 0.3 }}>
+            <Typography variant="md" sx={{ color: theme.textOnBgMuted, fontStyle: 'italic', mt: 0.3 }}>
               {favorites.length} cartinha{favorites.length !== 1 ? 's' : ''} que você mais ama
             </Typography>
           )}
@@ -70,7 +70,7 @@ export function FavoritasPage() {
             <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.2rem', color: theme.textOnBg }}>
               Nenhuma favorita ainda
             </Typography>
-            <Typography sx={{ fontSize: '0.84rem', color: theme.textOnBgMuted, maxWidth: 260 }}>
+            <Typography variant="lg" sx={{ color: theme.textOnBgMuted, maxWidth: 260 }}>
               Toque na estrelinha de uma cartinha pra guardá-la aqui.
             </Typography>
           </Stack>

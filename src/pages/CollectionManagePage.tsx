@@ -8,7 +8,7 @@ import { useCollectionsQuery } from '../hooks/useNotes'
 import { useBackground } from '../context/BackgroundContext'
 import { FloatingParticles } from '../components/FloatingParticles'
 import { useUser } from '../context/UserContext'
-import { fadeIn } from '../design-system'
+import { fadeIn, colors } from '../design-system'
 import { isCollectionOwner } from '../utils/collectionAccess'
 import { slugify } from '../utils/slug'
 import { NotesTab } from './manage/NotesTab'
@@ -77,7 +77,7 @@ export function CollectionManagePage() {
               background: theme.surfaceBg, border: `1.5px solid ${theme.surfaceBorder}`,
               backdropFilter: 'blur(14px)', boxShadow: '0 8px 24px rgba(15,23,42,0.08)',
               transition: 'transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease',
-              '&:hover': { background: 'rgba(255,255,255,0.76)', transform: 'translateX(-2px) scale(1.04)', boxShadow: '0 10px 28px rgba(15,23,42,0.12)' },
+              '&:hover': { background: colors.glass.strong, transform: 'translateX(-2px) scale(1.04)', boxShadow: '0 10px 28px rgba(15,23,42,0.12)' },
               '&:active': { transform: 'translateX(-1px) scale(0.98)' },
             }}
           >

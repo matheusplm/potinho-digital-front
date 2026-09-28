@@ -385,23 +385,23 @@ export function SimulatedReaderHomePage() {
                           <MailOutlineIcon sx={{ fontSize: 20, color: '#fff' }} />
                         </Box>
                         <Box sx={{ flex: 1, minWidth: 0 }}>
-                          <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, color: '#1d4ed8', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                          <Typography variant="label" sx={{ color: colors.primary.text }}>
                             Convite esperando você
                           </Typography>
-                          <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.95rem', color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {invite.collectionName || 'Coleção'}
                           </Typography>
-                          <Typography sx={{ fontSize: '0.72rem', color: colors.text.secondary }}>
+                          <Typography variant="sm" sx={{ color: colors.text.secondary }}>
                             {invite.inviterName ? `de ${invite.inviterName}` : 'toque para abrir'}
                           </Typography>
                         </Box>
-                        <Typography sx={{ fontSize: '1rem', color: '#1d4ed8', fontWeight: 900, flexShrink: 0 }}>→</Typography>
+                        <Typography variant="xl" sx={{ color: colors.primary.text, fontWeight: 900, flexShrink: 0 }}>→</Typography>
                       </Stack>
                     </Card>
                   ))}
                 </Stack>
               ) : (
-                <Typography sx={{ fontSize: '0.85rem', color: theme.textOnBgMuted, maxWidth: 260 }}>
+                <Typography variant="lg" sx={{ color: theme.textOnBgMuted, maxWidth: 260 }}>
                   Peça para liberarem seu email em uma coleção.
                 </Typography>
               )}
@@ -436,7 +436,7 @@ export function SimulatedReaderHomePage() {
         <Box sx={{ animation: `${fadeIn} 0.35s ease` }}>
           <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 1.35 }}>
             <Stack spacing={0.35} sx={{ flex: 1, minWidth: 0, mr: 1 }}>
-              <Typography sx={{ fontSize: '0.78rem', color: theme.textOnBgMuted, fontWeight: 700 }}>
+              <Typography variant="md" sx={{ color: theme.textOnBgMuted, fontWeight: 700 }}>
                 {isRealReader ? 'Para você' : 'Prévia do leitor'}
               </Typography>
               <Stack direction="row" alignItems="center" spacing={1} sx={{ minWidth: 0 }}>
@@ -447,7 +447,7 @@ export function SimulatedReaderHomePage() {
                   {activeSession.collectionName}
                 </Typography>
               </Stack>
-              <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBgMuted, fontStyle: 'italic' }}>
+              <Typography variant="md" sx={{ color: theme.textOnBgMuted, fontStyle: 'italic' }}>
                 seu potinho chegou 💌
               </Typography>
             </Stack>
@@ -467,7 +467,7 @@ export function SimulatedReaderHomePage() {
                     backdropFilter: 'blur(10px)', transition: 'all 0.16s',
                     '&:hover': active ? {} : { borderColor: `${theme.accent}55` },
                   }}>
-                    <Typography sx={{ fontSize: '0.74rem', fontWeight: 800, color: active ? '#fff' : theme.textOnBgMuted, maxWidth: 170, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <Typography variant="sm" sx={{ fontWeight: 800, color: active ? theme.onAccent : theme.textOnBgMuted, maxWidth: 170, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {c.emoji} {c.name}{hasNews ? ' 🎉' : ''}{hasPack ? ' 📦' : ''}
                     </Typography>
                     {(hasNews || hasPack) && !active && (
@@ -485,11 +485,11 @@ export function SimulatedReaderHomePage() {
           {isRealReader && pendingInvites.length > 0 && (
             <Card onClick={() => navigate(`/convite/${pendingInvites[0].token}`)} sx={{ p: 1.15, mb: 1.35, cursor: 'pointer', border: '1.5px solid #dbeafe', background: 'linear-gradient(135deg,#eff6ff,#fce7f3)', transition: 'transform 0.16s', '&:hover': { transform: 'translateY(-1px)' } }}>
               <Stack direction="row" alignItems="center" spacing={1}>
-                <MailOutlineIcon sx={{ fontSize: 18, color: '#1d4ed8', flexShrink: 0 }} />
-                <Typography sx={{ flex: 1, minWidth: 0, fontSize: '0.78rem', fontWeight: 700, color: ink.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <MailOutlineIcon sx={{ fontSize: 18, color: colors.primary.main, flexShrink: 0 }} />
+                <Typography variant="md" sx={{ flex: 1, minWidth: 0, fontWeight: 700, color: ink.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   Convite pendente: {pendingInvites[0].collectionName || 'Coleção'}
                 </Typography>
-                <Typography sx={{ fontSize: '0.9rem', color: '#1d4ed8', fontWeight: 900, flexShrink: 0 }}>→</Typography>
+                <Typography variant="xl" sx={{ color: colors.primary.main, fontWeight: 900, flexShrink: 0 }}>→</Typography>
               </Stack>
             </Card>
           )}
@@ -506,11 +506,11 @@ export function SimulatedReaderHomePage() {
                 transition: 'transform 0.16s ease, border-color 0.16s ease',
                 '&:hover': { transform: 'translateY(-1px)', borderColor: `${theme.accent}55` },
               }}>
-                <Typography sx={{ fontSize: '1rem', lineHeight: 1 }}>{s.emoji}</Typography>
+                <Typography variant="xl" sx={{ lineHeight: 1 }}>{s.emoji}</Typography>
                 <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.05rem', color: theme.textOnBg, lineHeight: 1.2, mt: 0.25 }}>
                   {s.value}
                 </Typography>
-                <Typography sx={{ fontSize: '0.70rem', fontWeight: 700, color: theme.textOnBgMuted }}>
+                <Typography variant="xs" sx={{ fontWeight: 700, color: theme.textOnBgMuted }}>
                   {s.label}
                 </Typography>
               </Box>
@@ -525,7 +525,7 @@ export function SimulatedReaderHomePage() {
                 ) : (
                   <>
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
-                      <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: colors.text.secondary }}>
+                      <Typography variant="sm" sx={{ fontWeight: 800, color: colors.text.secondary }}>
                         Coleção
                       </Typography>
                       <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.05rem', color: theme.accent }}>
@@ -539,12 +539,13 @@ export function SimulatedReaderHomePage() {
                       '& .MuiLinearProgress-bar': { borderRadius: radius.full, background: `linear-gradient(90deg, ${colors.rose.main}, ${theme.accent})` },
                     }} />
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
-                      <Typography sx={{ fontSize: '0.72rem', color: colors.text.secondary }}>
+                      <Typography variant="sm" sx={{ color: colors.text.secondary }}>
                         {play.owned} de {play.total} bilhetes coletados
                       </Typography>
                       <Typography
+                        variant="sm"
                         onClick={() => navigate(`/colecoes/${activeSession.collectionSlug}`)}
-                        sx={{ fontSize: '0.72rem', fontWeight: 800, color: theme.accent, cursor: 'pointer', flexShrink: 0, '&:hover': { textDecoration: 'underline' } }}
+                        sx={{ fontWeight: 800, color: theme.accent, cursor: 'pointer', flexShrink: 0, '&:hover': { textDecoration: 'underline' } }}
                       >
                         ver álbum →
                       </Typography>
@@ -561,10 +562,10 @@ export function SimulatedReaderHomePage() {
                     💭
                   </Box>
                   <Box sx={{ flex: 1, minWidth: 0, cursor: 'pointer' }} onClick={() => setSelectedNote(relerNote)}>
-                    <Typography sx={{ fontSize: '0.70rem', fontWeight: 900, letterSpacing: 0.6, color: theme.accent, textTransform: 'uppercase' }}>
+                    <Typography variant="label" sx={{ color: theme.accent }}>
                       Pra reler agora
                     </Typography>
-                    <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.92rem', color: colors.text.primary, lineHeight: 1.25, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, lineHeight: 1.25, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {relerNote.title}
                     </Typography>
                   </Box>

@@ -57,15 +57,15 @@ function AchievementToastContent({ emoji, label, description, duration }: { emoj
           <Box sx={{ position: 'relative' }}>{emoji}</Box>
         </Box>
         <Stack spacing={0.15} sx={{ minWidth: 0 }}>
-          <Typography sx={{ fontSize: '0.66rem', fontWeight: 900, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#b45309' }}>
+          <Typography variant="xs" sx={{ fontWeight: 900, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#b45309' }}>
             🏆 Conquista desbloqueada
           </Typography>
-          <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.98rem', color: ink.primary, lineHeight: 1.25 }}>
+          <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: ink.primary, lineHeight: 1.25 }}>
             {label}
           </Typography>
           {description && (
-            <Typography sx={{
-              fontSize: '0.74rem', color: ink.secondary, lineHeight: 1.3,
+            <Typography variant="sm" sx={{
+              color: ink.secondary, lineHeight: 1.3,
               display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
             }}>
               {description}
@@ -113,11 +113,11 @@ function ToastContent({ icon, title, description, accent, bg, border }: ToastCon
       <Stack direction="row" spacing={1.2} alignItems="center">
         <Box sx={{ flexShrink: 0, color: accent, display: 'flex' }}>{icon}</Box>
         <Stack spacing={0.15}>
-          <Typography sx={{ fontSize: '0.87rem', fontWeight: 700, color: ink.primary, lineHeight: 1.3 }}>
+          <Typography variant="lg" sx={{ fontWeight: 700, color: ink.primary, lineHeight: 1.3 }}>
             {title}
           </Typography>
           {description && (
-            <Typography sx={{ fontSize: '0.76rem', color: ink.secondary, lineHeight: 1.35 }}>
+            <Typography variant="sm" sx={{ color: ink.secondary, lineHeight: 1.35 }}>
               {description}
             </Typography>
           )}

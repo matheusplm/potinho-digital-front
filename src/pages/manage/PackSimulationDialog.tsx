@@ -4,8 +4,8 @@ import { keyframes } from '@emotion/react'
 import { useEffect, useState } from 'react'
 import { Button } from '../../components/ui'
 import { colors, font, ink, radius, shineSweep } from '../../design-system'
-import { gradientTextSx } from '../../utils/colorUtils'
 import type { RarityConfig, NoteTypeConfig } from '../../types/note'
+import { RarityChip } from '../../components/collection/RarityChip'
 import type { PackSimulation } from './packData'
 
 const packOpening = keyframes`
@@ -65,7 +65,7 @@ export function PackSimulationDialog({ simulation, rarities, types, onClose, onS
                 <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.08rem', color: colors.text.primary }}>
                   {revealed ? simulation.pack.name : 'Abrindo pacotinho...'}
                 </Typography>
-                <Typography sx={{ fontSize: '0.76rem', color: colors.text.secondary }}>
+                <Typography variant="sm" sx={{ color: colors.text.secondary }}>
                   {revealed
                     ? `${simulation.eligibleCount} ${simulation.eligibleCount === 1 ? 'bilhete elegível' : 'bilhetes elegíveis'}`
                     : 'Separando as cartinhas desse pacote'}
@@ -105,8 +105,8 @@ export function PackSimulationDialog({ simulation, rarities, types, onClose, onS
                     </Box>
                   </Box>
                 </Box>
-                <Typography sx={{ mt: 1.1, fontFamily: font.serif, fontSize: '1rem', fontWeight: 800, color: colors.text.primary }}>Abrindo o pacotinho</Typography>
-                <Typography sx={{ mt: 0.35, fontSize: '0.76rem', color: colors.text.muted }}>As cartinhas estão saindo do potinho...</Typography>
+                <Typography variant="xl" sx={{ mt: 1.1, fontFamily: font.serif, fontWeight: 800, color: colors.text.primary }}>Abrindo o pacotinho</Typography>
+                <Typography variant="sm" sx={{ mt: 0.35, color: colors.text.muted }}>As cartinhas estão saindo do potinho...</Typography>
               </Box>
             ) : (
               <Stack spacing={1.1} sx={{ animation: `${openingSceneFade} 0.2s ease-out both` }}>
@@ -121,17 +121,15 @@ export function PackSimulationDialog({ simulation, rarities, types, onClose, onS
                   return (
                     <Box key={`${note.id}-${index}`} sx={{ p: 1.25, borderRadius: radius.lg, background: rarity?.cardBg ?? ink.surface, border: `1.5px solid ${rarity?.borderColor ?? colors.border.subtle}`, boxShadow: rarity?.glowColor ? `${rarity.shadow}, 0 0 22px ${rarity.glowColor}` : rarity?.shadow, opacity: 0, animation: `${rewardReveal} 0.42s cubic-bezier(.2,.85,.2,1) forwards`, animationDelay: `${index * 0.12}s` }}>
                       <Stack direction="row" spacing={1} alignItems="flex-start">
-                        <Box sx={{ width: 28, height: 28, borderRadius: radius.md, display: 'flex', alignItems: 'center', justifyContent: 'center', background: rarity?.chipBg ?? 'rgba(0,0,0,0.06)', color: rarity ? ink.primary : ink.secondary, fontSize: '0.78rem', fontWeight: 900, flexShrink: 0 }}>
+                        <Box sx={{ width: 28, height: 28, borderRadius: radius.md, display: 'flex', alignItems: 'center', justifyContent: 'center', background: rarity?.chipBg ?? colors.fill.medium, color: rarity ? ink.primary : ink.secondary, fontSize: '0.78rem', fontWeight: 900, flexShrink: 0 }}>
                           {index + 1}
                         </Box>
                         <Box sx={{ flex: 1, minWidth: 0 }}>
-                          <Typography sx={{ fontFamily: font.serif, fontSize: '0.92rem', fontWeight: 800, color: rarity?.textColor ?? ink.primary, mb: 0.2 }}>{note.title}</Typography>
-                          <Typography sx={{ fontSize: '0.74rem', color: rarity?.captionColor ?? ink.secondary, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.45, whiteSpace: 'pre-line' }}>{note.message}</Typography>
+                          <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: rarity?.textColor ?? ink.primary, mb: 0.2 }}>{note.title}</Typography>
+                          <Typography variant="sm" sx={{ color: rarity?.captionColor ?? ink.secondary, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.45, whiteSpace: 'pre-line' }}>{note.message}</Typography>
                           <Stack direction="row" spacing={0.5} sx={{ mt: 0.75, flexWrap: 'wrap', rowGap: 0.45 }}>
                             {rarity && (
-                              <Box sx={{ display: 'inline-flex', alignItems: 'center', px: 0.75, py: 0.25, borderRadius: radius.full, background: rarity.chipBg, border: `1px solid ${rarity.borderColor}`, fontSize: '0.70rem', fontWeight: 750 }}>
-                                <Box component="span" sx={gradientTextSx(rarity.chipColor)}>{rarity.emoji} {rarity.label}</Box>
-                              </Box>
+                              <RarityChip rarity={rarity} bordered />
                             )}
                             {noteTypes.map((type) => (
                               <Box key={type.id} sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.35, px: 0.75, py: 0.25, borderRadius: radius.full, background: type.tagBg, color: type.tagColor, border: `1px solid ${type.accentColor}44`, fontSize: '0.70rem', fontWeight: 750 }}>

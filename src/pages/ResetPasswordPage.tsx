@@ -57,7 +57,7 @@ export function ResetPasswordPage() {
       {HEARTS.map((h, i) => (
         <FavoriteIcon key={i} sx={{
           position: 'absolute', bottom: -8, left: h.left, fontSize: h.size, zIndex: 0,
-          color: i % 2 === 0 ? '#1d4ed8' : '#e11d48', filter: 'blur(0.5px)',
+          color: i % 2 === 0 ? colors.primary.main : colors.rose.main, filter: 'blur(0.5px)',
           animation: `${floatHeart(i)} ${h.dur} ${h.delay} ease-in infinite`, pointerEvents: 'none',
         }} />
       ))}
@@ -75,7 +75,7 @@ export function ResetPasswordPage() {
 
           {!token ? (
             <Stack alignItems="center" spacing={2}>
-              <Typography sx={{ fontSize: '0.88rem', color: colors.rose.text, textAlign: 'center' }}>
+              <Typography variant="lg" sx={{ color: colors.rose.text, textAlign: 'center' }}>
                 Link inválido. Solicite um novo link de recuperação.
               </Typography>
               <Link to="/esqueci-minha-senha" style={{ color: colors.primary.text, fontWeight: 700, textDecoration: 'none', fontSize: '0.9rem' }}>
@@ -106,14 +106,14 @@ export function ResetPasswordPage() {
                 </Button>
                 {error && (
                   <Box sx={{ px: 1.5, py: 1, borderRadius: '10px', background: 'rgba(225,29,72,0.08)', border: '1px solid rgba(225,29,72,0.2)' }}>
-                    <Typography sx={{ fontSize: '0.8rem', color: colors.rose.text, fontWeight: 600 }}>{error}</Typography>
+                    <Typography variant="md" sx={{ color: colors.rose.text, fontWeight: 600 }}>{error}</Typography>
                   </Box>
                 )}
               </Stack>
             </Box>
           )}
 
-          <Typography sx={{ mt: 3.5, fontSize: '0.85rem', color: colors.text.secondary }}>
+          <Typography variant="lg" sx={{ mt: 3.5, color: colors.text.secondary }}>
             <Link to="/login" style={{ color: colors.primary.text, fontWeight: 700, textDecoration: 'none' }}>Voltar ao login</Link>
           </Typography>
         </Stack>

@@ -35,7 +35,7 @@ export function CollectionPanel({ play, rarities }: {
       <Stack spacing={1.3}>
         <Stack spacing={0.8}>
           <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, letterSpacing: 0.8, color: colors.text.muted, textTransform: 'uppercase' }}>
+            <Typography variant="label" sx={{ color: colors.text.muted }}>
               Sua coleção
             </Typography>
             <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.1rem', color: colors.primary.text }}>
@@ -43,15 +43,15 @@ export function CollectionPanel({ play, rarities }: {
             </Typography>
           </Stack>
           <LinearProgress variant="determinate" value={completion} sx={{
-            height: 7, borderRadius: radius.full, bgcolor: 'rgba(0,0,0,0.06)',
+            height: 7, borderRadius: radius.full, bgcolor: colors.fill.medium,
             '& .MuiLinearProgress-bar': { borderRadius: radius.full, background: `linear-gradient(90deg, ${colors.primary.main}, ${colors.purple.main})` },
           }} />
           <Stack direction="row" justifyContent="space-between">
-            <Typography sx={{ fontSize: '0.72rem', color: colors.text.muted }}>
+            <Typography variant="sm" sx={{ color: colors.text.muted }}>
               {play.owned} de {play.total} coletados
             </Typography>
             {missing > 0 && (
-              <Typography sx={{ fontSize: '0.72rem', color: colors.text.muted }}>
+              <Typography variant="sm" sx={{ color: colors.text.muted }}>
                 faltam {missing}
               </Typography>
             )}
@@ -76,15 +76,15 @@ export function CollectionPanel({ play, rarities }: {
               return (
                 <Box key={r.id}>
                   <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.25 }}>
-                    <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.text.secondary }}>
+                    <Typography variant="sm" sx={{ fontWeight: 700, color: colors.text.secondary }}>
                       {r.emoji} {r.label}
                     </Typography>
-                    <Typography sx={{ fontSize: '0.68rem', fontWeight: 800, color: owned === total ? colors.success.main : colors.text.muted }}>
+                    <Typography variant="xs" sx={{ fontWeight: 800, color: owned === total ? colors.success.main : colors.text.muted }}>
                       {owned}/{total}
                     </Typography>
                   </Stack>
                   <LinearProgress variant="determinate" value={pct} sx={{
-                    height: 4, borderRadius: radius.full, bgcolor: 'rgba(0,0,0,0.05)',
+                    height: 4, borderRadius: radius.full, bgcolor: colors.fill.medium,
                     '& .MuiLinearProgress-bar': { borderRadius: radius.full, background: r.chipColor || colors.primary.main },
                   }} />
                 </Box>

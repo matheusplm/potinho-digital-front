@@ -1,8 +1,9 @@
 import { Box, Chip, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { cardIn, font, ink, radius } from '../../design-system'
-import { gradientTextSx, themedCardBg } from '../../utils/colorUtils'
+import { themedCardBg } from '../../utils/colorUtils'
 import type { CollectionDailyReward, NoteImageLayout, NoteTypeConfig, RarityConfig } from '../../types/note'
+import { RarityChip } from './RarityChip'
 import { linkifyText } from '../../utils/linkify'
 
 export type { NoteImageLayout as ImageLayout } from '../../types/note'
@@ -47,10 +48,7 @@ function CardChips({ r, isNew }: { r?: RarityConfig; isNew: boolean }) {
   return (
     <Stack direction="row" justifyContent="space-between" alignItems="center">
       {r && (
-        <Chip size="small" label={`${r.emoji} ${r.label}`} sx={{
-          fontSize: '0.7rem', fontWeight: 800, height: 22, background: r.chipBg,
-          border: `1px solid ${r.borderColor}`, '& .MuiChip-label': { px: 1, ...gradientTextSx(r.chipColor) },
-        }} />
+        <RarityChip rarity={r} size="md" bordered />
       )}
       {isNew && (
         <Chip size="small" label="✨ Novo!" sx={{
@@ -151,7 +149,7 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
           <CardChips r={r} isNew={reward.isNew} />
           <Box sx={{ p: 1.15, borderRadius: radius.lg, background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.7)' }}>
             <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.2rem', color: ink.primary, lineHeight: 1.3 }}>{reward.title}</Typography>
-            <Typography sx={{ mt: 0.75, fontSize: '0.9rem', color: ink.secondary, lineHeight: 1.65, fontStyle: 'italic', whiteSpace: 'pre-line' }}>&ldquo;{linkifyText(reward.message)}&rdquo;</Typography>
+            <Typography variant="xl" sx={{ mt: 0.75, color: ink.secondary, lineHeight: 1.65, fontStyle: 'italic', whiteSpace: 'pre-line' }}>&ldquo;{linkifyText(reward.message)}&rdquo;</Typography>
           </Box>
           <CardTag t={t} all={rewardTypes} />
         </Stack>

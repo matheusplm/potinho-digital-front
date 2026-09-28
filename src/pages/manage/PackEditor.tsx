@@ -1,10 +1,9 @@
 import CasinoOutlinedIcon from '@mui/icons-material/CasinoOutlined'
 import { Box, Chip, DialogActions, DialogContent, DialogTitle, Stack, TextField, Typography } from '@mui/material'
 import { useState } from 'react'
-import { AdvancedOptions, Button, EmojiPickerInput, HintText, Input, SectionLabel } from '../../components/ui'
+import { AdvancedOptions, Button, ChoiceChip, EmojiPickerInput, HintText, Input, OptionTile, SectionLabel } from '../../components/ui'
 import { useCollectionNotesQuery, useCreateCollectionPackMutation, useCollectionPacksQuery, useUpdateCollectionPackMutation } from '../../hooks/useNotes'
-import { colors, font, ink, radius } from '../../design-system'
-import { gradientTextSx } from '../../utils/colorUtils'
+import { colors, font, ink, radius, liftOnDark } from '../../design-system'
 import { uniqueConfigId } from '../../utils/slug'
 import { toast } from '../../components/ui'
 import { ColorRow } from './shared'
@@ -17,6 +16,7 @@ import {
 } from './packData'
 import { PackSimulationDialog } from './PackSimulationDialog'
 import type { PackSimulation } from './packData'
+import { rarityTone } from '../../components/collection/rarityTone'
 import type { CollectionPack, CollectionPackFormData, RarityConfig, NoteTypeConfig } from '../../types/note'
 
 function CheckSquare({ checked }: { checked: boolean }) {
@@ -151,10 +151,10 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
                     <Stack direction="row" alignItems="center" spacing={0.8}>
                       <Typography sx={{ fontSize: '1.1rem' }}>{template.emoji}</Typography>
                       <Box sx={{ minWidth: 0 }}>
-                        <Typography sx={{ fontSize: '0.72rem', fontWeight: 900, color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <Typography variant="sm" sx={{ fontWeight: 900, color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {template.name}
                         </Typography>
-                        <Typography sx={{ fontSize: '0.70rem', fontWeight: 800, color: template.accent }}>
+                        <Typography variant="xs" sx={{ fontWeight: 800, color: template.accent }}>
                           {PACK_CATEGORY_LABELS[template.category]}
                         </Typography>
                       </Box>
@@ -174,7 +174,7 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
                 </Box>
                 <Box sx={{ flex: 1, minWidth: 0 }}>
                   <Stack direction="row" spacing={0.7} alignItems="center" sx={{ mb: 0.5 }}>
-                    <Typography sx={{ flex: 1, minWidth: 0, fontFamily: font.serif, fontWeight: 800, fontSize: '1rem', color: ink.primary, lineHeight: 1.15, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <Typography variant="xl" sx={{ flex: 1, minWidth: 0, fontFamily: font.serif, fontWeight: 800, color: ink.primary, lineHeight: 1.15, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {form.name.trim() || 'Meu pacotinho'}
                     </Typography>
                     <Chip label={PACK_STATUS_LABELS[form.status]} size="small"
@@ -183,7 +183,7 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
                   <Stack direction="row" spacing={0.5} sx={{ flexWrap: 'wrap', rowGap: 0.4 }}>
                     {[`🃏 ${form.cardsPerOpen} carta${form.cardsPerOpen === 1 ? '' : 's'}`, formatPackSchedule(form)].map((text) => (
                       <Box key={text} sx={{ px: 0.8, py: 0.25, borderRadius: radius.full, background: 'rgba(255,255,255,0.62)', border: '1px solid rgba(255,255,255,0.78)' }}>
-                        <Typography sx={{ fontSize: '0.64rem', fontWeight: 800, color: form.accent }}>{text}</Typography>
+                        <Typography variant="xxs" sx={{ fontWeight: 800, color: form.accent }}>{text}</Typography>
                       </Box>
                     ))}
                   </Stack>
@@ -191,7 +191,7 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
               </Stack>
             </Box>
             <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ px: 1.5, py: 0.7, background: colors.surface.paper, borderTop: `1px solid ${colors.border.subtle}` }}>
-              <Typography sx={{ fontSize: '0.62rem', fontWeight: 800, color: colors.text.muted, textTransform: 'uppercase', letterSpacing: 0.6 }}>
+              <Typography variant="xxs" sx={{ fontWeight: 800, color: colors.text.muted, textTransform: 'uppercase', letterSpacing: 0.6 }}>
                 Prévia ao vivo
               </Typography>
               <Button variant="ghost" onClick={runSimulation} sx={{ py: 0.45, px: 1.1, fontSize: '0.73rem' }}>
@@ -209,7 +209,7 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
             <Input label="Cartas por abertura" type="number" value={form.cardsPerOpen}
               onChange={(e) => set('cardsPerOpen', Math.max(1, Number(e.target.value) || 1))}
               inputProps={{ min: 1, max: 20 }} sx={{ width: 170, flexShrink: 0 }} />
-            <Typography sx={{ fontSize: '0.7rem', color: colors.text.muted, lineHeight: 1.45, flex: 1 }}>
+            <Typography variant="xs" sx={{ color: colors.text.muted, lineHeight: 1.45, flex: 1 }}>
               Quantos bilhetes saem cada vez que a pessoa abre.
             </Typography>
           </Stack>
@@ -220,17 +220,15 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
               {PACK_RHYTHMS.map((item) => {
                 const active = rhythm === item.id
                 return (
-                  <Box key={item.id} onClick={() => setForm((current) => ({ ...current, ...rhythmPatch(item.id, current) }))} sx={{
-                    px: 0.5, py: 0.8, borderRadius: radius.lg, cursor: 'pointer', textAlign: 'center',
-                    background: active ? colors.primary.main : 'rgba(0,0,0,0.04)',
-                    border: `1.5px solid ${active ? colors.primary.main : colors.border.subtle}`,
-                    transition: 'all 0.14s',
-                  }}>
-                    <Typography sx={{ fontSize: '0.95rem', lineHeight: 1 }}>{item.emoji}</Typography>
-                    <Typography sx={{ mt: 0.4, fontSize: '0.62rem', fontWeight: 800, lineHeight: 1.2, color: active ? '#fff' : colors.text.secondary }}>
-                      {item.label}
-                    </Typography>
-                  </Box>
+                  <OptionTile
+                    key={item.id}
+                    variant="solid"
+                    active={active}
+                    icon={item.emoji}
+                    title={item.label}
+                    onClick={() => setForm((current) => ({ ...current, ...rhythmPatch(item.id, current) }))}
+                    sx={{ px: 0.5, py: 0.8 }}
+                  />
                 )
               })}
             </Box>
@@ -241,7 +239,7 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
                 <Input label="Horário (BRT)" type="time" value={form.scheduleTime ?? '06:00'} onChange={(e) => set('scheduleTime', e.target.value || null)} sx={{ width: 170 }} inputProps={{ step: 60 }} />
                 <Stack direction="row" spacing={1} alignItems="center" sx={{ px: 0.5, py: 0.3, cursor: 'pointer' }} onClick={() => set('cumulative', !form.cumulative)}>
                   <CheckSquare checked={form.cumulative} />
-                  <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: colors.text.primary, userSelect: 'none' }}>
+                  <Typography variant="md" sx={{ fontWeight: 700, color: colors.text.primary, userSelect: 'none' }}>
                     Acumular slots não abertos
                   </Typography>
                 </Stack>
@@ -255,10 +253,10 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
           <Stack direction="row" spacing={1} alignItems="flex-start" onClick={() => set('status', form.status === 'active' ? 'draft' : 'active')} sx={{ cursor: 'pointer', px: 0.5 }}>
             <CheckSquare checked={form.status === 'active'} />
             <Box>
-              <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: colors.text.primary, userSelect: 'none', lineHeight: 1.3 }}>
+              <Typography variant="md" sx={{ fontWeight: 700, color: colors.text.primary, userSelect: 'none', lineHeight: 1.3 }}>
                 Visível para os leitores
               </Typography>
-              <Typography sx={{ fontSize: '0.68rem', color: colors.text.muted, mt: 0.15 }}>
+              <Typography variant="xs" sx={{ color: colors.text.muted, mt: 0.15 }}>
                 {PACK_STATUS_HINTS[form.status]}
               </Typography>
             </Box>
@@ -284,8 +282,7 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
                   <SectionLabel sx={{ mb: 0.8 }}>Categoria</SectionLabel>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6 }}>
                     {PACK_CATEGORY_OPTIONS.map((option) => (
-                      <Chip key={option.id} label={option.label} size="small" onClick={() => set('category', option.id)}
-                        sx={{ cursor: 'pointer', fontWeight: 800, background: form.category === option.id ? colors.primary.main : 'rgba(0,0,0,0.05)', color: form.category === option.id ? '#fff' : colors.text.secondary }} />
+                      <ChoiceChip key={option.id} label={option.label} selected={form.category === option.id} onClick={() => set('category', option.id)} />
                     ))}
                   </Box>
                   <HintText>{PACK_CATEGORY_HINTS[form.category]}</HintText>
@@ -295,8 +292,7 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
                   <SectionLabel sx={{ mb: 0.8 }}>Status</SectionLabel>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6 }}>
                     {PACK_STATUS_OPTIONS.map((option) => (
-                      <Chip key={option.id} label={option.label} size="small" onClick={() => set('status', option.id)}
-                        sx={{ cursor: 'pointer', fontWeight: 800, background: form.status === option.id ? colors.primary.main : 'rgba(0,0,0,0.05)', color: form.status === option.id ? '#fff' : colors.text.secondary }} />
+                      <ChoiceChip key={option.id} label={option.label} selected={form.status === option.id} onClick={() => set('status', option.id)} />
                     ))}
                   </Box>
                   <HintText>{PACK_STATUS_HINTS[form.status]}</HintText>
@@ -306,8 +302,7 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
                   <SectionLabel sx={{ mb: 0.8 }}>Distribuição</SectionLabel>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6 }}>
                     {PACK_DISTRIBUTION_OPTIONS.map((option) => (
-                      <Chip key={option.id} label={option.label} size="small" onClick={() => set('distribution', option.id)}
-                        sx={{ cursor: 'pointer', fontWeight: 800, background: form.distribution === option.id ? colors.primary.main : 'rgba(0,0,0,0.05)', color: form.distribution === option.id ? '#fff' : colors.text.secondary }} />
+                      <ChoiceChip key={option.id} label={option.label} selected={form.distribution === option.id} onClick={() => set('distribution', option.id)} />
                     ))}
                   </Box>
                   <HintText>{PACK_DISTRIBUTION_HINTS[form.distribution]}</HintText>
@@ -316,11 +311,9 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
                 <Box>
                   <SectionLabel sx={{ mb: 0.8 }}>Tipos permitidos</SectionLabel>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6 }}>
-                    <Chip label="Todos" size="small" onClick={() => set('allowedTypeIds', [])}
-                      sx={{ cursor: 'pointer', fontWeight: 800, background: form.allowedTypeIds.length === 0 ? colors.primary.main : 'rgba(0,0,0,0.05)', color: form.allowedTypeIds.length === 0 ? '#fff' : colors.text.secondary }} />
+                    <ChoiceChip label="Todos" selected={form.allowedTypeIds.length === 0} onClick={() => set('allowedTypeIds', [])} />
                     {types.map((type) => (
-                      <Chip key={type.id} label={`${type.emoji} ${type.label}`} size="small" onClick={() => toggle('allowedTypeIds', type.id)}
-                        sx={{ cursor: 'pointer', fontWeight: 800, background: form.allowedTypeIds.includes(type.id) ? type.tagBg : 'rgba(0,0,0,0.05)', color: form.allowedTypeIds.includes(type.id) ? type.tagColor : colors.text.secondary, border: `1px solid ${form.allowedTypeIds.includes(type.id) ? `${type.accentColor}55` : 'transparent'}` }} />
+                      <ChoiceChip key={type.id} label={`${type.emoji} ${type.label}`} selected={form.allowedTypeIds.includes(type.id)} tone={{ bg: type.tagBg, text: liftOnDark(type.tagColor), border: `${type.accentColor}55` }} onClick={() => toggle('allowedTypeIds', type.id)} />
                     ))}
                   </Box>
                   <HintText>Só bilhetes desses tipos podem sair deste pacotinho.</HintText>
@@ -329,11 +322,9 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
                 <Box>
                   <SectionLabel sx={{ mb: 0.8 }}>Raridades permitidas</SectionLabel>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6 }}>
-                    <Chip label="Todas" size="small" onClick={() => set('allowedRarityIds', [])}
-                      sx={{ cursor: 'pointer', fontWeight: 800, background: form.allowedRarityIds.length === 0 ? colors.primary.main : 'rgba(0,0,0,0.05)', color: form.allowedRarityIds.length === 0 ? '#fff' : colors.text.secondary }} />
+                    <ChoiceChip label="Todas" selected={form.allowedRarityIds.length === 0} onClick={() => set('allowedRarityIds', [])} />
                     {rarities.map((rarity) => (
-                      <Chip key={rarity.id} label={`${rarity.emoji} ${rarity.label}`} size="small" onClick={() => toggle('allowedRarityIds', rarity.id)}
-                        sx={{ cursor: 'pointer', fontWeight: 800, background: form.allowedRarityIds.includes(rarity.id) ? rarity.chipBg : 'rgba(0,0,0,0.05)', border: `1px solid ${form.allowedRarityIds.includes(rarity.id) ? rarity.borderColor : 'transparent'}`, '& .MuiChip-label': form.allowedRarityIds.includes(rarity.id) ? gradientTextSx(rarity.chipColor) : { color: colors.text.secondary } }} />
+                      <ChoiceChip key={rarity.id} label={`${rarity.emoji} ${rarity.label}`} selected={form.allowedRarityIds.includes(rarity.id)} tone={rarityTone(rarity)} onClick={() => toggle('allowedRarityIds', rarity.id)} />
                     ))}
                   </Box>
                 </Box>
@@ -341,11 +332,9 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
                 <Box>
                   <SectionLabel sx={{ mb: 0.8 }}>Raridade garantida</SectionLabel>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6 }}>
-                    <Chip label="Nenhuma" size="small" onClick={() => set('guaranteedRarityId', null)}
-                      sx={{ cursor: 'pointer', fontWeight: 800, background: form.guaranteedRarityId === null ? colors.primary.main : 'rgba(0,0,0,0.05)', color: form.guaranteedRarityId === null ? '#fff' : colors.text.secondary }} />
+                    <ChoiceChip label="Nenhuma" selected={form.guaranteedRarityId === null} onClick={() => set('guaranteedRarityId', null)} />
                     {rarities.map((rarity) => (
-                      <Chip key={rarity.id} label={`${rarity.emoji} ${rarity.label}`} size="small" onClick={() => set('guaranteedRarityId', rarity.id)}
-                        sx={{ cursor: 'pointer', fontWeight: 800, background: form.guaranteedRarityId === rarity.id ? rarity.chipBg : 'rgba(0,0,0,0.05)', border: `1px solid ${form.guaranteedRarityId === rarity.id ? rarity.borderColor : 'transparent'}`, '& .MuiChip-label': form.guaranteedRarityId === rarity.id ? gradientTextSx(rarity.chipColor) : { color: colors.text.secondary } }} />
+                      <ChoiceChip key={rarity.id} label={`${rarity.emoji} ${rarity.label}`} selected={form.guaranteedRarityId === rarity.id} tone={rarityTone(rarity)} onClick={() => set('guaranteedRarityId', rarity.id)} />
                     ))}
                   </Box>
                   <HintText>Pelo menos uma carta dessa raridade sai em toda abertura.</HintText>

@@ -46,7 +46,7 @@ function Metric({ value, label }: { value: number; label: string }) {
   return (
     <Box sx={{ textAlign: 'center', minWidth: 0 }}>
       <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.15rem', color: theme.textOnBg, lineHeight: 1.1 }}>{formatNumber(value)}</Typography>
-      <Typography sx={{ fontSize: '0.62rem', fontWeight: 700, color: theme.textOnBgMuted, textTransform: 'uppercase', letterSpacing: 0.4 }}>{label}</Typography>
+      <Typography variant="xxs" sx={{ fontWeight: 700, color: theme.textOnBgMuted, textTransform: 'uppercase', letterSpacing: 0.4 }}>{label}</Typography>
     </Box>
   )
 }
@@ -82,7 +82,7 @@ export function CollectionCard({ collection }: { collection: AdminCollectionRow 
           <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.02rem', color: theme.textOnBg, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {collection.name}
           </Typography>
-          <Typography sx={{ fontSize: '0.74rem', color: theme.textOnBgMuted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <Typography variant="sm" sx={{ color: theme.textOnBgMuted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             de {collection.ownerName ?? 'conta removida'} · criada {shortDate(collection.createdAt)}
           </Typography>
         </Box>
@@ -101,7 +101,7 @@ export function CollectionCard({ collection }: { collection: AdminCollectionRow 
 
         <Stack direction="row" alignItems="center" spacing={0.8} sx={{ mt: 'auto' }}>
           <Box sx={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0, background: tone === 'none' ? theme.surfaceBorder : TONE_COLOR[tone] }} />
-          <Typography sx={{ fontSize: '0.74rem', fontWeight: 700, color: theme.textOnBg }}>
+          <Typography variant="sm" sx={{ fontWeight: 700, color: theme.textOnBg }}>
             {collection.lastActivityAt ? `última abertura ${timeAgo(collection.lastActivityAt)}` : 'nenhum bilhete aberto ainda'}
           </Typography>
         </Stack>
@@ -156,7 +156,7 @@ export function CollectionsBrowser({ collections }: { collections: AdminCollecti
       {visible.length === 0 ? (
         <Stack alignItems="center" spacing={0.6} sx={{ py: 6, textAlign: 'center' }}>
           <Typography sx={{ fontSize: '1.8rem' }}>🫙</Typography>
-          <Typography sx={{ fontSize: '0.86rem', fontWeight: 700, color: theme.textOnBg }}>Nenhuma coleção aqui</Typography>
+          <Typography variant="lg" sx={{ fontWeight: 700, color: theme.textOnBg }}>Nenhuma coleção aqui</Typography>
         </Stack>
       ) : (
         <Box sx={{ display: 'grid', gap: { xs: 1.2, md: 1.6 }, gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0,1fr))', lg: 'repeat(3, minmax(0,1fr))' } }}>

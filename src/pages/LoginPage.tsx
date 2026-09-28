@@ -87,7 +87,7 @@ export function LoginPage() {
       <FloatingParticles />
 
       <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 3, py: 2, animation: `${fadeSlide} 0.5s ease both` }} spacing={0}>
-        <FavoriteIcon sx={{ fontSize: 52, color: '#e11d48', filter: 'drop-shadow(0 4px 16px rgba(225,29,72,0.4))', mb: 3 }} />
+        <FavoriteIcon sx={{ fontSize: 52, color: colors.rose.main, filter: 'drop-shadow(0 4px 16px rgba(225,29,72,0.4))', mb: 3 }} />
 
         <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2.8rem', lineHeight: 1, color: colors.text.primary, textAlign: 'center', letterSpacing: '-0.5px' }}>
           Potinho
@@ -98,7 +98,7 @@ export function LoginPage() {
 
         <Box sx={{ width: 40, height: 3, borderRadius: 2, background: 'linear-gradient(90deg, #1d4ed8, #e11d48)', mb: 1.5 }} />
 
-        <Typography sx={{ fontSize: '0.88rem', color: colors.text.secondary, fontStyle: 'italic', mb: 4 }}>
+        <Typography variant="lg" sx={{ color: colors.text.secondary, fontStyle: 'italic', mb: 4 }}>
           sua memória afetiva
         </Typography>
 
@@ -132,14 +132,15 @@ export function LoginPage() {
             </Button>
             {error && (
               <Box sx={{ mt: 0.5, px: 1.5, py: 1, borderRadius: '10px', background: 'rgba(225,29,72,0.08)', border: '1px solid rgba(225,29,72,0.2)' }}>
-                <Typography sx={{ fontSize: '0.8rem', color: colors.rose.text, fontWeight: 600 }}>
+                <Typography variant="md" sx={{ color: colors.rose.text, fontWeight: 600 }}>
                   {error}
                 </Typography>
                 {notVerified && (
                   <Typography
+                    variant="md"
                     component="span"
                     onClick={() => { navigate(`/verificar-email?email=${encodeURIComponent(email)}`) }}
-                    sx={{ display: 'block', mt: 0.5, fontSize: '0.78rem', color: colors.primary.text, fontWeight: 700, cursor: 'pointer', textDecoration: 'underline' }}
+                    sx={{ display: 'block', mt: 0.5, color: colors.primary.text, fontWeight: 700, cursor: 'pointer', textDecoration: 'underline' }}
                   >
                     Reenviar email de confirmação
                   </Typography>

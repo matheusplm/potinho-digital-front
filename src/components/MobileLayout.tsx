@@ -183,7 +183,7 @@ export function MobileLayout() {
                   position: 'relative',
                   '& svg': {
                     fontSize: '1.25rem',
-                    color: active || isEnd ? (isEnd ? colors.rose.main : theme.accent) : theme.textOnBgMuted,
+                    color: active || isEnd ? (isEnd ? colors.rose.text : theme.accent) : theme.textOnBgMuted,
                     transition: 'color 0.18s, transform 0.22s cubic-bezier(0.16,1,0.3,1)',
                     transform: active ? 'scale(1.15)' : 'scale(1)',
                   },
@@ -202,10 +202,9 @@ export function MobileLayout() {
                     }} />
                   )}
                 </Box>
-                <Typography sx={{
-                  fontSize: '0.70rem',
+                <Typography variant="xs" sx={{
                   fontWeight: active || isEnd ? 700 : 500,
-                  color: active || isEnd ? (isEnd ? colors.rose.main : theme.accent) : theme.textOnBgMuted,
+                  color: active || isEnd ? (isEnd ? colors.rose.text : theme.accent) : theme.textOnBgMuted,
                   lineHeight: 1, letterSpacing: 0.1,
                   transition: 'color 0.18s',
                   whiteSpace: 'nowrap',

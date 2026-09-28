@@ -8,12 +8,12 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import TuneIcon from '@mui/icons-material/Tune'
 import { Box, Dialog, DialogContent, IconButton, Stack, Typography } from '@mui/material'
 import { useMemo, useState } from 'react'
-import { Card } from '../../components/ui'
+import { Card, ChoiceChip } from '../../components/ui'
 import { NoteCard } from '../../components/collection/NoteCard'
 import { colors, font, radius } from '../../design-system'
 import type { BackgroundTheme } from '../../design-system'
-import { gradientTextSx } from '../../utils/colorUtils'
 import type { CollectionNoteView, NoteTypeConfig, RarityConfig } from '../../types/note'
+import { rarityTone } from '../../components/collection/rarityTone'
 import { noteTypeIdList } from '../../utils/noteTypes'
 
 export type AlbumView = 'list' | 'grid' | 'folders'
@@ -114,13 +114,13 @@ export function AlbumSection({
             { id: 'all' as AlbumFilter, label: 'Todas' },
             ...(hasFavorites ? [{ id: 'favorites' as AlbumFilter, label: 'Favoritas' }] : []),
           ].map((item) => (
-            <Box key={item.id} onClick={() => setFilter(item.id)} sx={{ px: 1.1, py: 0.52, borderRadius: radius.full, cursor: 'pointer', flexShrink: 0, fontSize: '0.72rem', fontWeight: 800, color: filter === item.id ? '#fff' : theme.textOnBgMuted, background: filter === item.id ? theme.accent : colors.glass.bg, border: `1px solid ${filter === item.id ? theme.accent : colors.glass.border}`, backdropFilter: 'blur(10px)' }}>
+            <Box key={item.id} onClick={() => setFilter(item.id)} sx={{ px: 1.1, py: 0.52, borderRadius: radius.full, cursor: 'pointer', flexShrink: 0, fontSize: '0.72rem', fontWeight: 800, color: filter === item.id ? theme.onAccent : theme.textOnBgMuted, background: filter === item.id ? theme.accent : colors.glass.bg, border: `1px solid ${filter === item.id ? theme.accent : colors.glass.border}`, backdropFilter: 'blur(10px)' }}>
               {item.label}
             </Box>
           ))}
         </Box>
         {(discoveredRarities.length > 0 || discoveredTypes.length > 0) && (
-          <Box onClick={() => setFilterSheetOpen(true)} sx={{ display: 'flex', alignItems: 'center', gap: 0.4, px: 1, py: 0.52, borderRadius: radius.full, cursor: 'pointer', flexShrink: 0, fontSize: '0.72rem', fontWeight: 800, color: activeFilterCount > 0 ? '#fff' : theme.textOnBgMuted, background: activeFilterCount > 0 ? theme.accent : colors.glass.bg, border: `1px solid ${activeFilterCount > 0 ? theme.accent : colors.glass.border}`, backdropFilter: 'blur(10px)' }}>
+          <Box onClick={() => setFilterSheetOpen(true)} sx={{ display: 'flex', alignItems: 'center', gap: 0.4, px: 1, py: 0.52, borderRadius: radius.full, cursor: 'pointer', flexShrink: 0, fontSize: '0.72rem', fontWeight: 800, color: activeFilterCount > 0 ? theme.onAccent : theme.textOnBgMuted, background: activeFilterCount > 0 ? theme.accent : colors.glass.bg, border: `1px solid ${activeFilterCount > 0 ? theme.accent : colors.glass.border}`, backdropFilter: 'blur(10px)' }}>
             <TuneIcon sx={{ fontSize: 14 }} />
             {activeFilterCount > 0 ? `Filtros (${activeFilterCount})` : 'Filtros'}
           </Box>
@@ -134,7 +134,7 @@ export function AlbumSection({
             { id: 'grid' as AlbumView, Icon: GridViewIcon },
             { id: 'folders' as AlbumView, Icon: FolderOutlinedIcon },
           ]).map(({ id, Icon }) => (
-            <Box key={id} role="button" aria-label={`Exibição ${id}`} onClick={() => setView(id)} sx={{ width: 32, height: 32, borderRadius: radius.md, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: view === id ? '#fff' : theme.textOnBgMuted, background: view === id ? theme.accent : colors.glass.bg, border: `1px solid ${view === id ? theme.accent : colors.glass.border}`, backdropFilter: 'blur(10px)', transition: 'all 0.15s' }}>
+            <Box key={id} role="button" aria-label={`Exibição ${id}`} onClick={() => setView(id)} sx={{ width: 32, height: 32, borderRadius: radius.md, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: view === id ? theme.onAccent : theme.textOnBgMuted, background: view === id ? theme.accent : colors.glass.bg, border: `1px solid ${view === id ? theme.accent : colors.glass.border}`, backdropFilter: 'blur(10px)', transition: 'all 0.15s' }}>
               <Icon sx={{ fontSize: 16 }} />
             </Box>
           ))}
@@ -150,7 +150,7 @@ export function AlbumSection({
           <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.1rem', color: colors.text.primary }}>Filtros</Typography>
           <Stack direction="row" spacing={1} alignItems="center">
             {activeFilterCount > 0 && (
-              <Box onClick={() => { setRarity('all'); setType('all') }} sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.rose.main, cursor: 'pointer', px: 0.5 }}>
+              <Box onClick={() => { setRarity('all'); setType('all') }} sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.rose.text, cursor: 'pointer', px: 0.5 }}>
                 Limpar
               </Box>
             )}
@@ -162,22 +162,18 @@ export function AlbumSection({
           <Stack spacing={2}>
             {discoveredRarities.length > 0 && (
               <Box>
-                <Typography sx={{ fontSize: '0.72rem', fontWeight: 900, letterSpacing: 0.6, color: colors.text.secondary, textTransform: 'uppercase', mb: 1 }}>Raridade</Typography>
+                <Typography variant="label" sx={{ mb: 1 }}>Raridade</Typography>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.7 }}>
-                  <Box onClick={() => setRarity('all')} sx={{ px: 1.2, py: 0.55, borderRadius: radius.full, cursor: 'pointer', fontSize: '0.78rem', fontWeight: 800, color: rarity === 'all' ? '#fff' : colors.text.secondary, background: rarity === 'all' ? colors.primary.main : colors.surface.overlay, border: `1.5px solid ${rarity === 'all' ? colors.primary.main : colors.border.subtle}` }}>
-                    Todas
-                  </Box>
+                  <ChoiceChip label="Todas" size="lg" surface="raised" selected={rarity === 'all'} onClick={() => setRarity('all')} />
                   {discoveredRarities.map((r) => (
-                    <Box key={r.id} onClick={() => setRarity(rarity === r.id ? 'all' : r.id)} sx={{ px: 1.2, py: 0.55, borderRadius: radius.full, cursor: 'pointer', fontSize: '0.78rem', fontWeight: 800, background: rarity === r.id ? r.chipBg : colors.surface.overlay, border: `1.5px solid ${rarity === r.id ? r.borderColor : colors.border.subtle}` }}>
-                      <Box component="span" sx={rarity === r.id ? gradientTextSx(r.chipColor) : { color: colors.text.secondary }}>{r.emoji} {r.label}</Box>
-                    </Box>
+                    <ChoiceChip key={r.id} label={`${r.emoji} ${r.label}`} size="lg" surface="raised" selected={rarity === r.id} tone={rarityTone(r)} onClick={() => setRarity(rarity === r.id ? 'all' : r.id)} />
                   ))}
                 </Box>
               </Box>
             )}
             {discoveredTypes.length > 0 && (
               <Box>
-                <Typography sx={{ fontSize: '0.72rem', fontWeight: 900, letterSpacing: 0.6, color: colors.text.secondary, textTransform: 'uppercase', mb: 1 }}>Tipo</Typography>
+                <Typography variant="label" sx={{ mb: 1 }}>Tipo</Typography>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.7 }}>
                   <Box onClick={() => setType('all')} sx={{ px: 1.2, py: 0.55, borderRadius: radius.full, cursor: 'pointer', fontSize: '0.78rem', fontWeight: 800, color: type === 'all' ? '#fff' : colors.text.secondary, background: type === 'all' ? colors.purple.main : colors.surface.overlay, border: `1.5px solid ${type === 'all' ? colors.purple.main : colors.border.subtle}` }}>
                     Todos
@@ -192,7 +188,7 @@ export function AlbumSection({
             )}
             {view === 'folders' && (
               <Box>
-                <Typography sx={{ fontSize: '0.72rem', fontWeight: 900, letterSpacing: 0.6, color: colors.text.secondary, textTransform: 'uppercase', mb: 1 }}>Agrupamento</Typography>
+                <Typography variant="label" sx={{ mb: 1 }}>Agrupamento</Typography>
                 <Box sx={{ display: 'flex', gap: 0.7 }}>
                   {([
                     { id: 'rarity' as AlbumGroup, label: 'Por raridade' },
@@ -212,7 +208,7 @@ export function AlbumSection({
       {items.length === 0 ? (
         <Card sx={{ p: 2, textAlign: 'center' }}>
           <Typography sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, mb: 0.3 }}>Nenhuma cartinha encontrada</Typography>
-          <Typography sx={{ fontSize: '0.78rem', color: colors.text.secondary }}>{emptyHint}</Typography>
+          <Typography variant="md" sx={{ color: colors.text.secondary }}>{emptyHint}</Typography>
         </Card>
       ) : view === 'folders' ? (
         <Stack spacing={1}>
@@ -222,8 +218,8 @@ export function AlbumSection({
               <Box key={g.key}>
                 <Stack direction="row" alignItems="center" spacing={0.8} onClick={() => setCollapsed((c) => ({ ...c, [g.key]: !c[g.key] }))} sx={{ px: 1.2, py: 0.8, mb: 0.8, borderRadius: radius.lg, cursor: 'pointer', background: colors.glass.bg, border: `1px solid ${g.accent}`, backdropFilter: 'blur(10px)' }}>
                   <ExpandMoreIcon sx={{ fontSize: 18, color: theme.textOnBgMuted, transition: 'transform 0.18s', transform: isCollapsed ? 'rotate(-90deg)' : 'none' }} />
-                  <Typography sx={{ flex: 1, fontSize: '0.8rem', fontWeight: 800, color: theme.textOnBg }}>{g.label}</Typography>
-                  <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: theme.textOnBgMuted }}>{g.items.length}</Typography>
+                  <Typography variant="md" sx={{ flex: 1, fontWeight: 800, color: theme.textOnBg }}>{g.label}</Typography>
+                  <Typography variant="sm" sx={{ fontWeight: 800, color: theme.textOnBgMuted }}>{g.items.length}</Typography>
                 </Stack>
                 {!isCollapsed && (
                   <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1, mb: 0.5 }}>
@@ -236,7 +232,7 @@ export function AlbumSection({
         </Stack>
       ) : (
         <Stack spacing={1}>
-          <Typography sx={{ fontSize: '0.72rem', fontWeight: 900, letterSpacing: 1.1, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
+          <Typography variant="sm" sx={{ fontWeight: 900, letterSpacing: 1.1, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
             Cartinhas da coleção · {sorted.length}
           </Typography>
           {view === 'grid' ? (

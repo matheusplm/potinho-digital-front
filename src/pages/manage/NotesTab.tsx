@@ -8,7 +8,7 @@ import ViewListIcon from '@mui/icons-material/ViewList'
 import DensitySmallIcon from '@mui/icons-material/DensitySmall'
 import { Box, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, TextField, Typography } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Card, ConfirmDeleteDialog, Input, LoadingState, SegmentedControl, toast } from '../../components/ui'
+import { Button, Card, ChoiceChip, ConfirmDeleteDialog, Input, LoadingState, SegmentedControl, toast } from '../../components/ui'
 import { NoteDetailDialog, type ReadableNote } from '../../components/collection/NoteDetailDialog'
 import {
   useCollectionNotesQuery, useCollectionRaritiesQuery, useCollectionTypesQuery,
@@ -19,12 +19,12 @@ import { useConfirmDelete } from '../../hooks/useConfirmDelete'
 import { useJsonImport } from '../../hooks/useJsonImport'
 import { colors, font, radius } from '../../design-system'
 import { useBackground } from '../../context/BackgroundContext'
-import { gradientTextSx } from '../../utils/colorUtils'
 import { noteTypeIdList } from '../../utils/noteTypes'
 import type { NoteRecord } from '../../types/note'
 import { actionButtonSx } from './shared'
 import { NoteDialog } from './NoteDialog'
 import { ReleaseDialog } from './ReleaseDialog'
+import { rarityTone } from '../../components/collection/rarityTone'
 import { ManageNoteCard } from './ManageNoteCard'
 
 type NoteSort = 'newest' | 'oldest' | 'az' | 'rarity' | 'type'
@@ -153,7 +153,7 @@ export function NotesTab({ cid }: NotesTabProps) {
     <>
       <Stack spacing={1.5}>
         <Stack spacing={1}>
-          <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted, fontWeight: 600 }}>
+          <Typography variant="sm" sx={{ color: theme.textOnBgMuted, fontWeight: 600 }}>
             {activeNotes.length} bilhete{activeNotes.length !== 1 ? 's' : ''} no ar
             {draftNotes.length > 0 && ` · ${draftNotes.length} rascunho${draftNotes.length !== 1 ? 's' : ''}`}
             {trashedNotes.length > 0 && ` · ${trashedNotes.length} na lixeira`}
@@ -188,7 +188,7 @@ export function NotesTab({ cid }: NotesTabProps) {
                   transition: 'all 0.18s ease',
                   '&:hover': active ? {} : { borderColor: `${theme.accent}55` },
                 }}>
-                  <Typography sx={{ fontSize: '0.78rem', fontWeight: 800, color: active ? '#fff' : theme.textOnBgMuted }}>
+                  <Typography variant="md" sx={{ fontWeight: 800, color: active ? theme.onAccent : theme.textOnBgMuted }}>
                     {option.label}
                   </Typography>
                 </Box>
@@ -209,10 +209,10 @@ export function NotesTab({ cid }: NotesTabProps) {
             }}>
               <Stack direction="row" alignItems="center" spacing={1.2} sx={{ px: 1.6, py: 1.2, flexWrap: 'wrap', rowGap: 1 }}>
                 <Box sx={{ flex: '1 1 160px', minWidth: 0 }}>
-                  <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.95rem', color: theme.textOnBg, lineHeight: 1.2 }}>
+                  <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: theme.textOnBg, lineHeight: 1.2 }}>
                     {selectedDraftIds.length === 0 ? '🚀 Monte seu lote' : `🚀 ${selectedDraftIds.length} de ${draftNotes.length} no lote`}
                   </Typography>
-                  <Typography sx={{ fontSize: '0.68rem', color: theme.textOnBgMuted, mt: 0.2 }}>
+                  <Typography variant="xs" sx={{ color: theme.textOnBgMuted, mt: 0.2 }}>
                     {selectedDraftIds.length === 0
                       ? 'toque nos bilhetes abaixo pra escolher o que lançar'
                       : 'pronto pra soltar pros leitores quando quiser'}
@@ -281,22 +281,14 @@ export function NotesTab({ cid }: NotesTabProps) {
             </Box>
             {rarities.length > 0 && (
               <Box sx={{ display: 'flex', gap: 0.6, flexWrap: 'wrap' }}>
-                <Chip label="Todas" size="small" onClick={() => setRarityFilter('all')}
-                  sx={{ height: 26, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer',
-                    bgcolor: rarityFilter === 'all' ? theme.accent : theme.surfaceBg,
-                    color: rarityFilter === 'all' ? '#fff' : theme.textOnBgMuted }} />
+                <ChoiceChip label="Todas" size="md" surface="page" selected={rarityFilter === 'all'} onClick={() => setRarityFilter('all')} />
                 {rarities.map((r) => (
-                  <Chip key={r.id} label={`${r.emoji} ${r.label}`} size="small" onClick={() => setRarityFilter(r.id)}
-                    sx={{ height: 26, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer',
-                      background: rarityFilter === r.id ? r.chipBg : theme.surfaceBg,
-                      border: `1.5px solid ${rarityFilter === r.id ? r.borderColor : 'transparent'}`,
-                      '& .MuiChip-label': rarityFilter === r.id ? gradientTextSx(r.chipColor) : { color: theme.textOnBgMuted },
-                    }} />
+                  <ChoiceChip key={r.id} label={`${r.emoji} ${r.label}`} size="md" surface="page" selected={rarityFilter === r.id} tone={rarityTone(r)} onClick={() => setRarityFilter(r.id)} />
                 ))}
               </Box>
             )}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.7, flexWrap: 'wrap', px: 0.1 }}>
-              <Typography sx={{ fontSize: '0.68rem', fontWeight: 800, letterSpacing: 0.6, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
+              <Typography variant="label" sx={{ color: theme.textOnBgMuted }}>
                 Ordenar
               </Typography>
               {NOTE_SORT_OPTIONS.map((option) => (
@@ -308,13 +300,13 @@ export function NotesTab({ cid }: NotesTabProps) {
                   sx={{
                     height: 26, fontSize: '0.72rem', fontWeight: 800, cursor: 'pointer',
                     bgcolor: noteSort === option.id ? theme.accent : theme.surfaceBg,
-                    color: noteSort === option.id ? '#fff' : theme.textOnBgMuted,
+                    color: noteSort === option.id ? theme.onAccent : theme.textOnBgMuted,
                     border: `1.5px solid ${noteSort === option.id ? theme.accent : theme.surfaceBorder}`,
                     '& .MuiChip-label': { px: 0.9 },
                   }}
                 />
               ))}
-              <Typography sx={{ ml: 'auto', fontSize: '0.7rem', color: theme.textOnBgMuted, fontWeight: 700 }}>
+              <Typography variant="xs" sx={{ ml: 'auto', color: theme.textOnBgMuted, fontWeight: 700 }}>
                 {Math.min(visibleNoteCount, filteredNotes.length)} de {filteredNotes.length} exibido{filteredNotes.length !== 1 ? 's' : ''}
               </Typography>
             </Box>
@@ -325,27 +317,27 @@ export function NotesTab({ cid }: NotesTabProps) {
 
         {!notesLoading && activeNotes.length === 0 && draftNotes.length === 0 && (
           <Box sx={{ textAlign: 'center', py: 4 }}>
-            <Typography sx={{ fontFamily: font.serif, fontSize: '1rem', fontWeight: 700, color: theme.textOnBg, mb: 0.5 }}>
+            <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 700, color: theme.textOnBg, mb: 0.5 }}>
               Nenhum bilhete ainda
             </Typography>
-            <Typography sx={{ fontSize: '0.8rem', color: theme.textOnBgMuted }}>Crie o primeiro card desta coleção</Typography>
+            <Typography variant="md" sx={{ color: theme.textOnBgMuted }}>Crie o primeiro card desta coleção</Typography>
           </Box>
         )}
 
         {statusView === 'live' && !notesLoading && activeNotes.length === 0 && draftNotes.length > 0 && (
           <Box onClick={() => setStatusView('drafts')} sx={{ textAlign: 'center', py: 4, cursor: 'pointer' }}>
             <Typography sx={{ fontSize: '2rem', mb: 0.5 }}>🚧</Typography>
-            <Typography sx={{ fontFamily: font.serif, fontSize: '1rem', fontWeight: 700, color: theme.textOnBg, mb: 0.5 }}>
+            <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 700, color: theme.textOnBg, mb: 0.5 }}>
               Nada no ar ainda
             </Typography>
-            <Typography sx={{ fontSize: '0.8rem', color: theme.textOnBgMuted }}>
+            <Typography variant="md" sx={{ color: theme.textOnBgMuted }}>
               Seus bilhetes estão nos rascunhos, toque aqui pra lançar
             </Typography>
           </Box>
         )}
 
         {statusView === 'live' && !notesLoading && activeNotes.length > 0 && filteredNotes.length === 0 && (
-          <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBgMuted, textAlign: 'center', py: 3 }}>
+          <Typography variant="md" sx={{ color: theme.textOnBgMuted, textAlign: 'center', py: 3 }}>
             Nenhum bilhete com esses filtros
           </Typography>
         )}
@@ -372,7 +364,7 @@ export function NotesTab({ cid }: NotesTabProps) {
 
         {statusView === 'live' && trashedNotes.length > 0 && (
           <Box sx={{ mt: 1.5, p: 1.4, borderRadius: radius.xl, border: `1.5px dashed ${theme.surfaceBorder}`, background: theme.surfaceBg, backdropFilter: 'blur(14px)' }}>
-            <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, letterSpacing: 0.6, color: theme.textOnBgMuted, textTransform: 'uppercase', mb: 1 }}>
+            <Typography variant="label" sx={{ color: theme.textOnBgMuted, mb: 1 }}>
               🗑️ Lixeira
             </Typography>
             <Stack spacing={0.8}>
@@ -380,11 +372,11 @@ export function NotesTab({ cid }: NotesTabProps) {
                 <Card key={note.id} sx={{ p: 1.2, opacity: 0.8 }}>
                   <Stack direction="row" alignItems="center" spacing={1}>
                     <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.86rem', color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <Typography variant="lg" sx={{ fontFamily: font.serif, fontWeight: 700, color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {note.title}
                       </Typography>
                       {(note.timesCollected ?? 0) > 0 && (
-                        <Typography sx={{ fontSize: '0.68rem', color: colors.text.muted }}>
+                        <Typography variant="xs" sx={{ color: colors.text.muted }}>
                           {note.timesCollected} leitor{note.timesCollected === 1 ? '' : 'es'} já {note.timesCollected === 1 ? 'tem' : 'têm'} este bilhete
                         </Typography>
                       )}
@@ -409,19 +401,19 @@ export function NotesTab({ cid }: NotesTabProps) {
         </DialogTitle>
         <DialogContent sx={{ pt: 1 }}>
           <Stack spacing={1.3}>
-            <Typography sx={{ fontSize: '0.82rem', color: colors.text.secondary, lineHeight: 1.5 }}>
+            <Typography variant="md" sx={{ color: colors.text.secondary, lineHeight: 1.5 }}>
               Cole uma lista de bilhetes. Cada item precisa ter <strong>title</strong>, <strong>message</strong>, <strong>rarity</strong> e <strong>typeId</strong>.
             </Typography>
             <TextField multiline minRows={10} value={noteImport.json} onChange={(e) => noteImport.setJson(e.target.value)} fullWidth spellCheck={false}
               sx={{ '& .MuiOutlinedInput-root': { borderRadius: radius.lg, background: colors.surface.base, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace', fontSize: '0.75rem', alignItems: 'flex-start' } }} />
             <Box sx={{ p: 1.1, borderRadius: radius.lg, background: `${theme.accent}10`, border: `1px solid ${theme.accent}24` }}>
-              <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, color: theme.accent, mb: 0.5, textTransform: 'uppercase', letterSpacing: 0.7 }}>
+              <Typography variant="label" sx={{ color: theme.accent, mb: 0.5 }}>
                 IDs aceitos
               </Typography>
-              <Typography sx={{ fontSize: '0.74rem', color: colors.text.secondary, lineHeight: 1.5 }}>
+              <Typography variant="sm" sx={{ color: colors.text.secondary, lineHeight: 1.5 }}>
                 Raridades: {rarities.map((r) => r.id).join(', ') || 'crie uma raridade primeiro'}
               </Typography>
-              <Typography sx={{ fontSize: '0.74rem', color: colors.text.secondary, lineHeight: 1.5 }}>
+              <Typography variant="sm" sx={{ color: colors.text.secondary, lineHeight: 1.5 }}>
                 Tipos: {types.map((t) => t.id).join(', ') || 'crie um tipo primeiro'}
               </Typography>
             </Box>
@@ -457,11 +449,11 @@ export function NotesTab({ cid }: NotesTabProps) {
         description={
           <Stack spacing={1.2}>
             {(notePurge.target?.timesCollected ?? 0) > 0 && (
-              <Typography sx={{ fontSize: '0.86rem', color: colors.text.primary, fontWeight: 700 }}>
+              <Typography variant="lg" sx={{ color: colors.text.primary, fontWeight: 700 }}>
                 ⚠️ {notePurge.target?.timesCollected} leitor{notePurge.target?.timesCollected === 1 ? '' : 'es'} já {notePurge.target?.timesCollected === 1 ? 'tem' : 'têm'} este bilhete. Ele vai sumir do álbum dessas pessoas também.
               </Typography>
             )}
-            <Typography sx={{ fontSize: '0.85rem', color: colors.text.secondary, lineHeight: 1.6 }}>
+            <Typography variant="lg" sx={{ color: colors.text.secondary, lineHeight: 1.6 }}>
               Isso é permanente e não pode ser desfeito. Para confirmar, digite o título exato do bilhete:
             </Typography>
             <Input

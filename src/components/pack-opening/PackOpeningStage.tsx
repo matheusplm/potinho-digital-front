@@ -186,7 +186,7 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
               background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}`, backdropFilter: 'blur(12px)',
             }}>
               <Box component="span" sx={{ fontSize: '1rem' }}>{pack.emoji}</Box>
-              <Typography sx={{ fontSize: '0.8rem', fontWeight: 800, color: textColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{pack.name}</Typography>
+              <Typography variant="md" sx={{ fontWeight: 800, color: textColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{pack.name}</Typography>
             </Box>
           )}
           {showSkip && (
@@ -269,9 +269,9 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
                 />
               </Box>
               {!flipped && current.style.caption && (
-                <Typography aria-live="polite" sx={{
+                <Typography variant="xl" aria-live="polite" sx={{
                   position: 'absolute', left: 0, right: 0, top: 'calc(100% + 18px)', textAlign: 'center',
-                  fontFamily: font.serif, fontWeight: 800, fontSize: '0.95rem', color: textColor, animation: `${riseIn} 0.5s ease 0.4s both`,
+                  fontFamily: font.serif, fontWeight: 800, color: textColor, animation: `${riseIn} 0.5s ease 0.4s both`,
                 }}>
                   {current.style.caption}
                 </Typography>
@@ -284,7 +284,7 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
               <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.6rem', color: textColor, textAlign: 'center', lineHeight: 1.15 }}>
                 {items.length === 1 ? 'Você recebeu 1 bilhete 💌' : `Você recebeu ${items.length} bilhetes 💌`}
               </Typography>
-              <Typography sx={{ mt: 0.6, mb: 2, fontSize: '0.84rem', color: mutedColor, textAlign: 'center' }}>
+              <Typography variant="lg" sx={{ mt: 0.6, mb: 2, color: mutedColor, textAlign: 'center' }}>
                 {newCount > 0 ? `${newCount} ${newCount === 1 ? 'novo' : 'novos'} na sua coleção ✨${onOpenReward ? ' · toque pra ler' : ''}` : onOpenReward ? 'Toque em um bilhete pra ler de novo' : ''}
               </Typography>
               <Stack spacing={1.2}>

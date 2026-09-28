@@ -27,7 +27,7 @@ export function SegmentedControl<T extends string>({ options, value, onChange }:
         const active = value === opt.id
         const color = opt.activeColor ?? colors.primary.main
         const activeBg = theme.isDark ? theme.accent : '#fff'
-        const activeTextColor = theme.isDark ? '#fff' : color
+        const activeTextColor = theme.isDark ? theme.onAccent : color
         return (
           <Box
             key={opt.id}
@@ -42,7 +42,7 @@ export function SegmentedControl<T extends string>({ options, value, onChange }:
             }}
           >
             {opt.icon}
-            <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, color: active ? activeTextColor : theme.textOnBgMuted, transition: 'color 0.2s', whiteSpace: 'nowrap' }}>
+            <Typography variant="md" sx={{ fontWeight: 700, color: active ? activeTextColor : theme.textOnBgMuted, transition: 'color 0.2s', whiteSpace: 'nowrap' }}>
               {opt.label}
             </Typography>
           </Box>

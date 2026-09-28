@@ -95,11 +95,11 @@ export function SimulateReaderSheet({ open, onClose }: SimulateReaderSheetProps)
       <DialogContent sx={{ pt: 1.5, pb: 3 }}>
         <Stack spacing={2}>
           <Box>
-            <Typography sx={{ fontSize: '0.68rem', fontWeight: 900, letterSpacing: 0.8, color: colors.text.muted, textTransform: 'uppercase', mb: 0.8 }}>
+            <Typography variant="label" sx={{ color: colors.text.muted, mb: 0.8 }}>
               Coleção
             </Typography>
             {ownedCollections.length === 0 ? (
-              <Typography sx={{ fontSize: '0.82rem', color: colors.text.secondary }}>
+              <Typography variant="md" sx={{ color: colors.text.secondary }}>
                 Você ainda não tem coleções para simular.
               </Typography>
             ) : (
@@ -117,7 +117,7 @@ export function SimulateReaderSheet({ open, onClose }: SimulateReaderSheetProps)
           </Box>
 
           <Box>
-            <Typography sx={{ fontSize: '0.68rem', fontWeight: 900, letterSpacing: 0.8, color: colors.text.muted, textTransform: 'uppercase', mb: 0.8 }}>
+            <Typography variant="label" sx={{ color: colors.text.muted, mb: 0.8 }}>
               Configuração
             </Typography>
             <Stack spacing={0.8}>
@@ -137,10 +137,10 @@ export function SimulateReaderSheet({ open, onClose }: SimulateReaderSheetProps)
                   <Stack direction="row" spacing={1} alignItems="flex-start">
                     <Typography sx={{ fontSize: '1.2rem', lineHeight: 1 }}>{item.emoji}</Typography>
                     <Box>
-                      <Typography sx={{ fontSize: '0.86rem', fontWeight: 800, color: colors.text.primary }}>
+                      <Typography variant="lg" sx={{ fontWeight: 800, color: colors.text.primary }}>
                         {item.label}
                       </Typography>
-                      <Typography sx={{ fontSize: '0.74rem', color: colors.text.secondary, lineHeight: 1.4 }}>
+                      <Typography variant="sm" sx={{ color: colors.text.secondary, lineHeight: 1.4 }}>
                         {item.description}
                       </Typography>
                     </Box>
@@ -172,7 +172,7 @@ function CollectionOption({ collection, active, onSelect }: {
         borderRadius: radius.lg,
         cursor: 'pointer',
         border: `1.5px solid ${active ? colors.rose.main : colors.border.subtle}`,
-        background: active ? `${colors.rose.main}10` : 'rgba(255,255,255,0.72)',
+        background: active ? `${colors.rose.main}10` : colors.glass.card,
         display: 'flex',
         alignItems: 'center',
         gap: 1,
@@ -185,16 +185,16 @@ function CollectionOption({ collection, active, onSelect }: {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'rgba(255,255,255,0.8)',
+        background: colors.glass.strong,
         fontSize: '1.2rem',
       }}>
         {collection.emoji}
       </Box>
       <Box sx={{ minWidth: 0 }}>
-        <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.9rem', color: colors.text.primary }}>
+        <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary }}>
           {collection.name}
         </Typography>
-        <Typography sx={{ fontSize: '0.72rem', color: colors.text.secondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <Typography variant="sm" sx={{ color: colors.text.secondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {collection.description || 'Sem descrição'}
         </Typography>
       </Box>

@@ -56,9 +56,9 @@ export function AnnouncementModal({ notifications, onClose }: {
           <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: { xs: '1.6rem', md: '2rem' }, color: theme.textOnBg, letterSpacing: -0.5 }}>
             {many ? `${notifications.length} novidades desde sua última visita!` : 'Tem novidade pra você!'}
           </Typography>
-          <Typography sx={{
+          <Typography variant="md" sx={{
             display: 'inline-flex', alignItems: 'center', gap: 0.5,
-            fontSize: '0.82rem', fontWeight: 700, color: theme.textOnBgMuted,
+            fontWeight: 700, color: theme.textOnBgMuted,
             bgcolor: `${theme.accent}14`, border: `1px solid ${theme.accent}28`,
             borderRadius: radius.full, px: 1.2, py: 0.3,
           }}>
@@ -78,7 +78,7 @@ export function AnnouncementModal({ notifications, onClose }: {
                   <Typography sx={{ flex: 1, fontFamily: font.serif, fontWeight: 800, fontSize: '1.02rem', color: colors.text.primary, lineHeight: 1.3 }}>
                     {kindHeadline(notification)}
                   </Typography>
-                  <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: colors.text.muted, flexShrink: 0 }}>
+                  <Typography variant="xs" sx={{ fontWeight: 700, color: colors.text.muted, flexShrink: 0 }}>
                     {formatDate(notification.createdAt)}
                   </Typography>
                 </Stack>
@@ -90,7 +90,7 @@ export function AnnouncementModal({ notifications, onClose }: {
                 )}
 
                 {notification.message && (
-                  <Typography sx={{ fontSize: '0.94rem', color: colors.text.secondary, lineHeight: 1.65, whiteSpace: 'pre-wrap' }}>
+                  <Typography variant="xl" sx={{ color: colors.text.secondary, lineHeight: 1.65, whiteSpace: 'pre-wrap' }}>
                     {notification.message}
                   </Typography>
                 )}

@@ -83,7 +83,7 @@ export function VerifyEmailPage() {
       {HEARTS.map((h, i) => (
         <FavoriteIcon key={i} sx={{
           position: 'absolute', bottom: -8, left: h.left, fontSize: h.size, zIndex: 0,
-          color: i % 2 === 0 ? '#1d4ed8' : '#e11d48', filter: 'blur(0.5px)',
+          color: i % 2 === 0 ? colors.primary.main : colors.rose.main, filter: 'blur(0.5px)',
           animation: `${floatHeart(i)} ${h.dur} ${h.delay} ease-in infinite`, pointerEvents: 'none',
         }} />
       ))}
@@ -104,7 +104,7 @@ export function VerifyEmailPage() {
             <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.8rem', color: colors.text.primary, textAlign: 'center' }}>
               Email verificado!
             </Typography>
-            <Typography sx={{ fontSize: '0.9rem', color: colors.text.secondary, textAlign: 'center' }}>
+            <Typography variant="xl" sx={{ color: colors.text.secondary, textAlign: 'center' }}>
               Entrando no seu potinho...
             </Typography>
           </Stack>
@@ -112,14 +112,14 @@ export function VerifyEmailPage() {
 
         {status === 'error' && (
           <Stack alignItems="center" spacing={2.5} sx={{ maxWidth: 320, width: '100%' }}>
-            <FavoriteIcon sx={{ fontSize: 52, color: '#e11d48', filter: 'drop-shadow(0 4px 16px rgba(225,29,72,0.3))' }} />
+            <FavoriteIcon sx={{ fontSize: 52, color: colors.rose.main, filter: 'drop-shadow(0 4px 16px rgba(225,29,72,0.3))' }} />
             <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.8rem', color: colors.text.primary, textAlign: 'center' }}>
               Link inválido
             </Typography>
-            <Typography sx={{ fontSize: '0.88rem', color: colors.text.secondary, textAlign: 'center' }}>
+            <Typography variant="lg" sx={{ color: colors.text.secondary, textAlign: 'center' }}>
               {errorMsg}
             </Typography>
-            <Typography sx={{ mt: 1, fontSize: '0.85rem', color: colors.text.secondary }}>
+            <Typography variant="lg" sx={{ mt: 1, color: colors.text.secondary }}>
               <Link to="/login" style={{ color: colors.primary.text, fontWeight: 700, textDecoration: 'none' }}>Voltar ao login</Link>
             </Typography>
           </Stack>
@@ -132,13 +132,13 @@ export function VerifyEmailPage() {
               Verifique seu email
             </Typography>
             <Box sx={{ width: 40, height: 3, borderRadius: 2, background: 'linear-gradient(90deg, #1d4ed8, #e11d48)' }} />
-            <Typography sx={{ fontSize: '0.88rem', color: colors.text.secondary, textAlign: 'center', lineHeight: 1.6 }}>
+            <Typography variant="lg" sx={{ color: colors.text.secondary, textAlign: 'center', lineHeight: 1.6 }}>
               Enviamos um link de confirmação para{' '}
               {emailFromState && <strong>{emailFromState}</strong>}.
               {!emailFromState && 'o seu email.'}
               {' '}Clique no link para ativar sua conta.
             </Typography>
-            <Typography sx={{ fontSize: '0.8rem', color: colors.text.muted, textAlign: 'center' }}>
+            <Typography variant="md" sx={{ color: colors.text.muted, textAlign: 'center' }}>
               Não recebeu? Verifique a pasta de spam.
             </Typography>
             {emailFromState && !resendSent && (
@@ -147,12 +147,12 @@ export function VerifyEmailPage() {
               </Button>
             )}
             {resendSent && !retry.blocked && (
-              <Typography sx={{ fontSize: '0.85rem', color: colors.primary.text, fontWeight: 600 }}>
+              <Typography variant="lg" sx={{ color: colors.primary.text, fontWeight: 600 }}>
                 Email reenviado!
               </Typography>
             )}
             {resendSent && retry.blocked && (
-              <Typography sx={{ fontSize: '0.78rem', color: colors.text.muted }}>
+              <Typography variant="md" sx={{ color: colors.text.muted }}>
                 Próximo reenvio em {retry.label}
               </Typography>
             )}
@@ -161,7 +161,7 @@ export function VerifyEmailPage() {
                 DEV: Simular clique no email
               </Button>
             )}
-            <Typography sx={{ mt: 1, fontSize: '0.85rem', color: colors.text.secondary }}>
+            <Typography variant="lg" sx={{ mt: 1, color: colors.text.secondary }}>
               <Link to="/login" style={{ color: colors.primary.text, fontWeight: 700, textDecoration: 'none' }}>Voltar ao login</Link>
             </Typography>
           </Stack>

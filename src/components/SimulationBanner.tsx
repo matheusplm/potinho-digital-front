@@ -41,16 +41,16 @@ export function SimulationBanner() {
             alignItems: 'center',
             justifyContent: 'center',
             background: `${colors.primary.main}14`,
-            color: colors.primary.main,
+            color: colors.primary.text,
             flexShrink: 0,
           }}>
             <VisibilityOutlinedIcon sx={{ fontSize: 17 }} />
           </Box>
           <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Typography sx={{ fontSize: '0.70rem', fontWeight: 900, letterSpacing: 0.7, color: colors.primary.main, textTransform: 'uppercase' }}>
+            <Typography variant="label" sx={{ color: colors.primary.text }}>
               Prévia do leitor
             </Typography>
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.82rem', color: theme.textOnBg, lineHeight: 1.2 }}>
+            <Typography variant="md" sx={{ fontFamily: font.serif, fontWeight: 800, color: theme.textOnBg, lineHeight: 1.2 }}>
               {session.collectionEmoji} {session.collectionName}
             </Typography>
           </Box>

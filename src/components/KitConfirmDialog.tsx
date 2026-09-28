@@ -6,8 +6,8 @@ import type { CollectionTemplate } from '../services/collectionTemplates'
 function SummaryRow({ icon, children }: { icon: string; children: React.ReactNode }) {
   return (
     <Stack direction="row" spacing={1} alignItems="flex-start">
-      <Typography sx={{ fontSize: '0.9rem', lineHeight: 1.4, flexShrink: 0 }}>{icon}</Typography>
-      <Typography sx={{ fontSize: '0.84rem', color: colors.text.secondary, lineHeight: 1.55 }}>{children}</Typography>
+      <Typography variant="xl" sx={{ lineHeight: 1.4, flexShrink: 0 }}>{icon}</Typography>
+      <Typography variant="lg" sx={{ color: colors.text.secondary, lineHeight: 1.55 }}>{children}</Typography>
     </Stack>
   )
 }
@@ -46,7 +46,7 @@ export function KitConfirmDialog({ open, template, inviteEmail, isPending, onCon
               </SummaryRow>
               {inviteEmail ? (
                 <Box sx={{ p: 1.1, borderRadius: radius.md, background: 'rgba(29,78,216,0.06)', border: '1px solid rgba(29,78,216,0.18)' }}>
-                  <Typography sx={{ fontSize: '0.82rem', color: colors.text.primary, lineHeight: 1.5 }}>
+                  <Typography variant="md" sx={{ color: colors.text.primary, lineHeight: 1.5 }}>
                     💌 Convidando <strong>{inviteEmail}</strong>: a pessoa recebe o convite por email assim que a coleção nascer.
                   </Typography>
                 </Box>

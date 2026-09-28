@@ -90,12 +90,8 @@ export function ScrollHint() {
               mt: '-2px',
             }} />
           </Box>
-          <Typography sx={{
-            fontSize: '0.66rem',
-            fontWeight: 800,
-            letterSpacing: 0.6,
+          <Typography variant="label" sx={{
             color: '#fff',
-            textTransform: 'uppercase',
             whiteSpace: 'nowrap',
             px: 1.2,
             py: 0.4,

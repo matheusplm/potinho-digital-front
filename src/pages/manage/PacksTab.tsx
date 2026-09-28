@@ -1,9 +1,9 @@
 import AddIcon from '@mui/icons-material/Add'
 import ViewAgendaIcon from '@mui/icons-material/ViewAgenda'
 import ViewListIcon from '@mui/icons-material/ViewList'
-import { Box, Chip, Dialog, Stack, Typography } from '@mui/material'
+import { Box, Dialog, Stack, Typography } from '@mui/material'
 import { useState } from 'react'
-import { Button, ConfirmDeleteDialog, LoadingState, SegmentedControl } from '../../components/ui'
+import { Button, ChoiceChip, ConfirmDeleteDialog, LoadingState, SegmentedControl } from '../../components/ui'
 import { useCollectionNotesQuery, useCollectionPacksQuery, useCollectionRaritiesQuery, useCollectionTypesQuery, useCreateCollectionPackMutation, useDeleteCollectionPackMutation, useUpdateCollectionPackMutation } from '../../hooks/useNotes'
 import { useConfirmDelete } from '../../hooks/useConfirmDelete'
 import { colors, font, radius } from '../../design-system'
@@ -100,10 +100,10 @@ export function PacksTab({ cid }: PacksTabProps) {
         <Stack spacing={1.1}>
           <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Box>
-              <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted, fontWeight: 600 }}>
+              <Typography variant="sm" sx={{ color: theme.textOnBgMuted, fontWeight: 600 }}>
                 {packsLoading ? 'Carregando pacotinhos...' : packs.length === 0 ? 'Seu primeiro pacotinho ✨' : `${filteredPacks.length} de ${packs.length} pacotinho${packs.length !== 1 ? 's' : ''}`}
               </Typography>
-              <Typography sx={{ fontSize: '0.68rem', color: theme.textOnBgMuted, opacity: 0.76, mt: 0.2 }}>
+              <Typography variant="xs" sx={{ color: theme.textOnBgMuted, opacity: 0.76, mt: 0.2 }}>
                 {packs.length > 0 ? 'Toque no 🎲 para testar a sorte de uma abertura.' : 'Escolha um modelo abaixo para começar.'}
               </Typography>
             </Box>
@@ -119,8 +119,7 @@ export function PacksTab({ cid }: PacksTabProps) {
               {PACK_FILTERS.map((filter) => {
                 const active = packFilter === filter.id
                 return (
-                  <Chip key={filter.id} label={filter.label} size="small" onClick={() => setPackFilter(filter.id)}
-                    sx={{ height: 26, fontSize: '0.72rem', fontWeight: 800, cursor: 'pointer', background: active ? theme.accent : theme.surfaceBg, color: active ? '#fff' : theme.textOnBgMuted, border: `1.5px solid ${active ? theme.accent : theme.surfaceBorder}`, backdropFilter: 'blur(10px)' }} />
+                  <ChoiceChip key={filter.id} label={filter.label} size="md" surface="page" selected={active} onClick={() => setPackFilter(filter.id)} />
                 )
               })}
             </Box>
@@ -132,15 +131,15 @@ export function PacksTab({ cid }: PacksTabProps) {
         {!packsLoading && packs.length === 0 && (
           <Stack spacing={1.4}>
             <Box sx={{ p: 1.7, borderRadius: radius.xl, background: theme.surfaceBg, backdropFilter: 'blur(14px)', border: `1px solid ${theme.surfaceBorder}` }}>
-              <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.98rem', color: theme.textOnBg, mb: 0.3 }}>
+              <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: theme.textOnBg, mb: 0.3 }}>
                 O que é um pacotinho?
               </Typography>
-              <Typography sx={{ fontSize: '0.8rem', color: theme.textOnBgMuted, lineHeight: 1.55 }}>
+              <Typography variant="md" sx={{ color: theme.textOnBgMuted, lineHeight: 1.55 }}>
                 É como a pessoa recebe seus bilhetes: abre o pacotinho e ganha cartas surpresa. Você define quantas cartas saem e com que frequência.
               </Typography>
             </Box>
 
-            <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, color: theme.textOnBgMuted, textTransform: 'uppercase', letterSpacing: 0.6 }}>
+            <Typography variant="label" sx={{ color: theme.textOnBgMuted }}>
               Comece com um toque
             </Typography>
 
@@ -158,14 +157,14 @@ export function PacksTab({ cid }: PacksTabProps) {
                   }}
                 >
                   <Typography sx={{ fontSize: '1.5rem', lineHeight: 1, mb: 0.6 }}>{template.emoji}</Typography>
-                  <Typography sx={{ fontSize: '0.82rem', fontWeight: 900, color: colors.text.primary, lineHeight: 1.2, mb: 0.3 }}>
+                  <Typography variant="md" sx={{ fontWeight: 900, color: colors.text.primary, lineHeight: 1.2, mb: 0.3 }}>
                     {template.name}
                   </Typography>
-                  <Typography sx={{ fontSize: '0.68rem', color: colors.text.secondary, lineHeight: 1.4, mb: 0.8, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                  <Typography variant="xs" sx={{ color: colors.text.secondary, lineHeight: 1.4, mb: 0.8, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                     {template.description}
                   </Typography>
                   <Box sx={{ display: 'inline-flex', px: 0.8, py: 0.3, borderRadius: radius.full, background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(255,255,255,0.8)' }}>
-                    <Typography sx={{ fontSize: '0.62rem', fontWeight: 800, color: template.accent }}>
+                    <Typography variant="xxs" sx={{ fontWeight: 800, color: template.accent }}>
                       🃏 {template.cardsPerOpen} · {quickRhythmLabel(template)}
                     </Typography>
                   </Box>
@@ -180,7 +179,7 @@ export function PacksTab({ cid }: PacksTabProps) {
         )}
 
         {!packsLoading && packs.length > 0 && filteredPacks.length === 0 && (
-          <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBgMuted, textAlign: 'center', py: 3 }}>
+          <Typography variant="md" sx={{ color: theme.textOnBgMuted, textAlign: 'center', py: 3 }}>
             Nenhum pacotinho nesse filtro
           </Typography>
         )}

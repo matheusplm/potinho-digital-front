@@ -1,11 +1,11 @@
 import { Box, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField, Typography } from '@mui/material'
 import { Suspense, lazy, useEffect, useState } from 'react'
-import { AdvancedOptions, Button, Input, LoadingState, toast } from '../../components/ui'
+import { AdvancedOptions, Button, ChoiceChip, Input, LoadingState, toast } from '../../components/ui'
 import { RewardCard } from '../../components/collection/RewardCard'
 import { useCreateCollectionNoteMutation, useUpdateCollectionNoteMutation } from '../../hooks/useNotes'
-import { colors, font, radius } from '../../design-system'
-import { gradientTextSx } from '../../utils/colorUtils'
+import { colors, font, radius, liftOnDark } from '../../design-system'
 import { noteTypeIdList } from '../../utils/noteTypes'
+import { rarityTone } from '../../components/collection/rarityTone'
 import type { NoteFormData, NoteRecord, RarityConfig, NoteTypeConfig } from '../../types/note'
 
 const ImagePicker = lazy(() => import('../../components/ImagePicker').then((m) => ({ default: m.ImagePicker })))
@@ -75,8 +75,8 @@ export function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
         <Stack spacing={2} sx={{ mt: 1 }}>
           <Box>
             <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.5 }}>
-              <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: touched.title && errors.title ? colors.error.main : colors.text.secondary }}>Título</Typography>
-              <Typography sx={{ fontSize: '0.68rem', color: form.title.length > 60 ? colors.error.main : colors.text.muted }}>{form.title.length}/60</Typography>
+              <Typography variant="sm" sx={{ fontWeight: 700, color: touched.title && errors.title ? colors.error.main : colors.text.secondary }}>Título</Typography>
+              <Typography variant="xs" sx={{ color: form.title.length > 60 ? colors.error.main : colors.text.muted }}>{form.title.length}/60</Typography>
             </Stack>
             <Input
               placeholder="Título especial..." value={form.title}
@@ -88,8 +88,8 @@ export function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
           </Box>
           <Box>
             <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.5 }}>
-              <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: touched.message && errors.message ? colors.error.main : colors.text.secondary }}>Mensagem</Typography>
-              <Typography sx={{ fontSize: '0.68rem', color: form.message.length > 500 ? colors.error.main : colors.text.muted }}>{form.message.length}/500</Typography>
+              <Typography variant="sm" sx={{ fontWeight: 700, color: touched.message && errors.message ? colors.error.main : colors.text.secondary }}>Mensagem</Typography>
+              <Typography variant="xs" sx={{ color: form.message.length > 500 ? colors.error.main : colors.text.muted }}>{form.message.length}/500</Typography>
             </Stack>
             <TextField multiline rows={4} fullWidth placeholder="Escreva algo especial..." value={form.message}
               onChange={(e) => { setForm((f) => ({ ...f, message: e.target.value })); touch('message') }}
@@ -100,70 +100,74 @@ export function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
             />
           </Box>
           <Box>
-            <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: touched.rarity && errors.rarity ? colors.error.main : colors.text.secondary, mb: 0.8 }}>Raridade</Typography>
-            {rarities.length === 0 ? <Typography sx={{ fontSize: '0.8rem', color: colors.text.muted }}>Crie raridades na aba Raridades.</Typography> : (
+            <Typography variant="sm" sx={{ fontWeight: 700, color: touched.rarity && errors.rarity ? colors.error.main : colors.text.secondary, mb: 0.8 }}>Raridade</Typography>
+            {rarities.length === 0 ? <Typography variant="md" sx={{ color: colors.text.muted }}>Crie raridades na aba Raridades.</Typography> : (
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8, opacity: lockedIdentity ? 0.5 : 1 }}>
                 {rarities.map((r) => (
-                  <Box key={r.id} onClick={() => { if (lockedIdentity) return; setForm((f) => ({ ...f, rarity: r.id })); touch('rarity') }} sx={{
-                    px: 1.4, py: 0.6, borderRadius: radius.full, cursor: lockedIdentity ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center',
-                    background: form.rarity === r.id ? r.chipBg : 'rgba(0,0,0,0.04)',
-                    border: `1.5px solid ${form.rarity === r.id ? r.borderColor : touched.rarity && errors.rarity ? colors.error.main + '66' : 'transparent'}`,
-                    fontWeight: 700, fontSize: '0.78rem', transition: 'all 0.15s',
-                  }}>
-                    <Box component="span" sx={form.rarity === r.id ? gradientTextSx(r.chipColor) : { color: colors.text.secondary }}>{r.emoji} {r.label}</Box>
-                  </Box>
+                  <ChoiceChip
+                    key={r.id}
+                    label={`${r.emoji} ${r.label}`}
+                    size="lg"
+                    selected={form.rarity === r.id}
+                    tone={rarityTone(r)}
+                    disabled={lockedIdentity}
+                    onClick={() => { setForm((f) => ({ ...f, rarity: r.id })); touch('rarity') }}
+                    sx={touched.rarity && errors.rarity ? { borderColor: `${colors.error.main}66` } : undefined}
+                  />
                 ))}
               </Box>
             )}
             {touched.rarity && errors.rarity && (
-              <Typography sx={{ fontSize: '0.68rem', color: colors.error.main, mt: 0.5, pl: 0.5 }}>{errors.rarity}</Typography>
+              <Typography variant="xs" sx={{ color: colors.error.main, mt: 0.5, pl: 0.5 }}>{errors.rarity}</Typography>
             )}
           </Box>
           <Box>
-            <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: touched.typeId && errors.typeId ? colors.error.main : colors.text.secondary, mb: 0.8 }}>Tipo</Typography>
-            {types.length === 0 ? <Typography sx={{ fontSize: '0.8rem', color: colors.text.muted }}>Crie tipos na aba Tipos.</Typography> : (
+            <Typography variant="sm" sx={{ fontWeight: 700, color: touched.typeId && errors.typeId ? colors.error.main : colors.text.secondary, mb: 0.8 }}>Tipo</Typography>
+            {types.length === 0 ? <Typography variant="md" sx={{ color: colors.text.muted }}>Crie tipos na aba Tipos.</Typography> : (
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8, opacity: lockedIdentity ? 0.5 : 1 }}>
                 {types.map((t) => {
                   const active = (form.typeIds ?? []).includes(t.id)
                   return (
-                    <Box key={t.id} onClick={() => {
-                      if (lockedIdentity) return
-                      setForm((f) => {
-                        const current = f.typeIds ?? []
-                        const next = active ? current.filter((id) => id !== t.id) : [...current, t.id]
-                        return { ...f, typeIds: next, typeId: next[0] ?? '' }
-                      })
-                      touch('typeId')
-                    }} sx={{
-                      px: 1.4, py: 0.6, borderRadius: radius.full, cursor: lockedIdentity ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: 0.5,
-                      background: active ? t.tagBg : 'rgba(0,0,0,0.04)',
-                      color: active ? t.tagColor : colors.text.secondary,
-                      border: `1.5px solid ${active ? t.accentColor + '55' : touched.typeId && errors.typeId ? colors.error.main + '66' : 'transparent'}`,
-                      fontWeight: 700, fontSize: '0.78rem', transition: 'all 0.15s',
-                    }}>{active ? '✓ ' : ''}{t.emoji} {t.label}</Box>
+                    <ChoiceChip
+                      key={t.id}
+                      label={`${active ? '✓ ' : ''}${t.emoji} ${t.label}`}
+                      size="lg"
+                      selected={active}
+                      tone={{ bg: t.tagBg, text: liftOnDark(t.tagColor), border: `${t.accentColor}55` }}
+                      disabled={lockedIdentity}
+                      onClick={() => {
+                        setForm((f) => {
+                          const current = f.typeIds ?? []
+                          const next = active ? current.filter((id) => id !== t.id) : [...current, t.id]
+                          return { ...f, typeIds: next, typeId: next[0] ?? '' }
+                        })
+                        touch('typeId')
+                      }}
+                      sx={touched.typeId && errors.typeId ? { borderColor: `${colors.error.main}66` } : undefined}
+                    />
                   )
                 })}
               </Box>
             )}
             {touched.typeId && errors.typeId && (
-              <Typography sx={{ fontSize: '0.68rem', color: colors.error.main, mt: 0.5, pl: 0.5 }}>{errors.typeId}</Typography>
+              <Typography variant="xs" sx={{ color: colors.error.main, mt: 0.5, pl: 0.5 }}>{errors.typeId}</Typography>
             )}
             {!lockedIdentity && (form.typeIds?.length ?? 0) > 1 && (
-              <Typography sx={{ fontSize: '0.66rem', color: colors.text.muted, mt: 0.5, pl: 0.5 }}>
+              <Typography variant="xs" sx={{ color: colors.text.muted, mt: 0.5, pl: 0.5 }}>
                 {form.typeIds?.length} tipos selecionados, o bilhete conta pra todos eles
               </Typography>
             )}
             {lockedIdentity && (
-              <Typography sx={{ fontSize: '0.68rem', color: colors.text.muted, mt: 0.5, pl: 0.5 }}>
+              <Typography variant="xs" sx={{ color: colors.text.muted, mt: 0.5, pl: 0.5 }}>
                 🔒 {editing?.timesCollected} leitor{editing?.timesCollected === 1 ? '' : 'es'} já {editing?.timesCollected === 1 ? 'coletou' : 'coletaram'} este bilhete. Raridade e tipo não podem mudar.
               </Typography>
             )}
           </Box>
           <AdvancedOptions label="🖼️ Imagem e layout (opcional)">
           <Box>
-            <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.secondary, mb: 0.8 }}>
+            <Typography variant="sm" sx={{ fontWeight: 700, color: colors.text.secondary, mb: 0.8 }}>
               Posição da imagem{' '}
-              <Typography component="span" sx={{ fontSize: '0.68rem', fontWeight: 400, color: colors.text.muted }}>(opcional)</Typography>
+              <Typography variant="xs" component="span" sx={{ fontWeight: 400, color: colors.text.muted }}>(opcional)</Typography>
             </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
               {IMAGE_LAYOUTS.map((opt) => (
@@ -171,7 +175,7 @@ export function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
                   ...f, imageLayout: f.imageLayout === opt.value ? null : opt.value, imageUrl: f.imageLayout === opt.value ? null : f.imageUrl,
                 }))} sx={{
                   px: 1.4, py: 0.5, borderRadius: radius.full, cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700,
-                  background: form.imageLayout === opt.value ? colors.primary.main : 'rgba(0,0,0,0.05)',
+                  background: form.imageLayout === opt.value ? colors.primary.main : colors.fill.medium,
                   color: form.imageLayout === opt.value ? '#fff' : colors.text.secondary,
                   border: `1.5px solid ${form.imageLayout === opt.value ? colors.primary.main : 'transparent'}`,
                   transition: 'all 0.15s',
@@ -187,13 +191,13 @@ export function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
                 <ImagePicker value={form.imageUrl} onChange={(url) => { setForm((f) => ({ ...f, imageUrl: url })); if (!url) setTouched((t) => ({ ...t, imageUrl: true })) }} />
               </Suspense>
               {touched.imageUrl && errors.imageUrl && (
-                <Typography sx={{ fontSize: '0.7rem', color: colors.error.main, pl: 0.5 }}>{errors.imageUrl}</Typography>
+                <Typography variant="xs" sx={{ color: colors.error.main, pl: 0.5 }}>{errors.imageUrl}</Typography>
               )}
             </Stack>
           )}
           </AdvancedOptions>
           <Box>
-            <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.secondary, mb: 1 }}>Prévia</Typography>
+            <Typography variant="sm" sx={{ fontWeight: 700, color: colors.text.secondary, mb: 1 }}>Prévia</Typography>
             <RewardCard
               previewMode
               reward={{

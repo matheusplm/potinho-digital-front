@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Box, Typography } from '@mui/material'
-import { colors, font, radius, shadow } from '../design-system'
+import { colors, font, radius, shadow, ink } from '../design-system'
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined
 const GIS_SRC = 'https://accounts.google.com/gsi/client?hl=pt-BR'
@@ -132,7 +132,7 @@ export function GoogleSignInButton({ onCredential, disabled, dividerLabel = 'ou 
           }}
         >
           <GoogleGlyph />
-          <Typography sx={{ fontFamily: font.sans, fontWeight: 700, fontSize: '0.95rem', color: '#1e3a5f', letterSpacing: '0.01em' }}>
+          <Typography variant="xl" sx={{ fontFamily: font.sans, fontWeight: 700, color: ink.primary, letterSpacing: '0.01em' }}>
             Continuar com o Google
           </Typography>
         </Box>
@@ -140,7 +140,7 @@ export function GoogleSignInButton({ onCredential, disabled, dividerLabel = 'ou 
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, my: 2.5 }}>
         <Box sx={{ flex: 1, height: '1px', background: `linear-gradient(90deg, transparent, ${colors.border.medium})` }} />
-        <Typography sx={{ fontFamily: font.sans, fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: colors.text.muted }}>{dividerLabel}</Typography>
+        <Typography variant="sm" sx={{ fontFamily: font.sans, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: colors.text.muted }}>{dividerLabel}</Typography>
         <Box sx={{ flex: 1, height: '1px', background: `linear-gradient(90deg, ${colors.border.medium}, transparent)` }} />
       </Box>
     </Box>

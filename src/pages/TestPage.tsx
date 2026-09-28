@@ -48,7 +48,7 @@ const REWARD_COM_IMAGEM: CollectionDailyReward = {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <Stack spacing={1.5}>
-      <Typography sx={{ fontSize: '0.66rem', fontWeight: 900, letterSpacing: 1.4, color: colors.text.muted, textTransform: 'uppercase' }}>
+      <Typography variant="xs" sx={{ fontWeight: 900, letterSpacing: 1.4, color: colors.text.muted, textTransform: 'uppercase' }}>
         {title}
       </Typography>
       {children}
@@ -63,18 +63,18 @@ function LayoutSelectorPreview() {
 
   return (
     <Stack spacing={2} sx={{ background: 'rgba(255,255,255,0.6)', borderRadius: radius.xl, p: 2.5, backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.5)' }}>
-      <Typography sx={{ fontSize: '0.66rem', fontWeight: 900, letterSpacing: 1.4, color: colors.text.muted, textTransform: 'uppercase' }}>Seletor de layout</Typography>
+      <Typography variant="xs" sx={{ fontWeight: 900, letterSpacing: 1.4, color: colors.text.muted, textTransform: 'uppercase' }}>Seletor de layout</Typography>
 
       <Stack spacing={0.5}>
-        <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.secondary }}>
-          Imagem <Typography component="span" sx={{ fontSize: '0.68rem', fontWeight: 400, color: colors.text.muted }}>(opcional)</Typography>
+        <Typography variant="sm" sx={{ fontWeight: 700, color: colors.text.secondary }}>
+          Imagem <Typography variant="xs" component="span" sx={{ fontWeight: 400, color: colors.text.muted }}>(opcional)</Typography>
         </Typography>
         <Input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://exemplo.com/imagem.jpg" />
       </Stack>
 
       {imageUrl && (
         <Stack spacing={0.8}>
-          <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: colors.text.secondary }}>Layout da imagem</Typography>
+          <Typography variant="sm" sx={{ fontWeight: 700, color: colors.text.secondary }}>Layout da imagem</Typography>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
             {IMAGE_LAYOUTS.map((opt) => (
               <Box key={opt.value} onClick={() => setSelected(opt.value)} sx={{
@@ -131,7 +131,7 @@ export function TestPage() {
           Componentes
         </Typography>
       </Stack>
-      <Typography sx={{ fontSize: '0.8rem', color: colors.text.muted, pl: 0.5, mb: 4.5, fontStyle: 'italic' }}>
+      <Typography variant="md" sx={{ color: colors.text.muted, pl: 0.5, mb: 4.5, fontStyle: 'italic' }}>
         Design system · potinho-digital/ui
       </Typography>
 
@@ -142,7 +142,7 @@ export function TestPage() {
             {SWATCHES.map((s) => (
               <Stack key={s.label} spacing={0.7} alignItems="center">
                 <Box sx={{ width: 44, height: 44, borderRadius: radius.md, background: s.bg, boxShadow: shadow.sm }} />
-                <Typography sx={{ fontSize: '0.62rem', fontWeight: 700, color: colors.text.muted, textAlign: 'center' }}>
+                <Typography variant="xxs" sx={{ fontWeight: 700, color: colors.text.muted, textAlign: 'center' }}>
                   {s.label}
                 </Typography>
               </Stack>
@@ -158,13 +158,13 @@ export function TestPage() {
             <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.2rem', color: colors.text.primary }}>
               Serif · Subheading
             </Typography>
-            <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: colors.text.primary }}>
+            <Typography variant="xl" sx={{ fontWeight: 700, color: colors.text.primary }}>
               Sans · Body bold
             </Typography>
-            <Typography sx={{ fontSize: '0.86rem', color: colors.text.secondary }}>
+            <Typography variant="lg" sx={{ color: colors.text.secondary }}>
               Sans · Body regular
             </Typography>
-            <Typography sx={{ fontSize: '0.74rem', color: colors.text.muted }}>
+            <Typography variant="sm" sx={{ color: colors.text.muted }}>
               Sans · Caption / muted
             </Typography>
           </Stack>
@@ -221,15 +221,15 @@ export function TestPage() {
           <Stack spacing={1.2}>
             <Card sx={{ p: 2 }}>
               <Typography sx={{ fontWeight: 700, color: colors.text.primary, mb: 0.3 }}>Card padrão</Typography>
-              <Typography sx={{ fontSize: '0.8rem', color: colors.text.secondary }}>Sem accent · borda e sombra neutras</Typography>
+              <Typography variant="md" sx={{ color: colors.text.secondary }}>Sem accent · borda e sombra neutras</Typography>
             </Card>
             <Card accent={colors.primary.main} sx={{ p: 2 }}>
               <Typography sx={{ fontWeight: 700, color: colors.primary.main, mb: 0.3 }}>Card accent · Primary</Typography>
-              <Typography sx={{ fontSize: '0.8rem', color: colors.text.secondary }}>Borda e glow no accent passado</Typography>
+              <Typography variant="md" sx={{ color: colors.text.secondary }}>Borda e glow no accent passado</Typography>
             </Card>
             <Card accent={colors.rose.main} sx={{ p: 2 }}>
               <Typography sx={{ fontWeight: 700, color: colors.rose.main, mb: 0.3 }}>Card accent · Rose</Typography>
-              <Typography sx={{ fontSize: '0.8rem', color: colors.text.secondary }}>Borda e glow no accent passado</Typography>
+              <Typography variant="md" sx={{ color: colors.text.secondary }}>Borda e glow no accent passado</Typography>
             </Card>
           </Stack>
         </Section>
@@ -366,7 +366,7 @@ function EmailPreviewSection() {
 
   return (
     <Stack spacing={1.5}>
-      <Typography sx={{ fontSize: '0.66rem', fontWeight: 900, letterSpacing: 1.4, color: colors.text.muted, textTransform: 'uppercase' }}>
+      <Typography variant="xs" sx={{ fontWeight: 900, letterSpacing: 1.4, color: colors.text.muted, textTransform: 'uppercase' }}>
         Templates de email
       </Typography>
 
@@ -391,7 +391,7 @@ function EmailPreviewSection() {
       <Box sx={{ borderRadius: radius.xl, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.08)', background: '#fff', minHeight: 400 }}>
         {isLoading && (
           <Box sx={{ p: 3 }}>
-            <Typography sx={{ fontSize: '0.8rem', color: colors.text.muted }}>Carregando...</Typography>
+            <Typography variant="md" sx={{ color: colors.text.muted }}>Carregando...</Typography>
           </Box>
         )}
         {html && !isLoading && (

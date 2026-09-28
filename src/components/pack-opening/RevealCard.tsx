@@ -74,8 +74,8 @@ export function RevealCard({ item, flipped, backFill, accent, emoji, rarities, t
             }}>
               {emoji}
             </Box>
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.95rem', color: 'rgba(30,41,59,0.75)' }}>Potinho Digital</Typography>
-            <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: 'rgba(30,41,59,0.55)' }}>toque pra virar</Typography>
+            <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: 'rgba(30,41,59,0.75)' }}>Potinho Digital</Typography>
+            <Typography variant="sm" sx={{ fontWeight: 700, color: 'rgba(30,41,59,0.55)' }}>toque pra virar</Typography>
           </Box>
         </Box>
 

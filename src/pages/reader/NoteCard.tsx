@@ -68,7 +68,7 @@ export function NoteCard({ note, rarity, onClick }: { note: CollectionNoteView; 
       <Box sx={{ position: 'relative', zIndex: 1 }}>
         <Stack spacing={0.8}>
           <Stack direction="row" alignItems="flex-start" justifyContent="space-between" spacing={0.5}>
-            <Typography sx={{ fontSize: '0.78rem', fontWeight: 800, color: rarity?.textColor ?? ink.primary, lineHeight: 1.3, flex: 1 }}>
+            <Typography variant="md" sx={{ fontWeight: 800, color: rarity?.textColor ?? ink.primary, lineHeight: 1.3, flex: 1 }}>
               {note.title}
             </Typography>
             {note.favorite && <FavoriteIcon sx={{ fontSize: 13, color: colors.rose.main, flexShrink: 0, mt: 0.1 }} />}
@@ -76,14 +76,14 @@ export function NoteCard({ note, rarity, onClick }: { note: CollectionNoteView; 
           {rarity && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <Box sx={{ width: 7, height: 7, borderRadius: radius.full, background: rarity.cardBg, flexShrink: 0, boxShadow: `0 0 5px ${rarity.glowColor ?? rarity.borderColor}` }} />
-              <Typography sx={{ fontSize: '0.68rem', fontWeight: 800, color: rarity.captionColor ?? ink.muted, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+              <Typography variant="label" sx={{ color: rarity.captionColor ?? ink.muted }}>
                 {rarity.emoji} {rarity.label}
               </Typography>
             </Box>
           )}
           {note.message && (
-            <Typography sx={{
-              fontSize: '0.68rem', color: rarity?.textColor ? `${rarity.textColor}99` : ink.secondary,
+            <Typography variant="xs" sx={{
+              color: rarity?.textColor ? `${rarity.textColor}99` : ink.secondary,
               lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', whiteSpace: 'pre-line',
             }}>
               {linkifyText(note.message)}
@@ -105,11 +105,11 @@ export function NoteRow({ note, rarity, onClick }: { note: CollectionNoteView; r
             <Box sx={{ width: 9, height: 9, borderRadius: radius.full, background: rarity.cardBg, flexShrink: 0, boxShadow: `0 0 7px ${rarity.glowColor ?? rarity.borderColor}88` }} />
           )}
           <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Typography sx={{ fontSize: '0.82rem', fontWeight: 700, color: rarity?.textColor ?? ink.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <Typography variant="md" sx={{ fontWeight: 700, color: rarity?.textColor ?? ink.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {note.title}
             </Typography>
             {rarity && (
-              <Typography sx={{ fontSize: '0.70rem', fontWeight: 700, color: rarity.captionColor ?? ink.muted, textTransform: 'uppercase', letterSpacing: 0.4 }}>
+              <Typography variant="label" sx={{ color: rarity.captionColor ?? ink.muted }}>
                 {rarity.emoji} {rarity.label}
               </Typography>
             )}

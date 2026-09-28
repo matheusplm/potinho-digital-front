@@ -46,10 +46,10 @@ export function PushPrompt() {
       <Stack direction="row" alignItems="center" spacing={1.5}>
         <NotificationsNoneIcon sx={{ fontSize: 22, color: theme.accent, flexShrink: 0 }} />
         <Box sx={{ flex: 1 }}>
-          <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: theme.textOnBg, lineHeight: 1.2 }}>
+          <Typography variant="md" sx={{ fontWeight: 700, color: theme.textOnBg, lineHeight: 1.2 }}>
             Ativar notificações
           </Typography>
-          <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted, lineHeight: 1.4, mt: 0.2 }}>
+          <Typography variant="sm" sx={{ color: theme.textOnBgMuted, lineHeight: 1.4, mt: 0.2 }}>
             Avise quando o pacotinho do dia estiver disponível.
           </Typography>
         </Box>

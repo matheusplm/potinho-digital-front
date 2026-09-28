@@ -7,7 +7,7 @@ import { AdvancedOptions, Button, Card, ConfirmDeleteDialog, EmojiPickerInput, I
 import { useCollectionTypesQuery, useCreateCollectionTypeMutation, useDeleteCollectionTypeMutation, useImportCollectionTypesMutation, useUpdateCollectionTypeMutation } from '../../hooks/useNotes'
 import { useConfirmDelete } from '../../hooks/useConfirmDelete'
 import { useJsonImport } from '../../hooks/useJsonImport'
-import { colors, font, radius } from '../../design-system'
+import { colors, font, radius, liftOnDark } from '../../design-system'
 import { useBackground } from '../../context/BackgroundContext'
 import { uniqueConfigId } from '../../utils/slug'
 import type { NoteTypeConfig } from '../../types/note'
@@ -79,8 +79,8 @@ function TypeEditor({ cid, type, onClose }: { cid: string; type: NoteTypeConfig 
             <ColorRow label="Texto da tag" field="tagColor" value={form.tagColor} onChange={set} />
           </AdvancedOptions>
           <Box sx={{ display: 'inline-flex', px: 0.8, py: 0.3, borderRadius: radius.md, bgcolor: form.tagBg, gap: 0.3, alignItems: 'center' }}>
-            <Typography sx={{ fontSize: '0.8rem' }}>{form.emoji}</Typography>
-            <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: form.tagColor }}>{form.label}</Typography>
+            <Typography variant="md">{form.emoji}</Typography>
+            <Typography variant="sm" sx={{ fontWeight: 600, color: liftOnDark(form.tagColor) }}>{form.label}</Typography>
           </Box>
         </Stack>
       </DialogContent>
@@ -122,7 +122,7 @@ export function TypesTab({ cid }: TypesTabProps) {
     <>
       <Stack spacing={1.4}>
         <Stack spacing={1}>
-          <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted, fontWeight: 600 }}>
+          <Typography variant="sm" sx={{ color: theme.textOnBgMuted, fontWeight: 600 }}>
             {types.length} tipo{types.length !== 1 ? 's' : ''}
           </Typography>
           <Stack direction="row" spacing={0.8} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.8 }}>
@@ -135,7 +135,7 @@ export function TypesTab({ cid }: TypesTabProps) {
           </Stack>
         </Stack>
         {types.length === 0 && (
-          <Typography sx={{ fontSize: '0.85rem', color: theme.textOnBgMuted, textAlign: 'center', py: 3 }}>
+          <Typography variant="lg" sx={{ color: theme.textOnBgMuted, textAlign: 'center', py: 3 }}>
             Nenhum tipo. Toque em "Novo" para criar.
           </Typography>
         )}
@@ -145,8 +145,8 @@ export function TypesTab({ cid }: TypesTabProps) {
               <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
                 <Box onClick={() => { setEditingType(t); setTypeDialogOpen(true) }} sx={{ flex: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 1.5 }}>
                   <Box sx={{ px: 1, py: 0.4, borderRadius: radius.md, bgcolor: t.tagBg, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <Typography sx={{ fontSize: '0.85rem' }}>{t.emoji}</Typography>
-                    <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, color: t.tagColor }}>{t.label}</Typography>
+                    <Typography variant="lg">{t.emoji}</Typography>
+                    <Typography variant="md" sx={{ fontWeight: 700, color: liftOnDark(t.tagColor) }}>{t.label}</Typography>
                   </Box>
                   <Box sx={{ width: 16, height: 16, borderRadius: '50%', bgcolor: t.accentColor }} />
                 </Box>
@@ -170,7 +170,7 @@ export function TypesTab({ cid }: TypesTabProps) {
         </DialogTitle>
         <DialogContent sx={{ pt: 1 }}>
           <Stack spacing={1.3}>
-            <Typography sx={{ fontSize: '0.82rem', color: colors.text.secondary, lineHeight: 1.5 }}>
+            <Typography variant="md" sx={{ color: colors.text.secondary, lineHeight: 1.5 }}>
               Cole uma lista de tipos. Cada item precisa ter <strong>id</strong>, <strong>label</strong>, <strong>emoji</strong>, <strong>order</strong>, <strong>accentColor</strong>, <strong>tagBg</strong> e <strong>tagColor</strong>. Tipos com id já existente serão ignorados.
             </Typography>
             <TextField multiline minRows={10} value={typeImport.json} onChange={(e) => typeImport.setJson(e.target.value)} fullWidth spellCheck={false}

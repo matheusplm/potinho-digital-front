@@ -25,10 +25,10 @@ function CardContent({ note }: { note: DemoNote }) {
             {note.legendary ? '★' : '◆'} {note.rarity}
           </Typography>
         </Box>
-        <Typography sx={{ fontSize: '0.7rem', opacity: 0.4, lineHeight: 1 }}>💌</Typography>
+        <Typography variant="xs" sx={{ opacity: 0.4, lineHeight: 1 }}>💌</Typography>
       </Stack>
       <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', py: 0.5 }}>
-        <Typography sx={{ fontFamily: font.serif, fontSize: '0.84rem', color: note.rarityColor, lineHeight: 1.65, opacity: 0.88 }}>
+        <Typography variant="lg" sx={{ fontFamily: font.serif, color: note.rarityColor, lineHeight: 1.65, opacity: 0.88 }}>
           {note.content}
         </Typography>
       </Box>
@@ -37,7 +37,7 @@ function CardContent({ note }: { note: DemoNote }) {
           display: 'inline-flex', alignItems: 'center', px: 0.7, py: 0.25,
           borderRadius: radius.full, background: `${note.rarityColor}10`, border: `1px solid ${note.rarityColor}20`,
         }}>
-          <Typography sx={{ fontSize: '0.6rem', fontWeight: 700, color: note.rarityColor }}>{note.type}</Typography>
+          <Typography variant="xxs" sx={{ fontWeight: 700, color: note.rarityColor }}>{note.type}</Typography>
         </Box>
         <Typography sx={{ fontSize: '0.52rem', fontWeight: 600, fontFamily: font.serif, color: note.rarityColor, opacity: 0.4, letterSpacing: 0.3 }}>
           Potinho Digital
@@ -170,7 +170,7 @@ export function HeroCardStack() {
           <CardContent note={n0} />
         </Box>
       </Box>
-      <Typography sx={{ mt: 1.5, textAlign: 'center', fontSize: '0.62rem', color: colors.text.muted, letterSpacing: 0.3 }}>
+      <Typography variant="xxs" sx={{ mt: 1.5, textAlign: 'center', color: colors.text.muted, letterSpacing: 0.3 }}>
         ← arraste para descobrir →
       </Typography>
     </Box>

@@ -15,7 +15,7 @@ import { useUser } from '../context/UserContext'
 import { api } from '../services/api'
 import { useRetryAfter } from '../hooks/useRetryAfter'
 import { Button, Input, ScrollablePage, toast } from '../components/ui'
-import { fadeIn, font, radius } from '../design-system'
+import { fadeIn, font, radius, colors } from '../design-system'
 
 type Section = 'profile' | 'email' | 'password'
 type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid'
@@ -128,7 +128,7 @@ export function ContaPage() {
   }
 
   const surfaceBg = theme.isDark ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.72)'
-  const borderColor = theme.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'
+  const borderColor = colors.border.subtle
 
   return (
     <Box sx={{ height: '100%', position: 'relative', overflow: 'hidden', background: theme.gradient }}>
@@ -137,7 +137,7 @@ export function ContaPage() {
 
       <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
         <Stack spacing={0.3} sx={{ mb: 2.5 }}>
-          <Typography sx={{ fontSize: '0.78rem', color: theme.textOnBgMuted, fontWeight: 700 }}>
+          <Typography variant="md" sx={{ color: theme.textOnBgMuted, fontWeight: 700 }}>
             👤 Conta
           </Typography>
           <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.6rem', color: theme.textOnBg, lineHeight: 1.1 }}>
@@ -167,9 +167,9 @@ export function ContaPage() {
                 <AccountCircleOutlinedIcon sx={{ fontSize: 19, color: theme.accent }} />
               </Box>
               <Box sx={{ flex: 1, minWidth: 0 }}>
-                <Typography sx={{ fontSize: '0.88rem', fontWeight: 700, color: theme.textOnBg, wordBreak: 'break-word' }}>{user?.name}</Typography>
+                <Typography variant="lg" sx={{ fontWeight: 700, color: theme.textOnBg, wordBreak: 'break-word' }}>{user?.name}</Typography>
                 {user?.username && (
-                  <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted }}>@{user.username}</Typography>
+                  <Typography variant="sm" sx={{ color: theme.textOnBgMuted }}>@{user.username}</Typography>
                 )}
               </Box>
               <EditOutlinedIcon sx={{ fontSize: 16, color: theme.textOnBgMuted }} />
@@ -199,9 +199,9 @@ export function ContaPage() {
                       endAdornment: <CircularProgress size={14} sx={{ color: theme.textOnBgMuted, mr: 0.5 }} />,
                     } : undefined}
                   />
-                  <Typography sx={{
-                    fontSize: '0.7rem', mt: 0.4, pl: 0.3, fontWeight: usernameStatus === 'idle' ? 400 : 600,
-                    color: usernameStatus === 'available' ? '#22c55e' : (usernameStatus === 'taken' || usernameStatus === 'invalid') ? '#e11d48' : theme.textOnBgMuted,
+                  <Typography variant="xs" sx={{
+                    mt: 0.4, pl: 0.3, fontWeight: usernameStatus === 'idle' ? 400 : 600,
+                    color: usernameStatus === 'available' ? '#22c55e' : (usernameStatus === 'taken' || usernameStatus === 'invalid') ? colors.rose.text : theme.textOnBgMuted,
                   }}>
                     {usernameStatus === 'available' ? '✓ disponível' : usernameStatus === 'taken' ? 'já está em uso' : usernameStatus === 'invalid' ? 'Apenas letras minúsculas, números e _ (mín. 3)' : 'Identificador único, sem espaços.'}
                   </Typography>
@@ -238,7 +238,7 @@ export function ContaPage() {
               </Box>
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Stack direction="row" alignItems="center" spacing={0.6}>
-                  <Typography sx={{ fontSize: '0.88rem', fontWeight: 700, color: theme.textOnBg, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <Typography variant="lg" sx={{ fontWeight: 700, color: theme.textOnBg, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {user?.email ?? '...'}
                   </Typography>
                   {user?.emailVerified === true && (
@@ -248,7 +248,7 @@ export function ContaPage() {
                     <ErrorOutlineIcon sx={{ fontSize: 14, color: '#f59e0b', flexShrink: 0 }} />
                   )}
                 </Stack>
-                <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted }}>
+                <Typography variant="sm" sx={{ color: theme.textOnBgMuted }}>
                   {user?.emailVerified === true ? 'verificado' : user?.emailVerified === false ? 'não verificado' : 'email da conta'}
                 </Typography>
               </Box>
@@ -260,7 +260,7 @@ export function ContaPage() {
               {!emailSent ? (
                 <Box component="form" onSubmit={handleEmailChange} sx={{ px: 2, py: 2 }}>
                   <Stack spacing={1.5}>
-                    <Typography sx={{ fontSize: '0.8rem', color: theme.textOnBgMuted, lineHeight: 1.5 }}>
+                    <Typography variant="md" sx={{ color: theme.textOnBgMuted, lineHeight: 1.5 }}>
                       Você receberá um link de confirmação no novo email. Após confirmar, o email será trocado.
                     </Typography>
                     <Input
@@ -297,11 +297,11 @@ export function ContaPage() {
                 <Stack spacing={1.5} sx={{ px: 2, py: 2 }}>
                   <Stack direction="row" alignItems="flex-start" spacing={1}>
                     <CheckCircleIcon sx={{ fontSize: 18, color: '#22c55e', mt: 0.1, flexShrink: 0 }} />
-                    <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBg, lineHeight: 1.55 }}>
+                    <Typography variant="md" sx={{ color: theme.textOnBg, lineHeight: 1.55 }}>
                       Email enviado para <strong>{pendingNewEmail}</strong>. Abra esse email e clique no link para confirmar a troca.
                     </Typography>
                   </Stack>
-                  <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted }}>
+                  <Typography variant="sm" sx={{ color: theme.textOnBgMuted }}>
                     O link expira em 30 minutos. Verifique também a pasta de spam.
                   </Typography>
                   {import.meta.env.DEV && (
@@ -335,8 +335,8 @@ export function ContaPage() {
                 <LockOutlinedIcon sx={{ fontSize: 19, color: theme.accent }} />
               </Box>
               <Box sx={{ flex: 1, minWidth: 0 }}>
-                <Typography sx={{ fontSize: '0.88rem', fontWeight: 700, color: theme.textOnBg }}>Senha</Typography>
-                <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted }}>alterar senha de acesso</Typography>
+                <Typography variant="lg" sx={{ fontWeight: 700, color: theme.textOnBg }}>Senha</Typography>
+                <Typography variant="sm" sx={{ color: theme.textOnBgMuted }}>alterar senha de acesso</Typography>
               </Box>
               {editing === 'password' ? <KeyboardArrowUpIcon sx={{ fontSize: 18, color: theme.textOnBgMuted }} /> : <KeyboardArrowDownIcon sx={{ fontSize: 18, color: theme.textOnBgMuted }} />}
             </Stack>
@@ -399,7 +399,7 @@ export function ContaPage() {
             <Box sx={{ px: 1.5, py: 1.2, borderRadius: radius.md, background: `${theme.accent}0e`, border: `1px solid ${theme.accent}22` }}>
               <Stack direction="row" alignItems="center" spacing={1}>
                 <AlternateEmailIcon sx={{ fontSize: 15, color: theme.accent, flexShrink: 0 }} />
-                <Typography sx={{ fontSize: '0.78rem', color: theme.textOnBg }}>
+                <Typography variant="md" sx={{ color: theme.textOnBg }}>
                   Você ainda não definiu um username. Edite seu perfil acima para adicionar um.
                 </Typography>
               </Stack>

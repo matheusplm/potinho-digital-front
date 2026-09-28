@@ -54,7 +54,7 @@ export function LoadingState({
             {label}
           </Typography>
           {!compact && (
-            <Typography sx={{ fontSize: '0.76rem', color: mutedColor }}>
+            <Typography variant="sm" sx={{ color: mutedColor }}>
               Só um instantinho
             </Typography>
           )}

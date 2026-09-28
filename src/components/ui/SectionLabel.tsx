@@ -1,23 +1,20 @@
-import { Typography, type SxProps } from '@mui/material'
-import { colors } from '../../design-system'
+import { Stack, Typography, type SxProps, type Theme } from '@mui/material'
+import type { ReactNode } from 'react'
+import { mergeSx } from './sx'
 
 interface SectionLabelProps {
-  children: React.ReactNode
+  children: ReactNode
+  hint?: ReactNode
   color?: string
-  sx?: SxProps
+  sx?: SxProps<Theme>
 }
 
-export function SectionLabel({ children, color = colors.text.secondary, sx }: SectionLabelProps) {
+export function SectionLabel({ children, hint, color, sx }: SectionLabelProps) {
+  if (!hint) return <Typography variant="label" sx={mergeSx({ color }, sx)}>{children}</Typography>
   return (
-    <Typography sx={{
-      fontSize: '0.72rem',
-      fontWeight: 800,
-      textTransform: 'uppercase',
-      letterSpacing: 0.6,
-      color,
-      ...sx,
-    }}>
-      {children}
-    </Typography>
+    <Stack direction="row" alignItems="baseline" sx={mergeSx({ flexWrap: 'wrap', columnGap: 1 }, sx)}>
+      <Typography variant="label" sx={{ color, whiteSpace: 'nowrap' }}>{children}</Typography>
+      <Typography variant="hint">{hint}</Typography>
+    </Stack>
   )
 }

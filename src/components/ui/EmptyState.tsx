@@ -22,7 +22,7 @@ export function EmptyState({ emoji, title, description, action, accent, sx }: Em
           {title}
         </Typography>
         {description && (
-          <Typography sx={{ fontSize: '0.8rem', color: colors.text.secondary, maxWidth: 280 }}>
+          <Typography variant="md" sx={{ color: colors.text.secondary, maxWidth: 280 }}>
             {description}
           </Typography>
         )}

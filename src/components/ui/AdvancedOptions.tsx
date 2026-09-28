@@ -16,10 +16,10 @@ export function AdvancedOptions({ children, label = '⚙️ Opções avançadas'
     <Box>
       <Stack direction="row" alignItems="center" justifyContent="space-between" onClick={() => setOpen((v) => !v)} sx={{
         cursor: 'pointer', py: 0.7, px: 1.1, borderRadius: radius.md,
-        background: 'rgba(0,0,0,0.03)', border: `1px solid ${colors.border.subtle}`,
-        transition: 'background 0.14s', '&:hover': { background: 'rgba(0,0,0,0.05)' },
+        background: colors.fill.subtle, border: `1px solid ${colors.border.subtle}`,
+        transition: 'background 0.14s', '&:hover': { background: colors.fill.medium },
       }}>
-        <Typography sx={{ fontSize: '0.78rem', fontWeight: 800, color: colors.text.secondary }}>
+        <Typography variant="md" sx={{ fontWeight: 800, color: colors.text.secondary }}>
           {label}
         </Typography>
         <ExpandMoreIcon sx={{ fontSize: 18, color: colors.text.muted, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />

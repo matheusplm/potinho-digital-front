@@ -9,6 +9,7 @@ import { RewardCard } from '../../components/collection/RewardCard'
 import { colors, font, ink, radius } from '../../design-system'
 import { gradientTextSx, themedCardBg } from '../../utils/colorUtils'
 import { actionButtonSx } from './shared'
+import { RarityChip } from '../../components/collection/RarityChip'
 import type { NoteRecord, NoteTypeConfig, RarityConfig } from '../../types/note'
 
 type ManageNoteView = 'cards' | 'list' | 'compact'
@@ -104,7 +105,7 @@ export function ManageNoteCard({ note, view, r, noteTypes = [], mask, onOpen, on
               <Box component="img" src={note.imageUrl} alt="" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             </Box>
           )}
-          <Typography sx={{ flex: 1, minWidth: 0, fontFamily: font.serif, fontWeight: 800, fontSize: '0.82rem', color: r?.textColor ?? ink.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <Typography variant="md" sx={{ flex: 1, minWidth: 0, fontFamily: font.serif, fontWeight: 800, color: r?.textColor ?? ink.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {note.title}
           </Typography>
           <Stack direction="row" spacing={0.25} sx={{ flexShrink: 0, opacity: 0.72 }}>
@@ -182,7 +183,7 @@ export function ManageNoteCard({ note, view, r, noteTypes = [], mask, onOpen, on
                 >
                   {note.message}
                 </Typography>
-                <Typography sx={{ mt: 0.35, fontSize: '0.70rem', color: ink.muted, fontWeight: 700 }}>
+                <Typography variant="xs" sx={{ mt: 0.35, color: ink.muted, fontWeight: 700 }}>
                   {[r?.label, ...noteTypes.map((t) => t.label)].filter(Boolean).join(' · ') || 'Sem categoria'}
                 </Typography>
               </Box>
@@ -248,18 +249,16 @@ export function ManageNoteCard({ note, view, r, noteTypes = [], mask, onOpen, on
             <NoteActions selection={selection} onOpen={onOpen} onEdit={onEdit} onDisable={onDisable} />
           </Stack>
           <Box sx={{ flex: 1, minWidth: 0, p: 1, borderRadius: radius.lg, background: 'rgba(255,255,255,0.68)', border: '1px solid rgba(255,255,255,0.58)', backdropFilter: 'blur(8px)' }}>
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.93rem', color: r?.textColor ?? ink.primary, mb: 0.3, display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+            <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 700, color: r?.textColor ?? ink.primary, mb: 0.3, display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
               {note.title}
             </Typography>
-            <Typography sx={{ fontSize: '0.78rem', color: r?.captionColor ?? ink.secondary, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.5, overflowWrap: 'anywhere', wordBreak: 'break-word', whiteSpace: 'pre-line' }}>
+            <Typography variant="md" sx={{ color: r?.captionColor ?? ink.secondary, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.5, overflowWrap: 'anywhere', wordBreak: 'break-word', whiteSpace: 'pre-line' }}>
               {note.message}
             </Typography>
             {(r || noteTypes.length > 0) && (
               <Stack direction="row" spacing={0.6} sx={{ mt: 0.9, flexWrap: 'wrap', rowGap: 0.5 }}>
                 {r && (
-                  <Box sx={{ display: 'inline-flex', alignItems: 'center', px: 1, py: 0.3, borderRadius: radius.full, background: r.chipBg, border: `1px solid ${r.borderColor}`, fontSize: '0.72rem', fontWeight: 700 }}>
-                    <Box component="span" sx={gradientTextSx(r.chipColor)}>{r.emoji} {r.label}</Box>
-                  </Box>
+                  <RarityChip rarity={r} size="md" bordered />
                 )}
                 {noteTypes.map((t) => (
                   <Box key={t.id} sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.4, px: 1, py: 0.3, borderRadius: radius.full, background: t.tagBg, color: t.tagColor, border: `1px solid ${t.accentColor}44`, fontSize: '0.72rem', fontWeight: 700 }}>

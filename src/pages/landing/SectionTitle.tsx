@@ -9,7 +9,7 @@ export function SectionTitle({ children, sub }: { children: string; sub?: string
       </Typography>
       <Box sx={{ mt: 0.6, width: 36, height: 2.5, borderRadius: 2, background: 'linear-gradient(90deg,#1d4ed8,#e11d48)' }} />
       {sub && (
-        <Typography sx={{ mt: 1.2, fontSize: '0.86rem', color: colors.text.secondary, lineHeight: 1.65 }}>
+        <Typography variant="lg" sx={{ mt: 1.2, color: colors.text.secondary, lineHeight: 1.65 }}>
           {sub}
         </Typography>
       )}

@@ -36,7 +36,7 @@ export function ConfirmDeleteDialog({
       </DialogTitle>
       <DialogContent>
         {typeof description === 'string' ? (
-          <Typography sx={{ fontSize: '0.88rem', color: colors.text.secondary, lineHeight: 1.55 }}>
+          <Typography variant="lg" sx={{ color: colors.text.secondary, lineHeight: 1.55 }}>
             {description}
           </Typography>
         ) : description}

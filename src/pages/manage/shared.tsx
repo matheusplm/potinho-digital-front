@@ -30,7 +30,7 @@ export function ColorRow({ label, field, value, onChange }: {
   const showPicker = isHexColor(value)
   return (
     <Stack direction="row" alignItems="center" spacing={1.5}>
-      <Typography sx={{ fontSize: '0.8rem', color: colors.text.secondary, width: 120, flexShrink: 0 }}>{label}</Typography>
+      <Typography variant="md" sx={{ color: colors.text.secondary, width: 120, flexShrink: 0 }}>{label}</Typography>
       {showPicker && (
         <Box sx={{ position: 'relative', width: 32, height: 32, borderRadius: 1.5, overflow: 'hidden', border: `1.5px solid ${colors.border.medium}`, flexShrink: 0 }}>
           <input type="color" value={value} onChange={(e) => onChange(field, e.target.value)}

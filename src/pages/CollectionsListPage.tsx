@@ -220,7 +220,7 @@ export function CollectionsListPage() {
               <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.15rem', color: theme.textOnBg }}>
                 {isWriter ? 'Sua primeira coleção' : 'Nenhuma coleção'}
               </Typography>
-              <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBgMuted, maxWidth: 260 }}>
+              <Typography variant="md" sx={{ color: theme.textOnBgMuted, maxWidth: 260 }}>
                 {isWriter ? 'Comece com um kit pronto ou crie do zero' : 'Peça para liberarem seu email em uma coleção'}
               </Typography>
             </Stack>
@@ -235,7 +235,7 @@ export function CollectionsListPage() {
                     onClick={() => !creatingKit && setKitToConfirm(template)}
                   />
                 ))}
-                <Typography sx={{ fontSize: '0.66rem', color: theme.textOnBgMuted, textAlign: 'center', opacity: 0.85 }}>
+                <Typography variant="xs" sx={{ color: theme.textOnBgMuted, textAlign: 'center', opacity: 0.85 }}>
                   Cada kit já vem com bilhetes de exemplo, raridades e pacotinhos
                 </Typography>
                 <AddGhostCard view="cards" onClick={() => setCreateOpen(true)} accent={theme.accent} />
@@ -246,10 +246,10 @@ export function CollectionsListPage() {
 
         {!isLoading && !!search && displayedCollections.length === 0 && (
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 6, gap: 1 }}>
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1rem', color: theme.textOnBg }}>
+            <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 700, color: theme.textOnBg }}>
               Nenhuma coleção aqui
             </Typography>
-            <Typography sx={{ fontSize: '0.8rem', color: theme.textOnBgMuted }}>
+            <Typography variant="md" sx={{ color: theme.textOnBgMuted }}>
               Tente outro filtro
             </Typography>
           </Box>
@@ -293,10 +293,10 @@ export function CollectionsListPage() {
             <Stack direction="row" spacing={1.2} alignItems="center">
               <Typography sx={{ fontSize: '1.3rem', lineHeight: 1, flexShrink: 0, opacity: trashItem ? 1 : 0.55 }}>🗑️</Typography>
               <Box sx={{ flex: 1, minWidth: 0 }}>
-                <Typography sx={{ fontSize: '0.8rem', fontWeight: 800, color: theme.textOnBg, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <Typography variant="md" sx={{ fontWeight: 800, color: theme.textOnBg, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {trashItem ? `Lixeira: ${trashItem.emoji} ${trashItem.name}` : 'Lixeira vazia'}
                 </Typography>
-                <Typography sx={{ fontSize: '0.66rem', color: theme.textOnBgMuted }}>
+                <Typography variant="xs" sx={{ color: theme.textOnBgMuted }}>
                   {trashItem
                     ? 'some de vez quando outra coleção for excluída'
                     : 'coleções excluídas ficam aqui para restaurar'}
@@ -342,10 +342,10 @@ export function CollectionsListPage() {
         title="⚠️ Tem gente usando essa coleção"
         description={
           <Stack spacing={1.2}>
-            <Typography sx={{ fontSize: '0.88rem', color: colors.text.primary, fontWeight: 700 }}>
+            <Typography variant="lg" sx={{ color: colors.text.primary, fontWeight: 700 }}>
               {readersWarning}
             </Typography>
-            <Typography sx={{ fontSize: '0.85rem', color: colors.text.secondary, lineHeight: 1.6 }}>
+            <Typography variant="lg" sx={{ color: colors.text.secondary, lineHeight: 1.6 }}>
               A coleção vai para a lixeira e some para essas pessoas. Para confirmar, digite o nome exato da coleção:
             </Typography>
             <Input

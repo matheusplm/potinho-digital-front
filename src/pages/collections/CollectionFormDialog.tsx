@@ -47,7 +47,7 @@ export function CollectionFormDialog({ open, onClose, initial, onSubmit, isPendi
               p: 1.3, borderRadius: radius.lg, background: `${colors.primary.main}0f`, border: `1px solid ${colors.primary.main}30`,
             }}>
               <Typography sx={{ fontSize: '1.4rem', flexShrink: 0 }}>😊</Typography>
-              <Typography sx={{ flex: 1, fontSize: '0.82rem', fontWeight: 700, color: colors.text.primary, lineHeight: 1.35 }}>
+              <Typography variant="md" sx={{ flex: 1, fontWeight: 700, color: colors.text.primary, lineHeight: 1.35 }}>
                 Quer usar um template pronto pra facilitar sua vida?
               </Typography>
               <Button variant="ghost" onClick={() => setShowTemplates(true)} sx={{ flexShrink: 0, whiteSpace: 'nowrap', fontSize: '0.76rem', px: 1.2 }}>
@@ -65,7 +65,7 @@ export function CollectionFormDialog({ open, onClose, initial, onSubmit, isPendi
                   onClick={() => onSelectTemplate?.(template)}
                 />
               ))}
-              <Typography onClick={() => setShowTemplates(false)} sx={{ fontSize: '0.76rem', color: colors.text.secondary, textAlign: 'center', cursor: 'pointer', fontWeight: 700, mt: 0.5, '&:hover': { color: colors.primary.main } }}>
+              <Typography variant="sm" onClick={() => setShowTemplates(false)} sx={{ color: colors.text.secondary, textAlign: 'center', cursor: 'pointer', fontWeight: 700, mt: 0.5, '&:hover': { color: colors.primary.main } }}>
                 ← Prefiro criar do zero
               </Typography>
             </Stack>
@@ -85,8 +85,8 @@ export function CollectionFormDialog({ open, onClose, initial, onSubmit, isPendi
 
               <Box>
                 <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
-                  <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.text.secondary }}>Nome</Typography>
-                  <Typography sx={{ fontSize: '0.72rem', color: form.name.length > 50 ? colors.error.main : colors.text.muted }}>
+                  <Typography variant="sm" sx={{ fontWeight: 700, color: colors.text.secondary }}>Nome</Typography>
+                  <Typography variant="sm" sx={{ color: form.name.length > 50 ? colors.error.main : colors.text.muted }}>
                     {form.name.length}/50
                   </Typography>
                 </Stack>
@@ -95,8 +95,8 @@ export function CollectionFormDialog({ open, onClose, initial, onSubmit, isPendi
 
               <Box>
                 <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
-                  <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.text.secondary }}>Descrição</Typography>
-                  <Typography sx={{ fontSize: '0.72rem', color: colors.text.muted }}>{form.description.length}/200</Typography>
+                  <Typography variant="sm" sx={{ fontWeight: 700, color: colors.text.secondary }}>Descrição</Typography>
+                  <Typography variant="sm" sx={{ color: colors.text.muted }}>{form.description.length}/200</Typography>
                 </Stack>
                 <TextField multiline rows={2} fullWidth placeholder="Um potinho cheio de amor..." value={form.description}
                   onChange={(e) => setForm((f) => ({ ...f, description: e.target.value.slice(0, 200) }))}
@@ -105,11 +105,11 @@ export function CollectionFormDialog({ open, onClose, initial, onSubmit, isPendi
               </Box>
 
               <Box>
-                <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.text.secondary, mb: 1 }}>Cor da coleção</Typography>
+                <Typography variant="sm" sx={{ fontWeight: 700, color: colors.text.secondary, mb: 1 }}>Cor da coleção</Typography>
                 <Stack spacing={0.8}>
                   {([false, true] as const).map((dark) => (
                     <Box key={String(dark)}>
-                      <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: 0.5, color: colors.text.muted, textTransform: 'uppercase', mb: 0.6 }}>
+                      <Typography variant="label" sx={{ color: colors.text.muted, mb: 0.6 }}>
                         {dark ? 'Escuros' : 'Claros'}
                       </Typography>
                       <Box sx={{ display: 'flex', gap: 0.8, flexWrap: 'wrap' }}>
