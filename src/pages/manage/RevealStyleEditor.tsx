@@ -14,16 +14,16 @@ type Flag = Exclude<keyof StyleFlags, 'caption'>
 
 const TIERS: { id: Tier; icon: string; label: string; hint: string }[] = [
   { id: 'common', icon: '🤍', label: 'Tranquilo', hint: 'o padrão' },
-  { id: 'rare', icon: '💫', label: 'Brilhante', hint: 'raios suaves' },
+  { id: 'rare', icon: '💫', label: 'Brilhante', hint: 'brilho e faíscas' },
   { id: 'epic', icon: '🔮', label: 'Épico', hint: 'tremor e suspense' },
   { id: 'legendary', icon: '👑', label: 'Lendário', hint: 'o show inteiro' },
 ]
 
 const FLAGS: { id: Flag; icon: string; label: string; hint: string }[] = [
   { id: 'rays', icon: '☀️', label: 'Raios de luz', hint: 'giram atrás do bilhete' },
-  { id: 'shake', icon: '💥', label: 'Tela tremendo', hint: 'quando o pacote estoura' },
+  { id: 'shake', icon: '💥', label: 'Tela tremendo', hint: 'quando o bilhete vira' },
   { id: 'tremble', icon: '💓', label: 'Bilhete tremendo', hint: 'antes de virar' },
-  { id: 'vibrate', icon: '📳', label: 'Vibrar o celular', hint: 'no estouro e ao virar' },
+  { id: 'vibrate', icon: '📳', label: 'Vibrar o celular', hint: 'quando o bilhete vira' },
 ]
 
 const grid = (columns: string | Record<string, string>) => ({ display: 'grid', gridTemplateColumns: columns, gap: 0.7 })
@@ -100,7 +100,7 @@ export function RevealStyleEditor({ cid, form, rarities, onStyle, onField }: {
     <>
       <AdvancedOptions label={customized ? '✨ Abertura personalizada' : '✨ Opções avançadas da abertura'} spacing={2}>
         <Typography variant="sm" sx={{ color: colors.text.muted, lineHeight: 1.5 }}>
-          Por padrão a abertura é tranquilinha, sem efeito nenhum. Se quiser caprichar nesta raridade, é aqui que você solta a imaginação.
+          O pacotinho sempre abre igual. O suspense fica pro bilhete: ele brilha e treme antes de virar, e o show acontece quando vira. Por padrão é tudo tranquilinho; aqui você solta a imaginação.
         </Typography>
 
         <Box>
@@ -176,8 +176,8 @@ export function RevealStyleEditor({ cid, form, rarities, onStyle, onField }: {
         />
 
         <Box>
-          <SectionLabel hint="chuva ou explosão do seu jeito" sx={{ mb: 0.8 }}>Depois de virar</SectionLabel>
-          <Box sx={grid('repeat(3, minmax(0, 1fr))')}>
+          <SectionLabel hint="o show quando o bilhete vira" sx={{ mb: 0.8 }}>Ao virar</SectionLabel>
+          <Box sx={grid({ xs: 'repeat(3, minmax(0, 1fr))', sm: 'repeat(4, minmax(0, 1fr))' })}>
             {REVEAL_EFFECTS.map((definition) => (
               <OptionTile
                 key={definition.kind}

@@ -1,4 +1,4 @@
-export type RevealEffectKind = 'none' | 'rain' | 'burst'
+export type RevealEffectKind = 'none' | 'rain' | 'burst' | 'rise' | 'spiral' | 'confetti' | 'sparkle' | 'wave'
 
 export interface RevealEffectDefinition {
   kind: RevealEffectKind
@@ -13,4 +13,6 @@ export interface RevealEffectDefinition {
 export interface RevealEffectPlayback {
   kind: RevealEffectKind
   media: string
+  palette?: string[]
+  anchor?: DOMRect | null
 }

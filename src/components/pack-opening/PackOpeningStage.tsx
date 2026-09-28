@@ -10,7 +10,7 @@ import { Button } from '../ui'
 import { cardLeave, cardRise, flash, raysSpin, riseIn, screenShake, spark, stageIn } from './motion'
 import { PackPouch, type PouchState } from './PackPouch'
 import { RevealCard } from './RevealCard'
-import { CARD_WIDTH, paint, rainbowConic, raysFill, resolveStyle, revealOrder, vibrate, vibrationFor, withAlpha, type RevealItem, type RevealStyle, type Tier } from './tiers'
+import { CARD_WIDTH, paint, rainbowConic, raysFill, revealOrder, showPalette, vibrate, withAlpha, type RevealItem, type RevealStyle, type Tier } from './tiers'
 
 type Phase = 'intro' | 'waiting' | 'burst' | 'reveal' | 'summary'
 
@@ -21,17 +21,49 @@ export interface StagePack {
   accent: string
 }
 
-const BURST_MS: Record<Tier, number> = { common: 900, rare: 1150, epic: 1400, legendary: 1900 }
+const BURST_MS = 900
+const SHOW_DELAY_MS = 420
 const RAY_SCALE: Record<Tier, number> = { common: 0.55, rare: 0.7, epic: 0.9, legendary: 1.1 }
 const RAY_ALPHA: Record<Tier, number> = { common: 16, rare: 22, epic: 34, legendary: 34 }
 const FLIP_VIBRATION: Record<Tier, number | number[]> = { common: 12, rare: 18, epic: 25, legendary: [20, 40, 70] }
-const SPARK_COUNT: Record<Tier, number> = { common: 0, rare: 14, epic: 22, legendary: 22 }
+const SPARK_COUNT: Record<Tier, number> = { common: 0, rare: 14, epic: 22, legendary: 30 }
+const FLASH_ALPHA: Record<Tier, number> = { common: 0, rare: 55, epic: 75, legendary: 90 }
 const FLASH_MASK = 'radial-gradient(circle, black 30%, transparent 70%)'
-const SPARKS = Array.from({ length: 22 }, (_, i) => {
-  const angle = (i / 22) * Math.PI * 2 + (i % 3) * 0.2
-  const distance = 120 + (i % 5) * 34
+const SPARKS = Array.from({ length: 30 }, (_, i) => {
+  const angle = (i / 30) * Math.PI * 2 + (i % 3) * 0.2
+  const distance = 150 + (i % 5) * 36
   return { dx: Math.cos(angle) * distance, dy: Math.sin(angle) * distance, size: 5 + (i % 4) * 2, delay: (i % 6) * 0.03 }
 })
+
+function FlipShow({ style }: { style: RevealStyle }) {
+  const alpha = FLASH_ALPHA[style.tier]
+  const anchor = { position: 'absolute', left: '50%', top: '50%', width: 0, height: 0, pointerEvents: 'none' } as const
+  return (
+    <>
+      <Box aria-hidden sx={{ ...anchor, zIndex: -1 }}>
+        <Box sx={{
+          position: 'absolute', left: 0, top: 0, width: 520, height: 520, borderRadius: '50%',
+          background: style.rainbow
+            ? `radial-gradient(circle, #ffffff 0%, rgba(255,255,255,0.75) 18%, transparent 42%), ${rainbowConic()}`
+            : `radial-gradient(circle, #ffffff 0%, ${withAlpha(style.color, alpha)} 35%, transparent 70%)`,
+          ...(style.rainbow && { maskImage: FLASH_MASK, WebkitMaskImage: FLASH_MASK }),
+          animation: `${flash} 1s ease-out both`,
+        }} />
+      </Box>
+      <Box aria-hidden sx={{ ...anchor, zIndex: 3 }}>
+        {SPARKS.slice(0, SPARK_COUNT[style.tier]).map((sparkItem, i) => (
+          <Box key={i} sx={{
+            position: 'absolute', left: 0, top: 0, width: sparkItem.size, height: sparkItem.size,
+            marginLeft: `${-sparkItem.size / 2}px`, marginTop: `${-sparkItem.size / 2}px`, borderRadius: '50%',
+            background: i % 3 === 0 ? '#fff' : paint(style, i), boxShadow: `0 0 10px ${paint(style, i)}`,
+            '--dx': `${sparkItem.dx}px`, '--dy': `${sparkItem.dy}px`,
+            animation: `${spark} 1s cubic-bezier(.15,.8,.3,1) ${sparkItem.delay}s both`,
+          }} />
+        ))}
+      </Box>
+    </>
+  )
+}
 
 function Rays({ style, visible }: { style: RevealStyle | undefined; visible: boolean }) {
   if (!visible || !style?.rays) return null
@@ -63,13 +95,15 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
   const [flipped, setFlipped] = useState(false)
   const [leaving, setLeaving] = useState(false)
   const [torn, setTorn] = useState(false)
+  const [showFor, setShowFor] = useState<number | null>(null)
+  const [shaking, setShaking] = useState(false)
   const tiltRef = useRef<HTMLDivElement>(null)
+  const cardRef = useRef<HTMLDivElement>(null)
   const timers = useRef<number[]>([])
 
   const accent = pack?.accent || theme.accent
   const backFill = pack?.gradient || `linear-gradient(135deg, ${accent}, ${withAlpha(accent, 55)})`
   const items = useMemo<RevealItem[]>(() => (rewards ? revealOrder(rewards, rarities, accent) : []), [rewards, rarities, accent])
-  const best = items[items.length - 1]?.style ?? resolveStyle(undefined, accent)
   const current = items[index]
 
   const later = useCallback((fn: () => void, ms: number) => {
@@ -83,6 +117,8 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
     setFlipped(false)
     setLeaving(false)
     setTorn(false)
+    setShowFor(null)
+    setShaking(false)
     const pending = timers.current
     return () => {
       pending.forEach((timer) => window.clearTimeout(timer))
@@ -96,9 +132,8 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
       return
     }
     setPhase('burst')
-    if (best.vibrate) vibrate(vibrationFor(best.tier))
-    later(() => setPhase('reveal'), BURST_MS[best.tier])
-  }, [reducedMotion, items.length, best.vibrate, best.tier, later])
+    later(() => setPhase('reveal'), BURST_MS)
+  }, [reducedMotion, items.length, later])
 
   useEffect(() => {
     if (phase === 'waiting' && rewards) startBurst()
@@ -115,9 +150,15 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
     setFlipped(true)
     const { rarity, style } = current
     later(() => {
+      setShowFor(index)
       if (style.vibrate) vibrate(FLIP_VIBRATION[style.tier])
-      play(normalizeRevealEffect(rarity?.revealEffect, rarity?.revealMedia, rarity?.revealEmoji, rarity?.emoji ?? '✨'))
-    }, reducedMotion ? 0 : 420)
+      if (style.shake && !reducedMotion) {
+        setShaking(true)
+        later(() => setShaking(false), style.tier === 'legendary' ? 750 : 500)
+      }
+      const effect = normalizeRevealEffect(rarity?.revealEffect, rarity?.revealMedia, rarity?.revealEmoji, rarity?.emoji ?? '✨')
+      play({ ...effect, palette: showPalette(style), anchor: cardRef.current?.getBoundingClientRect() ?? null })
+    }, reducedMotion ? 0 : SHOW_DELAY_MS)
   }
 
   function next() {
@@ -163,175 +204,159 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
       slotProps={{ paper: { sx: { background: theme.gradient, overflow: 'hidden' } } }}
     >
       {layer}
-      <Box
-        onPointerMove={tilt}
-        sx={{
-          position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden',
-          animation: phase === 'burst' && best.shake && !reducedMotion
-            ? `${screenShake} ${best.tier === 'legendary' ? 0.7 : 0.45}s ease-out 0.05s both`
-            : `${stageIn} 0.3s ease both`,
-        }}
-      >
-        <FloatingParticles />
-        <Box aria-hidden sx={{
-          position: 'absolute', inset: 0, pointerEvents: 'none',
-          background: `radial-gradient(circle at 50% 46%, ${withAlpha(accent, theme.isDark ? 30 : 22)}, transparent 55%)`,
-        }} />
-        <Rays style={phase === 'reveal' ? current?.style : best} visible={!reducedMotion && (phase === 'burst' || (phase === 'reveal' && flipped))} />
+      <Box onPointerMove={tilt} sx={{ position: 'relative', height: '100%', overflow: 'hidden', animation: `${stageIn} 0.3s ease both` }}>
+        <Box sx={{
+          position: 'relative', height: '100%', display: 'flex', flexDirection: 'column',
+          animation: shaking ? `${screenShake} ${current?.style.tier === 'legendary' ? 0.7 : 0.45}s ease-out both` : 'none',
+        }}>
+          <FloatingParticles />
+          <Box aria-hidden sx={{
+            position: 'absolute', inset: 0, pointerEvents: 'none',
+            background: `radial-gradient(circle at 50% 46%, ${withAlpha(accent, theme.isDark ? 30 : 22)}, transparent 55%)`,
+          }} />
+          <Rays style={current?.style} visible={!reducedMotion && phase === 'reveal' && flipped && showFor === index} />
 
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ position: 'relative', zIndex: 2, px: 2, pt: 'max(16px, env(safe-area-inset-top))', minHeight: 56 }}>
-          {pack && (
-            <Box sx={{
-              display: 'inline-flex', alignItems: 'center', gap: 0.8, px: 1.4, py: 0.6, borderRadius: radius.full, maxWidth: '65%',
-              background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}`, backdropFilter: 'blur(12px)',
-            }}>
-              <Box component="span" sx={{ fontSize: '1rem' }}>{pack.emoji}</Box>
-              <Typography variant="md" sx={{ fontWeight: 800, color: textColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{pack.name}</Typography>
-            </Box>
-          )}
-          {showSkip && (
-            <Box component="button" type="button" onClick={() => setPhase('summary')} sx={{
-              all: 'unset', cursor: 'pointer', px: 1.4, py: 0.6, borderRadius: radius.full, fontSize: '0.8rem', fontWeight: 800, color: textColor,
-              background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}`, backdropFilter: 'blur(12px)',
-              '&:focus-visible': { outline: `2px solid ${accent}` },
-            }}>
-              Pular ›
-            </Box>
-          )}
-        </Stack>
+          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ position: 'relative', zIndex: 2, px: 2, pt: 'max(16px, env(safe-area-inset-top))', minHeight: 56 }}>
+            {pack && (
+              <Box sx={{
+                display: 'inline-flex', alignItems: 'center', gap: 0.8, px: 1.4, py: 0.6, borderRadius: radius.full, maxWidth: '65%',
+                background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}`, backdropFilter: 'blur(12px)',
+              }}>
+                <Box component="span" sx={{ fontSize: '1rem' }}>{pack.emoji}</Box>
+                <Typography variant="md" sx={{ fontWeight: 800, color: textColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{pack.name}</Typography>
+              </Box>
+            )}
+            {showSkip && (
+              <Box component="button" type="button" onClick={() => setPhase('summary')} sx={{
+                all: 'unset', cursor: 'pointer', px: 1.4, py: 0.6, borderRadius: radius.full, fontSize: '0.8rem', fontWeight: 800, color: textColor,
+                background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}`, backdropFilter: 'blur(12px)',
+                '&:focus-visible': { outline: `2px solid ${accent}` },
+              }}>
+                Pular ›
+              </Box>
+            )}
+          </Stack>
 
-        <Box sx={{ position: 'relative', zIndex: 1, flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', px: 2 }}>
-          {(phase === 'intro' || phase === 'waiting' || phase === 'burst') && pack && (
-            <Stack alignItems="center" spacing={3}>
-              <Box ref={tiltRef} sx={{ position: 'relative', transform: { md: 'scale(1.22)' }, transformOrigin: 'center', my: { md: 4.5 } }}>
-                <PackPouch
-                  gradient={backFill}
-                  accent={accent}
-                  emoji={pack.emoji}
-                  name={pack.name}
-                  state={pouchState}
-                  onTorn={handleTorn}
-                  reducedMotion={reducedMotion}
-                />
-                {phase === 'burst' && (
-                  <>
+          <Box sx={{ position: 'relative', zIndex: 1, flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', px: 2 }}>
+            {(phase === 'intro' || phase === 'waiting' || phase === 'burst') && pack && (
+              <Stack alignItems="center" spacing={3}>
+                <Box ref={tiltRef} sx={{ position: 'relative', transform: { md: 'scale(1.22)' }, transformOrigin: 'center', my: { md: 4.5 } }}>
+                  <PackPouch
+                    gradient={backFill}
+                    accent={accent}
+                    emoji={pack.emoji}
+                    name={pack.name}
+                    state={pouchState}
+                    onTorn={handleTorn}
+                    reducedMotion={reducedMotion}
+                  />
+                  {phase === 'burst' && (
                     <Box aria-hidden sx={{
                       position: 'absolute', left: '50%', top: 40, width: 260, height: 260, borderRadius: '50%', pointerEvents: 'none',
-                      background: best.rainbow
-                        ? `radial-gradient(circle, #ffffff 0%, rgba(255,255,255,0.75) 18%, transparent 42%), ${rainbowConic()}`
-                        : best.tier === 'common'
-                          ? `radial-gradient(circle, rgba(255,255,255,0.7) 0%, ${withAlpha(best.color, 30)} 35%, transparent 65%)`
-                          : `radial-gradient(circle, #ffffff 0%, ${withAlpha(best.color, 85)} 35%, transparent 70%)`,
-                      ...(best.rainbow && { maskImage: FLASH_MASK, WebkitMaskImage: FLASH_MASK }),
-                      animation: `${flash} ${BURST_MS[best.tier] / 1000}s ease-out both`,
+                      background: `radial-gradient(circle, rgba(255,255,255,0.7) 0%, ${withAlpha(accent, 30)} 35%, transparent 65%)`,
+                      animation: `${flash} ${BURST_MS / 1000}s ease-out both`,
                     }} />
-                    {SPARKS.slice(0, SPARK_COUNT[best.tier]).map((sparkItem, i) => (
-                      <Box key={i} aria-hidden sx={{
-                        position: 'absolute', left: '50%', top: 50, width: sparkItem.size, height: sparkItem.size, borderRadius: '50%', pointerEvents: 'none',
-                        background: i % 3 === 0 ? '#fff' : paint(best, i), boxShadow: `0 0 10px ${paint(best, i)}`,
-                        '--dx': `${sparkItem.dx}px`, '--dy': `${sparkItem.dy}px`,
-                        animation: `${spark} 0.95s cubic-bezier(.15,.8,.3,1) ${0.12 + sparkItem.delay}s both`,
-                      }} />
-                    ))}
-                  </>
-                )}
-              </Box>
-              <Typography aria-live="polite" sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.05rem', color: textColor, textAlign: 'center', minHeight: 26 }}>
-                {phase === 'intro' ? 'Arraste na linha pra abrir ✂️' : phase === 'waiting' ? 'Sorteando seus bilhetes…' : ''}
-              </Typography>
-            </Stack>
-          )}
-
-          {phase === 'reveal' && current && (
-            <Box sx={{ position: 'relative', width: CARD_WIDTH, transform: { md: 'scale(1.15)' }, transformOrigin: 'center' }}>
-              {items.slice(index + 1, index + 3).map((item, i) => (
-                <Box key={item.reward.id + i} aria-hidden sx={{
-                  position: 'absolute', inset: 0, borderRadius: '22px', background: backFill, border: '2px solid rgba(255,255,255,0.6)',
-                  transform: `translate3d(${(i + 1) * 8}px, ${(i + 1) * 10}px, 0) rotate(${(i + 1) * 3}deg)`, opacity: 0.8 - i * 0.25,
-                  boxShadow: '0 12px 30px rgba(15,23,42,0.18)', minHeight: 260,
-                }} />
-              ))}
-              <Box
-                key={index}
-                sx={{ position: 'relative', animation: reducedMotion ? 'none' : leaving ? `${cardLeave} 0.32s ease-in both` : `${cardRise} 0.6s cubic-bezier(.2,.9,.3,1.1) both` }}
-              >
-                <RevealCard
-                  item={current}
-                  flipped={flipped}
-                  backFill={backFill}
-                  accent={accent}
-                  emoji={pack?.emoji ?? '💌'}
-                  rarities={rarities}
-                  types={types}
-                  reducedMotion={reducedMotion}
-                  onActivate={() => (flipped ? next() : flip())}
-                  label={flipped ? 'Próximo bilhete' : `Virar bilhete ${index + 1} de ${items.length}`}
-                />
-              </Box>
-              {!flipped && current.style.caption && (
-                <Typography variant="xl" aria-live="polite" sx={{
-                  position: 'absolute', left: 0, right: 0, top: 'calc(100% + 18px)', textAlign: 'center',
-                  fontFamily: font.serif, fontWeight: 800, color: textColor, animation: `${riseIn} 0.5s ease 0.4s both`,
-                }}>
-                  {current.style.caption}
+                  )}
+                </Box>
+                <Typography aria-live="polite" sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.05rem', color: textColor, textAlign: 'center', minHeight: 26 }}>
+                  {phase === 'intro' ? 'Arraste na linha pra abrir ✂️' : phase === 'waiting' ? 'Sorteando seus bilhetes…' : ''}
                 </Typography>
-              )}
-            </Box>
-          )}
-
-          {phase === 'summary' && (
-            <Box sx={{ width: '100%', maxWidth: 530, maxHeight: '100%', overflowY: 'auto', px: 3, py: 2.5, animation: `${riseIn} 0.4s ease both` }}>
-              <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.6rem', color: textColor, textAlign: 'center', lineHeight: 1.15 }}>
-                {items.length === 1 ? 'Você recebeu 1 bilhete 💌' : `Você recebeu ${items.length} bilhetes 💌`}
-              </Typography>
-              <Typography variant="lg" sx={{ mt: 0.6, mb: 2, color: mutedColor, textAlign: 'center' }}>
-                {newCount > 0 ? `${newCount} ${newCount === 1 ? 'novo' : 'novos'} na sua coleção ✨${onOpenReward ? ' · toque pra ler' : ''}` : onOpenReward ? 'Toque em um bilhete pra ler de novo' : ''}
-              </Typography>
-              <Stack spacing={1.2}>
-                {items.map((item, i) => (
-                  <Box key={`${item.reward.id}-${i}`} sx={{ position: 'relative', animation: `${riseIn} 0.4s ease ${0.08 * i}s both` }}>
-                    <RewardCard reward={{ ...item.reward, isNew: false }} rarities={rarities} types={types} onClick={onOpenReward ? () => onOpenReward(item.reward) : undefined} />
-                    {item.reward.isNew && (
-                      <Box sx={{ position: 'absolute', top: -8, right: 8, px: 0.9, py: 0.2, borderRadius: 99, fontSize: '0.64rem', fontWeight: 900, color: '#fff', background: 'linear-gradient(135deg, #f472b6, #fb7185)', boxShadow: '0 4px 10px rgba(244,114,182,0.4)' }}>
-                        NOVO
-                      </Box>
-                    )}
-                  </Box>
-                ))}
               </Stack>
-            </Box>
-          )}
-        </Box>
+            )}
 
-        <Box sx={{ position: 'relative', zIndex: 2, px: 2, pb: 'max(20px, env(safe-area-inset-bottom))', pt: 1.5, minHeight: 104 }}>
-          {phase === 'reveal' && current && (
-            <Stack alignItems="center" spacing={1.4} sx={{ maxWidth: 420, mx: 'auto' }}>
-              {items.length > 1 && <Stack direction="row" spacing={0.7} aria-label={`Bilhete ${index + 1} de ${items.length}`}>
-                {items.map((_, i) => (
-                  <Box key={i} sx={{
-                    width: i === index ? 22 : 8, height: 8, borderRadius: 99, transition: 'all 0.25s',
-                    background: i < index || (i === index && flipped) ? accent : withAlpha(theme.textOnBg, 25),
+            {phase === 'reveal' && current && (
+              <Box sx={{ position: 'relative', zIndex: 0, width: CARD_WIDTH, transform: { md: 'scale(1.15)' }, transformOrigin: 'center' }}>
+                {items.slice(index + 1, index + 3).map((item, i) => (
+                  <Box key={item.reward.id + i} aria-hidden sx={{
+                    position: 'absolute', inset: 0, borderRadius: '22px', background: backFill, border: '2px solid rgba(255,255,255,0.6)',
+                    transform: `translate3d(${(i + 1) * 8}px, ${(i + 1) * 10}px, 0) rotate(${(i + 1) * 3}deg)`, opacity: 0.8 - i * 0.25,
+                    boxShadow: '0 12px 30px rgba(15,23,42,0.18)', minHeight: 260,
                   }} />
                 ))}
-              </Stack>}
-              <Stack direction="row" spacing={1} sx={{ width: '100%' }}>
-                {items.length > 1 && (
-                  <Button variant="ghost" onClick={() => setPhase('summary')} sx={{ flex: 1, py: 1.1 }}>
-                    Ver todos
-                  </Button>
+                <Box
+                  key={index}
+                  ref={cardRef}
+                  sx={{ position: 'relative', animation: reducedMotion ? 'none' : leaving ? `${cardLeave} 0.32s ease-in both` : `${cardRise} 0.6s cubic-bezier(.2,.9,.3,1.1) both` }}
+                >
+                  <RevealCard
+                    item={current}
+                    flipped={flipped}
+                    backFill={backFill}
+                    accent={accent}
+                    emoji={pack?.emoji ?? '💌'}
+                    rarities={rarities}
+                    types={types}
+                    reducedMotion={reducedMotion}
+                    onActivate={() => (flipped ? next() : flip())}
+                    label={flipped ? 'Próximo bilhete' : `Virar bilhete ${index + 1} de ${items.length}`}
+                  />
+                </Box>
+                {flipped && showFor === index && !reducedMotion && SPARK_COUNT[current.style.tier] > 0 && <FlipShow key={`show-${index}`} style={current.style} />}
+                {!flipped && current.style.caption && (
+                  <Typography variant="xl" aria-live="polite" sx={{
+                    position: 'absolute', left: 0, right: 0, top: 'calc(100% + 18px)', textAlign: 'center',
+                    fontFamily: font.serif, fontWeight: 800, color: textColor, animation: `${riseIn} 0.5s ease 0.4s both`,
+                  }}>
+                    {current.style.caption}
+                  </Typography>
                 )}
-                <Button variant="primary" onClick={flipped ? next : flip} sx={{ flex: 1.4, py: 1.1 }}>
-                  {!flipped ? 'Virar' : index < items.length - 1 ? `Próximo (${index + 2}/${items.length})` : 'Ver resumo'}
-                </Button>
+              </Box>
+            )}
+
+            {phase === 'summary' && (
+              <Box sx={{ width: '100%', maxWidth: 530, maxHeight: '100%', overflowY: 'auto', px: 3, py: 2.5, animation: `${riseIn} 0.4s ease both` }}>
+                <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.6rem', color: textColor, textAlign: 'center', lineHeight: 1.15 }}>
+                  {items.length === 1 ? 'Você recebeu 1 bilhete 💌' : `Você recebeu ${items.length} bilhetes 💌`}
+                </Typography>
+                <Typography variant="lg" sx={{ mt: 0.6, mb: 2, color: mutedColor, textAlign: 'center' }}>
+                  {newCount > 0 ? `${newCount} ${newCount === 1 ? 'novo' : 'novos'} na sua coleção ✨${onOpenReward ? ' · toque pra ler' : ''}` : onOpenReward ? 'Toque em um bilhete pra ler de novo' : ''}
+                </Typography>
+                <Stack spacing={1.2}>
+                  {items.map((item, i) => (
+                    <Box key={`${item.reward.id}-${i}`} sx={{ position: 'relative', animation: `${riseIn} 0.4s ease ${0.08 * i}s both` }}>
+                      <RewardCard reward={{ ...item.reward, isNew: false }} rarities={rarities} types={types} onClick={onOpenReward ? () => onOpenReward(item.reward) : undefined} />
+                      {item.reward.isNew && (
+                        <Box sx={{ position: 'absolute', top: -8, right: 8, px: 0.9, py: 0.2, borderRadius: 99, fontSize: '0.64rem', fontWeight: 900, color: '#fff', background: 'linear-gradient(135deg, #f472b6, #fb7185)', boxShadow: '0 4px 10px rgba(244,114,182,0.4)' }}>
+                          NOVO
+                        </Box>
+                      )}
+                    </Box>
+                  ))}
+                </Stack>
+              </Box>
+            )}
+          </Box>
+
+          <Box sx={{ position: 'relative', zIndex: 2, px: 2, pb: 'max(20px, env(safe-area-inset-bottom))', pt: 1.5, minHeight: 104 }}>
+            {phase === 'reveal' && current && (
+              <Stack alignItems="center" spacing={1.4} sx={{ maxWidth: 420, mx: 'auto' }}>
+                {items.length > 1 && <Stack direction="row" spacing={0.7} aria-label={`Bilhete ${index + 1} de ${items.length}`}>
+                  {items.map((_, i) => (
+                    <Box key={i} sx={{
+                      width: i === index ? 22 : 8, height: 8, borderRadius: 99, transition: 'all 0.25s',
+                      background: i < index || (i === index && flipped) ? accent : withAlpha(theme.textOnBg, 25),
+                    }} />
+                  ))}
+                </Stack>}
+                <Stack direction="row" spacing={1} sx={{ width: '100%' }}>
+                  {items.length > 1 && (
+                    <Button variant="ghost" onClick={() => setPhase('summary')} sx={{ flex: 1, py: 1.1 }}>
+                      Ver todos
+                    </Button>
+                  )}
+                  <Button variant="primary" onClick={flipped ? next : flip} sx={{ flex: 1.4, py: 1.1 }}>
+                    {!flipped ? 'Virar' : index < items.length - 1 ? `Próximo (${index + 2}/${items.length})` : 'Ver resumo'}
+                  </Button>
+                </Stack>
               </Stack>
-            </Stack>
-          )}
-          {phase === 'summary' && (
-            <Stack direction="row" spacing={1} sx={{ maxWidth: 480, mx: 'auto' }}>
-              <Button variant={onViewCollection ? 'ghost' : 'primary'} onClick={onClose} sx={{ flex: 1, py: 1.1 }}>{onViewCollection ? 'Guardar' : 'Fechar'}</Button>
-              {onViewCollection && <Button variant="primary" onClick={onViewCollection} sx={{ flex: 1, py: 1.1, whiteSpace: 'nowrap' }}>Ver coleção</Button>}
-            </Stack>
-          )}
+            )}
+            {phase === 'summary' && (
+              <Stack direction="row" spacing={1} sx={{ maxWidth: 480, mx: 'auto' }}>
+                <Button variant={onViewCollection ? 'ghost' : 'primary'} onClick={onClose} sx={{ flex: 1, py: 1.1 }}>{onViewCollection ? 'Guardar' : 'Fechar'}</Button>
+                {onViewCollection && <Button variant="primary" onClick={onViewCollection} sx={{ flex: 1, py: 1.1, whiteSpace: 'nowrap' }}>Ver coleção</Button>}
+              </Stack>
+            )}
+          </Box>
         </Box>
       </Box>
     </Dialog>
