@@ -20,7 +20,7 @@ export function setNotificationOptOut(optedOut: boolean) {
 export async function showLocalNotification(title: string, body: string) {
   try {
     const reg = 'serviceWorker' in navigator ? await navigator.serviceWorker.getRegistration() : undefined
-    if (reg) await reg.showNotification(title, { body, icon: '/potinho-icon.svg' })
+    if (reg) await reg.showNotification(title, { body, icon: '/icon-192.png', badge: '/badge-96.png' })
     else new Notification(title, { body })
   } catch {
     void 0
