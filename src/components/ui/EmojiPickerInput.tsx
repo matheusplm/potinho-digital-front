@@ -1,8 +1,9 @@
-import { useState } from 'react'
-import { Box, Popover, Stack, Typography } from '@mui/material'
-import Picker from '@emoji-mart/react'
-import data from '@emoji-mart/data'
+import { lazy, Suspense, useState } from 'react'
+import { Box, CircularProgress, Popover, Stack, Typography } from '@mui/material'
 import { colors, radius } from '../../design-system'
+
+const loadPanel = () => import('./EmojiPickerPanel')
+const EmojiPickerPanel = lazy(loadPanel)
 
 interface EmojiPickerInputProps {
   label?: string
@@ -24,6 +25,8 @@ export function EmojiPickerInput({ label, value, onChange }: EmojiPickerInputPro
         component="button"
         type="button"
         onClick={(e: React.MouseEvent<HTMLButtonElement>) => setAnchorEl(e.currentTarget)}
+        onPointerEnter={loadPanel}
+        onFocus={loadPanel}
         sx={{
           width: 52,
           height: 44,
@@ -65,18 +68,16 @@ export function EmojiPickerInput({ label, value, onChange }: EmojiPickerInputPro
           },
         }}
       >
-        <Picker
-          data={data}
-          onEmojiSelect={(emoji: { native: string }) => {
-            onChange(emoji.native)
+        <Suspense fallback={
+          <Box sx={{ width: 316, maxWidth: '100%', height: 435, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#fff' }}>
+            <CircularProgress size={26} sx={{ color: colors.primary.main }} />
+          </Box>
+        }>
+          <EmojiPickerPanel onSelect={(emoji) => {
+            onChange(emoji)
             setAnchorEl(null)
-          }}
-          locale="pt"
-          theme="light"
-          previewPosition="none"
-          skinTonePosition="search"
-          perLine={8}
-        />
+          }} />
+        </Suspense>
       </Popover>
     </Stack>
   )
