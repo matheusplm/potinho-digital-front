@@ -16,12 +16,13 @@ import { ReaderProvider } from './context/ReaderContext'
 import { LoadingState } from './components/ui'
 import { clearAdminSession, useAdminSession } from './services/adminSession'
 import { ADMIN_QUERY_ROOT } from './hooks/useAdmin'
+import { lazyWithCaptcha } from './utils/turnstile'
 import { Box } from '@mui/material'
 
 const WriterHomePage = lazy(() => import('./pages/WriterHomePage').then((m) => ({ default: m.WriterHomePage })))
 const SimulatedReaderHomePage = lazy(() => import('./pages/SimulatedReaderHomePage').then((m) => ({ default: m.SimulatedReaderHomePage })))
-const LoginPage = lazy(() => import('./pages/LoginPage').then((m) => ({ default: m.LoginPage })))
-const RegisterPage = lazy(() => import('./pages/RegisterPage').then((m) => ({ default: m.RegisterPage })))
+const LoginPage = lazy(lazyWithCaptcha(() => import('./pages/LoginPage').then((m) => ({ default: m.LoginPage }))))
+const RegisterPage = lazy(lazyWithCaptcha(() => import('./pages/RegisterPage').then((m) => ({ default: m.RegisterPage }))))
 const CollectionsListPage = lazy(() => import('./pages/CollectionsListPage').then((m) => ({ default: m.CollectionsListPage })))
 const CollectionPlayPage = lazy(() => import('./pages/CollectionPlayPage').then((m) => ({ default: m.CollectionPlayPage })))
 const CollectionManagePage = lazy(() => import('./pages/CollectionManagePage').then((m) => ({ default: m.CollectionManagePage })))
@@ -32,7 +33,7 @@ const TestPage = lazy(() => import('./pages/TestPage').then((m) => ({ default: m
 const LandingPage = lazy(() => import('./pages/LandingPage').then((m) => ({ default: m.LandingPage })))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })))
 const VerifyEmailPage = lazy(() => import('./pages/VerifyEmailPage').then((m) => ({ default: m.VerifyEmailPage })))
-const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage').then((m) => ({ default: m.ForgotPasswordPage })))
+const ForgotPasswordPage = lazy(lazyWithCaptcha(() => import('./pages/ForgotPasswordPage').then((m) => ({ default: m.ForgotPasswordPage }))))
 const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage').then((m) => ({ default: m.ResetPasswordPage })))
 const ContaPage = lazy(() => import('./pages/ContaPage').then((m) => ({ default: m.ContaPage })))
 const ConfirmEmailChangePage = lazy(() => import('./pages/ConfirmEmailChangePage').then((m) => ({ default: m.ConfirmEmailChangePage })))
