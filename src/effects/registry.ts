@@ -17,7 +17,7 @@ export const REVEAL_EFFECTS: RevealEffectDefinition[] = [
     description: 'Chove o emoji, GIF ou imagem que você escolher pela tela inteira.',
     usesMedia: true,
     defaultMedia: '💖',
-    durationMs: 4200,
+    durationMs: 5200,
   },
   {
     kind: 'burst',
@@ -26,7 +26,7 @@ export const REVEAL_EFFECTS: RevealEffectDefinition[] = [
     description: 'O emoji, GIF ou imagem explode do bilhete para todos os lados.',
     usesMedia: true,
     defaultMedia: '✨',
-    durationMs: 2400,
+    durationMs: 2500,
   },
   {
     kind: 'rise',
@@ -35,7 +35,7 @@ export const REVEAL_EFFECTS: RevealEffectDefinition[] = [
     description: 'O emoji, GIF ou imagem sobe do pé da tela flutuando, tipo balão.',
     usesMedia: true,
     defaultMedia: '🎈',
-    durationMs: 5200,
+    durationMs: 5600,
   },
   {
     kind: 'spiral',
@@ -44,7 +44,7 @@ export const REVEAL_EFFECTS: RevealEffectDefinition[] = [
     description: 'O emoji, GIF ou imagem sai do bilhete girando em espiral.',
     usesMedia: true,
     defaultMedia: '⭐',
-    durationMs: 4400,
+    durationMs: 4600,
   },
   {
     kind: 'confetti',
@@ -53,7 +53,7 @@ export const REVEAL_EFFECTS: RevealEffectDefinition[] = [
     description: 'Dois canhões de confete disparam dos cantos, nas cores da luz.',
     usesMedia: false,
     defaultMedia: '',
-    durationMs: 4400,
+    durationMs: 4600,
   },
   {
     kind: 'sparkle',
@@ -62,7 +62,7 @@ export const REVEAL_EFFECTS: RevealEffectDefinition[] = [
     description: 'Estrelinhas piscam em volta do bilhete, nas cores da luz.',
     usesMedia: false,
     defaultMedia: '',
-    durationMs: 4400,
+    durationMs: 6200,
   },
   {
     kind: 'wave',
@@ -71,7 +71,7 @@ export const REVEAL_EFFECTS: RevealEffectDefinition[] = [
     description: 'Ondas de luz saem do bilhete e varrem a tela, nas cores da luz.',
     usesMedia: false,
     defaultMedia: '',
-    durationMs: 2200,
+    durationMs: 2400,
   },
 ]
 

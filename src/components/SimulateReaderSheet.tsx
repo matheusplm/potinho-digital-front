@@ -6,7 +6,7 @@ import { Button, toast } from './ui'
 import { useSimulation, type SimulationPreset } from '../context/SimulationContext'
 import { useCollectionsQuery } from '../hooks/useNotes'
 import { colors, font, radius } from '../design-system'
-import { slugify } from '../utils/slug'
+import { collectionSlug } from '../utils/slug'
 import { useUser } from '../context/UserContext'
 import { isCollectionOwner } from '../utils/collectionAccess'
 import type { Collection } from '../types/note'
@@ -61,7 +61,7 @@ export function SimulateReaderSheet({ open, onClose }: SimulateReaderSheetProps)
     }
 
     localStorage.setItem('potinho-sim-cid', collection.id)
-    const slug = slugify(collection.name)
+    const slug = collectionSlug(collection, collections)
     startSimulation({
       collectionId: collection.id,
       collectionSlug: slug,

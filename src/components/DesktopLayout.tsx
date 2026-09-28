@@ -33,7 +33,7 @@ import { useBackground } from '../context/BackgroundContext'
 import { ThemeSwatches } from './ThemeSwatches'
 import { useCollectionsQuery, useMyNotificationsQuery, usePendingInvitesQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
 import { backgroundThemes, colors, font, radius } from '../design-system'
-import { slugify } from '../utils/slug'
+import { collectionSlug } from '../utils/slug'
 import { isCollectionReader, personaCapabilities } from '../utils/collectionAccess'
 
 const SIDEBAR_W = 240
@@ -87,7 +87,7 @@ export function DesktopLayout() {
     return readerCollections.find((c) => c.id === activeCollectionId) ?? readerCollections[0]
   }, [isReader, readerCollections, activeCollectionId])
 
-  const readerAlbumPath = readerActive ? `/colecoes/${slugify(readerActive.name)}` : '/home'
+  const readerAlbumPath = readerActive ? `/colecoes/${collectionSlug(readerActive, collections)}` : '/home'
 
   const { data: myNotifications = [] } = useMyNotificationsQuery({ enabled: isReader })
   const hasUnreadNotifications = useMemo(() => myNotifications.some((n) => !n.readAt), [myNotifications])

@@ -6,6 +6,7 @@ import { Turnstile } from '@marsidev/react-turnstile'
 import type { TurnstileInstance } from '@marsidev/react-turnstile'
 import { useUser } from '../context/UserContext'
 import { api, ApiRequestError } from '../services/api'
+import { safeRedirect } from '../utils/safeRedirect'
 import { Button, Input, toast } from '../components/ui'
 import { GoogleSignInButton } from '../components/GoogleSignInButton'
 import { FloatingParticles } from '../components/FloatingParticles'
@@ -20,7 +21,7 @@ export function LoginPage() {
   const { setUser } = useUser()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const fromPath = searchParams.get('from')
+  const fromPath = safeRedirect(searchParams.get('from'))
   const [captchaToken, setCaptchaToken] = useState<string | null>(SITE_KEY ? null : 'bypass')
   const widgetRef = useRef<TurnstileInstance>(null)
   const [email, setEmail] = useState('')
@@ -42,7 +43,7 @@ export function LoginPage() {
       const { token, refreshToken, user } = await api.login(email, password, t)
       setUser({ id: user.id, name: user.name, email: user.email, role: user.role as 'writer' | 'reader', token, refreshToken, onboardingDone: user.onboardingDone })
       toast.success(`Bem-vindo, ${user.name.split(' ')[0]}! 💙`)
-      navigate(fromPath ?? '/home')
+      navigate(fromPath)
     } catch (err) {
       if (err instanceof ApiRequestError && err.code === 'EMAIL_NOT_VERIFIED') {
         setNotVerified(true)
@@ -64,7 +65,7 @@ export function LoginPage() {
       const { token, refreshToken, user } = await api.googleLogin(idToken)
       setUser({ id: user.id, name: user.name, email: user.email, role: user.role as 'writer' | 'reader', token, refreshToken, onboardingDone: user.onboardingDone })
       toast.success(`Bem-vindo, ${user.name.split(' ')[0]}! 💙`)
-      navigate(fromPath ?? '/home')
+      navigate(fromPath)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao entrar com o Google.')
       setLoading(false)

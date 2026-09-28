@@ -1,16 +1,16 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import FavoriteIcon from '@mui/icons-material/Favorite'
-import { Box, IconButton, Stack } from '@mui/material'
+import { Box, IconButton, Stack, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { LoadingState, PageTitle, ScrollablePage, SegmentedControl, toast } from '../components/ui'
+import { Button, LoadingState, PageTitle, ScrollablePage, SegmentedControl, toast } from '../components/ui'
 import { useCollectionsQuery } from '../hooks/useNotes'
 import { useBackground } from '../context/BackgroundContext'
 import { FloatingParticles } from '../components/FloatingParticles'
 import { useUser } from '../context/UserContext'
-import { fadeIn, colors } from '../design-system'
+import { fadeIn, colors, font } from '../design-system'
 import { isCollectionOwner } from '../utils/collectionAccess'
-import { slugify } from '../utils/slug'
+import { findCollectionBySlug } from '../utils/slug'
 import { NotesTab } from './manage/NotesTab'
 import { RaritiesTab } from './manage/RaritiesTab'
 import { TypesTab } from './manage/TypesTab'
@@ -37,7 +37,7 @@ export function CollectionManagePage() {
   const [tab, setTab] = useState<Tab>('notes')
 
   const { data: collections = [], isLoading: collectionsLoading } = useCollectionsQuery()
-  const collection = collections.find((c) => slugify(c.name) === slug)
+  const collection = findCollectionBySlug(collections, slug)
   const cid = collection?.id ?? ''
   const canManage = collection ? isCollectionOwner(collection, user?.id) : false
 
@@ -56,6 +56,22 @@ export function CollectionManagePage() {
         <FloatingParticles />
         <ScrollablePage sx={{ px: 2.5, py: 2.5 }}>
           <LoadingState label="Carregando coleção" accent={theme.accent} textColor={theme.textOnBg} mutedColor={theme.textOnBgMuted} sx={{ minHeight: 360 }} />
+        </ScrollablePage>
+      </Box>
+    )
+  }
+
+  if (!collection) {
+    return (
+      <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>
+        <FloatingParticles />
+        <ScrollablePage sx={{ px: 2.5, py: 2.5 }}>
+          <Box sx={{ textAlign: 'center', py: 8 }}>
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.1rem', color: theme.textOnBg, mb: 1 }}>
+              Coleção não encontrada
+            </Typography>
+            <Button variant="primary" onClick={() => navigate('/colecoes')}>Voltar às coleções</Button>
+          </Box>
         </ScrollablePage>
       </Box>
     )

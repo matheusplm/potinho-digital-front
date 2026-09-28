@@ -1,3 +1,7 @@
+export function withAlpha(color: string, percent: number): string {
+  return `color-mix(in srgb, ${color} ${percent}%, transparent)`
+}
+
 export function gradientTextSx(color: string) {
   if (color.includes('gradient')) {
     return {

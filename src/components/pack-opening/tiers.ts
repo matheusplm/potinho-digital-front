@@ -1,4 +1,5 @@
 import type { CollectionDailyReward, RarityConfig, RevealTier } from '../../types/note'
+import { withAlpha } from '../../utils/colorUtils'
 
 export type Tier = RevealTier
 
@@ -28,10 +29,6 @@ export interface RevealStyle extends StyleFlags {
   tier: Tier
   color: string
   rainbow: boolean
-}
-
-export function withAlpha(color: string, percent: number): string {
-  return `color-mix(in srgb, ${color} ${percent}%, transparent)`
 }
 
 export function isHex(value: string | undefined): value is string {

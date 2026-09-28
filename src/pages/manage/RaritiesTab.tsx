@@ -10,6 +10,7 @@ import { useConfirmDelete } from '../../hooks/useConfirmDelete'
 import { useJsonImport } from '../../hooks/useJsonImport'
 import { colors, font, radius, liftOnDark } from '../../design-system'
 import { useBackground } from '../../context/BackgroundContext'
+import { withAlpha } from '../../utils/colorUtils'
 import { uniqueConfigId } from '../../utils/slug'
 import type { RarityConfig } from '../../types/note'
 import { ColorRow, actionButtonSx } from './shared'
@@ -113,8 +114,8 @@ function OddsMeter({ total }: { total: number }) {
 function RarityPreview({ rarity }: { rarity: RarityConfig }) {
   const { cardBg, borderColor, shadow, glowColor, captionColor, textColor, odds } = rarity
   return (
-    <Box sx={{ position: 'relative', p: 2.5, overflow: 'hidden', borderRadius: radius.xl, background: cardBg, border: `2px solid ${borderColor}`, boxShadow: glowColor ? `${shadow}, 0 0 28px ${glowColor}88` : shadow }}>
-      {glowColor && <Box sx={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: `radial-gradient(ellipse at 50% -10%, ${glowColor}33, transparent 65%)` }} />}
+    <Box sx={{ position: 'relative', p: 2.5, overflow: 'hidden', borderRadius: radius.xl, background: cardBg, border: `2px solid ${borderColor}`, boxShadow: glowColor ? `${shadow}, 0 0 28px ${withAlpha(glowColor, 53)}` : shadow }}>
+      {glowColor && <Box sx={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: `radial-gradient(ellipse at 50% -10%, ${withAlpha(glowColor, 20)}, transparent 65%)` }} />}
       <Stack spacing={1.5} sx={{ position: 'relative' }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <RarityChip rarity={rarity} size="md" uppercase />
@@ -139,9 +140,9 @@ function TemplateTile({ template, applied, onClick }: { template: RarityConfig; 
       sx={{
         p: 1, borderRadius: radius.lg, cursor: 'pointer', background: cardBg, transition: 'all 0.15s ease',
         border: `1.5px solid ${applied ? borderColor : 'rgba(0,0,0,0.07)'}`,
-        boxShadow: applied ? `0 0 16px ${glowColor}99` : 'none',
-        outline: applied ? `2px solid ${borderColor}55` : 'none',
-        '&:hover': { transform: 'translateY(-1px)', boxShadow: `0 0 14px ${glowColor}66`, border: `1.5px solid ${borderColor}` },
+        boxShadow: applied && glowColor ? `0 0 16px ${withAlpha(glowColor, 60)}` : 'none',
+        outline: applied ? `2px solid ${withAlpha(borderColor, 33)}` : 'none',
+        '&:hover': { transform: 'translateY(-1px)', boxShadow: glowColor ? `0 0 14px ${withAlpha(glowColor, 40)}` : 'none', border: `1.5px solid ${borderColor}` },
       }}
     >
       <RarityChip rarity={template} />

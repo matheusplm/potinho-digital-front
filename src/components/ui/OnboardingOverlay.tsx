@@ -9,7 +9,8 @@ import { queryKeys } from '../../hooks/useNotes'
 import { useUser } from '../../context/UserContext'
 import { COLLECTION_TEMPLATES, createCollectionFromTemplate } from '../../services/collectionTemplates'
 import type { CollectionTemplate } from '../../services/collectionTemplates'
-import { slugify } from '../../utils/slug'
+import type { Collection } from '../../types/note'
+import { collectionSlug } from '../../utils/slug'
 import { TemplateKitRow } from '../TemplateKitRow'
 import { KitConfirmDialog } from '../KitConfirmDialog'
 import { Button } from './Button'
@@ -427,7 +428,7 @@ export function OnboardingOverlay({ onDismiss }: Props) {
       }
       setOpen(false)
       onDismiss?.()
-      navigate(`/colecoes/${slugify(collection.name)}/gerenciar`)
+      navigate(`/colecoes/${collectionSlug(collection, queryClient.getQueryData<Collection[]>(queryKeys.collections()) ?? [])}/gerenciar`)
     } catch (error) {
       toast.error((error as Error).message || 'Não deu para criar a coleção agora. Tenta de novo?')
       setCreating(null)

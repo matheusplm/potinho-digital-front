@@ -3,7 +3,8 @@ import { font } from '../../design-system'
 import type { NoteTypeConfig, RarityConfig } from '../../types/note'
 import { RewardCard } from '../collection/RewardCard'
 import { badgePop, edgeGlow, haloPulse, hueSpin, ringBurst, tremble } from './motion'
-import { CARD_WIDTH, rainbowConic, withAlpha, type RevealItem, type Tier } from './tiers'
+import { withAlpha } from '../../utils/colorUtils'
+import { CARD_WIDTH, rainbowConic, type RevealItem, type Tier } from './tiers'
 
 const GLOW_STRENGTH: Record<Tier, number> = { common: 18, rare: 45, epic: 70, legendary: 90 }
 const RING_MASK = 'radial-gradient(circle, transparent 63%, black 65%, black 69%, transparent 71%)'

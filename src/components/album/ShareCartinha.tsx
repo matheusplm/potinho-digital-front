@@ -285,6 +285,14 @@ async function renderGif(
   return new Blob([gif.bytes().buffer as ArrayBuffer], { type: 'image/gif' })
 }
 
+function downloadBlob(blob: Blob, filename: string) {
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = filename
+  a.click()
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000)
+}
+
 export function ShareCartinha({ reward, rarities, types, theme, sourceRef }: {
   reward: CollectionDailyReward
   rarities: RarityConfig[]
@@ -367,14 +375,14 @@ export function ShareCartinha({ reward, rarities, types, theme, sourceRef }: {
 
       const file = new File([blob], filename, { type: blob.type })
       const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean }
-      if (nav.canShare?.({ files: [file] }) && nav.share) {
-        await nav.share({ files: [file], title: 'Uma cartinha pra você 💌' })
-      } else {
-        const a = document.createElement('a')
-        a.href = URL.createObjectURL(blob)
-        a.download = filename
-        a.click()
-        setTimeout(() => URL.revokeObjectURL(a.href), 1000)
+      const shared = nav.canShare?.({ files: [file] }) && nav.share
+        ? await nav.share({ files: [file], title: 'Uma cartinha pra você 💌' }).then(() => true, (error: Error) => {
+          if (error.name === 'AbortError') throw error
+          return false
+        })
+        : false
+      if (!shared) {
+        downloadBlob(blob, filename)
         toast.success(isGif ? 'GIF baixado! 💌' : 'Imagem baixada! 💌')
       }
       if (imageDropped) toast.info('A imagem desse bilhete vem de um site que não permite cópia, então ela ficou de fora.')

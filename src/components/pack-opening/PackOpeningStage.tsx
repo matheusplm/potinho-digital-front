@@ -10,7 +10,8 @@ import { Button } from '../ui'
 import { cardLeave, cardRise, flash, raysSpin, riseIn, screenShake, spark, stageIn } from './motion'
 import { PackPouch, type PouchState } from './PackPouch'
 import { RevealCard } from './RevealCard'
-import { CARD_WIDTH, paint, rainbowConic, raysFill, revealOrder, showPalette, vibrate, withAlpha, type RevealItem, type RevealStyle, type Tier } from './tiers'
+import { withAlpha } from '../../utils/colorUtils'
+import { CARD_WIDTH, paint, rainbowConic, raysFill, revealOrder, showPalette, vibrate, type RevealItem, type RevealStyle, type Tier } from './tiers'
 
 type Phase = 'intro' | 'waiting' | 'burst' | 'reveal' | 'summary'
 
@@ -110,6 +111,18 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
     timers.current.push(window.setTimeout(fn, ms))
   }, [])
 
+  const clearTimers = useCallback(() => {
+    timers.current.forEach((timer) => window.clearTimeout(timer))
+    timers.current = []
+  }, [])
+
+  const showSummary = useCallback(() => {
+    clearTimers()
+    setShaking(false)
+    setLeaving(false)
+    setPhase('summary')
+  }, [clearTimers])
+
   useEffect(() => {
     if (!open) return
     setPhase('intro')
@@ -119,12 +132,8 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
     setTorn(false)
     setShowFor(null)
     setShaking(false)
-    const pending = timers.current
-    return () => {
-      pending.forEach((timer) => window.clearTimeout(timer))
-      timers.current = []
-    }
-  }, [open])
+    return clearTimers
+  }, [open, clearTimers])
 
   const startBurst = useCallback(() => {
     if (reducedMotion || !items.length) {
@@ -162,8 +171,9 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
   }
 
   function next() {
+    if (leaving) return
     if (index >= items.length - 1) {
-      setPhase('summary')
+      showSummary()
       return
     }
     setLeaving(true)
@@ -176,7 +186,7 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
 
   function handleEscape() {
     if (phase === 'summary') onClose()
-    else if (rewards) setPhase('summary')
+    else if (rewards) showSummary()
   }
 
   function tilt(e: React.PointerEvent) {
@@ -227,7 +237,7 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
               </Box>
             )}
             {showSkip && (
-              <Box component="button" type="button" onClick={() => setPhase('summary')} sx={{
+              <Box component="button" type="button" onClick={showSummary} sx={{
                 all: 'unset', cursor: 'pointer', px: 1.4, py: 0.6, borderRadius: radius.full, fontSize: '0.8rem', fontWeight: 800, color: textColor,
                 background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}`, backdropFilter: 'blur(12px)',
                 '&:focus-visible': { outline: `2px solid ${accent}` },
@@ -340,7 +350,7 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
                 </Stack>}
                 <Stack direction="row" spacing={1} sx={{ width: '100%' }}>
                   {items.length > 1 && (
-                    <Button variant="ghost" onClick={() => setPhase('summary')} sx={{ flex: 1, py: 1.1 }}>
+                    <Button variant="ghost" onClick={showSummary} sx={{ flex: 1, py: 1.1 }}>
                       Ver todos
                     </Button>
                   )}

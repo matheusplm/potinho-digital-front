@@ -23,7 +23,7 @@ import {
   useRevokeAccessMutation,
 } from '../hooks/useNotes'
 import { colors, font, radius } from '../design-system'
-import { slugify } from '../utils/slug'
+import { findCollectionBySlug } from '../utils/slug'
 import { isCollectionOwner } from '../utils/collectionAccess'
 import { formatRemainingTime } from '../utils/packCooldowns'
 import { NoteDetailDialog } from '../components/collection/NoteDetailDialog'
@@ -58,7 +58,7 @@ export function ReaderCollectionPage() {
   const email = decodeURIComponent(encodedEmail)
 
   const { data: collections = [], isLoading: collectionsLoading } = useCollectionsQuery()
-  const collection = collections.find((c) => slugify(c.name) === slug)
+  const collection = findCollectionBySlug(collections, slug)
   const cid = collection?.id ?? ''
   const canManage = collection ? isCollectionOwner(collection, user?.id) : false
 

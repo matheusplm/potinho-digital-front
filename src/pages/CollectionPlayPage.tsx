@@ -14,7 +14,7 @@ import { useUser } from '../context/UserContext'
 import { useSimulation } from '../context/SimulationContext'
 import { useReader } from '../context/ReaderContext'
 import { colors, fadeIn, font, radius } from '../design-system'
-import { slugify } from '../utils/slug'
+import { findCollectionBySlug } from '../utils/slug'
 import { isCollectionOwner } from '../utils/collectionAccess'
 import { noteTypeIdList } from '../utils/noteTypes'
 import { CollectionPanel } from '../components/album/CollectionPanel'
@@ -30,7 +30,7 @@ export function CollectionPlayPage() {
   const reader = useReader()
 
   const { data: collections = [], isLoading: collectionsLoading } = useCollectionsQuery()
-  const collection = collections.find((item) => slugify(item.name) === slug)
+  const collection = findCollectionBySlug(collections, slug)
   const cid = collection?.id ?? ''
   const collectionName = collection?.name
   const notFound = !collectionsLoading && !collection

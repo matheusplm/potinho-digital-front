@@ -14,7 +14,7 @@ import { FloatingParticles } from '../components/FloatingParticles'
 import { useSimulation } from '../context/SimulationContext'
 import { useUser } from '../context/UserContext'
 import { colors, fadeIn, font } from '../design-system'
-import { slugify } from '../utils/slug'
+import { collectionSlug } from '../utils/slug'
 import { isCollectionOwner } from '../utils/collectionAccess'
 import { ApiRequestError } from '../services/api'
 import { COLLECTION_TEMPLATES, createCollectionFromTemplate } from '../services/collectionTemplates'
@@ -90,7 +90,7 @@ export function CollectionsListPage() {
   }
 
   function openCollection(col: Collection) {
-    const slug = slugify(col.name)
+    const slug = collectionSlug(col, collections)
     if (isActive) {
       startSimulation({
         collectionId: col.id,
@@ -117,9 +117,13 @@ export function CollectionsListPage() {
   }
 
   async function handleCreate(data: CollectionFormData) {
-    await createMutation.mutateAsync(data)
-    toast.success('Coleção criada!')
-    setCreateOpen(false)
+    try {
+      await createMutation.mutateAsync(data)
+      toast.success('Coleção criada!')
+      setCreateOpen(false)
+    } catch (error) {
+      toast.error((error as Error).message || 'Erro ao criar a coleção.')
+    }
   }
 
   async function handleKitCreate(template: CollectionTemplate) {
@@ -130,7 +134,7 @@ export function CollectionsListPage() {
       await queryClient.invalidateQueries({ queryKey: queryKeys.collections() })
       toast.success('Coleção pronta! Deixamos bilhetes de exemplo para você editar. 💙')
       setKitToConfirm(null)
-      navigate(`/colecoes/${slugify(collection.name)}/gerenciar`)
+      navigate(`/colecoes/${collectionSlug(collection, queryClient.getQueryData<Collection[]>(queryKeys.collections()) ?? [])}/gerenciar`)
     } catch (error) {
       toast.error((error as Error).message || 'Erro ao criar a coleção.')
     } finally {
@@ -150,9 +154,13 @@ export function CollectionsListPage() {
 
   async function handleUpdate(data: CollectionFormData) {
     if (!editing) return
-    await updateMutation.mutateAsync({ id: editing.id, data })
-    toast.success('Coleção atualizada!')
-    setEditing(null)
+    try {
+      await updateMutation.mutateAsync({ id: editing.id, data })
+      toast.success('Coleção atualizada!')
+      setEditing(null)
+    } catch (error) {
+      toast.error((error as Error).message || 'Erro ao salvar a coleção.')
+    }
   }
 
   async function handleDelete(force = false, confirmName?: string) {
