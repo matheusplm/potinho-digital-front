@@ -64,9 +64,9 @@ export const hover = keyframes`
 `
 
 export const shootingStar = keyframes`
-  0%, 86% { opacity: 0; transform: translate3d(0, 0, 0) rotate(18deg); }
+  0%, 86% { opacity: 0; transform: rotate(18deg) translate3d(0, 0, 0); }
   88%     { opacity: 1; }
-  100%    { opacity: 0; transform: translate3d(75vw, 26vh, 0) rotate(18deg); }
+  100%    { opacity: 0; transform: rotate(18deg) translate3d(90vw, 0, 0); }
 `
 
 export const wander = keyframes`
