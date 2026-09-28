@@ -34,6 +34,22 @@ let authToken = ''
 let redirectingToLogin = false
 let refreshPromise: Promise<string | null> | null = null
 
+const NO_REFRESH_ROUTES = ['/auth/login', '/auth/google', '/auth/register', '/auth/refresh', '/auth/logout']
+
+export interface RefreshedSession {
+  token: string
+  refreshToken?: string
+}
+
+const sessionListeners = new Set<(session: RefreshedSession) => void>()
+
+export function onSessionRefresh(listener: (session: RefreshedSession) => void): () => void {
+  sessionListeners.add(listener)
+  return () => {
+    sessionListeners.delete(listener)
+  }
+}
+
 export class ApiRequestError extends Error {
   constructor(message: string, public status: number, public availableAt?: string, public code?: string, public retryAfterSec?: number) {
     super(message)
@@ -119,8 +135,10 @@ async function tryRefresh(): Promise<string | null> {
       const json = (await readJson(res)) as { data?: { token?: string; refreshToken?: string } } | null
       const data = json?.data ?? (json as { token?: string; refreshToken?: string } | null)
       if (!data?.token) return null
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ ...session, token: data.token, refreshToken: data.refreshToken }))
+      const refreshToken = data.refreshToken ?? session.refreshToken
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ ...session, token: data.token, refreshToken }))
       setAuthToken(data.token)
+      sessionListeners.forEach((listener) => listener({ token: data.token as string, refreshToken }))
       return data.token
     } finally {
       refreshPromise = null
@@ -151,10 +169,17 @@ async function readJson(response: Response): Promise<unknown> {
   }
 }
 
+async function isExpiredSession(response: Response, url: string): Promise<boolean> {
+  if (response.status !== 401 || NO_REFRESH_ROUTES.includes(url)) return false
+  const code = ((await readJson(response.clone())) as { error?: string } | null)?.error
+  if (url.startsWith('/auth/')) return code === 'UNAUTHORIZED'
+  return !code || code === 'UNAUTHORIZED'
+}
+
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
   let response = await send(url, init, authToken)
 
-  if (response.status === 401 && !url.startsWith('/auth/')) {
+  if (await isExpiredSession(response, url)) {
     const newToken = await tryRefresh()
     if (newToken) response = await send(url, init, newToken)
     if (!newToken || response.status === 401) {
@@ -363,6 +388,9 @@ export const api = {
     request<{ success: boolean }>('/api/push/subscribe', { method: 'POST', body: JSON.stringify(data) }),
   unsubscribePush: (endpoint: string) =>
     request<{ success: boolean }>('/api/push/unsubscribe', { method: 'DELETE', body: JSON.stringify({ endpoint }) }),
+  unsubscribePushQuietly: (endpoint: string) => {
+    send('/api/push/unsubscribe', { method: 'DELETE', body: JSON.stringify({ endpoint }) }, authToken).catch(() => {})
+  },
 
   getCollectionAchievements: (cid: string) => request<CollectionAchievement[]>(`/api/collections/${cid}/achievements`),
   getReaderAchievements: (cid: string) => request<ReaderAchievementsResponse>(`/api/collections/${cid}/achievements/me`),

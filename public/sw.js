@@ -3,8 +3,8 @@ self.addEventListener('push', (event) => {
   event.waitUntil(
     self.registration.showNotification(data.title ?? 'Potinho Digital', {
       body: data.body ?? '',
-      icon: '/potinho-icon.svg',
-      badge: '/potinho-icon.svg',
+      icon: '/icon-192.png',
+      badge: '/badge-96.png',
       data: { url: data.url ?? '/home' },
       tag: data.tag ?? 'potinho',
       renotify: true,

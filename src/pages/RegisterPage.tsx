@@ -1,4 +1,3 @@
-import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, CircularProgress, Stack, Typography } from '@mui/material'
 import { useRef, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
@@ -11,7 +10,8 @@ import { GoogleSignInButton } from '../components/GoogleSignInButton'
 import { ScrollHint } from '../components/ui/ScrollHint'
 import { FloatingParticles } from '../components/FloatingParticles'
 import { useBackground } from '../context/BackgroundContext'
-import { colors, fadeSlide, font, gradients } from '../design-system'
+import { BrandLogo, Copyright } from '../components/Brand'
+import { brandAccent, brandGradient, colors, fadeSlide, font, gradients } from '../design-system'
 
 const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined
 
@@ -122,16 +122,16 @@ export function RegisterPage() {
       <FloatingParticles />
 
       <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 3, py: 5, animation: `${fadeSlide} 0.5s ease both` }} spacing={0}>
-        <FavoriteIcon sx={{ fontSize: 52, color: colors.primary.text, filter: 'drop-shadow(0 4px 16px rgba(29,78,216,0.4))', mb: 3 }} />
+        <BrandLogo size={72} sx={{ mb: 3 }} />
 
         <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2.8rem', lineHeight: 1, color: colors.text.primary, textAlign: 'center', letterSpacing: '-0.5px' }}>
           Criar
         </Typography>
-        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2.8rem', lineHeight: 1, color: colors.primary.text, textAlign: 'center', letterSpacing: '-0.5px', mb: 1.5 }}>
+        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2.8rem', lineHeight: 1.05, textAlign: 'center', letterSpacing: '-0.5px', mb: 1.5, ...brandAccent() }}>
           Conta
         </Typography>
 
-        <Box sx={{ width: 40, height: 3, borderRadius: 2, background: 'linear-gradient(90deg, #1d4ed8, #e11d48)', mb: 4 }} />
+        <Box sx={{ width: 40, height: 3, borderRadius: 2, background: brandGradient(), mb: 4 }} />
 
         <Box sx={{ width: '100%', maxWidth: 320 }}>
           <GoogleSignInButton onCredential={handleGoogle} disabled={loading} />
@@ -197,6 +197,7 @@ export function RegisterPage() {
           Já tem conta?{' '}
           <Link to="/login" style={{ color: colors.primary.text, fontWeight: 700, textDecoration: 'none' }}>Entrar</Link>
         </Typography>
+        <Copyright sx={{ mt: 4 }} />
       </Stack>
       <ScrollHint />
     </Box>

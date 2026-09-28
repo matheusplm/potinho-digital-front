@@ -31,3 +31,19 @@ export function uniqueConfigId(label: string, existingIds: string[]): string {
 export function isHexColor(value: string): boolean {
   return /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(value)
 }
+
+interface SluggedCollection {
+  id: string
+  name: string
+}
+
+export function collectionSlug(collection: SluggedCollection, all: SluggedCollection[]): string {
+  const base = slugify(collection.name)
+  const shared = all.some((other) => other.id !== collection.id && slugify(other.name) === base)
+  return shared ? `${base}-${collection.id.replace(/[^a-z0-9]/gi, '').slice(-6).toLowerCase()}` : base
+}
+
+export function findCollectionBySlug<T extends SluggedCollection>(all: T[], slug: string | undefined): T | undefined {
+  if (!slug) return undefined
+  return all.find((item) => collectionSlug(item, all) === slug) ?? all.find((item) => slugify(item.name) === slug)
+}

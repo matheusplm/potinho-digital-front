@@ -2,7 +2,8 @@ import { Box, Typography } from '@mui/material'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { font } from '../../design-system'
 import { foilSweep, hintSlide, pouchEnter, pouchExit, pouchFloat, pouchShake, stripFly } from './motion'
-import { vibrate, withAlpha } from './tiers'
+import { withAlpha } from '../../utils/colorUtils'
+import { vibrate } from './tiers'
 
 export type PouchState = 'idle' | 'torn' | 'waiting' | 'exit'
 

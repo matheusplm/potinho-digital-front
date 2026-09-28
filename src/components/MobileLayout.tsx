@@ -21,7 +21,7 @@ import { useSimulation } from '../context/SimulationContext'
 import { useReader } from '../context/ReaderContext'
 import { useBackground } from '../context/BackgroundContext'
 import { useCollectionsQuery, useMyNotificationsQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
-import { slugify } from '../utils/slug'
+import { collectionSlug } from '../utils/slug'
 import { isCollectionReader } from '../utils/collectionAccess'
 import { colors, radius } from '../design-system'
 
@@ -66,7 +66,7 @@ export function MobileLayout() {
     const readerCollections = collections.filter((c) => isCollectionReader(c, user?.id))
     return readerCollections.find((c) => c.id === activeCollectionId) ?? readerCollections[0]
   }, [isReader, collections, activeCollectionId, user?.id])
-  const readerAlbumPath = readerActive ? `/colecoes/${slugify(readerActive.name)}` : '/home'
+  const readerAlbumPath = readerActive ? `/colecoes/${collectionSlug(readerActive, collections)}` : '/home'
 
   const { data: myNotifications = [] } = useMyNotificationsQuery({ enabled: isReader })
   const hasUnreadNotifications = useMemo(() => myNotifications.some((n) => !n.readAt), [myNotifications])

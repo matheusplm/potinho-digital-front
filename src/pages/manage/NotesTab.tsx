@@ -57,12 +57,14 @@ const DEFAULT_IMPORT_JSON = `[
   }
 ]`
 
+const NO_NOTES: NoteRecord[] = []
+
 interface NotesTabProps { cid: string }
 
 export function NotesTab({ cid }: NotesTabProps) {
   const { theme, maskLightCards } = useBackground()
   const maskCards = theme.isDark && maskLightCards
-  const { data: notes = [], isLoading: notesLoading } = useCollectionNotesQuery(cid)
+  const { data: notes = NO_NOTES, isLoading: notesLoading } = useCollectionNotesQuery(cid)
   const { data: rarities = [] } = useCollectionRaritiesQuery(cid)
   const { data: types = [] } = useCollectionTypesQuery(cid)
   const disableNote = useDisableCollectionNoteMutation(cid)
@@ -89,7 +91,10 @@ export function NotesTab({ cid }: NotesTabProps) {
   const trashedNotes = useMemo(() => notes.filter((n) => n.disabledAt), [notes])
 
   useEffect(() => {
-    setSelectedDraftIds((current) => current.filter((id) => draftNotes.some((n) => n.id === id)))
+    setSelectedDraftIds((current) => {
+      const kept = current.filter((id) => draftNotes.some((n) => n.id === id))
+      return kept.length === current.length ? current : kept
+    })
     if (draftNotes.length === 0) setStatusView('live')
   }, [draftNotes])
 

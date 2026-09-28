@@ -1,4 +1,3 @@
-import FavoriteIcon from '@mui/icons-material/Favorite'
 import HomeIcon from '@mui/icons-material/Home'
 import Inventory2Icon from '@mui/icons-material/Inventory2'
 import AutoStoriesOutlinedIcon from '@mui/icons-material/AutoStoriesOutlined'
@@ -33,7 +32,8 @@ import { useBackground } from '../context/BackgroundContext'
 import { ThemeSwatches } from './ThemeSwatches'
 import { useCollectionsQuery, useMyNotificationsQuery, usePendingInvitesQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
 import { backgroundThemes, colors, font, radius } from '../design-system'
-import { slugify } from '../utils/slug'
+import { collectionSlug } from '../utils/slug'
+import { BrandMark, Copyright } from './Brand'
 import { isCollectionReader, personaCapabilities } from '../utils/collectionAccess'
 
 const SIDEBAR_W = 240
@@ -87,7 +87,7 @@ export function DesktopLayout() {
     return readerCollections.find((c) => c.id === activeCollectionId) ?? readerCollections[0]
   }, [isReader, readerCollections, activeCollectionId])
 
-  const readerAlbumPath = readerActive ? `/colecoes/${slugify(readerActive.name)}` : '/home'
+  const readerAlbumPath = readerActive ? `/colecoes/${collectionSlug(readerActive, collections)}` : '/home'
 
   const { data: myNotifications = [] } = useMyNotificationsQuery({ enabled: isReader })
   const hasUnreadNotifications = useMemo(() => myNotifications.some((n) => !n.readAt), [myNotifications])
@@ -159,19 +159,7 @@ export function DesktopLayout() {
         scrollbarWidth: 'thin',
       }}>
 
-        {/* Brand */}
-        <Stack direction="row" spacing={1.4} alignItems="center" sx={{ px: 2, pt: 2.5, pb: 2 }}>
-          <Box sx={{
-            width: 36, height: 36, borderRadius: radius.lg, flexShrink: 0,
-            background: `linear-gradient(135deg, ${colors.primary.main}, ${theme.accent})`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <FavoriteIcon sx={{ fontSize: 17, color: '#fff' }} />
-          </Box>
-          <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: theme.textOnBg, lineHeight: 1.2 }}>
-            Potinho Digital
-          </Typography>
-        </Stack>
+        <BrandMark logo={36} size="1.2rem" color={theme.textOnBg} mutedColor={theme.textOnBgMuted} tagline sx={{ px: 2, pt: 2.5, pb: 2 }} />
 
         <Divider sx={{ borderColor: theme.surfaceBorder }} />
 
@@ -483,7 +471,7 @@ export function DesktopLayout() {
         </Box>
 
         {/* Logout */}
-        <Box sx={{ px: 2, pb: 2.5 }}>
+        <Box sx={{ px: 2, pb: 1.5 }}>
           <Stack
             direction="row" spacing={1.1} alignItems="center"
             onClick={logout}
@@ -504,6 +492,7 @@ export function DesktopLayout() {
             </Typography>
           </Stack>
         </Box>
+        <Copyright color={theme.textOnBgMuted} sx={{ px: 2, pb: 2 }} />
       </Box>
 
       {/* ── Content area ── */}

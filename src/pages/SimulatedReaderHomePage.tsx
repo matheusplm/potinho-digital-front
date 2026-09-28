@@ -34,7 +34,7 @@ import { computeAchievements } from '../utils/achievements'
 import { NoteDetailDialog, type ReadableNote } from '../components/collection/NoteDetailDialog'
 import { PackOpeningStage } from '../components/pack-opening/PackOpeningStage'
 import type { CollectionDailyReward, CollectionPack } from '../types/note'
-import { slugify } from '../utils/slug'
+import { collectionSlug } from '../utils/slug'
 import { MainPackButton } from './home/MainPackButton'
 import { BonusPackRow } from './home/BonusPackRow'
 import { BonusPackDialog } from './home/BonusPackDialog'
@@ -78,7 +78,7 @@ export function SimulatedReaderHomePage() {
 
   const activeSession = session ?? (readerCollection ? {
     collectionId: readerCollection.id,
-    collectionSlug: slugify(readerCollection.name),
+    collectionSlug: collectionSlug(readerCollection, collections),
     collectionName: readerCollection.name,
     collectionEmoji: readerCollection.emoji,
     preset: 'new_reader' as const,

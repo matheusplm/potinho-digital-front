@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { api } from '../services/api'
+import { forgetPushEndpoint, pushSupported, registerPushSubscription } from '../services/pushSubscription'
 import { isNotificationOptedOut } from '../utils/notifications'
 
 type PushState = 'unsupported' | 'default' | 'granted' | 'denied'
@@ -28,7 +29,7 @@ export function usePush() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+    if (!pushSupported()) {
       setState('unsupported')
       return
     }
@@ -40,16 +41,12 @@ export function usePush() {
       if (!vapidKey) return
       getSwRegistration().then(async (reg) => {
         if (!reg) return
-        const existing = await reg.pushManager.getSubscription()
-        if (existing) return
+        if (await reg.pushManager.getSubscription()) return
         const sub = await reg.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: urlBase64ToUint8Array(vapidKey) as unknown as BufferSource,
         })
-        const json = sub.toJSON()
-        if (json.endpoint && json.keys) {
-          await api.subscribePush({ endpoint: json.endpoint, keys: json.keys as { p256dh: string; auth: string } })
-        }
+        await registerPushSubscription(sub)
       }).catch(() => {})
     }
   }, [])
@@ -74,13 +71,7 @@ export function usePush() {
         applicationServerKey: urlBase64ToUint8Array(vapidKey) as unknown as BufferSource,
       })
 
-      const json = sub.toJSON()
-      if (json.endpoint && json.keys) {
-        await api.subscribePush({
-          endpoint: json.endpoint,
-          keys: json.keys as { p256dh: string; auth: string },
-        })
-      }
+      await registerPushSubscription(sub)
     } catch {
       void 0
     } finally {
@@ -96,6 +87,7 @@ export function usePush() {
       if (!sub) return
       await api.unsubscribePush(sub.endpoint).catch(() => {})
       await sub.unsubscribe()
+      forgetPushEndpoint()
       setState('default')
     } catch {
       void 0

@@ -1,5 +1,4 @@
 import LogoutIcon from '@mui/icons-material/Logout'
-import FavoriteIcon from '@mui/icons-material/Favorite'
 import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined'
 import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined'
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
@@ -23,6 +22,7 @@ import { ThemeSwatches } from './ThemeSwatches'
 import { useReader } from '../context/ReaderContext'
 import { useSimulation } from '../context/SimulationContext'
 import { useCollectionsQuery, usePendingInvitesQuery } from '../hooks/useNotes'
+import { BrandLogo, Copyright } from './Brand'
 import { backgroundThemes, colors, font, menuIn, radius } from '../design-system'
 
 export function FloatingMenu() {
@@ -112,13 +112,7 @@ export function FloatingMenu() {
             transformOrigin: 'top right',
           }}>
             <Stack direction="row" spacing={1.2} sx={{ alignItems: 'center', px: 1.8, pt: 1.8, pb: 1.5 }}>
-              <Box sx={{
-                width: 38, height: 38, borderRadius: radius.md, flexShrink: 0,
-                background: `linear-gradient(135deg, ${colors.primary.main}, ${theme.accent})`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <FavoriteIcon sx={{ fontSize: 17, color: '#fff' }} />
-              </Box>
+              <BrandLogo size={38} />
               <Box sx={{ minWidth: 0 }}>
                 <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 700, color: theme.textOnBg, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {user?.name?.split(' ')[0]}
@@ -385,6 +379,7 @@ export function FloatingMenu() {
                 </Typography>
               </Stack>
             </Box>
+            <Copyright color={theme.textOnBgMuted} sx={{ px: 1.5, pb: 1.5 }} />
           </Box>
         )}
       </Box>

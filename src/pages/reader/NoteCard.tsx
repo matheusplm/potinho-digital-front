@@ -2,7 +2,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, Stack, Typography } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { colors, ink, radius } from '../../design-system'
-import { themedCardBg } from '../../utils/colorUtils'
+import { themedCardBg, withAlpha } from '../../utils/colorUtils'
 import { linkifyText } from '../../utils/linkify'
 import { useBackground } from '../../context/BackgroundContext'
 import type { CollectionNoteView, RarityConfig } from '../../types/note'
@@ -75,7 +75,7 @@ export function NoteCard({ note, rarity, onClick }: { note: CollectionNoteView; 
           </Stack>
           {rarity && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <Box sx={{ width: 7, height: 7, borderRadius: radius.full, background: rarity.cardBg, flexShrink: 0, boxShadow: `0 0 5px ${rarity.glowColor ?? rarity.borderColor}` }} />
+              <Box sx={{ width: 7, height: 7, borderRadius: radius.full, background: rarity.cardBg, flexShrink: 0, boxShadow: `0 0 5px ${rarity.glowColor || rarity.borderColor}` }} />
               <Typography variant="label" sx={{ color: rarity.captionColor ?? ink.muted }}>
                 {rarity.emoji} {rarity.label}
               </Typography>
@@ -83,7 +83,7 @@ export function NoteCard({ note, rarity, onClick }: { note: CollectionNoteView; 
           )}
           {note.message && (
             <Typography variant="xs" sx={{
-              color: rarity?.textColor ? `${rarity.textColor}99` : ink.secondary,
+              color: rarity?.textColor ? withAlpha(rarity.textColor, 60) : ink.secondary,
               lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', whiteSpace: 'pre-line',
             }}>
               {linkifyText(note.message)}
@@ -102,7 +102,7 @@ export function NoteRow({ note, rarity, onClick }: { note: CollectionNoteView; r
       <Box sx={{ position: 'relative', zIndex: 1 }}>
         <Stack direction="row" alignItems="center" spacing={1.2}>
           {rarity && (
-            <Box sx={{ width: 9, height: 9, borderRadius: radius.full, background: rarity.cardBg, flexShrink: 0, boxShadow: `0 0 7px ${rarity.glowColor ?? rarity.borderColor}88` }} />
+            <Box sx={{ width: 9, height: 9, borderRadius: radius.full, background: rarity.cardBg, flexShrink: 0, boxShadow: `0 0 7px ${withAlpha(rarity.glowColor || rarity.borderColor, 53)}` }} />
           )}
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <Typography variant="md" sx={{ fontWeight: 700, color: rarity?.textColor ?? ink.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

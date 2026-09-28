@@ -1,4 +1,3 @@
-import FavoriteIcon from '@mui/icons-material/Favorite'
 import AutoStoriesOutlinedIcon from '@mui/icons-material/AutoStoriesOutlined'
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined'
 import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined'
@@ -19,6 +18,7 @@ import { FloatingParticles } from '../components/FloatingParticles'
 import { AUDIENCES, CUSTOMIZATIONS, DEMO_NOTES, FEATURES, RARITY_COLOR, RARITY_FILTERS, STEPS } from './landing/landingData'
 import { SectionTitle } from './landing/SectionTitle'
 import { DemoNoteCard } from './landing/DemoNoteCard'
+import { BrandLogo, BrandMark, BrandName, Copyright } from '../components/Brand'
 import { HeroCardStack } from './landing/HeroCardStack'
 
 export function LandingPage() {
@@ -83,16 +83,8 @@ export function LandingPage() {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <Stack direction="row" spacing={1.2} alignItems="center">
-          <Box sx={{
-            width: 32, height: 32, borderRadius: radius.md, flexShrink: 0,
-            background: 'linear-gradient(135deg,#1d4ed8,#e11d48)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <FavoriteIcon sx={{ fontSize: 15, color: '#fff' }} />
-          </Box>
-          <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, whiteSpace: 'nowrap', '@media (max-width: 359.98px)': { fontSize: '0.92rem' } }}>
-            Potinho Digital
-          </Typography>
+          <BrandLogo size={32} />
+          <BrandName size="1.1rem" sx={{ '@media (max-width: 359.98px)': { fontSize: '0.95rem' } }} />
         </Stack>
         <Stack direction="row" spacing={isDesktop ? 1 : 0.75} alignItems="center">
           <ThemeButton />
@@ -446,10 +438,9 @@ export function LandingPage() {
           </Box>
         </Box>
 
-        {/* CTA */}
         <Box sx={{ pb: isDesktop ? 10 : 8, px: isDesktop ? 5 : 2.5 }}>
           <Box sx={{ maxWidth: isDesktop ? 640 : 480, mx: 'auto', background: colors.glass.card, backdropFilter: 'blur(18px)', border: `1.5px solid ${colors.glass.cardBorder}`, borderRadius: radius.xl, p: isDesktop ? 5 : 3.5, textAlign: 'center' }}>
-            <FavoriteIcon sx={{ fontSize: isDesktop ? 44 : 36, color: colors.rose.main, mb: 1.5, filter: 'drop-shadow(0 4px 14px rgba(225,29,72,0.4))' }} />
+            <BrandLogo size={isDesktop ? 64 : 56} sx={{ mx: 'auto', mb: 1.5 }} />
             <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: isDesktop ? '1.9rem' : '1.55rem', color: colors.text.primary, mb: 0.8 }}>
               Pronto para começar?
             </Typography>
@@ -479,7 +470,8 @@ export function LandingPage() {
               ✓ Gratuito &nbsp;·&nbsp; ✓ Sem cartão de crédito
             </Typography>
           </Box>
-          <Box component="footer" sx={{ mt: 4, textAlign: 'center' }}>
+          <Box component="footer" sx={{ mt: 5, textAlign: 'center' }}>
+            <BrandMark logo={40} size="1.3rem" tagline sx={{ justifyContent: 'center', mb: 2 }} />
             <Typography variant="sm" sx={{ color: colors.text.muted, fontStyle: 'italic', mb: 1.2 }}>
               Feito com ❤️ para guardar o que importa.
             </Typography>
@@ -522,6 +514,8 @@ export function LandingPage() {
                 </IconButton>
               </Tooltip>
             </Stack>
+            <Box sx={{ height: '1px', maxWidth: 280, mx: 'auto', my: 2, background: colors.border.subtle }} />
+            <Copyright />
           </Box>
         </Box>
 

@@ -6,9 +6,11 @@ import type { NotifyDraft } from '../../components/manage/NotifyComposer'
 import { useReleaseNotesMutation, useCollectionPacksQuery, useCollectionAccessQuery, useAddPackOpensMutation } from '../../hooks/useNotes'
 import { useBackground } from '../../context/BackgroundContext'
 import { colors, font, radius } from '../../design-system'
-import type { NoteRecord, RarityConfig } from '../../types/note'
+import type { CollectionAccess, NoteRecord, RarityConfig } from '../../types/note'
 
 const CHIP_PREVIEW_LIMIT = 6
+
+const NO_ACCESSES: CollectionAccess[] = []
 
 export function ReleaseDialog({ cid, notes, rarities, open, onClose }: {
   cid: string
@@ -21,7 +23,7 @@ export function ReleaseDialog({ cid, notes, rarities, open, onClose }: {
   const releaseMutation = useReleaseNotesMutation(cid)
   const addPackOpensMutation = useAddPackOpensMutation(cid)
   const { data: packs = [] } = useCollectionPacksQuery(cid)
-  const { data: accesses = [] } = useCollectionAccessQuery(cid)
+  const { data: accesses = NO_ACCESSES } = useCollectionAccessQuery(cid)
   const [notify, setNotify] = useState<NotifyDraft>(EMPTY_NOTIFY_DRAFT)
   const [giveBonus, setGiveBonus] = useState(false)
   const [bonusPackId, setBonusPackId] = useState('')

@@ -1,7 +1,8 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { api, setAuthToken } from '../services/api'
+import { api, onSessionRefresh, setAuthToken } from '../services/api'
 import { clearAdminSession } from '../services/adminSession'
+import { attachExistingPush, detachPushFromSession } from '../services/pushSubscription'
 
 export type UserRole = 'writer' | 'reader'
 export type Persona = UserRole | 'admin'
@@ -91,9 +92,18 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     clearAdminSession(true)
+    detachPushFromSession()
     if (user?.refreshToken) api.logout(user.refreshToken)
     setUser(null)
   }
+
+  useEffect(() => onSessionRefresh(({ token, refreshToken }) => {
+    setUserState((current) => (current ? { ...current, token, refreshToken } : current))
+  }), [])
+
+  useEffect(() => {
+    if (user?.id) attachExistingPush().catch(() => {})
+  }, [user?.id])
 
   useEffect(() => {
     const token = user?.token

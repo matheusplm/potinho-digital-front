@@ -9,6 +9,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { api, ApiRequestError } from '../services/api'
 import { Button, ConfirmDeleteDialog, toast } from '../components/ui'
+import { BrandMark } from '../components/Brand'
 import { colors, fadeSlide, floatHeart, font, gradients, radius, shimmer, ink } from '../design-system'
 
 const HEARTS = [
@@ -86,14 +87,7 @@ function ShowcasePanel() {
       <Box sx={{ position: 'absolute', top: -70, right: -70, width: 220, height: 220, borderRadius: '50%', background: 'radial-gradient(circle, rgba(29,78,216,0.14) 0%, transparent 70%)', pointerEvents: 'none' }} />
       <Box sx={{ position: 'absolute', bottom: -60, left: -60, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(225,29,72,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ position: 'relative', zIndex: 1 }}>
-        <Box sx={{ width: 30, height: 30, borderRadius: '9px', background: 'linear-gradient(135deg,#1d4ed8,#e11d48)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-          <FavoriteIcon sx={{ fontSize: 15, color: '#fff' }} />
-        </Box>
-        <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: ink.primary }}>
-          Potinho Digital
-        </Typography>
-      </Stack>
+      <BrandMark logo={30} size="1.05rem" color={ink.primary} onLight sx={{ position: 'relative', zIndex: 1 }} />
 
       <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', py: { xs: 2, md: 0 } }}>
         <Box sx={{ position: 'relative', width: 216, height: { xs: 128, md: 150 } }}>

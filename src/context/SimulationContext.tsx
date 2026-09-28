@@ -1,4 +1,5 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useUser } from './UserContext'
 import type { CollectionDailyReward, CollectionDailyStatus, CollectionPlayView, NoteRecord } from '../types/note'
 import { buildSimulatedPlayView } from '../utils/simulationPlay'
 
@@ -58,6 +59,15 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
     setFavorites({})
     setDaily(defaultDailyStatus())
   }, [])
+
+  const { user } = useUser()
+  const userId = user?.id ?? null
+  const lastUserId = useRef(userId)
+  useEffect(() => {
+    if (lastUserId.current === userId) return
+    lastUserId.current = userId
+    endSimulation()
+  }, [userId, endSimulation])
 
   const isSimulatingCollection = useCallback(
     (collectionId: string) => session?.collectionId === collectionId,

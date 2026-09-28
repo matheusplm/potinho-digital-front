@@ -1,4 +1,5 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useUser } from './UserContext'
 
 const ACTIVE_KEY = 'potinho-active-collection'
 
@@ -24,6 +25,16 @@ export function ReaderProvider({ children }: { children: ReactNode }) {
     else localStorage.removeItem(ACTIVE_KEY)
     setActiveState(id)
   }, [])
+
+  const { user } = useUser()
+  const userId = user?.id ?? null
+  const lastUserId = useRef(userId)
+  useEffect(() => {
+    if (lastUserId.current === userId) return
+    lastUserId.current = userId
+    setUnreadByCollection({})
+    setActiveCollectionId(null)
+  }, [userId, setActiveCollectionId])
 
   const unreadFor = useCallback(
     (collectionId: string) => unreadByCollection[collectionId] ?? [],
