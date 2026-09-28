@@ -41,7 +41,7 @@ export function WriterHomePage() {
 
       <ScrollablePage sx={{ px: 2.5, py: 2.5, gap: 3, animation: `${fadeIn} 0.4s ease` }}>
         <Stack spacing={0.3}>
-          <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBgMuted, fontWeight: 500 }}>
+          <Typography variant="md" sx={{ color: theme.textOnBgMuted, fontWeight: 500 }}>
             {greeting},
           </Typography>
           <Typography sx={{
@@ -51,7 +51,7 @@ export function WriterHomePage() {
           }}>
             {firstName} 💙
           </Typography>
-          <Typography sx={{ fontSize: '0.85rem', color: theme.textOnBgMuted, fontStyle: 'italic', mt: 0.5 }}>
+          <Typography variant="lg" sx={{ color: theme.textOnBgMuted, fontStyle: 'italic', mt: 0.5 }}>
             {ownedCount > 0 ? 'suas coleções estão esperando por você' : 'que tal criar sua primeira coleção?'}
           </Typography>
         </Stack>
@@ -65,7 +65,7 @@ export function WriterHomePage() {
               <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.05rem', color: colors.text.primary, lineHeight: 1.2 }}>
                 Minhas coleções
               </Typography>
-              <Typography sx={{ fontSize: '0.78rem', color: colors.text.secondary }}>
+              <Typography variant="md" sx={{ color: colors.text.secondary }}>
                 {ownedCount > 0 ? `${ownedCount} ${ownedCount === 1 ? 'coleção criada' : 'coleções criadas'}` : 'Crie sua primeira coleção'}
               </Typography>
             </Box>

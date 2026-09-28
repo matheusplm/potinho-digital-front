@@ -1,6 +1,6 @@
 import { Box, Dialog, DialogActions, DialogContent, Stack, TextField, Typography } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
-import { Button, toast } from '../../components/ui'
+import { Button, OptionTile, toast } from '../../components/ui'
 import { NotifyComposer, ToggleRow, EMPTY_NOTIFY_DRAFT, notifyDraftToConfig } from '../../components/manage/NotifyComposer'
 import type { NotifyDraft } from '../../components/manage/NotifyComposer'
 import { useReleaseNotesMutation, useCollectionPacksQuery, useCollectionAccessQuery, useAddPackOpensMutation } from '../../hooks/useNotes'
@@ -91,7 +91,7 @@ export function ReleaseDialog({ cid, notes, rarities, open, onClose }: {
             <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.15rem', color: colors.text.primary, lineHeight: 1.2 }}>
               Lançar {count} bilhete{count === 1 ? '' : 's'}
             </Typography>
-            <Typography sx={{ fontSize: '0.76rem', color: colors.text.secondary, mt: 0.2 }}>
+            <Typography variant="sm" sx={{ color: colors.text.secondary, mt: 0.2 }}>
               Eles entram no sorteio e aparecem pros leitores. 🔒 Sem volta depois.
             </Typography>
           </Box>
@@ -109,8 +109,8 @@ export function ReleaseDialog({ cid, notes, rarities, open, onClose }: {
                   px: 1.1, py: 0.45, borderRadius: radius.full,
                   background: colors.surface.overlay, border: `1px solid ${r?.borderColor ?? colors.border.subtle}`,
                 }}>
-                  <Typography sx={{ fontSize: '0.74rem', flexShrink: 0 }}>{r?.emoji ?? '💌'}</Typography>
-                  <Typography sx={{ fontSize: '0.74rem', fontWeight: 700, color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <Typography variant="sm" sx={{ flexShrink: 0 }}>{r?.emoji ?? '💌'}</Typography>
+                  <Typography variant="sm" sx={{ fontWeight: 700, color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {note.title}
                   </Typography>
                 </Box>
@@ -121,7 +121,7 @@ export function ReleaseDialog({ cid, notes, rarities, open, onClose }: {
                 display: 'inline-flex', alignItems: 'center', px: 1.1, py: 0.45, borderRadius: radius.full,
                 background: `${theme.accent}14`, border: `1px solid ${theme.accent}30`,
               }}>
-                <Typography sx={{ fontSize: '0.74rem', fontWeight: 800, color: theme.accent }}>
+                <Typography variant="sm" sx={{ fontWeight: 800, color: theme.accent }}>
                   +{remaining} bilhete{remaining === 1 ? '' : 's'}
                 </Typography>
               </Box>
@@ -151,29 +151,20 @@ export function ReleaseDialog({ cid, notes, rarities, open, onClose }: {
             {giveBonus && (
               <Stack spacing={1.6} sx={{ pl: 0.3 }}>
                 {bonusPacks.length === 0 ? (
-                  <Typography sx={{ fontSize: '0.76rem', color: colors.text.muted }}>
+                  <Typography variant="sm" sx={{ color: colors.text.muted }}>
                     Você ainda não tem pacotes elegíveis pra brinde (crie um em Pacotes).
                   </Typography>
                 ) : (
                   <>
                     <Box>
-                      <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: colors.text.secondary, mb: 0.7 }}>
+                      <Typography variant="sm" sx={{ fontWeight: 800, color: colors.text.secondary, mb: 0.7 }}>
                         Qual pacote?
                       </Typography>
                       <Stack direction="row" spacing={0.7} sx={{ flexWrap: 'wrap', rowGap: 0.7 }}>
                         {bonusPacks.map((pack) => {
                           const active = bonusPackId === pack.id
                           return (
-                            <Box key={pack.id} onClick={() => setBonusPackId(pack.id)} sx={{
-                              px: 1.2, py: 0.6, borderRadius: radius.lg, cursor: 'pointer',
-                              background: active ? `${colors.primary.main}14` : 'rgba(0,0,0,0.04)',
-                              border: `1.5px solid ${active ? colors.primary.main : 'transparent'}`,
-                              transition: 'all 0.14s',
-                            }}>
-                              <Typography sx={{ fontSize: '0.8rem', fontWeight: 800, color: active ? colors.primary.main : colors.text.secondary }}>
-                                {pack.emoji} {pack.name}
-                              </Typography>
-                            </Box>
+                            <OptionTile key={pack.id} active={active} layout="row" size="md" title={`${pack.emoji} ${pack.name}`} onClick={() => setBonusPackId(pack.id)} sx={{ px: 1.2, py: 0.6 }} />
                           )
                         })}
                       </Stack>
@@ -192,23 +183,14 @@ export function ReleaseDialog({ cid, notes, rarities, open, onClose }: {
 
                     {accesses.length > 1 && (
                       <Box>
-                        <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: colors.text.secondary, mb: 0.7 }}>
+                        <Typography variant="sm" sx={{ fontWeight: 800, color: colors.text.secondary, mb: 0.7 }}>
                           Para quem?
                         </Typography>
                         <Stack direction="row" spacing={0.7} sx={{ flexWrap: 'wrap', rowGap: 0.7 }}>
                           {accesses.map((access) => {
                             const active = bonusEmails.includes(access.email)
                             return (
-                              <Box key={access.email} onClick={() => toggleBonusEmail(access.email)} sx={{
-                                px: 1.2, py: 0.6, borderRadius: radius.lg, cursor: 'pointer',
-                                background: active ? `${colors.primary.main}14` : 'rgba(0,0,0,0.04)',
-                                border: `1.5px solid ${active ? colors.primary.main : 'transparent'}`,
-                                transition: 'all 0.14s',
-                              }}>
-                                <Typography sx={{ fontSize: '0.8rem', fontWeight: 800, color: active ? colors.primary.main : colors.text.secondary }}>
-                                  {access.email}
-                                </Typography>
-                              </Box>
+                              <OptionTile key={access.email} active={active} layout="row" size="md" title={access.email} onClick={() => toggleBonusEmail(access.email)} sx={{ px: 1.2, py: 0.6 }} />
                             )
                           })}
                         </Stack>

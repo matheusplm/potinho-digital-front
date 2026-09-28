@@ -78,7 +78,7 @@ export function FloatingMenu() {
             backdropFilter: 'blur(12px)',
             boxShadow: open ? `0 4px 16px ${theme.accent}55` : '0 2px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.08)',
             border: `1px solid ${theme.surfaceBorder}`,
-            color: open ? '#fff' : theme.textOnBg,
+            color: open ? theme.onAccent : theme.textOnBg,
             transition: 'all 0.2s cubic-bezier(0.16,1,0.3,1)',
             '&:hover': { bgcolor: open ? theme.accent : theme.isDark ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,1)' },
           }}
@@ -120,10 +120,10 @@ export function FloatingMenu() {
                 <FavoriteIcon sx={{ fontSize: 17, color: '#fff' }} />
               </Box>
               <Box sx={{ minWidth: 0 }}>
-                <Typography sx={{ fontFamily: font.serif, fontSize: '0.92rem', fontWeight: 700, color: theme.textOnBg, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 700, color: theme.textOnBg, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {user?.name?.split(' ')[0]}
                 </Typography>
-                <Typography sx={{ fontSize: '0.68rem', color: theme.textOnBgMuted, lineHeight: 1.2 }}>
+                <Typography variant="xs" sx={{ color: theme.textOnBgMuted, lineHeight: 1.2 }}>
                   {persona === 'writer' ? 'escritor' : persona === 'admin' ? 'admin' : 'leitor'}
                 </Typography>
               </Box>
@@ -133,7 +133,7 @@ export function FloatingMenu() {
 
             {(canSwitch || canWriter || canReader || user?.isAdmin) && (
               <Box sx={{ px: 1.8, py: 1.4 }}>
-                <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.6, color: theme.textOnBgMuted, textTransform: 'uppercase', mb: 1 }}>
+                <Typography variant="label" sx={{ color: theme.textOnBgMuted, mb: 1 }}>
                   Modo de uso
                 </Typography>
                 <Stack direction="row" spacing={0.6}>
@@ -156,14 +156,14 @@ export function FloatingMenu() {
                           background: active ? `${theme.accent}12` : 'transparent',
                           opacity: enabled ? 1 : 0.4,
                           transition: 'background 0.12s, border-color 0.12s',
-                          '&:hover': enabled ? { background: active ? `${theme.accent}18` : theme.isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.03)' } : undefined,
+                          '&:hover': enabled ? { background: active ? `${theme.accent}18` : colors.fill.subtle } : undefined,
                         }}
                       >
                         {showInviteDot && (
                           <Box sx={{ position: 'absolute', top: -3, right: -3, width: 10, height: 10, borderRadius: '50%', background: '#ef4444', border: '2px solid #fff', boxShadow: '0 1px 4px rgba(239,68,68,0.5)' }} />
                         )}
                         {icon}
-                        <Typography sx={{ fontSize: '0.78rem', fontWeight: active ? 800 : 600, color: active ? theme.accent : theme.textOnBgMuted }}>
+                        <Typography variant="md" sx={{ fontWeight: active ? 800 : 600, color: active ? theme.accent : theme.textOnBgMuted }}>
                           {label}
                         </Typography>
                       </Box>
@@ -187,7 +187,7 @@ export function FloatingMenu() {
                 <Box sx={{ px: 1.8, py: 1.4 }}>
                   <Stack direction="row" spacing={0.6} sx={{ alignItems: 'center', mb: 1.1 }}>
                     <SwapHorizIcon sx={{ fontSize: 14, color: theme.textOnBgMuted }} />
-                    <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.6, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
+                    <Typography variant="label" sx={{ color: theme.textOnBgMuted }}>
                       Seus potinhos
                     </Typography>
                   </Stack>
@@ -207,7 +207,7 @@ export function FloatingMenu() {
                             border: `1.5px solid ${active ? `${theme.accent}66` : 'transparent'}`,
                             background: active ? `${theme.accent}10` : 'transparent',
                             transition: 'background 0.12s, border-color 0.12s',
-                            '&:hover': { background: active ? `${theme.accent}16` : theme.isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.035)' },
+                            '&:hover': { background: active ? `${theme.accent}16` : colors.fill.subtle },
                           }}
                         >
                           <Box sx={{
@@ -222,8 +222,8 @@ export function FloatingMenu() {
                               }} />
                             )}
                           </Box>
-                          <Typography sx={{
-                            flex: 1, minWidth: 0, fontFamily: font.serif, fontSize: '0.85rem',
+                          <Typography variant="lg" sx={{
+                            flex: 1, minWidth: 0, fontFamily: font.serif,
                             fontWeight: active ? 800 : 600, color: theme.textOnBg,
                             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                           }}>
@@ -243,7 +243,7 @@ export function FloatingMenu() {
             <Box sx={{ px: 1.8, py: 1.4 }}>
               <Stack direction="row" spacing={0.6} sx={{ alignItems: 'center', mb: 1.2 }}>
                 <PaletteOutlinedIcon sx={{ fontSize: 14, color: theme.textOnBgMuted }} />
-                <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.6, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
+                <Typography variant="label" sx={{ color: theme.textOnBgMuted }}>
                   Tema de fundo
                 </Typography>
               </Stack>
@@ -260,10 +260,10 @@ export function FloatingMenu() {
                     }} />
                   </Box>
                   <Box>
-                    <Typography sx={{ fontSize: '0.76rem', fontWeight: 700, color: theme.textOnBg, lineHeight: 1.25 }}>
+                    <Typography variant="sm" sx={{ fontWeight: 700, color: theme.textOnBg, lineHeight: 1.25 }}>
                       Suavizar bilhetes claros
                     </Typography>
-                    <Typography sx={{ fontSize: '0.64rem', color: theme.textOnBgMuted }}>
+                    <Typography variant="xxs" sx={{ color: theme.textOnBgMuted }}>
                       aplica uma máscara escura sobre cards muito brancos
                     </Typography>
                   </Box>
@@ -288,7 +288,7 @@ export function FloatingMenu() {
                   >
                     <Box sx={{
                       width: 30, height: 30, borderRadius: radius.sm, flexShrink: 0,
-                      background: notifEnabled ? `${theme.accent}18` : theme.isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
+                      background: notifEnabled ? `${theme.accent}18` : colors.fill.medium,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
                       {notifStatus === 'denied'
@@ -299,10 +299,10 @@ export function FloatingMenu() {
                       }
                     </Box>
                     <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: theme.textOnBg }}>
+                      <Typography variant="lg" sx={{ fontWeight: 700, color: theme.textOnBg }}>
                         Notificações
                       </Typography>
-                      <Typography sx={{ fontSize: '0.68rem', color: theme.textOnBgMuted }}>
+                      <Typography variant="xs" sx={{ color: theme.textOnBgMuted }}>
                         {notifStatus === 'denied' ? 'bloqueado pelo navegador' : notifEnabled ? 'ativo, toque para desligar' : 'toque para ativar'}
                       </Typography>
                     </Box>
@@ -330,7 +330,7 @@ export function FloatingMenu() {
                 }}>
                   <ManageAccountsOutlinedIcon sx={{ fontSize: 16, color: theme.accent }} />
                 </Box>
-                <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: theme.textOnBg }}>
+                <Typography variant="lg" sx={{ fontWeight: 700, color: theme.textOnBg }}>
                   Minha conta
                 </Typography>
               </Stack>
@@ -355,7 +355,7 @@ export function FloatingMenu() {
                 }}>
                   <PlayCircleOutlineIcon sx={{ fontSize: 16, color: theme.accent }} />
                 </Box>
-                <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: theme.textOnBg }}>
+                <Typography variant="lg" sx={{ fontWeight: 700, color: theme.textOnBg }}>
                   Ver tutorial
                 </Typography>
               </Stack>
@@ -378,9 +378,9 @@ export function FloatingMenu() {
                   background: `${colors.rose.main}14`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <LogoutIcon sx={{ fontSize: 16, color: colors.rose.main }} />
+                  <LogoutIcon sx={{ fontSize: 16, color: colors.rose.text }} />
                 </Box>
-                <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: colors.rose.main }}>
+                <Typography variant="lg" sx={{ fontWeight: 700, color: colors.rose.text }}>
                   Sair
                 </Typography>
               </Stack>

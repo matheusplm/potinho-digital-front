@@ -9,7 +9,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { api, ApiRequestError } from '../services/api'
 import { Button, ConfirmDeleteDialog, toast } from '../components/ui'
-import { colors, fadeSlide, floatHeart, font, gradients, radius, shimmer } from '../design-system'
+import { colors, fadeSlide, floatHeart, font, gradients, radius, shimmer, ink } from '../design-system'
 
 const HEARTS = [
   { size: 18, left: '6%',  delay: '0s',   dur: '14s' },
@@ -64,10 +64,10 @@ function MiniNote({ look }: { look: typeof NOTE_LOOKS[number] }) {
             {look.legendary ? '★' : '◆'} {look.label}
           </Typography>
         </Box>
-        <Typography sx={{ fontSize: '0.7rem', opacity: 0.4, lineHeight: 1 }}>💌</Typography>
+        <Typography variant="xs" sx={{ opacity: 0.4, lineHeight: 1 }}>💌</Typography>
       </Stack>
       <Box sx={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-        <Typography sx={{ fontFamily: font.serif, fontSize: '0.84rem', color: '#1e3a5f', lineHeight: 1.55 }}>
+        <Typography variant="lg" sx={{ fontFamily: font.serif, color: ink.primary, lineHeight: 1.55 }}>
           {look.message}
         </Typography>
       </Box>
@@ -90,7 +90,7 @@ function ShowcasePanel() {
         <Box sx={{ width: 30, height: 30, borderRadius: '9px', background: 'linear-gradient(135deg,#1d4ed8,#e11d48)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <FavoriteIcon sx={{ fontSize: 15, color: '#fff' }} />
         </Box>
-        <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.95rem', color: '#1e3a5f' }}>
+        <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: ink.primary }}>
           Potinho Digital
         </Typography>
       </Stack>
@@ -101,7 +101,7 @@ function ShowcasePanel() {
         </Box>
       </Box>
 
-      <Typography sx={{ position: 'relative', zIndex: 1, fontSize: '0.8rem', color: 'rgba(30,58,95,0.6)', fontStyle: 'italic', textAlign: 'center' }}>
+      <Typography variant="md" sx={{ position: 'relative', zIndex: 1, color: 'rgba(30,58,95,0.6)', fontStyle: 'italic', textAlign: 'center' }}>
         um álbum de bilhetes, feito com carinho, esperando por você 💌
       </Typography>
     </Box>
@@ -112,7 +112,7 @@ function StateBlock({ icon, title, children }: { icon: React.ReactNode; title: s
   return (
     <Stack spacing={2} sx={{ alignItems: { xs: 'center', md: 'flex-start' }, textAlign: { xs: 'center', md: 'left' } }}>
       {icon}
-      <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: { xs: '1.7rem', md: '2rem' }, color: '#1e3a5f', lineHeight: 1.15, letterSpacing: '-0.5px' }}>
+      <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: { xs: '1.7rem', md: '2rem' }, color: ink.primary, lineHeight: 1.15, letterSpacing: '-0.5px' }}>
         {title}
       </Typography>
       {children}
@@ -168,7 +168,7 @@ export function InviteAcceptPage() {
       {HEARTS.map((h, i) => (
         <FavoriteIcon key={i} sx={{
           position: 'absolute', bottom: -8, left: h.left, fontSize: h.size, zIndex: 0,
-          color: i % 2 === 0 ? '#1d4ed8' : '#e11d48', filter: 'blur(0.5px)',
+          color: i % 2 === 0 ? colors.primary.main : colors.rose.main, filter: 'blur(0.5px)',
           animation: `${floatHeart(i)} ${h.dur} ${h.delay} ease-in infinite`, pointerEvents: 'none',
         }} />
       ))}
@@ -186,16 +186,16 @@ export function InviteAcceptPage() {
 
             {isLoading && (
               <Stack spacing={2} sx={{ alignItems: { xs: 'center', md: 'flex-start' } }}>
-                <CircularProgress size={30} sx={{ color: '#1d4ed8' }} />
-                <Typography sx={{ fontFamily: font.serif, fontSize: '1.2rem', color: '#1e3a5f' }}>
+                <CircularProgress size={30} sx={{ color: colors.primary.main }} />
+                <Typography sx={{ fontFamily: font.serif, fontSize: '1.2rem', color: ink.primary }}>
                   Carregando convite...
                 </Typography>
               </Stack>
             )}
 
             {!isLoading && (error || !invite) && (
-              <StateBlock icon={<HighlightOffIcon sx={{ fontSize: 52, color: '#e11d48' }} />} title="Convite não encontrado">
-                <Typography sx={{ fontSize: '0.9rem', color: 'rgba(30,58,95,0.6)', lineHeight: 1.65 }}>
+              <StateBlock icon={<HighlightOffIcon sx={{ fontSize: 52, color: colors.rose.main }} />} title="Convite não encontrado">
+                <Typography variant="xl" sx={{ color: 'rgba(30,58,95,0.6)', lineHeight: 1.65 }}>
                   {error instanceof ApiRequestError ? error.message : 'Este convite pode ter expirado ou foi cancelado.'}
                 </Typography>
                 <Button variant="ghost" onClick={() => navigate('/')} sx={{ px: 3 }}>
@@ -205,8 +205,8 @@ export function InviteAcceptPage() {
             )}
 
             {!isLoading && invite && (status === 'rejected' || status === 'expired') && (
-              <StateBlock icon={<HighlightOffIcon sx={{ fontSize: 52, color: status === 'expired' ? '#6b7280' : '#e11d48' }} />} title={status === 'expired' ? 'Convite expirado' : 'Convite recusado'}>
-                <Typography sx={{ fontSize: '0.9rem', color: 'rgba(30,58,95,0.6)', lineHeight: 1.65 }}>
+              <StateBlock icon={<HighlightOffIcon sx={{ fontSize: 52, color: status === 'expired' ? '#6b7280' : colors.rose.main }} />} title={status === 'expired' ? 'Convite expirado' : 'Convite recusado'}>
+                <Typography variant="xl" sx={{ color: 'rgba(30,58,95,0.6)', lineHeight: 1.65 }}>
                   {status === 'expired'
                     ? 'Este convite não é mais válido. Peça ao criador da coleção para enviar um novo.'
                     : 'Este convite já foi recusado.'}
@@ -219,8 +219,8 @@ export function InviteAcceptPage() {
 
             {!isLoading && invite && status === 'accepted' && (
               <StateBlock icon={<CheckCircleOutlineIcon sx={{ fontSize: 52, color: '#16a34a' }} />} title="Convite já aceito!">
-                <Typography sx={{ fontSize: '0.9rem', color: 'rgba(30,58,95,0.6)', lineHeight: 1.65 }}>
-                  Você já tem acesso à coleção <strong style={{ color: '#1e3a5f' }}>{invite.collectionName}</strong>.
+                <Typography variant="xl" sx={{ color: 'rgba(30,58,95,0.6)', lineHeight: 1.65 }}>
+                  Você já tem acesso à coleção <strong style={{ color: ink.primary }}>{invite.collectionName}</strong>.
                 </Typography>
                 {user ? (
                   <Button variant="primary" onClick={() => navigate('/home')} sx={{ px: 4 }}>
@@ -236,8 +236,8 @@ export function InviteAcceptPage() {
 
             {!isLoading && invite && status === 'pending' && user && invite.isForMe === false && (
               <StateBlock icon={<MailOutlineIcon sx={{ fontSize: 52, color: '#d97706' }} />} title="Convite de outro email">
-                <Typography sx={{ fontSize: '0.9rem', color: 'rgba(30,58,95,0.6)', lineHeight: 1.65 }}>
-                  Este convite foi enviado para <strong style={{ color: '#1e3a5f' }}>{invite.email}</strong>, mas você está logado como <strong style={{ color: '#1e3a5f' }}>{user.email}</strong>. Entre com a conta certa para aceitar.
+                <Typography variant="xl" sx={{ color: 'rgba(30,58,95,0.6)', lineHeight: 1.65 }}>
+                  Este convite foi enviado para <strong style={{ color: ink.primary }}>{invite.email}</strong>, mas você está logado como <strong style={{ color: ink.primary }}>{user.email}</strong>. Entre com a conta certa para aceitar.
                 </Typography>
                 <Button variant="ghost" onClick={() => navigate('/home')} sx={{ px: 3 }}>
                   Ir para home
@@ -247,25 +247,25 @@ export function InviteAcceptPage() {
 
             {!isLoading && invite && status === 'pending' && !user && (
               <Stack spacing={2.2} sx={{ alignItems: { xs: 'center', md: 'flex-start' }, textAlign: { xs: 'center', md: 'left' } }}>
-                <Typography sx={{ fontSize: '0.72rem', fontWeight: 900, letterSpacing: 1.4, color: '#1d4ed8', textTransform: 'uppercase' }}>
+                <Typography variant="sm" sx={{ fontWeight: 900, letterSpacing: 1.4, color: colors.primary.main, textTransform: 'uppercase' }}>
                   Convite especial
                 </Typography>
-                <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: { xs: '1.8rem', md: '2.3rem' }, color: '#1e3a5f', lineHeight: 1.12, letterSpacing: '-0.5px' }}>
+                <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: { xs: '1.8rem', md: '2.3rem' }, color: ink.primary, lineHeight: 1.12, letterSpacing: '-0.5px' }}>
                   Você foi convidado! 💌
                 </Typography>
-                <Typography sx={{ fontSize: '0.95rem', color: 'rgba(30,58,95,0.7)', lineHeight: 1.7 }}>
-                  <strong style={{ color: '#1e3a5f' }}>{invite.inviterName || 'Alguém'}</strong> preparou a coleção{' '}
-                  <strong style={{ color: '#1e3a5f' }}>{invite.collectionName}</strong> para você.
+                <Typography variant="xl" sx={{ color: 'rgba(30,58,95,0.7)', lineHeight: 1.7 }}>
+                  <strong style={{ color: ink.primary }}>{invite.inviterName || 'Alguém'}</strong> preparou a coleção{' '}
+                  <strong style={{ color: ink.primary }}>{invite.collectionName}</strong> para você.
                 </Typography>
                 <Stack spacing={1}>
                   {PERKS.map((perk) => (
                     <Stack key={perk.text} direction="row" spacing={1.1} alignItems="center">
-                      <Typography sx={{ fontSize: '1rem', lineHeight: 1 }}>{perk.emoji}</Typography>
-                      <Typography sx={{ fontSize: '0.86rem', color: 'rgba(30,58,95,0.72)' }}>{perk.text}</Typography>
+                      <Typography variant="xl" sx={{ lineHeight: 1 }}>{perk.emoji}</Typography>
+                      <Typography variant="lg" sx={{ color: 'rgba(30,58,95,0.72)' }}>{perk.text}</Typography>
                     </Stack>
                   ))}
                 </Stack>
-                <Typography sx={{ fontSize: '0.8rem', color: 'rgba(30,58,95,0.5)' }}>
+                <Typography variant="md" sx={{ color: 'rgba(30,58,95,0.5)' }}>
                   Entre ou crie uma conta gratuita para aceitar.
                 </Typography>
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.2} sx={{ width: '100%', maxWidth: 380 }}>
@@ -281,21 +281,21 @@ export function InviteAcceptPage() {
 
             {pendingForMe && !rejectMutation.isSuccess && !acceptMutation.isSuccess && (
               <Stack spacing={2.2} sx={{ alignItems: { xs: 'center', md: 'flex-start' }, textAlign: { xs: 'center', md: 'left' } }}>
-                <Typography sx={{ fontSize: '0.72rem', fontWeight: 900, letterSpacing: 1.4, color: '#1d4ed8', textTransform: 'uppercase' }}>
+                <Typography variant="sm" sx={{ fontWeight: 900, letterSpacing: 1.4, color: colors.primary.main, textTransform: 'uppercase' }}>
                   Convite especial
                 </Typography>
-                <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: { xs: '1.8rem', md: '2.3rem' }, color: '#1e3a5f', lineHeight: 1.12, letterSpacing: '-0.5px' }}>
+                <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: { xs: '1.8rem', md: '2.3rem' }, color: ink.primary, lineHeight: 1.12, letterSpacing: '-0.5px' }}>
                   Você foi convidado! 💌
                 </Typography>
-                <Typography sx={{ fontSize: '0.95rem', color: 'rgba(30,58,95,0.7)', lineHeight: 1.7 }}>
-                  <strong style={{ color: '#1e3a5f' }}>{invite?.inviterName || 'Alguém'}</strong> preparou a coleção{' '}
-                  <strong style={{ color: '#1e3a5f' }}>{invite?.collectionName}</strong> especialmente para você.
+                <Typography variant="xl" sx={{ color: 'rgba(30,58,95,0.7)', lineHeight: 1.7 }}>
+                  <strong style={{ color: ink.primary }}>{invite?.inviterName || 'Alguém'}</strong> preparou a coleção{' '}
+                  <strong style={{ color: ink.primary }}>{invite?.collectionName}</strong> especialmente para você.
                 </Typography>
                 <Stack spacing={1}>
                   {PERKS.map((perk) => (
                     <Stack key={perk.text} direction="row" spacing={1.1} alignItems="center">
-                      <Typography sx={{ fontSize: '1rem', lineHeight: 1 }}>{perk.emoji}</Typography>
-                      <Typography sx={{ fontSize: '0.86rem', color: 'rgba(30,58,95,0.72)' }}>{perk.text}</Typography>
+                      <Typography variant="xl" sx={{ lineHeight: 1 }}>{perk.emoji}</Typography>
+                      <Typography variant="lg" sx={{ color: 'rgba(30,58,95,0.72)' }}>{perk.text}</Typography>
                     </Stack>
                   ))}
                 </Stack>
@@ -319,15 +319,16 @@ export function InviteAcceptPage() {
                   </Button>
                 </Stack>
                 <Typography
+                  variant="md"
                   onClick={() => { if (!acceptMutation.isPending && !rejectMutation.isPending) navigate('/home') }}
                   sx={{
-                    fontSize: '0.8rem', fontWeight: 700, color: '#1d4ed8', cursor: 'pointer',
+                    fontWeight: 700, color: colors.primary.main, cursor: 'pointer',
                     '&:hover': { textDecoration: 'underline' },
                   }}
                 >
                   Prefiro decidir depois (o convite fica guardado)
                 </Typography>
-                <Typography sx={{ fontSize: '0.72rem', color: 'rgba(30,58,95,0.45)' }}>
+                <Typography variant="sm" sx={{ color: 'rgba(30,58,95,0.45)' }}>
                   logado como {user?.email}
                 </Typography>
               </Stack>
@@ -335,15 +336,15 @@ export function InviteAcceptPage() {
 
             {pendingForMe && acceptMutation.isSuccess && (
               <StateBlock icon={<CheckCircleOutlineIcon sx={{ fontSize: 56, color: '#16a34a' }} />} title="Aceito! 🎉">
-                <Typography sx={{ fontSize: '0.9rem', color: 'rgba(30,58,95,0.6)', lineHeight: 1.65 }}>
-                  A coleção <strong style={{ color: '#1e3a5f' }}>{invite?.collectionName}</strong> já é sua. Redirecionando...
+                <Typography variant="xl" sx={{ color: 'rgba(30,58,95,0.6)', lineHeight: 1.65 }}>
+                  A coleção <strong style={{ color: ink.primary }}>{invite?.collectionName}</strong> já é sua. Redirecionando...
                 </Typography>
               </StateBlock>
             )}
 
             {pendingForMe && rejectMutation.isSuccess && (
               <StateBlock icon={<HighlightOffIcon sx={{ fontSize: 52, color: '#6b7280' }} />} title="Convite recusado">
-                <Typography sx={{ fontSize: '0.9rem', color: 'rgba(30,58,95,0.6)', lineHeight: 1.65 }}>
+                <Typography variant="xl" sx={{ color: 'rgba(30,58,95,0.6)', lineHeight: 1.65 }}>
                   Tudo bem! Você pode ignorar este convite.
                 </Typography>
                 <Button variant="ghost" onClick={() => navigate('/home')} sx={{ px: 3 }}>
@@ -360,7 +361,7 @@ export function InviteAcceptPage() {
         open={rejectConfirmOpen}
         title="Recusar este convite?"
         description={
-          <Typography sx={{ fontSize: '0.88rem', color: colors.text.secondary, lineHeight: 1.6 }}>
+          <Typography variant="lg" sx={{ color: colors.text.secondary, lineHeight: 1.6 }}>
             O link ficará inválido e <strong style={{ color: colors.text.primary }}>{invite?.inviterName || 'o criador'}</strong> precisará enviar um novo convite se você mudar de ideia.
           </Typography>
         }

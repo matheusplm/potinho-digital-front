@@ -37,10 +37,10 @@ export function AddGhostCard({ view, onClick, accent }: { view: ViewMode; onClic
       }}>
         <PlusCircle size={40} accent={accent} />
         <Box>
-          <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.92rem', color: accent, lineHeight: 1.2 }}>
+          <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 700, color: accent, lineHeight: 1.2 }}>
             Nova coleção
           </Typography>
-          <Typography sx={{ fontSize: '0.7rem', color: accent, opacity: 0.55, mt: 0.15 }}>
+          <Typography variant="xs" sx={{ color: accent, opacity: 0.55, mt: 0.15 }}>
             Toque para criar
           </Typography>
         </Box>
@@ -55,10 +55,10 @@ export function AddGhostCard({ view, onClick, accent }: { view: ViewMode; onClic
           <PlusCircle size={42} accent={accent} />
         </Box>
         <Box sx={{ px: 1.2, py: 1 }}>
-          <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.86rem', color: accent, lineHeight: 1.2 }}>
+          <Typography variant="lg" sx={{ fontFamily: font.serif, fontWeight: 700, color: accent, lineHeight: 1.2 }}>
             Nova coleção
           </Typography>
-          <Typography sx={{ fontSize: '0.70rem', color: accent, opacity: 0.5, mt: 0.2 }}>
+          <Typography variant="xs" sx={{ color: accent, opacity: 0.5, mt: 0.2 }}>
             Toque para criar
           </Typography>
         </Box>
@@ -77,10 +77,10 @@ export function AddGhostCard({ view, onClick, accent }: { view: ViewMode; onClic
         <PlusCircle size={46} accent={accent} />
       </Box>
       <Box sx={{ p: 1.6 }}>
-        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1rem', color: accent, lineHeight: 1.25 }}>
+        <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 700, color: accent, lineHeight: 1.25 }}>
           Nova coleção
         </Typography>
-        <Typography sx={{ fontSize: '0.74rem', color: accent, opacity: 0.55, mt: 0.2 }}>
+        <Typography variant="sm" sx={{ color: accent, opacity: 0.55, mt: 0.2 }}>
           Toque para criar
         </Typography>
         <Box sx={{ height: '3px', borderRadius: 2, background: `linear-gradient(90deg, ${accent}66, ${accent}22)`, mt: 1.2 }} />

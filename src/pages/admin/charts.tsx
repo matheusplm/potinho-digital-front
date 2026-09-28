@@ -1,7 +1,7 @@
 import { Box, Stack, Typography } from '@mui/material'
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
 import { useBackground } from '../../context/BackgroundContext'
-import { radius } from '../../design-system'
+import { radius, colors } from '../../design-system'
 import type { Change } from './insights'
 import { formatNumber, niceCeil, percentLabel, share } from './format'
 
@@ -10,7 +10,7 @@ function useTones() {
   return {
     up: { fg: theme.isDark ? '#4ade80' : '#15803d', bg: theme.isDark ? 'rgba(74,222,128,0.14)' : 'rgba(21,128,61,0.1)' },
     down: { fg: theme.isDark ? '#fb7185' : '#be123c', bg: theme.isDark ? 'rgba(251,113,133,0.14)' : 'rgba(190,18,60,0.09)' },
-    flat: { fg: theme.textOnBgMuted, bg: theme.isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)' },
+    flat: { fg: theme.textOnBgMuted, bg: colors.fill.medium },
   }
 }
 
@@ -149,11 +149,11 @@ export function ProgressBar({ ratio, color, label }: { ratio: number; color: str
   const { theme } = useBackground()
   return (
     <Box>
-      <Box sx={{ height: 6, borderRadius: radius.full, background: theme.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.07)', overflow: 'hidden' }}>
+      <Box sx={{ height: 6, borderRadius: radius.full, background: colors.fill.medium, overflow: 'hidden' }}>
         <Box sx={{ width: `${Math.max(0, Math.min(1, ratio)) * 100}%`, height: '100%', borderRadius: radius.full, background: color, transition: 'width 0.8s ease' }} />
       </Box>
       {label && (
-        <Typography sx={{ mt: 0.6, fontSize: '0.68rem', fontWeight: 600, color: theme.textOnBgMuted }}>{label}</Typography>
+        <Typography variant="xs" sx={{ mt: 0.6, fontWeight: 600, color: theme.textOnBgMuted }}>{label}</Typography>
       )}
     </Box>
   )
@@ -190,7 +190,7 @@ export function BarChart({ points, color, height = 180, average, focus, onFocus,
       <Box sx={{ position: 'relative', height }}>
         {[1, 0.5, 0].map((fraction) => (
           <Box key={fraction} sx={{ position: 'absolute', left: 0, right: 0, top: `${(1 - fraction) * 100}%`, borderTop: `1px ${fraction === 0 ? 'solid' : 'dashed'} ${theme.surfaceBorder}` }}>
-            <Typography sx={{ position: 'absolute', right: '100%', mr: 1, top: -8, fontSize: '0.62rem', fontWeight: 600, color: theme.textOnBgMuted, whiteSpace: 'nowrap' }}>
+            <Typography variant="xxs" sx={{ position: 'absolute', right: '100%', mr: 1, top: -8, fontWeight: 600, color: theme.textOnBgMuted, whiteSpace: 'nowrap' }}>
               {formatNumber(Math.round(max * fraction))}
             </Typography>
           </Box>
@@ -198,7 +198,7 @@ export function BarChart({ points, color, height = 180, average, focus, onFocus,
 
         {average !== undefined && average > 0 && (
           <Box sx={{ position: 'absolute', left: 0, right: 0, bottom: `${(average / max) * 100}%`, borderTop: `1.5px dashed ${color}`, opacity: 0.75, zIndex: 1, pointerEvents: 'none' }}>
-            <Typography sx={{ position: 'absolute', right: 0, bottom: 2, px: 0.6, borderRadius: radius.sm, fontSize: '0.6rem', fontWeight: 800, color, background: theme.surfaceBg }}>
+            <Typography variant="xxs" sx={{ position: 'absolute', right: 0, bottom: 2, px: 0.6, borderRadius: radius.sm, fontWeight: 800, color, background: theme.surfaceBg }}>
               média {average.toLocaleString('pt-BR', { maximumFractionDigits: 1 })}
             </Typography>
           </Box>
@@ -235,11 +235,12 @@ export function BarChart({ points, color, height = 180, average, focus, onFocus,
       <Box sx={{ position: 'relative', height: 18, mt: 0.8 }}>
         {ticks.map(({ index, label }) => (
           <Typography
+            variant="xxs"
             key={index}
             sx={{
               position: 'absolute', top: 0, left: `${((index + 0.5) / count) * 100}%`,
               transform: index === 0 ? 'translateX(-20%)' : index === count - 1 ? 'translateX(-80%)' : 'translateX(-50%)',
-              fontSize: '0.64rem', fontWeight: 700, color: theme.textOnBgMuted, whiteSpace: 'nowrap',
+              fontWeight: 700, color: theme.textOnBgMuted, whiteSpace: 'nowrap',
             }}
           >
             {label}
@@ -282,7 +283,7 @@ export function ColumnStrip({ values, labels, color, height = 72, onFocus, focus
       </Box>
       <Stack direction="row" justifyContent="space-between" sx={{ mt: 0.6 }}>
         {labels.map((label) => (
-          <Typography key={label} sx={{ fontSize: '0.62rem', fontWeight: 700, color: theme.textOnBgMuted }}>{label}</Typography>
+          <Typography key={label} variant="xxs" sx={{ fontWeight: 700, color: theme.textOnBgMuted }}>{label}</Typography>
         ))}
       </Stack>
     </Box>
@@ -294,7 +295,7 @@ export function SegmentBar({ segments }: { segments: Array<{ label: string; coun
   const total = segments.reduce((sum, segment) => sum + segment.count, 0)
   return (
     <Box>
-      <Box sx={{ display: 'flex', height: 12, borderRadius: radius.full, overflow: 'hidden', gap: '2px', background: theme.isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)' }}>
+      <Box sx={{ display: 'flex', height: 12, borderRadius: radius.full, overflow: 'hidden', gap: '2px', background: colors.fill.medium }}>
         {segments.filter((segment) => segment.count > 0).map((segment) => (
           <Box key={segment.label} title={`${segment.label}: ${segment.count}`} sx={{ flex: segment.count, background: segment.color, transition: 'flex 0.6s ease' }} />
         ))}
@@ -303,10 +304,10 @@ export function SegmentBar({ segments }: { segments: Array<{ label: string; coun
         {segments.map((segment) => (
           <Stack key={segment.label} direction="row" spacing={0.8} alignItems="center" sx={{ minWidth: 0 }}>
             <Box sx={{ width: 9, height: 9, borderRadius: '3px', background: segment.color, flexShrink: 0 }} />
-            <Typography sx={{ fontSize: '0.74rem', color: theme.textOnBg, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <Typography variant="sm" sx={{ color: theme.textOnBg, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {segment.label}
             </Typography>
-            <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted, ml: 'auto !important', whiteSpace: 'nowrap' }}>
+            <Typography variant="sm" sx={{ color: theme.textOnBgMuted, ml: 'auto !important', whiteSpace: 'nowrap' }}>
               {formatNumber(segment.count)} · {percentLabel(share(segment.count, total))}
             </Typography>
           </Stack>

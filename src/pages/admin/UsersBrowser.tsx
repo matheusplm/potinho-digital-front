@@ -89,24 +89,24 @@ function TableRow({ user, onOpen }: { user: AdminUserRow; onOpen: () => void }) 
       <Stack direction="row" spacing={1.2} alignItems="center" sx={{ minWidth: 0 }}>
         <Avatar id={user.id} name={user.name} tone={activityTone(user.lastActiveAt)} />
         <Box sx={{ minWidth: 0 }}>
-          <Typography sx={{ fontSize: '0.86rem', fontWeight: 800, color: theme.textOnBg, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <Typography variant="lg" sx={{ fontWeight: 800, color: theme.textOnBg, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {user.name}
             {user.username && <Box component="span" sx={{ ml: 0.6, fontWeight: 600, fontSize: '0.74rem', color: theme.textOnBgMuted }}>@{user.username}</Box>}
           </Typography>
-          <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.emailMasked}</Typography>
+          <Typography variant="sm" sx={{ color: theme.textOnBgMuted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.emailMasked}</Typography>
         </Box>
       </Stack>
       <Box>
-        <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: theme.textOnBg }}>{timeAgo(user.lastActiveAt)}</Typography>
-        <Typography sx={{ fontSize: '0.68rem', color: theme.textOnBgMuted }}>{user.lastLoginAt ? `login ${shortDate(user.lastLoginAt)}` : 'login sem registro'}</Typography>
+        <Typography variant="md" sx={{ fontWeight: 700, color: theme.textOnBg }}>{timeAgo(user.lastActiveAt)}</Typography>
+        <Typography variant="xs" sx={{ color: theme.textOnBgMuted }}>{user.lastLoginAt ? `login ${shortDate(user.lastLoginAt)}` : 'login sem registro'}</Typography>
       </Box>
-      <Typography sx={{ fontSize: '0.8rem', color: theme.textOnBg }}>{shortDate(user.createdAt)}</Typography>
-      <Typography sx={{ fontSize: '0.8rem', color: theme.textOnBg }}>
+      <Typography variant="md" sx={{ color: theme.textOnBg }}>{shortDate(user.createdAt)}</Typography>
+      <Typography variant="md" sx={{ color: theme.textOnBg }}>
         {user.collectionsOwned || user.collectionsReading ? `✍️ ${user.collectionsOwned} · 📖 ${user.collectionsReading}` : '—'}
       </Typography>
       <Box sx={{ textAlign: 'right' }}>
-        <Typography sx={{ fontSize: '0.86rem', fontWeight: 800, color: theme.textOnBg }}>{formatNumber(user.collected)}</Typography>
-        <Typography sx={{ fontSize: '0.68rem', color: theme.textOnBgMuted }}>❤️ {user.favorites}</Typography>
+        <Typography variant="lg" sx={{ fontWeight: 800, color: theme.textOnBg }}>{formatNumber(user.collected)}</Typography>
+        <Typography variant="xs" sx={{ color: theme.textOnBgMuted }}>❤️ {user.favorites}</Typography>
       </Box>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, minWidth: 0 }}>
         <UserBadges user={user} />
@@ -131,16 +131,16 @@ function UserCard({ user, onOpen }: { user: AdminUserRow; onOpen: () => void }) 
       <Stack direction="row" spacing={1.2} alignItems="center">
         <Avatar id={user.id} name={user.name} tone={activityTone(user.lastActiveAt)} />
         <Box sx={{ minWidth: 0, flex: 1 }}>
-          <Typography sx={{ fontSize: '0.88rem', fontWeight: 800, color: theme.textOnBg, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <Typography variant="lg" sx={{ fontWeight: 800, color: theme.textOnBg, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {user.name}
           </Typography>
-          <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <Typography variant="sm" sx={{ color: theme.textOnBgMuted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {user.username ? `@${user.username} · ` : ''}{user.emailMasked}
           </Typography>
         </Box>
         <Box sx={{ textAlign: 'right', flexShrink: 0 }}>
-          <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, color: theme.textOnBg, whiteSpace: 'nowrap' }}>{timeAgo(user.lastActiveAt)}</Typography>
-          <Typography sx={{ fontSize: '0.68rem', color: theme.textOnBgMuted, whiteSpace: 'nowrap' }}>💌 {formatNumber(user.collected)} · ❤️ {user.favorites}</Typography>
+          <Typography variant="md" sx={{ fontWeight: 700, color: theme.textOnBg, whiteSpace: 'nowrap' }}>{timeAgo(user.lastActiveAt)}</Typography>
+          <Typography variant="xs" sx={{ color: theme.textOnBgMuted, whiteSpace: 'nowrap' }}>💌 {formatNumber(user.collected)} · ❤️ {user.favorites}</Typography>
         </Box>
       </Stack>
       <Box sx={{ mt: 0.9, pl: '50px', display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
@@ -213,8 +213,8 @@ export function UsersBrowser({ users }: { users: AdminUserRow[] }) {
       {visible.length === 0 ? (
         <Stack alignItems="center" spacing={0.6} sx={{ py: 5, textAlign: 'center' }}>
           <Typography sx={{ fontSize: '1.8rem' }}>🔎</Typography>
-          <Typography sx={{ fontSize: '0.86rem', fontWeight: 700, color: theme.textOnBg }}>Ninguém por aqui</Typography>
-          <Typography sx={{ fontSize: '0.78rem', color: theme.textOnBgMuted }}>Tente outro nome ou outro filtro.</Typography>
+          <Typography variant="lg" sx={{ fontWeight: 700, color: theme.textOnBg }}>Ninguém por aqui</Typography>
+          <Typography variant="md" sx={{ color: theme.textOnBgMuted }}>Tente outro nome ou outro filtro.</Typography>
         </Stack>
       ) : (
         <Stack divider={isDesktop ? undefined : <Box sx={{ height: '1px', background: theme.surfaceBorder, mx: 1.2 }} />} spacing={isDesktop ? 0.3 : 0}>

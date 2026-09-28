@@ -54,7 +54,7 @@ export function ConfirmEmailChangePage() {
       {HEARTS.map((h, i) => (
         <FavoriteIcon key={i} sx={{
           position: 'absolute', bottom: -8, left: h.left, fontSize: h.size, zIndex: 0,
-          color: i % 2 === 0 ? '#1d4ed8' : '#7c3aed', filter: 'blur(0.5px)',
+          color: i % 2 === 0 ? colors.primary.main : '#7c3aed', filter: 'blur(0.5px)',
           animation: `${floatHeart(i)} ${h.dur} ${h.delay} ease-in infinite`, pointerEvents: 'none',
         }} />
       ))}
@@ -76,11 +76,11 @@ export function ConfirmEmailChangePage() {
               Email atualizado!
             </Typography>
             {newEmail && (
-              <Typography sx={{ fontSize: '0.88rem', color: colors.text.secondary, lineHeight: 1.6 }}>
+              <Typography variant="lg" sx={{ color: colors.text.secondary, lineHeight: 1.6 }}>
                 Seu novo email é <strong>{newEmail}</strong>.
               </Typography>
             )}
-            <Typography sx={{ fontSize: '0.82rem', color: colors.text.muted }}>
+            <Typography variant="md" sx={{ color: colors.text.muted }}>
               Redirecionando para sua conta...
             </Typography>
           </Stack>
@@ -88,14 +88,14 @@ export function ConfirmEmailChangePage() {
 
         {status === 'error' && (
           <Stack alignItems="center" spacing={2.5} sx={{ maxWidth: 320, textAlign: 'center' }}>
-            <FavoriteIcon sx={{ fontSize: 52, color: '#e11d48', filter: 'drop-shadow(0 4px 16px rgba(225,29,72,0.3))' }} />
+            <FavoriteIcon sx={{ fontSize: 52, color: colors.rose.main, filter: 'drop-shadow(0 4px 16px rgba(225,29,72,0.3))' }} />
             <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.8rem', color: colors.text.primary }}>
               Link inválido
             </Typography>
-            <Typography sx={{ fontSize: '0.88rem', color: colors.text.secondary, lineHeight: 1.6 }}>
+            <Typography variant="lg" sx={{ color: colors.text.secondary, lineHeight: 1.6 }}>
               {errorMsg}
             </Typography>
-            <Typography sx={{ fontSize: '0.85rem' }}>
+            <Typography variant="lg">
               <Link to="/conta" style={{ color: colors.primary.text, fontWeight: 700, textDecoration: 'none' }}>
                 Voltar para minha conta
               </Link>

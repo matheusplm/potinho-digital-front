@@ -31,7 +31,7 @@ export function Panel({ title, subtitle, count, actions, children, dense }: {
             )}
           </Typography>
           {subtitle && (
-            <Typography component="div" sx={{ mt: 0.3, fontSize: '0.76rem', color: theme.textOnBgMuted, lineHeight: 1.45 }}>
+            <Typography variant="sm" component="div" sx={{ mt: 0.3, color: theme.textOnBgMuted, lineHeight: 1.45 }}>
               {subtitle}
             </Typography>
           )}
@@ -61,7 +61,7 @@ export function StatCard({ emoji, label, value, badge, detail, aside, footer }: 
       transition: 'transform 0.18s ease, box-shadow 0.18s ease',
       '@media (hover: hover)': { '&:hover': { transform: 'translateY(-2px)' } },
     }}>
-      <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: theme.textOnBgMuted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+      <Typography variant="sm" sx={{ fontWeight: 700, color: theme.textOnBgMuted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
         {emoji} {label}
       </Typography>
       <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
@@ -73,7 +73,7 @@ export function StatCard({ emoji, label, value, badge, detail, aside, footer }: 
             {badge}
           </Stack>
           {detail && (
-            <Typography component="div" sx={{ mt: 0.6, fontSize: '0.7rem', color: theme.textOnBgMuted, lineHeight: 1.4 }}>
+            <Typography variant="xs" component="div" sx={{ mt: 0.6, color: theme.textOnBgMuted, lineHeight: 1.4 }}>
               {detail}
             </Typography>
           )}
@@ -151,7 +151,7 @@ export function FilterChips<T extends string>({ options, value, onChange }: { op
             sx={{
               all: 'unset', flexShrink: 0, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 0.6,
               px: 1.2, py: 0.6, borderRadius: radius.full, fontSize: '0.76rem', fontWeight: 700, whiteSpace: 'nowrap',
-              color: active ? '#fff' : theme.textOnBg,
+              color: active ? theme.onAccent : theme.textOnBg,
               background: active ? theme.accent : theme.isDark ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.7)',
               border: `1px solid ${active ? theme.accent : theme.surfaceBorder}`,
               boxShadow: active ? `0 4px 14px ${theme.accent}40` : 'none',
@@ -162,7 +162,7 @@ export function FilterChips<T extends string>({ options, value, onChange }: { op
             {option.label}
             <Box component="span" sx={{
               minWidth: 18, px: 0.5, borderRadius: radius.full, textAlign: 'center', fontSize: '0.66rem', fontWeight: 800,
-              background: active ? 'rgba(255,255,255,0.25)' : `${theme.accent}1f`, color: active ? '#fff' : theme.textOnBg,
+              background: active ? 'rgba(255,255,255,0.25)' : `${theme.accent}1f`, color: active ? theme.onAccent : theme.textOnBg,
             }}>
               {option.count.toLocaleString('pt-BR')}
             </Box>

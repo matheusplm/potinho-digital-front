@@ -63,7 +63,7 @@ export function BonusPackDialog({ pack, isRealReader, canOpen, block, opens, acc
             }}>
               {pack.emoji} {pack.name}
             </DialogTitle>
-            <Typography sx={{ mt: 0.45, fontSize: '0.78rem', color: ink.secondary, fontWeight: 700 }}>
+            <Typography variant="md" sx={{ mt: 0.45, color: ink.secondary, fontWeight: 700 }}>
               {isRealReader && block === 'cooldown'
                 ? `Disponível em ${formatRemainingTime(cooldownMs)}`
                 : isRealReader && pack.cumulative && accrued > 1
@@ -73,7 +73,7 @@ export function BonusPackDialog({ pack, isRealReader, canOpen, block, opens, acc
           </Box>
           <DialogContent sx={{ px: 2, pt: 1.5, pb: 1 }}>
             <Box sx={{ p: 1.25, borderRadius: radius.lg, background: 'rgba(255,255,255,0.72)', border: '1px solid rgba(255,255,255,0.62)', backdropFilter: 'blur(8px)' }}>
-              <Typography sx={{ fontSize: '0.83rem', color: ink.secondary, lineHeight: 1.55, display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+              <Typography variant="lg" sx={{ color: ink.secondary, lineHeight: 1.55, display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                 {pack.description || 'Abra este pacote especial para tentar descobrir novos bilhetinhos da coleção.'}
               </Typography>
               <Stack direction="row" spacing={0.7} sx={{ mt: 1, flexWrap: 'wrap', rowGap: 0.6 }}>

@@ -102,7 +102,7 @@ export function RegisterPage() {
 
   const usernameHelperColor = () => {
     if (usernameStatus === 'available') return '#22c55e'
-    if (usernameStatus === 'taken' || usernameStatus === 'invalid') return '#e11d48'
+    if (usernameStatus === 'taken' || usernameStatus === 'invalid') return colors.rose.main
     return colors.text.muted
   }
 
@@ -152,7 +152,7 @@ export function RegisterPage() {
                     endAdornment: <CircularProgress size={14} sx={{ color: colors.text.muted, mr: 0.5 }} />,
                   } : undefined}
                 />
-                <Typography sx={{ fontSize: '0.72rem', color: usernameHelperColor(), mt: 0.5, pl: 0.5, fontWeight: usernameStatus === 'idle' ? 400 : 600 }}>
+                <Typography variant="sm" sx={{ color: usernameHelperColor(), mt: 0.5, pl: 0.5, fontWeight: usernameStatus === 'idle' ? 400 : 600 }}>
                   {usernameHelperText()}
                 </Typography>
               </Box>

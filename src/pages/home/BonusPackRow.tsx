@@ -108,7 +108,7 @@ export function BonusPackRow({ bonusPacks, isRealReader, packOpens, packAvailabl
                 background: '#fff', border: `1.5px solid ${pack.accent}`, display: 'flex', alignItems: 'center',
                 justifyContent: 'center', px: 0.4, boxShadow: '0 1px 4px rgba(0,0,0,0.18)',
               }}>
-                <Typography sx={{ fontSize: '0.68rem', fontWeight: 900, color: pack.accent, lineHeight: 1 }}>
+                <Typography variant="xs" sx={{ fontWeight: 900, color: pack.accent, lineHeight: 1 }}>
                   {packOpens?.[pack.id] ?? 0}
                 </Typography>
               </Box>
@@ -119,7 +119,7 @@ export function BonusPackRow({ bonusPacks, isRealReader, packOpens, packAvailabl
                 background: pack.accent, display: 'flex', alignItems: 'center', justifyContent: 'center',
                 px: 0.4, boxShadow: '0 1px 4px rgba(0,0,0,0.25)',
               }}>
-                <Typography sx={{ fontSize: '0.68rem', fontWeight: 900, color: '#fff', lineHeight: 1 }}>
+                <Typography variant="xs" sx={{ fontWeight: 900, color: '#fff', lineHeight: 1 }}>
                   {packAvailableCounts[pack.id]}x
                 </Typography>
               </Box>

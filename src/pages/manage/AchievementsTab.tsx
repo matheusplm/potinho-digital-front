@@ -50,7 +50,7 @@ export function AchievementsTab({ cid }: AchievementsTabProps) {
     <>
       <Stack spacing={1.4}>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted, fontWeight: 600 }}>
+          <Typography variant="sm" sx={{ color: theme.textOnBgMuted, fontWeight: 600 }}>
             {achievements.length} conquista{achievements.length !== 1 ? 's' : ''}
           </Typography>
           <Button variant="primary" onClick={() => { setEditingAchievement(null); setAchievementDialogOpen(true) }} sx={{ py: 0.7, px: 1.4, fontSize: '0.78rem' }}>
@@ -59,7 +59,7 @@ export function AchievementsTab({ cid }: AchievementsTabProps) {
         </Stack>
 
         <Box>
-          <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.5, color: theme.textOnBgMuted, textTransform: 'uppercase', mb: 0.7 }}>
+          <Typography variant="label" sx={{ color: theme.textOnBgMuted, mb: 0.7 }}>
             Adicionar rápido
           </Typography>
           <Box sx={{ display: 'flex', gap: 0.6, flexWrap: 'wrap' }}>
@@ -80,7 +80,7 @@ export function AchievementsTab({ cid }: AchievementsTabProps) {
         </Box>
 
         {achievements.length === 0 && (
-          <Typography sx={{ fontSize: '0.85rem', color: theme.textOnBgMuted, textAlign: 'center', py: 3 }}>
+          <Typography variant="lg" sx={{ color: theme.textOnBgMuted, textAlign: 'center', py: 3 }}>
             Nenhuma conquista. Use "Adicionar rápido" ou "Nova".
           </Typography>
         )}
@@ -93,10 +93,10 @@ export function AchievementsTab({ cid }: AchievementsTabProps) {
                     {a.emoji}
                   </Box>
                   <Box sx={{ minWidth: 0 }}>
-                    <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.92rem', color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {a.label}
                     </Typography>
-                    <Typography sx={{ fontSize: '0.72rem', color: colors.text.secondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <Typography variant="sm" sx={{ color: colors.text.secondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {a.description || a.conditionType}
                     </Typography>
                   </Box>

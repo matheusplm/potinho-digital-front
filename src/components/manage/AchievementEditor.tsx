@@ -1,6 +1,6 @@
 import { Box, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material'
 import { useState } from 'react'
-import { Button, Input, toast, EmojiPickerInput } from '../ui'
+import { Button, ChoiceChip, EmojiPickerInput, Input, toast } from '../ui'
 import {
   useCollectionAchievementsQuery,
   useCreateCollectionAchievementMutation,
@@ -8,7 +8,7 @@ import {
 } from '../../hooks/useNotes'
 import { colors, font, radius } from '../../design-system'
 import { uniqueConfigId } from '../../utils/slug'
-import { gradientTextSx } from '../../utils/colorUtils'
+import { rarityTone } from '../collection/rarityTone'
 import type {
   AchievementConditionType,
   CollectionAchievement,
@@ -101,14 +101,6 @@ export function AchievementEditor({ cid, achievement, rarities, types, onClose }
     }
   }
 
-  const pickerChip = (active: boolean, accent: string) => ({
-    px: 1.05, py: 0.5, borderRadius: radius.full, cursor: 'pointer', flexShrink: 0,
-    fontSize: '0.74rem', fontWeight: 800,
-    color: active ? '#fff' : colors.text.secondary,
-    background: active ? accent : 'rgba(0,0,0,0.04)',
-    border: `1.5px solid ${active ? accent : colors.border.subtle}`,
-  })
-
   return (
     <>
       <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 700, color: colors.text.primary, pb: 1 }}>
@@ -123,12 +115,10 @@ export function AchievementEditor({ cid, achievement, rarities, types, onClose }
           <Input label="Descrição" value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
 
           <Box>
-            <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: colors.text.secondary, mb: 0.8 }}>Condição</Typography>
+            <Typography variant="sm" sx={{ fontWeight: 800, color: colors.text.secondary, mb: 0.8 }}>Condição</Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6 }}>
               {CONDITIONS.map((c) => (
-                <Box key={c.type} onClick={() => setForm((f) => ({ ...f, conditionType: c.type }))} sx={pickerChip(form.conditionType === c.type, colors.primary.main)}>
-                  {c.label}
-                </Box>
+                <ChoiceChip key={c.type} label={c.label} size="md" selected={form.conditionType === c.type} onClick={() => setForm((f) => ({ ...f, conditionType: c.type }))} />
               ))}
             </Box>
           </Box>
@@ -145,15 +135,13 @@ export function AchievementEditor({ cid, achievement, rarities, types, onClose }
 
           {needsRarity && (
             <Box>
-              <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: colors.text.secondary, mb: 0.8 }}>Raridade</Typography>
+              <Typography variant="sm" sx={{ fontWeight: 800, color: colors.text.secondary, mb: 0.8 }}>Raridade</Typography>
               {rarities.length === 0 ? (
-                <Typography sx={{ fontSize: '0.8rem', color: colors.text.muted }}>Crie raridades primeiro.</Typography>
+                <Typography variant="md" sx={{ color: colors.text.muted }}>Crie raridades primeiro.</Typography>
               ) : (
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6 }}>
                   {rarities.map((r) => (
-                    <Box key={r.id} onClick={() => setForm((f) => ({ ...f, rarityId: r.id }))} sx={form.rarityId === r.id ? { ...pickerChip(true, r.chipBg || colors.primary.main), ...gradientTextSx(r.chipColor) } : pickerChip(false, '')}>
-                      {r.emoji} {r.label}
-                    </Box>
+                    <ChoiceChip key={r.id} label={`${r.emoji} ${r.label}`} size="md" selected={form.rarityId === r.id} tone={rarityTone(r)} onClick={() => setForm((f) => ({ ...f, rarityId: r.id }))} />
                   ))}
                 </Box>
               )}
@@ -162,28 +150,26 @@ export function AchievementEditor({ cid, achievement, rarities, types, onClose }
 
           {needsType && (
             <Box>
-              <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: colors.text.secondary, mb: 0.8 }}>Tipo</Typography>
+              <Typography variant="sm" sx={{ fontWeight: 800, color: colors.text.secondary, mb: 0.8 }}>Tipo</Typography>
               {types.length === 0 ? (
-                <Typography sx={{ fontSize: '0.8rem', color: colors.text.muted }}>Crie tipos primeiro.</Typography>
+                <Typography variant="md" sx={{ color: colors.text.muted }}>Crie tipos primeiro.</Typography>
               ) : (
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6 }}>
                   {types.map((t) => (
-                    <Box key={t.id} onClick={() => setForm((f) => ({ ...f, typeId: t.id }))} sx={pickerChip(form.typeId === t.id, t.accentColor || colors.primary.main)}>
-                      {t.emoji} {t.label}
-                    </Box>
+                    <ChoiceChip key={t.id} label={`${t.emoji} ${t.label}`} size="md" selected={form.typeId === t.id} tone={{ bg: t.accentColor || colors.primary.main, border: t.accentColor || colors.primary.main, text: '#fff' }} onClick={() => setForm((f) => ({ ...f, typeId: t.id }))} />
                   ))}
                 </Box>
               )}
             </Box>
           )}
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 1.2, borderRadius: radius.lg, background: 'rgba(0,0,0,0.03)' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 1.2, borderRadius: radius.lg, background: colors.fill.subtle }}>
             <Box sx={{ width: 40, height: 40, borderRadius: radius.full, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.3rem', background: `linear-gradient(135deg,${colors.primary.main}22,${colors.primary.main}44)` }}>
               {form.emoji}
             </Box>
             <Box>
-              <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '0.9rem', color: colors.text.primary }}>{form.label || 'Conquista'}</Typography>
-              <Typography sx={{ fontSize: '0.72rem', color: colors.text.secondary }}>{form.description || condition.label}</Typography>
+              <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary }}>{form.label || 'Conquista'}</Typography>
+              <Typography variant="sm" sx={{ color: colors.text.secondary }}>{form.description || condition.label}</Typography>
             </Box>
           </Box>
         </Stack>

@@ -43,7 +43,7 @@ export function AdminUnlock() {
         <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.3rem', color: theme.textOnBg }}>
           Confirme que é você
         </Typography>
-        <Typography sx={{ fontSize: '0.84rem', color: theme.textOnBgMuted, lineHeight: 1.6 }}>
+        <Typography variant="lg" sx={{ color: theme.textOnBgMuted, lineHeight: 1.6 }}>
           O modo admin mostra dados de todos os usuários. O acesso dura 30 minutos e acaba quando você recarrega ou fecha a página.
         </Typography>
       </Stack>
@@ -68,7 +68,7 @@ export function AdminUnlock() {
           </Button>
           {error && (
             <Box role="alert" sx={{ px: 1.5, py: 1, borderRadius: radius.md, background: 'rgba(225,29,72,0.1)', border: '1px solid rgba(225,29,72,0.25)' }}>
-              <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: theme.isDark ? '#fda4af' : '#be123c' }}>{error}</Typography>
+              <Typography variant="md" sx={{ fontWeight: 600, color: theme.isDark ? '#fda4af' : '#be123c' }}>{error}</Typography>
             </Box>
           )}
         </Stack>

@@ -69,7 +69,7 @@ export function BonusPackDialog({ cid, target, onClose, onSuccess }: {
       </DialogTitle>
       <DialogContent sx={{ pt: 1 }}>
         <Stack spacing={1.8}>
-          <Typography sx={{ fontSize: '0.78rem', color: colors.text.secondary }}>
+          <Typography variant="md" sx={{ color: colors.text.secondary }}>
             Presente para <strong>{target?.email}</strong>
             {target?.currentOpens !== undefined && <> · aberturas atuais: <strong>{target.currentOpens}</strong></>}
           </Typography>

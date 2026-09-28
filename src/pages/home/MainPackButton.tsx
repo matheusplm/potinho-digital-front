@@ -112,7 +112,7 @@ export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLa
                 background: '#dc2626', border: '2px solid #fff', display: 'flex', alignItems: 'center',
                 justifyContent: 'center', px: 0.6, boxShadow: '0 2px 8px rgba(0,0,0,0.28)',
               }}>
-                <Typography sx={{ fontSize: '0.86rem', fontWeight: 900, color: '#fff', lineHeight: 1 }}>
+                <Typography variant="lg" sx={{ fontWeight: 900, color: '#fff', lineHeight: 1 }}>
                   {accruedCount}x
                 </Typography>
               </Box>
@@ -145,7 +145,7 @@ export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLa
               <Typography sx={{ fontFamily: font.serif, fontWeight: 900, fontSize: '1.02rem', color: accent, lineHeight: 1.1 }}>
                 {remainingLabel}
               </Typography>
-              <Typography sx={{ fontSize: '0.68rem', fontWeight: 900, color: accentMuted, textTransform: 'uppercase', letterSpacing: 0.6 }}>
+              <Typography variant="label" sx={{ color: accentMuted }}>
                 restante
               </Typography>
             </Stack>
@@ -158,10 +158,10 @@ export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLa
           background: colors.glass.bg, border: `1px solid ${colors.glass.border}`,
           backdropFilter: 'blur(12px)', boxShadow: '0 8px 20px rgba(15,23,42,0.08)',
         }}>
-          <Typography sx={{ color: colors.text.primary, fontFamily: font.serif, fontSize: '1rem', fontWeight: 850, lineHeight: 1.1 }}>
+          <Typography variant="xl" sx={{ color: colors.text.primary, fontFamily: font.serif, fontWeight: 850, lineHeight: 1.1 }}>
             {hasAccrued ? `${accruedCount} pacotinhos disponíveis` : 'Pacotinho disponível'}
           </Typography>
-          <Typography sx={{ color: colors.text.secondary, fontSize: '0.72rem', fontWeight: 750, lineHeight: 1.2 }}>
+          <Typography variant="sm" sx={{ color: colors.text.secondary, fontWeight: 750, lineHeight: 1.2 }}>
             toque no coração
           </Typography>
           {hasAccrued && onOpenAll && (
@@ -186,10 +186,10 @@ export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLa
           background: colors.glass.bg, border: `1px solid ${colors.glass.border}`,
           backdropFilter: 'blur(12px)',
         }}>
-          <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1rem', color: colors.text.primary, textAlign: 'center', maxWidth: 280, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+          <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 850, color: colors.text.primary, textAlign: 'center', maxWidth: 280, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
             Novo pacotinho em
           </Typography>
-          <Typography sx={{ fontSize: '0.78rem', color: colors.text.secondary, textAlign: 'center', maxWidth: 280, lineHeight: 1.45 }}>
+          <Typography variant="md" sx={{ color: colors.text.secondary, textAlign: 'center', maxWidth: 280, lineHeight: 1.45 }}>
             {remainingLabel}
           </Typography>
           {!isRealReader && (

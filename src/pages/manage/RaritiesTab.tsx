@@ -1,15 +1,15 @@
 import AddIcon from '@mui/icons-material/Add'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
-import { Box, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, TextField, Typography } from '@mui/material'
+import { Box, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, TextField, Typography } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
-import { AdvancedOptions, Button, Card, ConfirmDeleteDialog, EmojiPickerInput, Input, toast } from '../../components/ui'
+import { AdvancedOptions, Button, Card, ConfirmDeleteDialog, EmojiPickerInput, Input, SectionLabel, toast } from '../../components/ui'
+import { RarityChip } from '../../components/collection/RarityChip'
 import { useCollectionRaritiesQuery, useCreateCollectionRarityMutation, useDeleteCollectionRarityMutation, useImportCollectionRaritiesMutation, useUpdateCollectionRarityMutation } from '../../hooks/useNotes'
 import { useConfirmDelete } from '../../hooks/useConfirmDelete'
 import { useJsonImport } from '../../hooks/useJsonImport'
-import { colors, font, radius } from '../../design-system'
+import { colors, font, radius, liftOnDark } from '../../design-system'
 import { useBackground } from '../../context/BackgroundContext'
-import { gradientTextSx } from '../../utils/colorUtils'
 import { uniqueConfigId } from '../../utils/slug'
 import type { RarityConfig } from '../../types/note'
 import { ColorRow, actionButtonSx } from './shared'
@@ -82,6 +82,73 @@ const RARITY_TEMPLATES: RarityConfig[] = [
   },
 ]
 
+const formatOdds = (odds: number) => (odds % 1 === 0 ? String(odds) : odds.toFixed(2))
+
+const ODDS_TONE = {
+  ok: { color: colors.success.main, text: colors.success.main, title: 'Distribuição de chances' },
+  warn: { color: '#f59e0b', text: '#b45309', title: 'Distribuição de chances' },
+  over: { color: colors.error.main, text: colors.error.main, title: '⚠ Soma ultrapassa 100%' },
+}
+
+function OddsMeter({ total }: { total: number }) {
+  const tone = total > 100 ? 'over' : total > 95 ? 'warn' : 'ok'
+  const { color, text, title } = ODDS_TONE[tone]
+  const over = tone === 'over'
+  return (
+    <Box sx={{ borderRadius: radius.lg, px: 1.5, py: 1.1, bgcolor: `${color}12`, border: `1px solid ${color}40` }}>
+      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.8 }}>
+        <Typography variant="label" sx={{ color: liftOnDark(text) }}>{title}</Typography>
+        <Typography variant="sm" sx={{ fontWeight: 800, color: over ? liftOnDark(text) : colors.text.secondary }}>{total.toFixed(2)}%</Typography>
+      </Stack>
+      <Box sx={{ height: 5, borderRadius: radius.full, bgcolor: colors.border.subtle, overflow: 'hidden' }}>
+        <Box sx={{ height: '100%', width: `${Math.min(total, 100)}%`, borderRadius: radius.full, bgcolor: color, transition: 'width 0.2s ease, background-color 0.2s ease' }} />
+      </Box>
+      <Typography variant="xs" sx={{ mt: 0.7, textAlign: 'right', color: over ? liftOnDark(text) : colors.text.secondary }}>
+        {over ? `excede em ${(total - 100).toFixed(2)}%` : `${(100 - total).toFixed(2)}% livres`}
+      </Typography>
+    </Box>
+  )
+}
+
+function RarityPreview({ rarity }: { rarity: RarityConfig }) {
+  const { cardBg, borderColor, shadow, glowColor, captionColor, textColor, odds } = rarity
+  return (
+    <Box sx={{ position: 'relative', p: 2.5, overflow: 'hidden', borderRadius: radius.xl, background: cardBg, border: `2px solid ${borderColor}`, boxShadow: glowColor ? `${shadow}, 0 0 28px ${glowColor}88` : shadow }}>
+      {glowColor && <Box sx={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: `radial-gradient(ellipse at 50% -10%, ${glowColor}33, transparent 65%)` }} />}
+      <Stack spacing={1.5} sx={{ position: 'relative' }}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <RarityChip rarity={rarity} size="md" uppercase />
+          <Typography variant="xs" sx={{ fontWeight: 700, color: captionColor }}>{formatOdds(odds)}% de chance</Typography>
+        </Stack>
+        <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.1rem', lineHeight: 1.25, color: textColor }}>
+          Exemplo de bilhete ✨
+        </Typography>
+        <Typography variant="lg" sx={{ fontStyle: 'italic', lineHeight: 1.5, color: captionColor }}>
+          "Aqui vai a mensagem especial que o leitor vai receber quando tirar essa raridade."
+        </Typography>
+      </Stack>
+    </Box>
+  )
+}
+
+function TemplateTile({ template, applied, onClick }: { template: RarityConfig; applied: boolean; onClick: () => void }) {
+  const { cardBg, borderColor, glowColor } = template
+  return (
+    <Box
+      onClick={onClick}
+      sx={{
+        p: 1, borderRadius: radius.lg, cursor: 'pointer', background: cardBg, transition: 'all 0.15s ease',
+        border: `1.5px solid ${applied ? borderColor : 'rgba(0,0,0,0.07)'}`,
+        boxShadow: applied ? `0 0 16px ${glowColor}99` : 'none',
+        outline: applied ? `2px solid ${borderColor}55` : 'none',
+        '&:hover': { transform: 'translateY(-1px)', boxShadow: `0 0 14px ${glowColor}66`, border: `1.5px solid ${borderColor}` },
+      }}
+    >
+      <RarityChip rarity={template} />
+    </Box>
+  )
+}
+
 function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityConfig | null; onClose: () => void }) {
   const isNew = !rarity
   const { data: existingRarities = [] } = useCollectionRaritiesQuery(cid)
@@ -100,8 +167,6 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
 
   const otherOdds = existingRarities.filter((r) => r.id !== form.id).reduce((sum, r) => sum + r.odds, 0)
   const totalOdds = parseFloat((otherOdds + form.odds).toFixed(2))
-  const overLimit = totalOdds > 100
-  const remaining = parseFloat((100 - totalOdds).toFixed(2))
 
   const applyTemplate = (template: RarityConfig) => {
     setAppliedTemplateId(template.id)
@@ -145,36 +210,11 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
       <DialogContent>
         <Stack spacing={2} sx={{ pt: 1 }}>
           <Box>
-            <Stack direction="row" alignItems="baseline" spacing={1} sx={{ mb: 1 }}>
-              <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: colors.text.secondary, textTransform: 'uppercase', letterSpacing: 0.6 }}>
-                Modelos prontos
-              </Typography>
-              <Typography sx={{ fontSize: '0.68rem', color: colors.text.muted }}>
-                clique para preencher automaticamente
-              </Typography>
-            </Stack>
+            <SectionLabel hint="clique para preencher automaticamente" sx={{ mb: 1 }}>Modelos prontos</SectionLabel>
             <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 0.7 }}>
-              {RARITY_TEMPLATES.map((template) => {
-                const isApplied = appliedTemplateId === template.id
-                return (
-                  <Box
-                    key={template.id}
-                    onClick={() => applyTemplate(template)}
-                    sx={{
-                      p: 1, borderRadius: radius.lg, cursor: 'pointer',
-                      background: template.cardBg,
-                      border: `1.5px solid ${isApplied ? template.borderColor : 'rgba(0,0,0,0.07)'}`,
-                      boxShadow: isApplied ? `0 0 16px ${template.glowColor}99` : 'none',
-                      outline: isApplied ? `2px solid ${template.borderColor}55` : 'none',
-                      transition: 'all 0.15s ease',
-                      '&:hover': { transform: 'translateY(-1px)', boxShadow: `0 0 14px ${template.glowColor}66`, border: `1.5px solid ${template.borderColor}` },
-                    }}
-                  >
-                    <Chip label={`${template.emoji} ${template.label}`} size="small"
-                      sx={{ height: 20, fontSize: '0.68rem', fontWeight: 800, background: template.chipBg, '& .MuiChip-label': { px: 0.7, ...gradientTextSx(template.chipColor) } }} />
-                  </Box>
-                )
-              })}
+              {RARITY_TEMPLATES.map((template) => (
+                <TemplateTile key={template.id} template={template} applied={appliedTemplateId === template.id} onClick={() => applyTemplate(template)} />
+              ))}
             </Box>
           </Box>
 
@@ -183,51 +223,8 @@ function RarityEditor({ cid, rarity, onClose }: { cid: string; rarity: RarityCon
             <EmojiPickerInput label="Emoji" value={form.emoji} onChange={(emoji) => set('emoji', emoji)} />
             <Input label="Chance %" type="number" value={form.odds} onChange={(e) => set('odds', e.target.value === '' ? 0 : Number(e.target.value))} onBlur={(e) => set('odds', parseFloat(Math.max(0, Math.min(100, Number(e.target.value) || 0)).toFixed(2)))} sx={{ width: 95 }} inputProps={{ step: 0.01, min: 0, max: 100 }} />
           </Stack>
-          <Box sx={{
-            borderRadius: radius.lg, px: 1.5, py: 1.1,
-            bgcolor: overLimit ? `${colors.error.main}12` : totalOdds > 95 ? '#f59e0b12' : `${colors.success.main}10`,
-            border: `1px solid ${overLimit ? colors.error.main + '40' : totalOdds > 95 ? '#f59e0b40' : colors.success.main + '35'}`,
-          }}>
-            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.8 }}>
-              <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: overLimit ? colors.error.main : totalOdds > 95 ? '#f59e0b' : colors.success.main, textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                {overLimit ? '⚠ Soma ultrapassa 100%' : 'Distribuição de chances'}
-              </Typography>
-              <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, color: overLimit ? colors.error.main : colors.text.secondary }}>
-                {totalOdds.toFixed(2)}%
-              </Typography>
-            </Stack>
-            <Box sx={{ height: 5, borderRadius: radius.full, bgcolor: 'rgba(0,0,0,0.07)', overflow: 'hidden' }}>
-              <Box sx={{
-                height: '100%', borderRadius: radius.full,
-                width: `${Math.min(totalOdds, 100)}%`,
-                bgcolor: overLimit ? colors.error.main : totalOdds > 95 ? '#f59e0b' : colors.success.main,
-                transition: 'width 0.2s ease, background-color 0.2s ease',
-              }} />
-            </Box>
-            <Typography sx={{ fontSize: '0.66rem', color: overLimit ? colors.error.main : colors.text.muted, mt: 0.7, textAlign: 'right' }}>
-              {overLimit ? `excede em ${(totalOdds - 100).toFixed(2)}%` : `${remaining.toFixed(2)}% livres`}
-            </Typography>
-          </Box>
-          <Box sx={{ position: 'relative', borderRadius: radius.xl, background: form.cardBg, border: `2px solid ${form.borderColor}`, boxShadow: `${form.shadow}${form.glowColor ? `, 0 0 28px ${form.glowColor}88` : ''}`, p: 2.5, overflow: 'hidden' }}>
-            {form.glowColor && (
-              <Box sx={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse at 50% -10%, ${form.glowColor}33, transparent 65%)`, pointerEvents: 'none' }} />
-            )}
-            <Stack spacing={1.5} sx={{ position: 'relative', zIndex: 1 }}>
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <Chip label={`${form.emoji} ${form.label.toUpperCase()}`} size="small"
-                  sx={{ height: 22, fontSize: '0.73rem', fontWeight: 800, background: form.chipBg, '& .MuiChip-label': { px: 1, ...gradientTextSx(form.chipColor) } }} />
-                <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: form.captionColor }}>
-                  {form.odds % 1 === 0 ? form.odds : form.odds.toFixed(2)}% de chance
-                </Typography>
-              </Stack>
-              <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.1rem', color: form.textColor, lineHeight: 1.25 }}>
-                Exemplo de bilhete ✨
-              </Typography>
-              <Typography sx={{ fontSize: '0.83rem', fontStyle: 'italic', color: form.captionColor, lineHeight: 1.5 }}>
-                "Aqui vai a mensagem especial que o leitor vai receber quando tirar essa raridade."
-              </Typography>
-            </Stack>
-          </Box>
+          <OddsMeter total={totalOdds} />
+          <RarityPreview rarity={form} />
           <RevealStyleEditor
             cid={cid}
             form={form}
@@ -285,7 +282,7 @@ export function RaritiesTab({ cid }: RaritiesTabProps) {
     <>
       <Stack spacing={1.4}>
         <Stack spacing={1}>
-          <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted, fontWeight: 600 }}>
+          <Typography variant="sm" sx={{ color: theme.textOnBgMuted, fontWeight: 600 }}>
             {rarities.length} raridade{rarities.length !== 1 ? 's' : ''}
           </Typography>
           <Stack direction="row" spacing={0.8} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.8 }}>
@@ -298,7 +295,7 @@ export function RaritiesTab({ cid }: RaritiesTabProps) {
           </Stack>
         </Stack>
         {rarities.length === 0 && (
-          <Typography sx={{ fontSize: '0.85rem', color: theme.textOnBgMuted, textAlign: 'center', py: 3 }}>
+          <Typography variant="lg" sx={{ color: theme.textOnBgMuted, textAlign: 'center', py: 3 }}>
             Nenhuma raridade. Toque em "Nova" para criar.
           </Typography>
         )}
@@ -307,9 +304,8 @@ export function RaritiesTab({ cid }: RaritiesTabProps) {
             <Box sx={{ py: 1.4, px: 1.8 }}>
               <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
                 <Box onClick={() => { setEditingRarity(r); setRarityDialogOpen(true) }} sx={{ flex: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Chip label={`${r.emoji} ${r.label.toUpperCase()}`} size="small"
-                    sx={{ height: 20, fontSize: '0.72rem', fontWeight: 700, background: r.chipBg, '& .MuiChip-label': { px: 0.9, ...gradientTextSx(r.chipColor) } }} />
-                  <Typography sx={{ fontSize: '0.78rem', color: r.captionColor, fontWeight: 600 }}>{r.odds % 1 === 0 ? r.odds : r.odds.toFixed(2)}% de chance</Typography>
+                  <RarityChip rarity={r} uppercase />
+                  <Typography variant="md" sx={{ fontWeight: 600, color: r.captionColor }}>{formatOdds(r.odds)}% de chance</Typography>
                 </Box>
                 <Stack direction="row" spacing={0.5}>
                   <IconButton size="small" aria-label="editar raridade" onClick={() => { setEditingRarity(r); setRarityDialogOpen(true) }} sx={actionButtonSx('primary')}>
@@ -331,7 +327,7 @@ export function RaritiesTab({ cid }: RaritiesTabProps) {
         </DialogTitle>
         <DialogContent sx={{ pt: 1 }}>
           <Stack spacing={1.3}>
-            <Typography sx={{ fontSize: '0.82rem', color: colors.text.secondary, lineHeight: 1.5 }}>
+            <Typography variant="md" sx={{ color: colors.text.secondary, lineHeight: 1.5 }}>
               Cole uma lista de raridades. Cada item precisa ter <strong>id</strong>, <strong>label</strong>, <strong>emoji</strong>, <strong>odds</strong>, <strong>order</strong> e as cores. Raridades com id já existente serão ignoradas.
             </Typography>
             <TextField multiline minRows={10} value={rarityImport.json} onChange={(e) => rarityImport.setJson(e.target.value)} fullWidth spellCheck={false}

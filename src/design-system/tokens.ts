@@ -5,6 +5,7 @@ export const colors = {
   text:      { primary: 'var(--pd-text-primary)', secondary: 'var(--pd-text-secondary)', muted: 'var(--pd-text-muted)' },
   surface:   { base: 'var(--pd-surface-base)', overlay: 'var(--pd-surface-overlay)', paper: 'var(--pd-surface-paper)' },
   border:    { subtle: 'var(--pd-border-subtle)', medium: 'var(--pd-border-medium)' },
+  fill:      { subtle: 'var(--pd-fill-subtle)', medium: 'var(--pd-fill-medium)' },
   glass:     {
     bg: 'var(--pd-glass-bg)', border: 'var(--pd-glass-border)', strong: 'var(--pd-glass-strong)',
     card: 'var(--pd-glass-card)', cardBorder: 'var(--pd-glass-card-border)',
@@ -19,7 +20,7 @@ export const colors = {
 export const ink = {
   primary: '#1e3a5f',
   secondary: '#64748b',
-  muted: '#94a3b8',
+  muted: '#7d8ba1',
   surface: 'rgba(255,253,251,0.95)',
   borderSubtle: 'rgba(0,0,0,0.07)',
   borderMedium: 'rgba(0,0,0,0.1)',

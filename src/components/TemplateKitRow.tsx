@@ -25,14 +25,14 @@ export function TemplateKitRow({ template, busy, dimmed, onClick }: {
         <Typography sx={{ fontSize: '1.15rem', lineHeight: 1 }}>{template.emoji}</Typography>
       </Box>
       <Box sx={{ flex: 1, minWidth: 0 }}>
-        <Typography sx={{ fontSize: '0.82rem', fontWeight: 900, color: colors.text.primary, lineHeight: 1.2 }}>
+        <Typography variant="md" sx={{ fontWeight: 900, color: colors.text.primary, lineHeight: 1.2 }}>
           {template.title}
         </Typography>
-        <Typography sx={{ fontSize: '0.66rem', color: colors.text.secondary, lineHeight: 1.35, mt: 0.2 }}>
+        <Typography variant="xs" sx={{ color: colors.text.secondary, lineHeight: 1.35, mt: 0.2 }}>
           {busy ? '✨ Preparando sua coleção...' : template.tagline}
         </Typography>
       </Box>
-      <Typography sx={{ fontSize: '0.9rem', color: template.accent, flexShrink: 0, fontWeight: 900 }}>→</Typography>
+      <Typography variant="xl" sx={{ color: template.accent, flexShrink: 0, fontWeight: 900 }}>→</Typography>
     </Box>
   )
 }

@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { SegmentedControl } from '../../components/ui'
 import { useBackground } from '../../context/BackgroundContext'
-import { font, getBackgroundTheme, radius } from '../../design-system'
+import { font, getBackgroundTheme, radius, colors } from '../../design-system'
 import type { AdminCollectionRow, AdminDailyPoint, AdminOverview, AdminRhythm, AdminUserRow } from '../../types/admin'
 import { AnimatedNumber, BarChart, ColumnStrip, DeltaBadge, SegmentBar } from './charts'
 import { Avatar, Panel } from './Panel'
@@ -48,7 +48,7 @@ function HeroMetric({ emoji, label, value, badge, detail }: { emoji: string; lab
   const { theme } = useBackground()
   return (
     <Box sx={{ minWidth: 0 }}>
-      <Typography sx={{ fontSize: '0.74rem', fontWeight: 700, color: theme.textOnBgMuted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+      <Typography variant="sm" sx={{ fontWeight: 700, color: theme.textOnBgMuted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
         {emoji} {label}
       </Typography>
       <Stack direction="row" alignItems="baseline" spacing={1} sx={{ mt: 0.4, flexWrap: 'wrap', rowGap: 0.4 }}>
@@ -57,7 +57,7 @@ function HeroMetric({ emoji, label, value, badge, detail }: { emoji: string; lab
         </Typography>
         {badge}
       </Stack>
-      {detail && <Typography sx={{ mt: 0.5, fontSize: '0.7rem', color: theme.textOnBgMuted }}>{detail}</Typography>}
+      {detail && <Typography variant="xs" sx={{ mt: 0.5, color: theme.textOnBgMuted }}>{detail}</Typography>}
     </Box>
   )
 }
@@ -75,7 +75,7 @@ export function TodayHero({ data }: { data: AdminOverview }) {
       <Box sx={{ position: 'absolute', right: -40, top: -60, width: 220, height: 220, borderRadius: '50%', background: `radial-gradient(circle, ${theme.accent}33, transparent 70%)`, pointerEvents: 'none' }} />
       <Stack direction="row" alignItems="baseline" spacing={1} sx={{ mb: { xs: 1.6, md: 2.2 }, position: 'relative' }}>
         <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.2rem', color: theme.textOnBg }}>Hoje</Typography>
-        {today && <Typography sx={{ fontSize: '0.8rem', color: theme.textOnBgMuted }}>{dayLabelLong(today)} · comparado com ontem</Typography>}
+        {today && <Typography variant="md" sx={{ color: theme.textOnBgMuted }}>{dayLabelLong(today)} · comparado com ontem</Typography>}
       </Stack>
       <Box sx={{ position: 'relative', display: 'grid', gap: { xs: 2, md: 3 }, gridTemplateColumns: { xs: 'repeat(2, minmax(0,1fr))', md: 'repeat(4, minmax(0,1fr))' } }}>
         <HeroMetric emoji="📦" label="Bilhetes abertos" value={todayChange(data.daily, 'collected').current} badge={<DeltaBadge change={todayChange(data.daily, 'collected')} />} />
@@ -132,7 +132,7 @@ export function TrendPanel({ daily }: { daily: AdminDailyPoint[] }) {
               aria-pressed={range === option}
               sx={{
                 all: 'unset', cursor: 'pointer', px: 1, py: 0.35, borderRadius: radius.full, fontSize: '0.72rem', fontWeight: 800,
-                color: range === option ? '#fff' : theme.textOnBgMuted, background: range === option ? theme.accent : 'transparent',
+                color: range === option ? theme.onAccent : theme.textOnBgMuted, background: range === option ? theme.accent : 'transparent',
                 border: `1px solid ${range === option ? theme.accent : theme.surfaceBorder}`,
                 '&:focus-visible': { outline: `2px solid ${theme.accent}` },
               }}
@@ -152,14 +152,14 @@ export function TrendPanel({ daily }: { daily: AdminDailyPoint[] }) {
           <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: { xs: '1.9rem', md: '2.2rem' }, lineHeight: 1, color: theme.textOnBg, fontVariantNumeric: 'tabular-nums' }}>
             {formatNumber(focusValue)}
           </Typography>
-          <Typography sx={{ mt: 0.4, fontSize: '0.76rem', color: theme.textOnBgMuted }}>
+          <Typography variant="sm" sx={{ mt: 0.4, color: theme.textOnBgMuted }}>
             {focusValue === 1 ? config.unit[0] : config.unit[1]} · {focus === points.length - 1 ? 'hoje' : dayLabelLong(points[focus].date)}
           </Typography>
         </Box>
         {comparison.previous !== null && (
           <Stack direction="row" spacing={0.8} alignItems="center">
             <DeltaBadge change={comparison} />
-            <Typography sx={{ fontSize: '0.7rem', color: theme.textOnBgMuted }}>vs {range} dias anteriores</Typography>
+            <Typography variant="xs" sx={{ color: theme.textOnBgMuted }}>vs {range} dias anteriores</Typography>
           </Stack>
         )}
       </Stack>
@@ -191,15 +191,15 @@ export function RhythmPanel({ rhythm }: { rhythm?: AdminRhythm }) {
   return (
     <Panel title="Quando abrem" subtitle="Bilhetes abertos nos últimos 30 dias, no horário de Brasília">
       {total === 0 ? (
-        <Typography sx={{ py: 4, textAlign: 'center', fontSize: '0.82rem', color: theme.textOnBgMuted }}>Ainda sem aberturas pra mostrar o ritmo.</Typography>
+        <Typography variant="md" sx={{ py: 4, textAlign: 'center', color: theme.textOnBgMuted }}>Ainda sem aberturas pra mostrar o ritmo.</Typography>
       ) : (
         <Stack spacing={2.4}>
           <Box>
             <Stack direction="row" alignItems="baseline" justifyContent="space-between" sx={{ mb: 1 }}>
-              <Typography sx={{ fontSize: '0.8rem', fontWeight: 800, color: theme.textOnBg }}>
+              <Typography variant="md" sx={{ fontWeight: 800, color: theme.textOnBg }}>
                 {focus === peakHour ? '⏰ Pico ' : ''}às {focus}h
               </Typography>
-              <Typography sx={{ fontSize: '0.74rem', color: theme.textOnBgMuted }}>
+              <Typography variant="sm" sx={{ color: theme.textOnBgMuted }}>
                 {formatNumber(hours[focus] ?? 0)} bilhetes · {percentLabel(share(hours[focus] ?? 0, total))}
               </Typography>
             </Stack>
@@ -207,17 +207,17 @@ export function RhythmPanel({ rhythm }: { rhythm?: AdminRhythm }) {
           </Box>
 
           <Box>
-            <Typography sx={{ mb: 1, fontSize: '0.8rem', fontWeight: 800, color: theme.textOnBg }}>
+            <Typography variant="md" sx={{ mb: 1, fontWeight: 800, color: theme.textOnBg }}>
               📅 Dia favorito: {peakDay >= 0 ? WEEKDAYS_LONG[peakDay] : '—'}
             </Typography>
             <Stack spacing={0.6}>
               {[1, 2, 3, 4, 5, 6, 0].map((day) => (
                 <Stack key={day} direction="row" alignItems="center" spacing={1}>
-                  <Typography sx={{ width: 30, fontSize: '0.7rem', fontWeight: 700, color: day === peakDay ? theme.textOnBg : theme.textOnBgMuted }}>{WEEKDAYS_SHORT[day]}</Typography>
-                  <Box sx={{ flex: 1, height: 8, borderRadius: radius.full, background: theme.isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+                  <Typography variant="xs" sx={{ width: 30, fontWeight: 700, color: day === peakDay ? theme.textOnBg : theme.textOnBgMuted }}>{WEEKDAYS_SHORT[day]}</Typography>
+                  <Box sx={{ flex: 1, height: 8, borderRadius: radius.full, background: colors.fill.medium, overflow: 'hidden' }}>
                     <Box sx={{ width: `${(weekdays[day] / maxDay) * 100}%`, height: '100%', borderRadius: radius.full, background: day === peakDay ? theme.accent : `${theme.accent}66`, transition: 'width 0.6s ease' }} />
                   </Box>
-                  <Typography sx={{ width: 34, textAlign: 'right', fontSize: '0.7rem', fontWeight: 700, color: theme.textOnBgMuted }}>{formatNumber(weekdays[day] ?? 0)}</Typography>
+                  <Typography variant="xs" sx={{ width: 34, textAlign: 'right', fontWeight: 700, color: theme.textOnBgMuted }}>{formatNumber(weekdays[day] ?? 0)}</Typography>
                 </Stack>
               ))}
             </Stack>
@@ -241,16 +241,16 @@ export function FunnelPanel({ users }: { users: AdminUserRow[] }) {
           return (
             <Box key={step.label}>
               <Stack direction="row" alignItems="baseline" justifyContent="space-between" spacing={1}>
-                <Typography sx={{ fontSize: '0.8rem', fontWeight: 800, color: theme.textOnBg }}>{step.label}</Typography>
-                <Typography sx={{ fontSize: '0.8rem', fontWeight: 800, color: theme.textOnBg, whiteSpace: 'nowrap' }}>
+                <Typography variant="md" sx={{ fontWeight: 800, color: theme.textOnBg }}>{step.label}</Typography>
+                <Typography variant="md" sx={{ fontWeight: 800, color: theme.textOnBg, whiteSpace: 'nowrap' }}>
                   {formatNumber(step.count)}
                   <Box component="span" sx={{ ml: 0.6, fontWeight: 600, fontSize: '0.72rem', color: theme.textOnBgMuted }}>{percentLabel(ratio)}</Box>
                 </Typography>
               </Stack>
-              <Box sx={{ mt: 0.5, height: 10, borderRadius: radius.full, background: theme.isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+              <Box sx={{ mt: 0.5, height: 10, borderRadius: radius.full, background: colors.fill.medium, overflow: 'hidden' }}>
                 <Box sx={{ width: `${ratio * 100}%`, height: '100%', borderRadius: radius.full, background: `linear-gradient(90deg, ${theme.accent}, ${theme.accent}99)`, opacity: 1 - i * 0.12, transition: 'width 0.7s ease' }} />
               </Box>
-              <Typography sx={{ mt: 0.3, fontSize: '0.68rem', color: theme.textOnBgMuted }}>
+              <Typography variant="xs" sx={{ mt: 0.3, color: theme.textOnBgMuted }}>
                 {step.hint}{previous !== null && previous > 0 ? ` · ${percentLabel(share(step.count, previous))} da etapa anterior` : ''}
               </Typography>
             </Box>
@@ -272,19 +272,19 @@ export function CompositionPanel({ data }: { data: AdminOverview }) {
     <Panel title="Quem usa o Potinho" subtitle="Como a base se divide hoje">
       <Stack spacing={2.2}>
         <Box>
-          <Typography sx={{ mb: 1, fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.4, textTransform: 'uppercase', color: theme.textOnBgMuted }}>Papel</Typography>
+          <Typography variant="label" sx={{ mb: 1, color: theme.textOnBgMuted }}>Papel</Typography>
           <SegmentBar segments={roleSegments(data.users)} />
         </Box>
         <Box>
-          <Typography sx={{ mb: 1, fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.4, textTransform: 'uppercase', color: theme.textOnBgMuted }}>Como entram</Typography>
+          <Typography variant="label" sx={{ mb: 1, color: theme.textOnBgMuted }}>Como entram</Typography>
           <SegmentBar segments={loginSegments(data.users)} />
         </Box>
         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0,1fr))', gap: 0.8 }}>
           {extras.map((extra) => (
             <Box key={extra.label} sx={{ p: 1, borderRadius: radius.lg, textAlign: 'center', background: `${theme.accent}0f`, border: `1px solid ${theme.accent}22` }}>
-              <Typography sx={{ fontSize: '1rem' }}>{extra.emoji}</Typography>
+              <Typography variant="xl">{extra.emoji}</Typography>
               <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.1rem', color: theme.textOnBg, lineHeight: 1.2 }}>{formatNumber(extra.value)}</Typography>
-              <Typography sx={{ fontSize: '0.62rem', fontWeight: 700, color: theme.textOnBgMuted, textTransform: 'uppercase', letterSpacing: 0.3 }}>{extra.label}</Typography>
+              <Typography variant="xxs" sx={{ fontWeight: 700, color: theme.textOnBgMuted, textTransform: 'uppercase', letterSpacing: 0.3 }}>{extra.label}</Typography>
             </Box>
           ))}
         </Box>
@@ -313,12 +313,12 @@ export function RecentUsersPanel({ users, onOpen }: { users: AdminUserRow[]; onO
           >
             <Avatar id={user.id} name={user.name} tone={activityTone(user.lastActiveAt)} size={34} />
             <Box sx={{ minWidth: 0, flex: 1 }}>
-              <Typography sx={{ fontSize: '0.84rem', fontWeight: 800, color: theme.textOnBg, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.name}</Typography>
-              <Typography sx={{ fontSize: '0.7rem', color: theme.textOnBgMuted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.emailMasked}</Typography>
+              <Typography variant="lg" sx={{ fontWeight: 800, color: theme.textOnBg, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.name}</Typography>
+              <Typography variant="xs" sx={{ color: theme.textOnBgMuted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.emailMasked}</Typography>
             </Box>
             <Box sx={{ textAlign: 'right', flexShrink: 0 }}>
-              <Typography sx={{ fontSize: '0.76rem', fontWeight: 700, color: theme.textOnBg }}>{timeAgo(user.lastActiveAt)}</Typography>
-              <Typography sx={{ fontSize: '0.66rem', color: theme.textOnBgMuted }}>💌 {formatNumber(user.collected)}</Typography>
+              <Typography variant="sm" sx={{ fontWeight: 700, color: theme.textOnBg }}>{timeAgo(user.lastActiveAt)}</Typography>
+              <Typography variant="xs" sx={{ color: theme.textOnBgMuted }}>💌 {formatNumber(user.collected)}</Typography>
             </Box>
           </Box>
         ))}
@@ -335,7 +335,7 @@ export function TopCollectionsPanel({ collections }: { collections: AdminCollect
   return (
     <Panel title="Coleções em alta" subtitle="Mais bilhetes abertos no total" actions={<SeeAll to="/admin/colecoes" label="todas as coleções" />} dense>
       {top.length === 0 ? (
-        <Typography sx={{ py: 3, textAlign: 'center', fontSize: '0.82rem', color: theme.textOnBgMuted }}>Nenhuma coleção ainda.</Typography>
+        <Typography variant="md" sx={{ py: 3, textAlign: 'center', color: theme.textOnBgMuted }}>Nenhuma coleção ainda.</Typography>
       ) : (
         <Stack spacing={1.1}>
           {top.map((collection, i) => {
@@ -348,13 +348,13 @@ export function TopCollectionsPanel({ collections }: { collections: AdminCollect
                 </Box>
                 <Box sx={{ minWidth: 0, flex: 1 }}>
                   <Stack direction="row" justifyContent="space-between" spacing={1}>
-                    <Typography sx={{ fontSize: '0.82rem', fontWeight: 800, color: theme.textOnBg, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{collection.name}</Typography>
-                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 800, color: theme.textOnBg }}>{formatNumber(collection.collected)}</Typography>
+                    <Typography variant="md" sx={{ fontWeight: 800, color: theme.textOnBg, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{collection.name}</Typography>
+                    <Typography variant="md" sx={{ fontWeight: 800, color: theme.textOnBg }}>{formatNumber(collection.collected)}</Typography>
                   </Stack>
-                  <Box sx={{ mt: 0.5, height: 6, borderRadius: radius.full, background: theme.isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+                  <Box sx={{ mt: 0.5, height: 6, borderRadius: radius.full, background: colors.fill.medium, overflow: 'hidden' }}>
                     <Box sx={{ width: `${(collection.collected / max) * 100}%`, height: '100%', borderRadius: radius.full, background: look.accent }} />
                   </Box>
-                  <Typography sx={{ mt: 0.3, fontSize: '0.66rem', color: theme.textOnBgMuted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <Typography variant="xs" sx={{ mt: 0.3, color: theme.textOnBgMuted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     de {collection.ownerName ?? 'conta removida'} · {collection.readers} {collection.readers === 1 ? 'leitor' : 'leitores'}
                   </Typography>
                 </Box>

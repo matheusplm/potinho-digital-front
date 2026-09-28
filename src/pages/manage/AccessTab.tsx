@@ -106,7 +106,7 @@ export function AccessTab({ cid }: AccessTabProps) {
       <Stack spacing={2}>
         <Card sx={{ p: 2 }}>
           <Stack spacing={1}>
-            <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.8, color: colors.text.muted, textTransform: 'uppercase' }}>
+            <Typography variant="label" sx={{ color: colors.text.muted }}>
               Convidar por email
             </Typography>
             <Stack direction="row" spacing={1} alignItems="flex-end">
@@ -124,7 +124,7 @@ export function AccessTab({ cid }: AccessTabProps) {
 
         {!isLoading && pendingInvites.length > 0 && (
           <Stack spacing={1}>
-            <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.8, color: colors.text.muted, textTransform: 'uppercase', px: 0.5 }}>
+            <Typography variant="label" sx={{ color: colors.text.muted, px: 0.5 }}>
               Convites pendentes
             </Typography>
             {pendingInvites.map((invite) => (
@@ -142,7 +142,7 @@ export function AccessTab({ cid }: AccessTabProps) {
 
         {!isLoading && rejectedInvites.length > 0 && (
           <Stack spacing={1}>
-            <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.8, color: colors.text.muted, textTransform: 'uppercase', px: 0.5 }}>
+            <Typography variant="label" sx={{ color: colors.text.muted, px: 0.5 }}>
               Convites recusados / expirados
             </Typography>
             {rejectedInvites.map((invite) => (
@@ -160,7 +160,7 @@ export function AccessTab({ cid }: AccessTabProps) {
 
         {!isLoading && acceptedInvites.length > 0 && (
           <Stack spacing={1}>
-            <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.8, color: colors.text.muted, textTransform: 'uppercase', px: 0.5 }}>
+            <Typography variant="label" sx={{ color: colors.text.muted, px: 0.5 }}>
               Convites aceitos
             </Typography>
             {acceptedInvites.map((invite) => (
@@ -178,7 +178,7 @@ export function AccessTab({ cid }: AccessTabProps) {
         )}
 
         {!isLoading && accesses.length === 0 && pendingInvites.length === 0 && rejectedInvites.length === 0 && acceptedInvites.length === 0 && (
-          <Typography sx={{ fontSize: '0.82rem', color: theme.textOnBgMuted, textAlign: 'center', py: 2 }}>
+          <Typography variant="md" sx={{ color: theme.textOnBgMuted, textAlign: 'center', py: 2 }}>
             Nenhum acesso ou convite ainda
           </Typography>
         )}
@@ -186,7 +186,7 @@ export function AccessTab({ cid }: AccessTabProps) {
         {accesses.length > 0 && (
           <Stack spacing={1}>
             {!isLoading && (
-              <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.8, color: colors.text.muted, textTransform: 'uppercase', px: 0.5 }}>
+              <Typography variant="label" sx={{ color: colors.text.muted, px: 0.5 }}>
                 Leitores com acesso
               </Typography>
             )}
@@ -195,11 +195,11 @@ export function AccessTab({ cid }: AccessTabProps) {
                 <Stack spacing={1.4}>
                   <Stack direction="row" alignItems="center" spacing={1.5}>
                     <Box sx={{ width: 36, height: 36, borderRadius: radius.md, background: `linear-gradient(135deg,${colors.primary.main},${colors.rose.main})`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <Typography sx={{ fontFamily: font.serif, fontWeight: 700, color: '#fff', fontSize: '0.9rem' }}>
+                      <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 700, color: '#fff' }}>
                         {a.email[0].toUpperCase()}
                       </Typography>
                     </Box>
-                    <Typography sx={{ flex: 1, fontSize: '0.84rem', color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <Typography variant="lg" sx={{ flex: 1, color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {a.email}
                     </Typography>
                     <IconButton size="small" aria-label="ver coleção" onClick={() => navigate(`/colecoes/${slug}/gerenciar/leitores/${encodeURIComponent(a.email)}`)} sx={{ ...actionButtonSx('neutral'), flexShrink: 0 }}>
@@ -209,7 +209,7 @@ export function AccessTab({ cid }: AccessTabProps) {
 
                   {accessBonusPacks.length > 0 && (
                     <Stack spacing={0.8}>
-                      <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.7, color: colors.text.muted, textTransform: 'uppercase' }}>
+                      <Typography variant="label" sx={{ color: colors.text.muted }}>
                         Brindes liberados
                       </Typography>
                       <Stack direction="row" spacing={0.7} sx={{ flexWrap: 'wrap', rowGap: 0.7 }}>
@@ -244,32 +244,32 @@ export function AccessTab({ cid }: AccessTabProps) {
 
         {!isLoading && sentNotifications.length > 0 && (
           <Stack spacing={1}>
-            <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 0.8, color: colors.text.muted, textTransform: 'uppercase', px: 0.5 }}>
+            <Typography variant="label" sx={{ color: colors.text.muted, px: 0.5 }}>
               Avisos enviados
             </Typography>
             {sentNotifications.map((notification) => (
               <Card key={notification.id} sx={{ p: 1.6 }}>
                 <Stack spacing={0.8}>
                   <Stack direction="row" alignItems="center" spacing={1}>
-                    <Typography sx={{ flex: 1, fontSize: '0.82rem', fontWeight: 800, color: colors.text.primary }}>
+                    <Typography variant="md" sx={{ flex: 1, fontWeight: 800, color: colors.text.primary }}>
                       {notification.kind === 'release'
                         ? `🚀 Lançamento de ${Number(notification.payload.noteCount ?? 0)} bilhete${Number(notification.payload.noteCount ?? 0) === 1 ? '' : 's'}`
                         : `🎁 ${Number(notification.payload.opens ?? 0)}x ${String(notification.payload.packEmoji ?? '')} ${String(notification.payload.packName ?? 'pacotinho')}`}
                     </Typography>
-                    <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: colors.text.muted, flexShrink: 0 }}>
+                    <Typography variant="xs" sx={{ fontWeight: 700, color: colors.text.muted, flexShrink: 0 }}>
                       {new Date(notification.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
                     </Typography>
                   </Stack>
                   {notification.message && (
-                    <Typography sx={{ fontSize: '0.78rem', color: colors.text.secondary, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>
+                    <Typography variant="md" sx={{ color: colors.text.secondary, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>
                       {notification.message}
                     </Typography>
                   )}
                   <Stack direction="row" spacing={0.6} sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
-                    <Chip label={`${notification.readersNotified} leitor${notification.readersNotified === 1 ? '' : 'es'}`} size="small" sx={{ height: 20, fontSize: '0.64rem', fontWeight: 800, background: 'rgba(0,0,0,0.05)', color: colors.text.secondary }} />
-                    {notification.channels.inApp && <Chip label="💌 app" size="small" sx={{ height: 20, fontSize: '0.64rem', fontWeight: 800, background: `${colors.primary.main}12`, color: colors.primary.main }} />}
-                    {notification.channels.push && <Chip label="🔔 push" size="small" sx={{ height: 20, fontSize: '0.64rem', fontWeight: 800, background: `${colors.primary.main}12`, color: colors.primary.main }} />}
-                    {notification.channels.email && <Chip label="✉️ email" size="small" sx={{ height: 20, fontSize: '0.64rem', fontWeight: 800, background: `${colors.primary.main}12`, color: colors.primary.main }} />}
+                    <Chip label={`${notification.readersNotified} leitor${notification.readersNotified === 1 ? '' : 'es'}`} size="small" sx={{ height: 20, fontSize: '0.64rem', fontWeight: 800, background: colors.fill.medium, color: colors.text.secondary }} />
+                    {notification.channels.inApp && <Chip label="💌 app" size="small" sx={{ height: 20, fontSize: '0.64rem', fontWeight: 800, background: `${colors.primary.main}12`, color: colors.primary.text }} />}
+                    {notification.channels.push && <Chip label="🔔 push" size="small" sx={{ height: 20, fontSize: '0.64rem', fontWeight: 800, background: `${colors.primary.main}12`, color: colors.primary.text }} />}
+                    {notification.channels.email && <Chip label="✉️ email" size="small" sx={{ height: 20, fontSize: '0.64rem', fontWeight: 800, background: `${colors.primary.main}12`, color: colors.primary.text }} />}
                   </Stack>
                 </Stack>
               </Card>
@@ -301,11 +301,11 @@ function InviteRow({ invite, effectiveStatus: status, isMutating, onResend, onCa
       <Card sx={{ p: 1.8 }}>
         <Stack direction="row" alignItems="center" spacing={1.5}>
           <Box sx={{ width: 36, height: 36, borderRadius: radius.md, background: `${statusColor}22`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, color: statusColor, fontSize: '0.9rem' }}>
+            <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 700, color: statusColor }}>
               {invite.email[0].toUpperCase()}
             </Typography>
           </Box>
-          <Typography sx={{ flex: 1, fontSize: '0.84rem', color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <Typography variant="lg" sx={{ flex: 1, color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {invite.email}
           </Typography>
           <Chip
@@ -339,7 +339,7 @@ function InviteRow({ invite, effectiveStatus: status, isMutating, onResend, onCa
           Cancelar convite?
         </DialogTitle>
         <DialogContent>
-          <Typography sx={{ fontSize: '0.85rem', color: colors.text.secondary, lineHeight: 1.6 }}>
+          <Typography variant="lg" sx={{ color: colors.text.secondary, lineHeight: 1.6 }}>
             O convite enviado para <strong>{invite.email}</strong> será cancelado e o link ficará inválido.
           </Typography>
         </DialogContent>

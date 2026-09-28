@@ -16,7 +16,7 @@ export function EmojiPickerInput({ label, value, onChange }: EmojiPickerInputPro
   return (
     <Stack spacing={0.6}>
       {label && (
-        <Typography sx={{ fontSize: '0.78rem', fontWeight: 600, color: colors.text.secondary, pl: 0.5 }}>
+        <Typography variant="md" sx={{ fontWeight: 600, color: colors.text.secondary, pl: 0.5 }}>
           {label}
         </Typography>
       )}

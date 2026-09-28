@@ -154,9 +154,9 @@ export function PackPouch({ gradient, accent, emoji, name, state, onTorn, reduce
               {emoji}
             </Box>
             <Box sx={{ position: 'absolute', left: 0, right: 0, bottom: 34, display: 'flex', justifyContent: 'center', px: 2 }}>
-              <Typography sx={{
+              <Typography variant="xl" sx={{
                 px: 1.4, py: 0.45, borderRadius: 99, maxWidth: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                fontFamily: font.serif, fontWeight: 800, fontSize: '0.92rem', color: '#1e293b',
+                fontFamily: font.serif, fontWeight: 800, color: '#1e293b',
                 background: 'rgba(255,255,255,0.82)', boxShadow: '0 4px 12px rgba(15,23,42,0.12)',
               }}>
                 {name}

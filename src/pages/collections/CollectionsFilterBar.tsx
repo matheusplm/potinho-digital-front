@@ -70,7 +70,7 @@ export function CollectionsFilterBar({ sort, setSort, search, setSearch, view, c
           color: sort !== 'name-asc' ? accent : textOnBgMuted,
         }}>
           <SwapVertIcon sx={{ fontSize: 13 }} />
-          <Typography sx={{ fontSize: '0.7rem', fontWeight: 700 }}>
+          <Typography variant="xs" sx={{ fontWeight: 700 }}>
             {sort === 'name-asc' ? 'A-Z' : 'Z-A'}
           </Typography>
         </Box>

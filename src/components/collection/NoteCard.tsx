@@ -5,10 +5,10 @@ import { Box, Chip, IconButton, Stack, Typography } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
 import { Card } from '../ui'
 import { colors, font, ink, radius } from '../../design-system'
-import { gradientTextSx } from '../../utils/colorUtils'
 import { linkifyText } from '../../utils/linkify'
 import { useBackground } from '../../context/BackgroundContext'
 import { RewardCard, rarityCardSx } from './RewardCard'
+import { RarityChip } from './RarityChip'
 import type { CollectionNoteView, NoteTypeConfig, RarityConfig } from '../../types/note'
 
 export function NoteCard({ note, r, ts = [], unread, variant, onSelect, onToggleFavorite }: {
@@ -39,7 +39,7 @@ export function NoteCard({ note, r, ts = [], unread, variant, onSelect, onToggle
       <Card accent={r?.borderColor} sx={{ ...(rarityCardSx(r, true, theme.isDark && maskLightCards) as object), height: grid ? '100%' : undefined, opacity: 0.72, cursor: 'default' }}>
         <Box sx={{ position: 'relative', minWidth: 0, height: '100%', p: 1, borderRadius: radius.lg, background: 'rgba(255,255,255,0.68)', border: '1px solid rgba(255,255,255,0.58)', backdropFilter: 'blur(8px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: 52 }}>
           <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.4, flexWrap: 'wrap', rowGap: 0.4 }}>
-            {r && <Chip size="small" label={`${r.emoji} ${r.label}`} sx={{ height: 19, fontSize: '0.70rem', fontWeight: 800, background: r.chipBg, border: `1px solid ${r.borderColor}`, '& .MuiChip-label': { px: 0.8, ...gradientTextSx(r.chipColor) } }} />}
+            {r && <RarityChip rarity={r} bordered />}
           </Stack>
           <Typography sx={{ fontSize: grid ? '0.74rem' : '0.8rem', color: ink.muted, fontStyle: 'italic' }}>
             🔒 Ainda não coletado
@@ -82,7 +82,7 @@ export function NoteCard({ note, r, ts = [], unread, variant, onSelect, onToggle
         <Box sx={{ position: 'relative', minWidth: 0, height: '100%', p: 1, pr: grid ? 3.4 : 4.4, borderRadius: radius.lg, background: 'rgba(255,255,255,0.68)', border: '1px solid rgba(255,255,255,0.58)', backdropFilter: 'blur(8px)', display: 'flex', flexDirection: 'column' }}>
           <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.55, flexWrap: 'wrap', rowGap: 0.4 }}>
             {r && (
-              <Chip size="small" label={`${r.emoji} ${r.label}`} sx={{ height: 19, fontSize: '0.70rem', fontWeight: 800, background: r.chipBg, border: `1px solid ${r.borderColor}`, '& .MuiChip-label': { px: 0.8, ...gradientTextSx(r.chipColor) } }} />
+              <RarityChip rarity={r} bordered />
             )}
             {!grid && ts.map((t) => (
               <Chip key={t.id} size="small" label={`${t.emoji} ${t.label}`} sx={{ height: 19, fontSize: '0.70rem', fontWeight: 800, background: t.tagBg, color: t.tagColor, border: `1px solid ${t.accentColor}44`, '& .MuiChip-label': { px: 0.8 } }} />

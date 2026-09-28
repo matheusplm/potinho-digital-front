@@ -68,10 +68,10 @@ function CardActions({ col, variant, onEdit, onDelete }: {
   if (variant === 'inline') {
     return (
       <Stack direction="row" spacing={0.2} sx={{ flexShrink: 0 }}>
-        <IconButton size="small" aria-label="editar coleção" onClick={handle(onEdit)} sx={{ color: colors.primary.main, p: 0.7 }}>
+        <IconButton size="small" aria-label="editar coleção" onClick={handle(onEdit)} sx={{ color: colors.primary.text, p: 0.7 }}>
           <EditIcon sx={{ fontSize: 17 }} />
         </IconButton>
-        <IconButton size="small" aria-label="excluir coleção" onClick={handle(onDelete)} sx={{ color: colors.rose.main, p: 0.7 }}>
+        <IconButton size="small" aria-label="excluir coleção" onClick={handle(onDelete)} sx={{ color: colors.rose.text, p: 0.7 }}>
           <DeleteForeverOutlinedIcon sx={{ fontSize: 17 }} />
         </IconButton>
       </Stack>
@@ -123,7 +123,7 @@ export function CollectionCardView({ col, i, onClick, onEdit, onDelete, hasNews 
       </Box>
       <Box sx={{ px: 1.6, pt: 1.4, pb: 1.5 }}>
         <Stack direction="row" sx={{ alignItems: 'flex-start', justifyContent: 'space-between', mb: col.description ? 0.5 : 0 }}>
-          <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1rem', color: colors.text.primary, lineHeight: 1.25, flex: 1, minWidth: 0, mr: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 700, color: colors.text.primary, lineHeight: 1.25, flex: 1, minWidth: 0, mr: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {col.name}
           </Typography>
           <Box sx={{
@@ -138,7 +138,7 @@ export function CollectionCardView({ col, i, onClick, onEdit, onDelete, hasNews 
           </Box>
         </Stack>
         {col.description && (
-          <Typography sx={{ fontSize: '0.78rem', color: colors.text.secondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <Typography variant="md" sx={{ color: colors.text.secondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {col.description}
           </Typography>
         )}
@@ -183,7 +183,7 @@ export function CollectionGridItem({ col, i, onClick, onEdit, onDelete, hasNews 
         )}
       </Box>
       <Box sx={{ px: 1.3, py: 1.1, display: 'flex', flexDirection: 'column', gap: 0.35 }}>
-        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.88rem', color: colors.text.primary, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
+        <Typography variant="lg" sx={{ fontFamily: font.serif, fontWeight: 700, color: colors.text.primary, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
           {col.name}
         </Typography>
         <Box sx={{
@@ -228,11 +228,11 @@ export function CollectionListItem({ col, i, onClick, onEdit, onDelete, hasNews 
         {col.emoji}
       </Box>
       <Box sx={{ flex: 1, minWidth: 0 }}>
-        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '0.92rem', color: colors.text.primary, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
+        <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 700, color: colors.text.primary, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
           {col.name}
         </Typography>
         {col.description && (
-          <Typography sx={{ fontSize: '0.72rem', color: colors.text.secondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', mt: 0.1 }}>
+          <Typography variant="sm" sx={{ color: colors.text.secondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', mt: 0.1 }}>
             {col.description}
           </Typography>
         )}
@@ -246,7 +246,7 @@ export function CollectionListItem({ col, i, onClick, onEdit, onDelete, hasNews 
               px: 0.8, py: 0.2, borderRadius: radius.full, flexShrink: 0,
               background: `${colors.rose.main}15`,
               fontSize: '0.68rem', fontWeight: 800, letterSpacing: 0.4,
-              color: colors.rose.main, textTransform: 'uppercase',
+              color: colors.rose.text, textTransform: 'uppercase',
             }}>
               convidado
             </Box>

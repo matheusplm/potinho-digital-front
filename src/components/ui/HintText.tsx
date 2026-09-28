@@ -1,21 +1,7 @@
-import { Typography, type SxProps } from '@mui/material'
-import { colors } from '../../design-system'
+import { Typography, type SxProps, type Theme } from '@mui/material'
+import type { ReactNode } from 'react'
+import { mergeSx } from './sx'
 
-interface HintTextProps {
-  children: React.ReactNode
-  sx?: SxProps
-}
-
-export function HintText({ children, sx }: HintTextProps) {
-  return (
-    <Typography sx={{
-      fontSize: '0.68rem',
-      color: colors.text.muted,
-      mt: 0.7,
-      lineHeight: 1.45,
-      ...sx,
-    }}>
-      {children}
-    </Typography>
-  )
+export function HintText({ children, sx }: { children: ReactNode; sx?: SxProps<Theme> }) {
+  return <Typography variant="hint" sx={mergeSx({ mt: 0.7 }, sx)}>{children}</Typography>
 }

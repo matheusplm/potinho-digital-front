@@ -89,7 +89,7 @@ function Overview({ data }: { data: AdminOverview }) {
         <RecentUsersPanel users={data.users} onOpen={setOpenId} />
         <TopCollectionsPanel collections={data.collections} />
       </Box>
-      <Typography sx={{ fontSize: '0.68rem', color: theme.textOnBgMuted, textAlign: 'center', px: 2 }}>
+      <Typography variant="xs" sx={{ color: theme.textOnBgMuted, textAlign: 'center', px: 2 }}>
         "Acesso" conta login, volta ao app e abertura de pacotinho. Emails aparecem mascarados e o conteúdo dos bilhetes nunca sai do servidor.
       </Typography>
       <UserDrawer user={openUser} onClose={() => setOpenId(null)} />

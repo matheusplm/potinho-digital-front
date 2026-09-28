@@ -130,7 +130,7 @@ export function CollectionPlayPage() {
       <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
         <Stack direction="row" alignItems="center" spacing={1.2} sx={{ mb: 3 }}>
           {!isSimulating && (
-            <IconButton size="small" aria-label={isReaderView ? 'voltar para o início' : 'voltar para coleções'} onClick={() => navigate(isReaderView ? '/home' : '/colecoes')} sx={{ width: 38, height: 38, color: theme.textOnBg, background: 'rgba(255,255,255,0.5)', border: '1.5px solid rgba(255,255,255,0.66)', backdropFilter: 'blur(14px)', boxShadow: '0 8px 24px rgba(15,23,42,0.08)', transition: 'transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease', '&:hover': { background: 'rgba(255,255,255,0.76)', transform: 'translateX(-2px) scale(1.04)', boxShadow: '0 10px 28px rgba(15,23,42,0.12)' }, '&:active': { transform: 'translateX(-1px) scale(0.98)' } }}>
+            <IconButton size="small" aria-label={isReaderView ? 'voltar para o início' : 'voltar para coleções'} onClick={() => navigate(isReaderView ? '/home' : '/colecoes')} sx={{ width: 38, height: 38, color: theme.textOnBg, background: colors.glass.bg, border: `1.5px solid ${colors.glass.border}`, backdropFilter: 'blur(14px)', boxShadow: '0 8px 24px rgba(15,23,42,0.08)', transition: 'transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease', '&:hover': { background: colors.glass.strong, transform: 'translateX(-2px) scale(1.04)', boxShadow: '0 10px 28px rgba(15,23,42,0.12)' }, '&:active': { transform: 'translateX(-1px) scale(0.98)' } }}>
               <ArrowBackIcon sx={{ fontSize: 20, filter: 'drop-shadow(0 1px 1px rgba(255,255,255,0.6))' }} />
             </IconButton>
           )}
@@ -139,7 +139,7 @@ export function CollectionPlayPage() {
               {isLoading ? 'Carregando...' : collectionName ?? (play ? 'Coleção' : '...')}
             </Typography>
             {isSimulating && (
-              <Typography sx={{ mt: 0.15, fontSize: '0.72rem', color: theme.textOnBgMuted, fontWeight: 700 }}>
+              <Typography variant="sm" sx={{ mt: 0.15, color: theme.textOnBgMuted, fontWeight: 700 }}>
                 visão do leitor · coleção ativa
               </Typography>
             )}
@@ -167,16 +167,16 @@ export function CollectionPlayPage() {
         {!isLoading && !notFound && play && (
           <Stack spacing={2.5}>
             {isSimulating && (
-              <Card sx={{ p: 1.6, background: 'rgba(255,255,255,0.62)', backdropFilter: 'blur(14px)', border: `1.5px solid ${theme.accent}26`, boxShadow: `0 8px 24px ${theme.accent}12` }}>
+              <Card sx={{ p: 1.6, background: colors.glass.card, backdropFilter: 'blur(14px)', border: `1.5px solid ${theme.accent}26`, boxShadow: `0 8px 24px ${theme.accent}12` }}>
                 <Stack direction="row" spacing={1.2} alignItems="center">
                   <Box sx={{ width: 40, height: 40, borderRadius: radius.lg, display: 'flex', alignItems: 'center', justifyContent: 'center', background: `${theme.accent}14`, color: theme.accent, fontSize: '1.25rem', flexShrink: 0 }}>
                     {collection?.emoji ?? '💌'}
                   </Box>
                   <Box sx={{ minWidth: 0 }}>
-                    <Typography sx={{ fontSize: '0.68rem', fontWeight: 900, letterSpacing: 0.8, color: theme.accent, textTransform: 'uppercase' }}>
+                    <Typography variant="label" sx={{ color: theme.accent }}>
                       Simulando leitor novo
                     </Typography>
-                    <Typography sx={{ fontSize: '0.78rem', color: colors.text.secondary, lineHeight: 1.35 }}>
+                    <Typography variant="md" sx={{ color: colors.text.secondary, lineHeight: 1.35 }}>
                       Abra pacotinhos, veja as cartinhas coletadas e favorite bilhetes como quem recebeu acesso.
                     </Typography>
                   </Box>
@@ -215,10 +215,10 @@ export function CollectionPlayPage() {
             {!isSimulating && play.total > 0 && undiscoveredItems.length > 0 && (
               <Stack spacing={1}>
                 <Box>
-                  <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: 1.2, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
+                  <Typography variant="sm" sx={{ fontWeight: 800, letterSpacing: 1.2, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
                     Ainda por descobrir · {undiscoveredItems.length}
                   </Typography>
-                  <Typography sx={{ fontSize: '0.72rem', color: theme.textOnBgMuted, mt: 0.3, fontStyle: 'italic' }}>
+                  <Typography variant="sm" sx={{ color: theme.textOnBgMuted, mt: 0.3, fontStyle: 'italic' }}>
                     Continue abrindo pacotinhos para descobrir estas cartinhas 💌
                   </Typography>
                 </Box>

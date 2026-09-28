@@ -1,3 +1,5 @@
+import { readableOn } from './contrast'
+
 export interface BackgroundTheme {
   key: string
   label: string
@@ -10,9 +12,10 @@ export interface BackgroundTheme {
   surfaceBg: string
   surfaceBorder: string
   isDark: boolean
+  onAccent: string
 }
 
-export const backgroundThemes: BackgroundTheme[] = [
+const THEMES: Omit<BackgroundTheme, 'onAccent'>[] = [
   {
     key: 'romance',
     label: 'Romance',
@@ -157,6 +160,8 @@ export const backgroundThemes: BackgroundTheme[] = [
     isDark: true,
   },
 ]
+
+export const backgroundThemes: BackgroundTheme[] = THEMES.map((theme) => ({ ...theme, onAccent: readableOn(theme.accent) }))
 
 export const defaultBackgroundKey = 'romance'
 
