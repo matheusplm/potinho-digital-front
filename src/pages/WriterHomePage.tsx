@@ -1,34 +1,59 @@
 import FavoriteIcon from '@mui/icons-material/Favorite'
-import Inventory2Icon from '@mui/icons-material/Inventory2'
-import ChevronRightIcon from '@mui/icons-material/ChevronRight'
-import { Box, Stack, Typography } from '@mui/material'
+import { Box, Menu, MenuItem, Skeleton, Stack, Typography } from '@mui/material'
+import { useQueryClient } from '@tanstack/react-query'
+import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
-import { useCallback } from 'react'
-import { useCollectionsQuery } from '../hooks/useNotes'
-import { Card, ScrollablePage } from '../components/ui'
+import { Button, EmptyState, LoadingState, ScrollablePage, SectionLabel } from '../components/ui'
 import { OnboardingOverlay } from '../components/ui/OnboardingOverlay'
+import { BonusPackDialog, type BonusPackTarget } from '../components/manage/BonusPackDialog'
 import { api } from '../services/api'
 import { colors, fadeIn, font } from '../design-system'
 import { useBackground } from '../context/BackgroundContext'
 import { FloatingParticles } from '../components/FloatingParticles'
-import { isCollectionOwner } from '../utils/collectionAccess'
+import { queryKeys } from '../hooks/useNotes'
+import type { CollectionPack } from '../types/note'
+import { managePath, type ReaderSummary } from './writer-home/insights'
+import { useWriterHome } from './writer-home/useWriterHome'
+import { ReaderCard } from './writer-home/ReaderCard'
+import { TouchedSection } from './writer-home/TouchedSection'
+import { TodoSection } from './writer-home/TodoSection'
 
 export function WriterHomePage() {
   const { user, patchUser } = useUser()
   const { theme } = useBackground()
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const home = useWriterHome()
+  const [giftMenu, setGiftMenu] = useState<{ reader: ReaderSummary; anchor: HTMLElement } | null>(null)
+  const [gift, setGift] = useState<{ reader: ReaderSummary; target: BonusPackTarget } | null>(null)
+  const [writeMenu, setWriteMenu] = useState<HTMLElement | null>(null)
 
   const handleOnboardingDismiss = useCallback(async () => {
     patchUser({ onboardingDone: true })
     api.markOnboardingDone().catch(() => {})
   }, [patchUser])
-  const navigate = useNavigate()
-  const { data: collections = [] } = useCollectionsQuery()
 
   const firstName = user?.name?.split(' ')[0] ?? ''
-  const ownedCount = collections.filter((c) => isCollectionOwner(c, user?.id)).length
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite'
+  const hasCollections = home.collections.length > 0
+  const settled = !home.loading && !home.readersLoading
+
+  function chooseGift(reader: ReaderSummary, pack: CollectionPack) {
+    setGiftMenu(null)
+    setGift({ reader, target: { email: reader.email, pack, currentOpens: reader.packOpens[pack.id] } })
+  }
+
+  function startGift(reader: ReaderSummary, anchor: HTMLElement) {
+    if (reader.bonusPacks.length === 1) chooseGift(reader, reader.bonusPacks[0])
+    else setGiftMenu({ reader, anchor })
+  }
+
+  function startWriting(anchor: HTMLElement) {
+    if (home.collections.length === 1) navigate(managePath(home.collections[0].slug, { aba: 'bilhetes', novo: '1' }))
+    else setWriteMenu(anchor)
+  }
 
   return (
     <Box sx={{ height: '100%', position: 'relative', overflow: 'hidden', background: theme.gradient }}>
@@ -39,41 +64,103 @@ export function WriterHomePage() {
         fontSize: 500, color: 'rgba(29,78,216,0.05)', pointerEvents: 'none',
       }} />
 
-      <ScrollablePage sx={{ px: 2.5, py: 2.5, gap: 3, animation: `${fadeIn} 0.4s ease` }}>
-        <Stack spacing={0.3}>
-          <Typography variant="md" sx={{ color: theme.textOnBgMuted, fontWeight: 500 }}>
-            {greeting},
-          </Typography>
-          <Typography sx={{
-            fontFamily: font.serif, fontWeight: 700, fontSize: '2rem',
-            color: theme.textOnBg, lineHeight: 1.1, letterSpacing: '-0.5px',
-            wordBreak: 'break-word',
-          }}>
-            {firstName} 💙
-          </Typography>
-          <Typography variant="lg" sx={{ color: theme.textOnBgMuted, fontStyle: 'italic', mt: 0.5 }}>
-            {ownedCount > 0 ? 'suas coleções estão esperando por você' : 'que tal criar sua primeira coleção?'}
-          </Typography>
-        </Stack>
-
-        <Card onClick={() => navigate('/colecoes')} sx={{ p: 2, cursor: 'pointer', transition: 'transform 0.18s, box-shadow 0.18s', '&:hover': { transform: 'translateY(-2px)' } }}>
-          <Stack direction="row" alignItems="center" spacing={1.5}>
-            <Box sx={{ width: 46, height: 46, borderRadius: 2.5, background: `linear-gradient(135deg,${colors.primary.main},${colors.purple.main})`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <Inventory2Icon sx={{ fontSize: 24, color: '#fff' }} />
-            </Box>
-            <Box sx={{ flex: 1, minWidth: 0 }}>
-              <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.05rem', color: colors.text.primary, lineHeight: 1.2 }}>
-                Minhas coleções
+      <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.4s ease` }}>
+        <Stack spacing={3} sx={{ width: '100%', maxWidth: 760, mx: 'auto', pb: 3 }}>
+          <Stack spacing={0.3}>
+            <Typography variant="md" sx={{ color: theme.textOnBgMuted, fontWeight: 500 }}>
+              {greeting},
+            </Typography>
+            <Typography sx={{
+              fontFamily: font.serif, fontWeight: 700, fontSize: '2rem',
+              color: theme.textOnBg, lineHeight: 1.1, letterSpacing: '-0.5px',
+              wordBreak: 'break-word',
+            }}>
+              {firstName} 💙
+            </Typography>
+            {settled ? (
+              <Typography variant="lg" sx={{ color: theme.textOnBgMuted, fontStyle: 'italic', mt: 0.5 }}>
+                {home.greeting}
               </Typography>
-              <Typography variant="md" sx={{ color: colors.text.secondary }}>
-                {ownedCount > 0 ? `${ownedCount} ${ownedCount === 1 ? 'coleção criada' : 'coleções criadas'}` : 'Crie sua primeira coleção'}
-              </Typography>
-            </Box>
-            <ChevronRightIcon sx={{ color: colors.text.muted, flexShrink: 0 }} />
+            ) : (
+              <Skeleton variant="text" width={240} sx={{ bgcolor: colors.fill.medium, mt: 0.5 }} />
+            )}
           </Stack>
-        </Card>
 
+          {!home.loading && !hasCollections && (
+            <EmptyState
+              emoji="🫙"
+              title="Seu primeiro potinho"
+              description="Crie uma coleção, escreva os bilhetes e convide quem você ama pra abrir os pacotinhos."
+              action={<Button variant="primary" onClick={() => navigate('/colecoes')} sx={{ mt: 1.5 }}>Criar minha coleção</Button>}
+            />
+          )}
+
+          {hasCollections && (
+            <>
+              <TouchedSection readers={home.readers} raritiesByCollection={home.raritiesByCollection} />
+
+              <Stack spacing={1.2}>
+                <SectionLabel color={theme.textOnBgMuted}>🫶 Seus leitores</SectionLabel>
+                {home.readersLoading ? (
+                  <LoadingState compact label="Buscando seus leitores" accent={theme.accent} textColor={theme.textOnBg} mutedColor={theme.textOnBgMuted} />
+                ) : home.readers.length > 0 ? (
+                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))', gap: 1.5 }}>
+                    {home.readers.map((reader) => <ReaderCard key={reader.key} reader={reader} onGift={startGift} />)}
+                  </Box>
+                ) : (
+                  <EmptyState
+                    emoji="💌"
+                    title="Ninguém lendo ainda"
+                    description="Quando alguém aceitar seu convite, o progresso aparece aqui."
+                  />
+                )}
+                {home.hiddenReaders > 0 && (
+                  <Typography variant="sm" sx={{ color: theme.textOnBgMuted, textAlign: 'center' }}>
+                    e mais {home.hiddenReaders} {home.hiddenReaders === 1 ? 'leitor' : 'leitores'} nas suas coleções
+                  </Typography>
+                )}
+              </Stack>
+
+              <TodoSection todos={home.todos} />
+
+              <Stack direction="row" spacing={1}>
+                <Button variant="primary" onClick={(event) => startWriting(event.currentTarget)} sx={{ flex: 1.4, py: 1.1 }}>
+                  ✍️ Escrever bilhete
+                </Button>
+                <Button variant="ghost" onClick={() => navigate('/colecoes')} sx={{ flex: 1, py: 1.1 }}>
+                  📚 Coleções
+                </Button>
+              </Stack>
+            </>
+          )}
+        </Stack>
       </ScrollablePage>
+
+      <Menu anchorEl={writeMenu} open={!!writeMenu} onClose={() => setWriteMenu(null)}>
+        {home.collections.map(({ collection, slug }) => (
+          <MenuItem key={collection.id} onClick={() => { setWriteMenu(null); navigate(managePath(slug, { aba: 'bilhetes', novo: '1' })) }}>
+            {collection.emoji} {collection.name}
+          </MenuItem>
+        ))}
+      </Menu>
+
+      <Menu anchorEl={giftMenu?.anchor} open={!!giftMenu} onClose={() => setGiftMenu(null)}>
+        {giftMenu?.reader.bonusPacks.map((pack) => (
+          <MenuItem key={pack.id} onClick={() => chooseGift(giftMenu.reader, pack)}>
+            {pack.emoji} {pack.name}
+          </MenuItem>
+        ))}
+      </Menu>
+
+      <BonusPackDialog
+        cid={gift?.reader.collection.id ?? ''}
+        target={gift?.target ?? null}
+        onClose={() => setGift(null)}
+        onSuccess={() => {
+          if (!gift) return
+          void queryClient.invalidateQueries({ queryKey: queryKeys.readerView(gift.reader.collection.id, gift.reader.email) })
+        }}
+      />
     </Box>
   )
 }

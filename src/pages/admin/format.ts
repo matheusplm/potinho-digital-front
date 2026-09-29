@@ -1,8 +1,6 @@
+export { timeAgo } from '../../utils/timeAgo'
+
 const MONTHS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez']
-const relative = new Intl.RelativeTimeFormat('pt-BR', { numeric: 'auto' })
-const UNITS: Array<[Intl.RelativeTimeFormatUnit, number]> = [
-  ['year', 31_536_000], ['month', 2_592_000], ['week', 604_800], ['day', 86_400], ['hour', 3_600], ['minute', 60],
-]
 
 export type ActivityTone = 'hot' | 'warm' | 'cold' | 'none'
 
@@ -17,16 +15,6 @@ function validTime(iso: string | null): number | null {
   if (!iso) return null
   const time = Date.parse(iso)
   return Number.isNaN(time) ? null : time
-}
-
-export function timeAgo(iso: string | null): string {
-  const time = validTime(iso)
-  if (time === null) return 'nunca'
-  const seconds = Math.round((time - Date.now()) / 1000)
-  for (const [unit, size] of UNITS) {
-    if (Math.abs(seconds) >= size) return relative.format(Math.round(seconds / size), unit)
-  }
-  return 'agora'
 }
 
 export function shortDate(iso: string | null): string {

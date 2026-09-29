@@ -446,7 +446,8 @@ const collectionHandlers = [
     const accessEntry = collection.access.find((a) => a.email === email)
     if (!accessEntry) return notFound('Leitor não encontrado.')
     const { ownership } = collection
-    const items = collection.notes.map((note) => {
+    const visibleNotes = collection.notes.filter((note) => (!note.disabledAt && note.status !== 'preview') || ownership.owned.has(note.id))
+    const items = visibleNotes.map((note) => {
       const view = buildNoteView(note, ownership.owned, ownership.favorites, ownership.obtainedAt)
       return { ...view, message: ownership.owned.has(note.id) ? note.message : '' }
     })
@@ -478,7 +479,30 @@ const collectionHandlers = [
     await delay(200)
     const auth = authorizeCollection(request, String(params.cid), 'owner')
     if (!auth.ok) return auth.response
+    const email = decodeURIComponent(String(params.email)).toLowerCase().trim()
+    const now = new Date()
+    const invite = {
+      token: nextId('invite'), collectionId: auth.collection.meta.id, email, status: 'pending' as const,
+      createdAt: now.toISOString(), expiresAt: new Date(now.getTime() + 7 * 86_400_000).toISOString(),
+    }
+    auth.collection.invites = [...auth.collection.invites.filter((item) => item.email !== email), invite]
     return HttpResponse.json({ ok: true })
+  }),
+
+  http.get('/api/collections/:cid/invites', async ({ params, request }) => {
+    await delay(180)
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    return HttpResponse.json(auth.collection.invites)
+  }),
+
+  http.delete('/api/collections/:cid/invites/:email', async ({ params, request }) => {
+    await delay(160)
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const email = decodeURIComponent(String(params.email)).toLowerCase().trim()
+    auth.collection.invites = auth.collection.invites.filter((item) => item.email !== email)
+    return HttpResponse.json({ cancelled: true })
   }),
 
   http.get('/api/collections/:cid/packs', async ({ params, request }) => {

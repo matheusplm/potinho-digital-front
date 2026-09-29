@@ -59,9 +59,11 @@ const DEFAULT_IMPORT_JSON = `[
 
 const NO_NOTES: NoteRecord[] = []
 
-interface NotesTabProps { cid: string }
+export type NotesIntent = 'new' | 'drafts'
 
-export function NotesTab({ cid }: NotesTabProps) {
+interface NotesTabProps { cid: string; intent?: NotesIntent }
+
+export function NotesTab({ cid, intent }: NotesTabProps) {
   const { theme, maskLightCards } = useBackground()
   const maskCards = theme.isDark && maskLightCards
   const { data: notes = NO_NOTES, isLoading: notesLoading } = useCollectionNotesQuery(cid)
@@ -77,14 +79,14 @@ export function NotesTab({ cid }: NotesTabProps) {
   const [noteSort, setNoteSort] = useState<NoteSort>('newest')
   const [noteView, setNoteView] = useState<NoteView>('cards')
   const [visibleNoteCount, setVisibleNoteCount] = useState(NOTE_PAGE_SIZE)
-  const [noteDialog, setNoteDialog] = useState(false)
+  const [noteDialog, setNoteDialog] = useState(intent === 'new')
   const [editingNote, setEditingNote] = useState<NoteRecord | null>(null)
   const [viewingNote, setViewingNote] = useState<ReadableNote | null>(null)
   const [importDialogOpen, setImportDialogOpen] = useState(false)
   const [purgeConfirmInput, setPurgeConfirmInput] = useState('')
   const [selectedDraftIds, setSelectedDraftIds] = useState<string[]>([])
   const [releaseDialogOpen, setReleaseDialogOpen] = useState(false)
-  const [statusView, setStatusView] = useState<'live' | 'drafts'>('live')
+  const [statusView, setStatusView] = useState<'live' | 'drafts'>(intent === 'drafts' ? 'drafts' : 'live')
 
   const activeNotes = useMemo(() => notes.filter((n) => !n.disabledAt && n.status !== 'preview'), [notes])
   const draftNotes = useMemo(() => notes.filter((n) => !n.disabledAt && n.status === 'preview'), [notes])
@@ -276,7 +278,7 @@ export function NotesTab({ cid }: NotesTabProps) {
               <Box component="input" value={search}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
                 placeholder="Buscar bilhete..."
-                sx={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: '0.86rem', color: theme.textOnBg, fontFamily: 'inherit', '&::placeholder': { color: theme.textOnBgMuted } }}
+                sx={{ flex: 1, minWidth: 0, border: 'none', outline: 'none', background: 'transparent', fontSize: '0.86rem', color: theme.textOnBg, fontFamily: 'inherit', '&::placeholder': { color: theme.textOnBgMuted } }}
               />
               {search && (
                 <Box onClick={() => setSearch('')} sx={{ display: 'flex', cursor: 'pointer', color: theme.textOnBgMuted }}>
