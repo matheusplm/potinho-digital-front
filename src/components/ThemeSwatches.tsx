@@ -27,7 +27,7 @@ export function ThemeSwatches({ size = 28, labelColor }: { size?: number; labelC
                       width: size, height: size, borderRadius: '50%', p: 0,
                       background: bg.gradient, cursor: 'pointer', flexShrink: 0,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      border: `2px solid ${active ? bg.accent : colors.border.subtle}`,
+                      border: `2px solid ${active ? bg.accent : bg.isDark ? 'rgba(255,255,255,0.4)' : colors.border.medium}`,
                       boxShadow: active ? `0 2px 8px ${bg.accent}55` : 'none',
                       transition: 'all 0.18s',
                       '&:hover': { transform: 'scale(1.12)' },
