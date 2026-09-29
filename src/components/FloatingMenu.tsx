@@ -23,6 +23,7 @@ import { useTour } from '../tour/TourContext'
 import { useReader } from '../context/ReaderContext'
 import { useSimulation } from '../context/SimulationContext'
 import { useCollectionsQuery, usePendingInvitesQuery } from '../hooks/useNotes'
+import { useSupportUnreadQuery } from '../hooks/useAdmin'
 import { BrandLogo, Copyright } from './Brand'
 import { backgroundThemes, colors, font, menuIn, radius } from '../design-system'
 
@@ -40,6 +41,8 @@ export function FloatingMenu() {
   const { data: collections = [] } = useCollectionsQuery()
   const { data: pendingInvites = [] } = usePendingInvitesQuery({ enabled: !!user })
   const hasPendingInvites = pendingInvites.length > 0
+  const { data: supportUnread = 0 } = useSupportUnreadQuery()
+  const adminHasNews = supportUnread > 0 && persona !== 'admin'
   const { canSwitch, canWriter, canReader } = useMemo(
     () => personaCapabilities(collections, user?.id, user?.role ?? 'writer'),
     [collections, user?.id, user?.role],
@@ -97,7 +100,7 @@ export function FloatingMenu() {
               }} />
             ))}
           </Stack>
-          {hasPendingInvites && persona !== 'reader' && !open && (
+          {((hasPendingInvites && persona !== 'reader') || adminHasNews) && !open && (
             <Box sx={{ position: 'absolute', top: 2, right: 2, width: 10, height: 10, borderRadius: '50%', background: '#ef4444', border: '2px solid #fff', boxShadow: '0 1px 4px rgba(239,68,68,0.5)' }} />
           )}
         </IconButton>
@@ -140,7 +143,7 @@ export function FloatingMenu() {
                     ...(user?.isAdmin ? [{ role: 'admin' as const, label: 'Admin', icon: <AdminPanelSettingsOutlinedIcon sx={{ fontSize: 14 }} />, enabled: true, disabledTip: '' }] : []),
                   ] satisfies Array<{ role: Persona; label: string; icon: React.ReactNode; enabled: boolean; disabledTip: string }>).map(({ role, label, icon, enabled, disabledTip }) => {
                     const active = persona === role
-                    const showInviteDot = role === 'reader' && hasPendingInvites && persona !== 'reader'
+                    const showInviteDot = (role === 'reader' && hasPendingInvites && persona !== 'reader') || (role === 'admin' && adminHasNews)
                     const btn = (
                       <Box
                         key={role}

@@ -9,7 +9,7 @@ import { useUser } from '../../context/UserContext'
 import { fadeIn, font, radius, spin } from '../../design-system'
 import { useAdminOverviewQuery } from '../../hooks/useAdmin'
 import { ApiRequestError } from '../../services/api'
-import { clearAdminSession } from '../../services/adminSession'
+import { clearAdminSession, type useAdminSession } from '../../services/adminSession'
 import type { AdminOverview } from '../../types/admin'
 import { AdminUnlock } from './AdminUnlock'
 import { SkeletonBlock } from './charts'
@@ -26,13 +26,14 @@ function useMinutesLeft(expiresAt: number | undefined): number | null {
   return Math.max(0, Math.round((expiresAt - now) / 60_000))
 }
 
-function Pill({ children, onClick, disabled, tone, label }: { children: ReactNode; onClick?: () => void; disabled?: boolean; tone?: string; label?: string }) {
+export function Pill({ children, onClick, href, disabled, tone, label }: { children: ReactNode; onClick?: () => void; href?: string; disabled?: boolean; tone?: string; label?: string }) {
   const { theme } = useBackground()
   const color = tone ?? theme.textOnBg
   return (
     <Box
-      component={onClick ? 'button' : 'span'}
-      type={onClick ? 'button' : undefined}
+      component={href ? 'a' : onClick ? 'button' : 'span'}
+      type={onClick && !href ? 'button' : undefined}
+      href={href}
       onClick={onClick}
       disabled={disabled}
       aria-label={label}
@@ -40,9 +41,9 @@ function Pill({ children, onClick, disabled, tone, label }: { children: ReactNod
         all: 'unset', boxSizing: 'border-box', display: 'inline-flex', alignItems: 'center', gap: 0.6, height: 32, px: 1.3,
         borderRadius: radius.full, fontSize: '0.76rem', fontWeight: 700, whiteSpace: 'nowrap', color,
         background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}`, backdropFilter: 'blur(12px)',
-        cursor: onClick && !disabled ? 'pointer' : 'default', opacity: disabled ? 0.6 : 1,
+        cursor: (onClick || href) && !disabled ? 'pointer' : 'default', opacity: disabled ? 0.6 : 1,
         transition: 'background 0.15s, border-color 0.15s',
-        '&:hover': onClick && !disabled ? { borderColor: `${theme.accent}66` } : undefined,
+        '&:hover': (onClick || href) && !disabled ? { borderColor: `${theme.accent}66` } : undefined,
         '&:focus-visible': { outline: `2px solid ${theme.accent}`, outlineOffset: 2 },
         '& svg': { fontSize: 16 },
       }}
@@ -67,10 +68,37 @@ function LoadingSkeleton() {
   )
 }
 
+interface AdminQueryState<T> {
+  data: T | undefined
+  isLoading: boolean
+  error: Error | null
+  isFetching: boolean
+  refetch: () => unknown
+  session: ReturnType<typeof useAdminSession>
+  dataUpdatedAt: number
+}
+
 export function AdminShell({ title, subtitle, children }: { title: string; subtitle?: string; children: (data: AdminOverview) => ReactNode }) {
+  const query = useAdminOverviewQuery()
+  return (
+    <AdminFrame title={title} subtitle={subtitle} query={query} generatedAt={query.data?.generatedAt}>
+      {children}
+    </AdminFrame>
+  )
+}
+
+export function AdminFrame<T>({ title, subtitle, query, generatedAt, skeleton, children }: {
+  title: string
+  subtitle?: string
+  query: AdminQueryState<T>
+  generatedAt?: string
+  skeleton?: ReactNode
+  children: (data: T) => ReactNode
+}) {
   const { theme } = useBackground()
   const { user, setPersona } = useUser()
-  const { data, isLoading, error, isFetching, refetch, session } = useAdminOverviewQuery()
+  const { data, isLoading, error, isFetching, refetch, session, dataUpdatedAt } = query
+  const updatedAt = generatedAt ?? (dataUpdatedAt ? new Date(dataUpdatedAt).toISOString() : undefined)
   const forbidden = error instanceof ApiRequestError && error.code === 'FORBIDDEN'
   const minutesLeft = useMinutesLeft(session?.expiresAt)
 
@@ -102,9 +130,9 @@ export function AdminShell({ title, subtitle, children }: { title: string; subti
               <Typography component="h1" sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: { xs: '1.75rem', md: '2.3rem' }, color: theme.textOnBg, lineHeight: 1.05, letterSpacing: '-0.5px' }}>
                 {title}
               </Typography>
-              {data && (
+              {data !== undefined && updatedAt && (
                 <Typography variant="sm" sx={{ mt: 0.6, color: theme.textOnBgMuted, fontStyle: 'italic' }}>
-                  dados de {timeAgo(data.generatedAt)}
+                  dados de {timeAgo(updatedAt)}
                 </Typography>
               )}
             </Box>
@@ -130,9 +158,9 @@ export function AdminShell({ title, subtitle, children }: { title: string; subti
 
           {!session && <AdminUnlock />}
 
-          {session && isLoading && <LoadingSkeleton />}
+          {session && isLoading && (skeleton ?? <LoadingSkeleton />)}
 
-          {session && error && !data && !forbidden && (
+          {session && error && data === undefined && !forbidden && (
             <Stack alignItems="center" spacing={1.5} sx={{ py: 6, textAlign: 'center' }}>
               <Typography sx={{ fontSize: '2.2rem' }}>😵</Typography>
               <Typography sx={{ fontFamily: font.serif, fontWeight: 700, color: theme.textOnBg }}>Não consegui carregar o painel</Typography>
@@ -141,7 +169,7 @@ export function AdminShell({ title, subtitle, children }: { title: string; subti
             </Stack>
           )}
 
-          {session && data && children(data)}
+          {session && data !== undefined && children(data)}
         </Box>
       </ScrollablePage>
     </Box>

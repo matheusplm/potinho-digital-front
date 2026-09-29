@@ -7,10 +7,14 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
+import SupportAgentOutlinedIcon from '@mui/icons-material/SupportAgentOutlined'
 import { Box, CircularProgress, Collapse, Divider, Stack, Typography } from '@mui/material'
 import { useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useBackground } from '../context/BackgroundContext'
 import { FloatingParticles } from '../components/FloatingParticles'
+import { SupportDialog } from '../components/SupportDialog'
+import { DeleteAccountDialog } from '../components/DeleteAccountDialog'
 import { useUser } from '../context/UserContext'
 import { api } from '../services/api'
 import { useRetryAfter } from '../hooks/useRetryAfter'
@@ -41,6 +45,9 @@ export function ContaPage() {
   const [emailSent, setEmailSent] = useState(false)
   const [pendingNewEmail, setPendingNewEmail] = useState('')
   const emailRetry = useRetryAfter()
+
+  const [supportOpen, setSupportOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
 
   const handleUsernameChange = (value: string) => {
     const lower = value.toLowerCase()
@@ -129,6 +136,13 @@ export function ContaPage() {
 
   const surfaceBg = theme.isDark ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.72)'
   const borderColor = colors.border.subtle
+  const quietLink = {
+    all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 0.6,
+    color: theme.textOnBgMuted, fontSize: '0.84rem', fontWeight: 600, borderRadius: radius.sm,
+    transition: 'color 0.15s',
+    '&:hover': { color: theme.textOnBg },
+    '&:focus-visible': { outline: `2px solid ${theme.accent}`, outlineOffset: 3 },
+  } as const
 
   return (
     <Box sx={{ height: '100%', position: 'relative', overflow: 'hidden', background: theme.gradient }}>
@@ -401,7 +415,24 @@ export function ContaPage() {
               </Stack>
             </Box>
           )}
+
+          <Stack spacing={1.3} alignItems="center" sx={{ pt: 3, pb: 2 }}>
+            <Box component="button" type="button" onClick={() => setSupportOpen(true)} sx={quietLink}>
+              <SupportAgentOutlinedIcon sx={{ fontSize: 17 }} />
+              Falar com o suporte
+            </Box>
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ '& a': { ...quietLink, fontSize: '0.78rem', fontWeight: 500 } }}>
+              <Link to="/termos">Termos de uso</Link>
+              <Typography variant="xs" sx={{ color: theme.textOnBgMuted }}>·</Typography>
+              <Link to="/privacidade">Privacidade</Link>
+            </Stack>
+            <Box component="button" type="button" onClick={() => setDeleteOpen(true)} sx={{ ...quietLink, fontSize: '0.76rem', fontWeight: 500, color: colors.rose.text, opacity: 0.75, '&:hover': { opacity: 1 } }}>
+              Excluir minha conta
+            </Box>
+          </Stack>
         </Stack>
+        <SupportDialog open={supportOpen} onClose={() => setSupportOpen(false)} />
+        <DeleteAccountDialog open={deleteOpen} onClose={() => setDeleteOpen(false)} />
       </ScrollablePage>
     </Box>
   )

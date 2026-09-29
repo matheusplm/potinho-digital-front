@@ -189,6 +189,9 @@ export function RegisterPage() {
               >
                 Criar conta
               </Button>
+              <Typography variant="xs" sx={{ color: colors.text.muted, textAlign: 'center', lineHeight: 1.5, '& a': { color: colors.primary.text, fontWeight: 700, textDecoration: 'none' } }}>
+                Ao criar a conta, você concorda com os <Link to="/termos">Termos de uso</Link> e a <Link to="/privacidade">Política de privacidade</Link>.
+              </Typography>
             </Stack>
           </Box>
         </Box>

@@ -17,6 +17,7 @@ interface AuthUser {
   token: string
   refreshToken?: string
   onboardingDone?: boolean | null
+  hasPassword?: boolean
   isAdmin?: boolean
 }
 
@@ -123,6 +124,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
             username: profile.username,
             emailVerified: profile.emailVerified,
             onboardingDone: profile.onboardingDone,
+            hasPassword: profile.hasPassword,
             isAdmin: profile.isAdmin === true,
             token: current.token,
           }

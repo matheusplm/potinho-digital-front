@@ -1,4 +1,4 @@
-import type { AdminOverview } from '../types/admin'
+import type { AdminOverview, SupportMessage, SupportStatus } from '../types/admin'
 import type {
   Collection,
   CollectionAccess,
@@ -103,6 +103,8 @@ const FRIENDLY_ERROR_MESSAGES: Record<string, string> = {
   ADMIN_REAUTH_REQUIRED: 'Confirme sua identidade para continuar no modo admin.',
   ADMIN_REAUTH_FAILED: 'Não deu pra confirmar que é você. Confira a senha e tente de novo.',
   ADMIN_USE_GOOGLE: 'Essa conta entra com o Google. Confirme pelo botão do Google.',
+  DELETE_CONFIRM_MISMATCH: 'O e-mail digitado não é o da sua conta.',
+  ACCOUNT_DELETE_INCOMPLETE: 'Não deu pra apagar tudo agora. Tente de novo em alguns minutos.',
 }
 
 export function setAuthToken(token: string) {
@@ -237,7 +239,11 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ name, email, password, captchaToken, ...(username ? { username } : {}) }),
     }),
-  me: () => request<{ id: string; name: string; role: string; email: string; username?: string; emailVerified?: boolean; onboardingDone: boolean | null; isAdmin?: boolean }>('/auth/me'),
+  me: () => request<{ id: string; name: string; role: string; email: string; username?: string; emailVerified?: boolean; onboardingDone: boolean | null; hasPassword?: boolean; isAdmin?: boolean }>('/auth/me'),
+  deleteAccount: (confirmEmail: string, password?: string) =>
+    request<{ ok: boolean }>('/auth/delete-account', { method: 'POST', body: JSON.stringify({ confirmEmail, password }) }),
+  sendSupportMessage: (message: string, page?: string) =>
+    request<{ id: string; createdAt: string }>('/api/support', { method: 'POST', body: JSON.stringify({ message, page }) }),
   markOnboardingDone: () => request<{ ok: boolean }>('/auth/onboarding-done', { method: 'PATCH' }),
   updateMe: (data: { name?: string; username?: string }) =>
     request<{ id: string; name: string; email: string; username?: string }>('/auth/me', { method: 'PATCH', body: JSON.stringify(data) }),
@@ -407,4 +413,11 @@ export const api = {
     send('/api/admin/session', { method: 'DELETE', headers: { 'X-Admin-Token': adminToken } }, authToken).then(() => undefined, () => undefined),
   adminOverview: (adminToken: string) =>
     request<AdminOverview>('/api/admin/overview', { headers: { 'X-Admin-Token': adminToken } }),
+  adminSupportUnread: () => request<{ unread: number }>('/api/admin/support/unread'),
+  adminSupportList: (adminToken: string) =>
+    request<SupportMessage[]>('/api/admin/support', { headers: { 'X-Admin-Token': adminToken } }),
+  adminSupportStatus: (adminToken: string, id: string, status: SupportStatus) =>
+    request<SupportMessage>(`/api/admin/support/${id}`, { method: 'PATCH', headers: { 'X-Admin-Token': adminToken }, body: JSON.stringify({ status }) }),
+  adminSupportDelete: (adminToken: string, id: string) =>
+    request<{ ok: boolean }>(`/api/admin/support/${id}`, { method: 'DELETE', headers: { 'X-Admin-Token': adminToken } }),
 }

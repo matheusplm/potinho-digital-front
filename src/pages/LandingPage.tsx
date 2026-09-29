@@ -505,6 +505,11 @@ export function LandingPage() {
               </Tooltip>
             </Stack>
             <Box sx={{ height: '1px', maxWidth: 280, mx: 'auto', my: 2, background: colors.border.subtle }} />
+            <Stack direction="row" spacing={1} justifyContent="center" sx={{ mb: 1, '& a': { color: colors.text.muted, fontSize: '0.78rem', textDecoration: 'none', '&:hover': { color: colors.primary.text } } }}>
+              <Box component="a" {...linkTo('/termos')}>Termos de uso</Box>
+              <Typography variant="xs" sx={{ color: colors.text.muted }}>·</Typography>
+              <Box component="a" {...linkTo('/privacidade')}>Privacidade</Box>
+            </Stack>
             <Copyright />
           </Box>
         </Box>
