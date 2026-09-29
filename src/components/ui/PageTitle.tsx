@@ -11,11 +11,11 @@ export function PageTitle({ title, subtitle }: PageTitleProps) {
   const { theme } = useBackground()
   return (
     <Stack spacing={0.25}>
-      <Typography variant="h5" sx={{ color: theme.textOnBg, lineHeight: 1.1, letterSpacing: '-0.3px', fontFamily: font.serif }}>
+      <Typography variant="h5" sx={{ color: theme.textOnBg, lineHeight: 1.1, letterSpacing: '-0.3px', fontFamily: font.serif, overflowWrap: 'anywhere' }}>
         {title}
       </Typography>
       {subtitle && (
-        <Typography variant="body2" sx={{ color: theme.textOnBgMuted }}>
+        <Typography variant="body2" sx={{ color: theme.textOnBgMuted, overflowWrap: 'anywhere' }}>
           {subtitle}
         </Typography>
       )}

@@ -109,7 +109,7 @@ export function AlbumSection({
       </Box>
 
       <Stack direction="row" alignItems="center" spacing={0.6}>
-        <Box sx={{ display: 'flex', gap: 0.6, flex: 1, overflowX: 'auto', pb: 0.2, scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6, flex: 1, minWidth: 0 }}>
           {[
             { id: 'all' as AlbumFilter, label: 'Todas' },
             ...(hasFavorites ? [{ id: 'favorites' as AlbumFilter, label: 'Favoritas' }] : []),

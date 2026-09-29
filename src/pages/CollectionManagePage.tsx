@@ -2,7 +2,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, IconButton, Stack, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Button, LoadingState, PageTitle, ScrollablePage, SegmentedControl, toast } from '../components/ui'
 import { useCollectionsQuery } from '../hooks/useNotes'
 import { useBackground } from '../context/BackgroundContext'
@@ -11,7 +11,7 @@ import { useUser } from '../context/UserContext'
 import { fadeIn, colors, font } from '../design-system'
 import { isCollectionOwner } from '../utils/collectionAccess'
 import { findCollectionBySlug } from '../utils/slug'
-import { NotesTab } from './manage/NotesTab'
+import { NotesTab, type NotesIntent } from './manage/NotesTab'
 import { RaritiesTab } from './manage/RaritiesTab'
 import { TypesTab } from './manage/TypesTab'
 import { PacksTab } from './manage/PacksTab'
@@ -29,12 +29,28 @@ const TABS = [
   { id: 'access' as Tab, label: 'Acesso' },
 ]
 
+const TAB_PARAM: Record<string, Tab> = {
+  bilhetes: 'notes', raridades: 'rarities', tipos: 'types', pacotinhos: 'packs', conquistas: 'achievements', acesso: 'access',
+}
+
+function notesIntentFrom(params: URLSearchParams): NotesIntent | undefined {
+  if (params.get('novo') === '1') return 'new'
+  if (params.get('ver') === 'rascunhos') return 'drafts'
+  return undefined
+}
+
 export function CollectionManagePage() {
   const { slug = '' } = useParams<{ slug: string }>()
   const navigate = useNavigate()
   const { theme } = useBackground()
   const { user } = useUser()
-  const [tab, setTab] = useState<Tab>('notes')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [tab, setTab] = useState<Tab>(() => TAB_PARAM[searchParams.get('aba') ?? ''] ?? 'notes')
+  const [notesIntent] = useState(() => notesIntentFrom(searchParams))
+
+  useEffect(() => {
+    if (searchParams.toString()) setSearchParams({}, { replace: true })
+  }, [searchParams, setSearchParams])
 
   const { data: collections = [], isLoading: collectionsLoading } = useCollectionsQuery()
   const collection = findCollectionBySlug(collections, slug)
@@ -108,7 +124,7 @@ export function CollectionManagePage() {
           <SegmentedControl options={TABS} value={tab} onChange={setTab} />
         </Box>
 
-        {tab === 'notes' && <NotesTab cid={cid} />}
+        {tab === 'notes' && <NotesTab cid={cid} intent={notesIntent} />}
         {tab === 'rarities' && <RaritiesTab cid={cid} />}
         {tab === 'types' && <TypesTab cid={cid} />}
         {tab === 'packs' && <PacksTab cid={cid} />}

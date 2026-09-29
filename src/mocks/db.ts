@@ -2,6 +2,7 @@ import type {
   Collection,
   CollectionAccess,
   CollectionAchievement,
+  CollectionInvite,
   CollectionPack,
   NoteRecord,
   NoteTypeConfig,
@@ -45,6 +46,7 @@ export interface CollectionState {
   types: NoteTypeConfig[]
   packs: CollectionPack[]
   access: CollectionAccess[]
+  invites: CollectionInvite[]
   ownership: OwnershipState
   lastDailyOpenDate: string | null
   packOpens: Record<string, { lastOpenAt: string; totalOpens: number }>
@@ -69,22 +71,35 @@ interface MockDb {
   sequence: number
 }
 
+const OBTAINED_HOURS_AGO = [170, 96, 54, 19, 3]
+
+function hoursAgo(hours: number) {
+  return new Date(Date.now() - hours * 3_600_000).toISOString()
+}
+
 function buildOwnership(ownedIds: string[], favoriteIds: string[]): OwnershipState {
   const obtainedAt: Record<string, string> = {}
-  for (const id of ownedIds) obtainedAt[id] = '2026-04-20T10:00:00.000Z'
+  ownedIds.forEach((id, index) => {
+    obtainedAt[id] = hoursAgo(OBTAINED_HOURS_AGO[index % OBTAINED_HOURS_AGO.length] + Math.floor(index / OBTAINED_HOURS_AGO.length) * 200)
+  })
   return { owned: new Set(ownedIds), favorites: new Set(favoriteIds), obtainedAt }
 }
 
-function buildCollection(meta: Collection, ownedIds: string[], favoriteIds: string[]): CollectionState {
+function draftNote(id: string, title: string, message: string, rarity: string, typeId: string): NoteRecord {
+  return { id, title, message, rarity, typeId, createdAt: hoursAgo(28), status: 'preview', releasedAt: null }
+}
+
+function buildCollection(meta: Collection, ownedIds: string[], favoriteIds: string[], extra: Partial<Pick<CollectionState, 'invites' | 'notes'>> = {}): CollectionState {
   return {
     meta,
-    notes: cloneNotes(),
+    notes: [...cloneNotes(), ...(extra.notes ?? [])],
     rarities: cloneRarities(),
     types: cloneTypes(),
     packs: [...cloneStarterPacks(meta.id), ...cloneBonusPacks(meta.id)],
     access: meta.access === 'owner'
       ? [{ collectionId: meta.id, email: 'leitor@potinho.app', packIds: [], createdAt: '2026-04-21T09:00:00.000Z' }]
       : [],
+    invites: extra.invites ?? [],
     ownership: buildOwnership(ownedIds, favoriteIds),
     lastDailyOpenDate: null,
     packOpens: {},
@@ -101,6 +116,7 @@ function buildEmptyCollection(meta: Collection): CollectionState {
     types: cloneStarterTypes(),
     packs: cloneStarterPacks(meta.id),
     access: [],
+    invites: [],
     ownership: buildOwnership([], []),
     lastDailyOpenDate: null,
     packOpens: {},
@@ -130,6 +146,12 @@ function createInitialDb(): MockDb {
       },
       defaultOwnedIds,
       defaultFavoriteIds,
+      {
+        notes: [
+          draftNote('note_draft_1', 'Café da manhã', 'Acordar do seu lado é meu jeito favorito de começar o dia.', 'comum', 'amor'),
+          draftNote('note_draft_2', 'Playlist nossa', 'Toda música boa agora tem um pedacinho seu.', 'raro', 'parceria'),
+        ],
+      },
     ),
     buildCollection(
       {
@@ -138,7 +160,13 @@ function createInitialDb(): MockDb {
         createdAt: '2026-04-15T12:00:00.000Z', updatedAt: '2026-04-18T12:00:00.000Z',
       },
       ['note_001', 'note_011'],
-      [],
+      ['note_011'],
+      {
+        invites: [{
+          token: 'invite_trips_amanda', collectionId: 'col_trips', email: 'amanda.souza@gmail.com', status: 'pending',
+          createdAt: hoursAgo(72), expiresAt: hoursAgo(-96),
+        }],
+      },
     ),
   ]
 

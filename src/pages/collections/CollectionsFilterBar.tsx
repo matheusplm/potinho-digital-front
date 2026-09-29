@@ -50,7 +50,7 @@ export function CollectionsFilterBar({ sort, setSort, search, setSearch, view, c
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
           placeholder="Buscar coleção..."
           sx={{
-            flex: 1, border: 'none', outline: 'none', background: 'transparent',
+            flex: 1, minWidth: 0, border: 'none', outline: 'none', background: 'transparent',
             fontSize: '0.88rem', color: textOnBg, fontFamily: 'inherit',
             '&::placeholder': { color: textOnBgMuted },
           }}

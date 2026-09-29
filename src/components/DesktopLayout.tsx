@@ -30,6 +30,8 @@ import { useReader } from '../context/ReaderContext'
 import { useNotificationToggle } from '../hooks/useNotificationToggle'
 import { useBackground } from '../context/BackgroundContext'
 import { ThemeSwatches } from './ThemeSwatches'
+import { MenuAction } from './MenuAction'
+import { withAlpha } from '../utils/colorUtils'
 import { useCollectionsQuery, useMyNotificationsQuery, usePendingInvitesQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
 import { backgroundThemes, colors, font, radius } from '../design-system'
 import { collectionSlug } from '../utils/slug'
@@ -200,7 +202,7 @@ export function DesktopLayout() {
         )}
 
         {/* Nav items */}
-        <Stack sx={{ px: 1.2, py: 1.4, flex: '0 0 auto' }} spacing={0.3}>
+        <Stack sx={{ px: 0.7, py: 1.4, flex: '0 0 auto' }} spacing={0.3}>
           {items.map((item) => {
             const active = navValue === item.path
             const isEnd = item.action === 'end-simulation'
@@ -315,13 +317,12 @@ export function DesktopLayout() {
 
         <Divider sx={{ borderColor: theme.surfaceBorder }} />
 
-        {/* Persona switch */}
         {(canWriter || canReader || user?.isAdmin) && (
-          <Box sx={{ px: 1.5, pt: 1.4, pb: 0.6 }}>
-            <Typography variant="label" sx={{ color: theme.textOnBgMuted, mb: 0.8, px: 0.3 }}>
+          <Box sx={{ px: 2, pt: 1.75, pb: 1.25 }}>
+            <Typography variant="label" sx={{ color: theme.textOnBgMuted, mb: 1 }}>
               Modo
             </Typography>
-            <Stack direction="row" spacing={0.5}>
+            <Stack direction="row" spacing={0.6}>
               {([
                 { role: 'reader' as const, label: 'Leitor', icon: <MenuBookOutlinedIcon sx={{ fontSize: 13 }} />, enabled: canReader || hasPendingInvites },
                 { role: 'writer' as const, label: 'Escritor', icon: <EditOutlinedIcon sx={{ fontSize: 13 }} />, enabled: canWriter },
@@ -336,18 +337,18 @@ export function DesktopLayout() {
                     sx={{
                       flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.4,
                       position: 'relative',
-                      py: 0.7, borderRadius: radius.md, cursor: enabled ? 'pointer' : 'default',
-                      border: `1.5px solid ${active ? `${theme.accent}55` : theme.surfaceBorder}`,
-                      background: active ? `${theme.accent}10` : 'transparent',
+                      py: 0.75, borderRadius: radius.md, cursor: enabled ? 'pointer' : 'default',
+                      border: `1.5px solid ${active ? withAlpha(theme.accent, 34) : theme.surfaceBorder}`,
+                      background: active ? withAlpha(theme.accent, 7) : 'transparent',
                       opacity: enabled ? 1 : 0.4,
                       transition: 'all 0.14s',
-                      '&:hover': enabled ? { background: active ? `${theme.accent}16` : colors.fill.subtle } : undefined,
+                      '&:hover': enabled ? { background: active ? withAlpha(theme.accent, 9) : colors.fill.subtle } : undefined,
                     }}
                   >
                     {showInviteDot && (
                       <Box sx={{ position: 'absolute', top: -3, right: -3, width: 10, height: 10, borderRadius: '50%', background: '#ef4444', border: '2px solid #fff', boxShadow: '0 1px 4px rgba(239,68,68,0.5)' }} />
                     )}
-                    <Box sx={{ '& svg': { fontSize: '0.9rem', color: active ? theme.accent : theme.textOnBgMuted } }}>{icon}</Box>
+                    <Box sx={{ display: 'flex', '& svg': { fontSize: '0.9rem', color: active ? theme.accent : theme.textOnBgMuted } }}>{icon}</Box>
                     <Typography variant="sm" sx={{ fontWeight: active ? 700 : 500, color: active ? theme.accent : theme.textOnBgMuted }}>
                       {label}
                     </Typography>
@@ -358,16 +359,15 @@ export function DesktopLayout() {
           </Box>
         )}
 
-        {/* Theme picker */}
-        <Box sx={{ px: 2, pt: 1.2, pb: 1 }}>
-          <Typography variant="label" sx={{ color: theme.textOnBgMuted, mb: 0.9 }}>
+        <Box sx={{ px: 2, pt: 1.25, pb: 1.75 }}>
+          <Typography variant="label" sx={{ color: theme.textOnBgMuted, mb: 1 }}>
             Tema de fundo
           </Typography>
           <ThemeSwatches size={24} labelColor={theme.textOnBgMuted} />
           {theme.isDark && (
-            <Stack direction="row" spacing={0.9} alignItems="center" onClick={() => setMaskLightCards(!maskLightCards)} sx={{ mt: 0.6, cursor: 'pointer', userSelect: 'none' }}>
+            <Stack direction="row" spacing={1.1} alignItems="flex-start" onClick={() => setMaskLightCards(!maskLightCards)} sx={{ mt: 1.5, cursor: 'pointer', userSelect: 'none' }}>
               <Box sx={{
-                width: 30, height: 17, borderRadius: radius.full, flexShrink: 0, position: 'relative',
+                width: 30, height: 17, mt: 0.2, borderRadius: radius.full, flexShrink: 0, position: 'relative',
                 background: maskLightCards ? theme.accent : 'rgba(255,255,255,0.18)', transition: 'background 0.18s',
               }}>
                 <Box sx={{
@@ -375,11 +375,11 @@ export function DesktopLayout() {
                   background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.3)', transition: 'left 0.18s',
                 }} />
               </Box>
-              <Box>
-                <Typography variant="xs" sx={{ fontWeight: 700, color: theme.textOnBg, lineHeight: 1.2 }}>
+              <Box sx={{ minWidth: 0 }}>
+                <Typography variant="xs" sx={{ fontWeight: 700, color: theme.textOnBg, lineHeight: 1.3 }}>
                   Suavizar bilhetes claros
                 </Typography>
-                <Typography variant="xxs" sx={{ color: theme.textOnBgMuted }}>
+                <Typography variant="xxs" sx={{ color: theme.textOnBgMuted, lineHeight: 1.35 }}>
                   máscara escura sobre cards muito brancos
                 </Typography>
               </Box>
@@ -387,112 +387,26 @@ export function DesktopLayout() {
           )}
         </Box>
 
-        {/* Notifications */}
-        {notifSupported && (
-          <Box sx={{ px: 2, pb: 1 }}>
-            <Stack
-              direction="row" spacing={1.1} alignItems="center"
+        <Divider sx={{ borderColor: theme.surfaceBorder }} />
+
+        <Stack spacing={0.3} sx={{ px: 0.7, pt: 1, pb: 0.5 }}>
+          {notifSupported && (
+            <MenuAction
+              icon={notifStatus === 'denied' ? <BlockIcon /> : notifEnabled ? <NotificationsActiveIcon /> : <NotificationsNoneOutlinedIcon />}
+              label="Notificações"
+              tone={notifEnabled ? theme.accent : theme.textOnBgMuted}
+              labelColor={theme.textOnBg}
+              disabled={notifStatus === 'denied'}
+              title={notifStatus === 'denied' ? 'Ative nas configurações do navegador' : undefined}
               onClick={() => { void handleNotificationToggle() }}
-              sx={{
-                py: 0.8, px: 1, borderRadius: radius.md, cursor: notifStatus === 'denied' ? 'not-allowed' : 'pointer',
-                opacity: notifStatus === 'denied' ? 0.5 : 1,
-                transition: 'background 0.12s',
-                '&:hover': notifStatus !== 'denied' ? { bgcolor: `${theme.accent}0c` } : undefined,
-              }}
-            >
-              <Box sx={{
-                width: 28, height: 28, borderRadius: radius.sm, flexShrink: 0,
-                background: notifEnabled ? `${theme.accent}16` : colors.fill.medium,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                {notifStatus === 'denied'
-                  ? <BlockIcon sx={{ fontSize: 14, color: theme.textOnBgMuted }} />
-                  : notifEnabled
-                    ? <NotificationsActiveIcon sx={{ fontSize: 14, color: theme.accent }} />
-                    : <NotificationsNoneOutlinedIcon sx={{ fontSize: 14, color: theme.textOnBgMuted }} />
-                }
-              </Box>
-              <Box sx={{ minWidth: 0 }}>
-                <Typography variant="md" sx={{ fontWeight: 600, color: theme.textOnBg }}>
-                  {notifStatus === 'denied' ? 'Bloqueadas' : notifEnabled ? 'Notificações ativas' : 'Notificações'}
-                </Typography>
-                <Typography variant="xs" sx={{ color: theme.textOnBgMuted }}>
-                  {notifStatus === 'denied' ? 'Ativar nas configurações' : notifEnabled ? 'Toque para desativar' : 'Toque para ativar'}
-                </Typography>
-              </Box>
-            </Stack>
-          </Box>
-        )}
-
-        {/* My account */}
-        <Box sx={{ px: 2, pb: 0.5 }}>
-          <Stack
-            direction="row" spacing={1.1} alignItems="center"
-            onClick={() => navigate('/conta')}
-            sx={{
-              py: 0.8, px: 1, borderRadius: radius.md, cursor: 'pointer',
-              transition: 'background 0.12s',
-              '&:hover': { bgcolor: `${theme.accent}0c` },
-            }}
-          >
-            <Box sx={{
-              width: 28, height: 28, borderRadius: radius.sm, flexShrink: 0,
-              background: `${theme.accent}14`, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <ManageAccountsOutlinedIcon sx={{ fontSize: 14, color: theme.accent }} />
-            </Box>
-            <Typography variant="md" sx={{ fontWeight: 600, color: theme.textOnBg }}>
-              Minha conta
-            </Typography>
-          </Stack>
-        </Box>
-
-        {/* Tutorial */}
-        <Box sx={{ px: 2, pb: 0.5 }}>
-          <Stack
-            direction="row" spacing={1.1} alignItems="center"
-            onClick={() => setShowTutorial(true)}
-            sx={{
-              py: 0.8, px: 1, borderRadius: radius.md, cursor: 'pointer',
-              transition: 'background 0.12s',
-              '&:hover': { bgcolor: `${theme.accent}0c` },
-            }}
-          >
-            <Box sx={{
-              width: 28, height: 28, borderRadius: radius.sm, flexShrink: 0,
-              background: `${theme.accent}14`, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <PlayCircleOutlineIcon sx={{ fontSize: 14, color: theme.accent }} />
-            </Box>
-            <Typography variant="md" sx={{ fontWeight: 600, color: theme.textOnBg }}>
-              Ver tutorial
-            </Typography>
-          </Stack>
-        </Box>
-
-        {/* Logout */}
-        <Box sx={{ px: 2, pb: 1.5 }}>
-          <Stack
-            direction="row" spacing={1.1} alignItems="center"
-            onClick={logout}
-            sx={{
-              py: 0.8, px: 1, borderRadius: radius.md, cursor: 'pointer',
-              transition: 'background 0.12s',
-              '&:hover': { bgcolor: `${colors.rose.main}0c` },
-            }}
-          >
-            <Box sx={{
-              width: 28, height: 28, borderRadius: radius.sm, flexShrink: 0,
-              background: `${colors.rose.main}14`, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <LogoutIcon sx={{ fontSize: 14, color: colors.rose.text }} />
-            </Box>
-            <Typography variant="md" sx={{ fontWeight: 600, color: colors.rose.text }}>
-              Sair
-            </Typography>
-          </Stack>
-        </Box>
-        <Copyright color={theme.textOnBgMuted} sx={{ px: 2, pb: 2 }} />
+              badge={{ label: notifStatus === 'denied' ? 'bloqueadas' : notifEnabled ? 'ativas' : 'ativar', active: notifEnabled }}
+            />
+          )}
+          <MenuAction icon={<ManageAccountsOutlinedIcon />} label="Minha conta" tone={theme.accent} labelColor={theme.textOnBg} onClick={() => navigate('/conta')} />
+          <MenuAction icon={<PlayCircleOutlineIcon />} label="Ver tutorial" tone={theme.accent} labelColor={theme.textOnBg} onClick={() => setShowTutorial(true)} />
+          <MenuAction icon={<LogoutIcon />} label="Sair" tone={colors.rose.main} labelColor={colors.rose.text} onClick={logout} />
+        </Stack>
+        <Copyright color={theme.textOnBgMuted} sx={{ px: 2, pt: 1, pb: 2 }} />
       </Box>
 
       {/* ── Content area ── */}

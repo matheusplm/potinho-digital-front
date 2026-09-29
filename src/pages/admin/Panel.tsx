@@ -133,9 +133,7 @@ export function FilterChips<T extends string>({ options, value, onChange }: { op
     <Box
       role="tablist"
       sx={{
-        display: 'flex', gap: 0.7, overflowX: 'auto', flexWrap: { xs: 'nowrap', md: 'wrap' },
-        mx: { xs: -1.6, md: 0 }, px: { xs: 1.6, md: 0 }, pb: 0.4,
-        scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' },
+        display: 'flex', gap: 0.7, flexWrap: 'wrap', pb: 0.4,
       }}
     >
       {options.map((option) => {
