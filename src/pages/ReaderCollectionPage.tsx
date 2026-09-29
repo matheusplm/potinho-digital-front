@@ -150,7 +150,7 @@ export function ReaderCollectionPage() {
           <IconButton size="small" aria-label="voltar" onClick={() => navigate(`/colecoes/${slug}/gerenciar`)} sx={{ ...glassBtn, color: theme.textOnBg }}>
             <ArrowBackIcon sx={{ fontSize: 20 }} />
           </IconButton>
-          <Box sx={{ flex: 1 }}>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
             <PageTitle title={collection?.name ?? 'Coleção'} subtitle={email} />
           </Box>
           <IconButton size="small" aria-label="remover acesso" onClick={() => setRevokeDialogOpen(true)} sx={{ ...glassBtn, color: colors.rose.text }}>
@@ -234,7 +234,7 @@ export function ReaderCollectionPage() {
                   value={search}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
                   placeholder="Buscar bilhete..."
-                  sx={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: '0.86rem', color: theme.textOnBg, fontFamily: 'inherit', '&::placeholder': { color: theme.textOnBgMuted } }}
+                  sx={{ flex: 1, minWidth: 0, border: 'none', outline: 'none', background: 'transparent', fontSize: '0.86rem', color: theme.textOnBg, fontFamily: 'inherit', '&::placeholder': { color: theme.textOnBgMuted } }}
                 />
                 {search && (
                   <Box onClick={() => setSearch('')} sx={{ display: 'flex', cursor: 'pointer', color: theme.textOnBgMuted }}>
