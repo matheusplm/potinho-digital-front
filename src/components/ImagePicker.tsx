@@ -73,7 +73,7 @@ export function ImagePicker({ value, onChange, mediaType = 'gifs', label }: Prop
     const ro = new ResizeObserver((entries) => setGridWidth(entries[0].contentRect.width))
     ro.observe(gridRef.current)
     return () => ro.disconnect()
-  }, [mode]) // re-run when mode opens the grid
+  }, [mode])
 
   const fetchGifs = useCallback(
     (offset: number) =>
@@ -128,7 +128,6 @@ export function ImagePicker({ value, onChange, mediaType = 'gifs', label }: Prop
         </Typography>
       </Typography>
 
-      {/* Preview */}
       {value && (
         <Box sx={{
           position: 'relative', borderRadius: radius.lg, overflow: 'hidden', height: 88,
@@ -171,7 +170,6 @@ export function ImagePicker({ value, onChange, mediaType = 'gifs', label }: Prop
         <OptionTile variant="solid" size="md" active={mode === 'url'} onClick={() => toggleMode('url')} title="🔗 URL" sx={{ flex: 1 }} />
       </Stack>
 
-      {/* GIF panel */}
       {mode === 'giphy' && (
         <Stack spacing={1}>
           <Input
@@ -214,7 +212,6 @@ export function ImagePicker({ value, onChange, mediaType = 'gifs', label }: Prop
         </Stack>
       )}
 
-      {/* URL panel */}
       {mode === 'url' && (
         <Stack spacing={0.5}>
           <Input

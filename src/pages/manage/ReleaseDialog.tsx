@@ -8,6 +8,7 @@ import { useBackground } from '../../context/BackgroundContext'
 import { colors, font, radius } from '../../design-system'
 import type { CollectionAccess, NoteRecord, RarityConfig } from '../../types/note'
 import { TourHint } from '../../tour/TourHint'
+import { MAX_OPENS_PER_GRANT } from '../../components/manage/BonusPackDialog'
 
 const CHIP_PREVIEW_LIMIT = 6
 
@@ -178,8 +179,8 @@ export function ReleaseDialog({ cid, notes, rarities, open, onClose }: {
                       label="Quantas aberturas"
                       type="number"
                       value={bonusOpens}
-                      onChange={(e) => setBonusOpens(Math.max(1, Number(e.target.value)))}
-                      inputProps={{ min: 1 }}
+                      onChange={(e) => setBonusOpens(Math.min(MAX_OPENS_PER_GRANT, Math.max(1, Number(e.target.value))))}
+                      inputProps={{ min: 1, max: MAX_OPENS_PER_GRANT }}
                       fullWidth
                       size="small"
                       sx={{ '& .MuiOutlinedInput-root': { borderRadius: radius.lg } }}

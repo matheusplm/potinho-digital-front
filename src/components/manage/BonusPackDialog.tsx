@@ -7,6 +7,8 @@ import { useAddPackOpensMutation } from '../../hooks/useNotes'
 import { colors, font, radius } from '../../design-system'
 import type { CollectionPack } from '../../types/note'
 
+export const MAX_OPENS_PER_GRANT = 10
+
 export interface BonusPackTarget {
   email: string
   pack: CollectionPack
@@ -78,8 +80,9 @@ export function BonusPackDialog({ cid, target, onClose, onSuccess }: {
             label="Quantas aberturas adicionar"
             type="number"
             value={opens}
-            onChange={(e) => setOpens(Math.max(1, Number(e.target.value)))}
-            inputProps={{ min: 1 }}
+            onChange={(e) => setOpens(Math.min(MAX_OPENS_PER_GRANT, Math.max(1, Number(e.target.value))))}
+            inputProps={{ min: 1, max: MAX_OPENS_PER_GRANT }}
+            helperText={`até ${MAX_OPENS_PER_GRANT} por vez`}
             fullWidth
             size="small"
             sx={{ '& .MuiOutlinedInput-root': { borderRadius: radius.lg } }}

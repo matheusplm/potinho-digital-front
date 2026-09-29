@@ -72,7 +72,6 @@ export function LandingPage() {
 
       <FloatingParticles fixed />
 
-      {/* Navbar */}
       <Box component="nav" sx={{
         position: 'sticky', top: 0, zIndex: 100,
         background: colors.surface.overlay, backdropFilter: 'blur(20px)',
@@ -99,7 +98,6 @@ export function LandingPage() {
 
       <Box sx={{ position: 'relative', zIndex: 1 }}>
 
-        {/* Hero */}
         <Box sx={{ px: isDesktop ? 5 : 2.5, pt: isDesktop ? 8 : 5, pb: isDesktop ? 9 : 6, maxWidth: isDesktop ? 1200 : 480, mx: 'auto' }}>
           {isDesktop ? (
             <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, alignItems: 'center' }}>
@@ -175,7 +173,6 @@ export function LandingPage() {
           )}
         </Box>
 
-        {/* Concept pitch */}
         <Box sx={{ background: colors.glass.band, backdropFilter: 'blur(20px)', borderTop: `1px solid ${colors.glass.bandBorder}`, borderBottom: `1px solid ${colors.glass.bandBorder}`, py: isDesktop ? 7 : 5, px: isDesktop ? 5 : 2.5 }}>
           <Box className="pd-enter" sx={{ maxWidth: isDesktop ? 760 : 480, mx: 'auto', textAlign: 'center', animation: `${fadeInHero} 0.6s 0.1s ease both` }}>
             <Typography sx={{ fontSize: isDesktop ? '2rem' : '1.5rem', fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, lineHeight: 1.3, mb: 2 }}>
@@ -199,7 +196,6 @@ export function LandingPage() {
           </Box>
         </Box>
 
-        {/* Features */}
         <Box sx={{ py: isDesktop ? 8 : 5, px: isDesktop ? 5 : 2.5, maxWidth: isDesktop ? 1200 : 480, mx: 'auto' }}>
           <Box sx={{ textAlign: isDesktop ? 'center' : 'left', mb: 4 }}>
             <SectionTitle>O que você ganha</SectionTitle>
@@ -215,7 +211,6 @@ export function LandingPage() {
           </Box>
         </Box>
 
-        {/* Interactive demo */}
         <Box sx={{ background: colors.glass.band, backdropFilter: 'blur(20px)', borderTop: `1px solid ${colors.glass.bandBorder}`, borderBottom: `1px solid ${colors.glass.bandBorder}`, py: isDesktop ? 8 : 5, px: isDesktop ? 5 : 2.5 }}>
           <Box sx={{ maxWidth: isDesktop ? 1200 : 480, mx: 'auto' }}>
             {isDesktop ? (
@@ -294,7 +289,6 @@ export function LandingPage() {
           </Box>
         </Box>
 
-        {/* How it works */}
         <Box sx={{ py: isDesktop ? 8 : 5, px: isDesktop ? 5 : 2.5, maxWidth: isDesktop ? 1200 : 480, mx: 'auto' }}>
           <Box sx={{ textAlign: isDesktop ? 'center' : 'left', mb: isDesktop ? 5 : 3 }}>
             <SectionTitle>Como funciona?</SectionTitle>
@@ -346,7 +340,6 @@ export function LandingPage() {
           )}
         </Box>
 
-        {/* Customization */}
         <Box sx={{ background: colors.glass.band, backdropFilter: 'blur(20px)', borderTop: `1px solid ${colors.glass.bandBorder}`, borderBottom: `1px solid ${colors.glass.bandBorder}`, py: isDesktop ? 8 : 5, px: isDesktop ? 5 : 2.5 }}>
           <Box sx={{ maxWidth: isDesktop ? 1200 : 480, mx: 'auto' }}>
             <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.8, px: 1.4, py: 0.5, borderRadius: radius.full, background: 'linear-gradient(90deg,rgba(29,78,216,0.08),rgba(225,29,72,0.06))', border: '1px solid rgba(29,78,216,0.15)', mb: 1.5 }}>
@@ -379,10 +372,8 @@ export function LandingPage() {
           </Box>
         </Box>
 
-        {/* Themes */}
         <ThemesSection isDesktop={isDesktop} />
 
-        {/* For whom */}
         <Box sx={{ background: colors.glass.band, backdropFilter: 'blur(20px)', borderTop: `1px solid ${colors.glass.bandBorder}`, borderBottom: `1px solid ${colors.glass.bandBorder}`, py: isDesktop ? 7 : 5, px: isDesktop ? 5 : 2.5 }}>
           <Box sx={{ maxWidth: isDesktop ? 1200 : 480, mx: 'auto' }}>
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: isDesktop ? 6 : 0, flexDirection: isDesktop ? 'row' : 'column' }}>
@@ -419,7 +410,6 @@ export function LandingPage() {
           </Box>
         </Box>
 
-        {/* Access control highlight */}
         <Box sx={{ py: isDesktop ? 7 : 5, px: isDesktop ? 5 : 2.5 }}>
           <Box sx={{ maxWidth: isDesktop ? 900 : 480, mx: 'auto', background: colors.glass.card, backdropFilter: 'blur(18px)', border: `1.5px solid ${colors.glass.cardBorder}`, borderRadius: radius.xl, p: isDesktop ? 4 : 2.5 }}>
             <Stack direction={isDesktop ? 'row' : 'column'} spacing={isDesktop ? 4 : 2} alignItems={isDesktop ? 'center' : 'flex-start'}>
