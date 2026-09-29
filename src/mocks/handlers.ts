@@ -13,7 +13,7 @@ import type {
 import { toConfigId } from '../utils/slug'
 import { COLLECTION_TEMPLATES } from '../services/collectionTemplates'
 import { buildNoteView, drawReward } from './data'
-import { adminHandlers, MOCK_ADMIN_EMAIL } from './admin'
+import { addSupportMessage, adminHandlers, forgetSupportMessagesOf, MOCK_ADMIN_EMAIL } from './admin'
 import {
   createEmptyCollection,
   db,
@@ -225,8 +225,34 @@ const authHandlers = [
     if (!user) return HttpResponse.json({ message: 'Não autenticado.' }, { status: 401 })
     return HttpResponse.json({
       id: user.id, name: user.name, role: inferMockRole(user), email: user.email, onboardingDone: true,
-      isAdmin: user.email === MOCK_ADMIN_EMAIL,
+      hasPassword: true, isAdmin: user.email === MOCK_ADMIN_EMAIL,
     })
+  }),
+
+  http.post('/auth/delete-account', async ({ request }) => {
+    await delay(700)
+    const user = resolveUser(tokenFrom(request))
+    if (!user) return HttpResponse.json({ error: 'UNAUTHORIZED' }, { status: 401 })
+    const { confirmEmail, password } = (await request.json()) as { confirmEmail: string; password?: string }
+    if (confirmEmail.trim().toLowerCase() !== user.email.toLowerCase()) return HttpResponse.json({ error: 'DELETE_CONFIRM_MISMATCH' }, { status: 400 })
+    if (password !== user.password) return HttpResponse.json({ error: 'INVALID_CREDENTIALS' }, { status: 401 })
+    db.collections = db.collections.filter((collection) => collection.meta.ownerId !== user.id)
+    db.collections.forEach((collection) => {
+      collection.access = collection.access.filter((entry) => entry.email.toLowerCase() !== user.email.toLowerCase())
+    })
+    db.users = db.users.filter((candidate) => candidate.id !== user.id)
+    forgetSupportMessagesOf(user.id)
+    return HttpResponse.json({ ok: true })
+  }),
+
+  http.post('/api/support', async ({ request }) => {
+    await delay(500)
+    const user = resolveUser(tokenFrom(request))
+    if (!user) return HttpResponse.json({ error: 'UNAUTHORIZED' }, { status: 401 })
+    const { message, page } = (await request.json()) as { message: string; page?: string }
+    if (message.trim().length < 5) return HttpResponse.json({ error: 'VALIDATION_ERROR' }, { status: 400 })
+    const record = addSupportMessage(user, message.trim(), page)
+    return HttpResponse.json({ id: record.id, createdAt: record.createdAt }, { status: 201 })
   }),
 
   http.post('/auth/verify-email', async ({ request }) => {

@@ -16,6 +16,7 @@ import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettin
 import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined'
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined'
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
+import SupportAgentOutlinedIcon from '@mui/icons-material/SupportAgentOutlined'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import { Box, Divider, Stack, Typography } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
@@ -34,6 +35,7 @@ import { MenuAction } from './MenuAction'
 import { useTour } from '../tour/TourContext'
 import { withAlpha } from '../utils/colorUtils'
 import { useCollectionsQuery, useMyNotificationsQuery, usePendingInvitesQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
+import { useSupportUnreadQuery } from '../hooks/useAdmin'
 import { backgroundThemes, colors, font, radius } from '../design-system'
 import { collectionSlug } from '../utils/slug'
 import { BrandMark, Copyright } from './Brand'
@@ -52,6 +54,7 @@ const ADMIN_NAV: NavItem[] = [
   { label: 'Visão geral', path: '/home', icon: <InsightsOutlinedIcon /> },
   { label: 'Usuários', path: '/admin/usuarios', icon: <PeopleAltOutlinedIcon /> },
   { label: 'Coleções', path: '/admin/colecoes', icon: <Inventory2Icon /> },
+  { label: 'Suporte', path: '/admin/suporte', icon: <SupportAgentOutlinedIcon /> },
 ]
 
 const WRITER_NAV: NavItem[] = [
@@ -74,6 +77,7 @@ export function DesktopLayout() {
   const { data: collections = [] } = useCollectionsQuery()
   const { data: pendingInvites = [] } = usePendingInvitesQuery({ enabled: !!user })
   const hasPendingInvites = pendingInvites.length > 0
+  const { data: supportUnread = 0 } = useSupportUnreadQuery()
 
   const { canWriter, canReader } = useMemo(
     () => personaCapabilities(collections, user?.id, user?.role ?? 'writer'),
@@ -204,7 +208,8 @@ export function DesktopLayout() {
             const active = navValue === item.path
             const isEnd = item.action === 'end-simulation'
             const showDot = (item.label === 'Coleção' && ((isActive && hasUnreadNotes) || (isReader && readerHasUnread))) ||
-              (item.label === 'Novidades' && hasUnreadNotifications)
+              (item.label === 'Novidades' && hasUnreadNotifications) ||
+              (item.path === '/admin/suporte' && supportUnread > 0)
             const accentColor = isEnd ? colors.rose.main : theme.accent
             return (
               <Box
@@ -325,7 +330,7 @@ export function DesktopLayout() {
                 ...(user?.isAdmin ? [{ role: 'admin' as const, label: 'Admin', icon: <AdminPanelSettingsOutlinedIcon sx={{ fontSize: 13 }} />, enabled: true }] : []),
               ] satisfies Array<{ role: Persona; label: string; icon: React.ReactNode; enabled: boolean }>).map(({ role, label, icon, enabled }) => {
                 const active = persona === role
-                const showInviteDot = role === 'reader' && hasPendingInvites && persona !== 'reader'
+                const showInviteDot = (role === 'reader' && hasPendingInvites && persona !== 'reader') || (role === 'admin' && supportUnread > 0 && persona !== 'admin')
                 return (
                   <Box
                     key={role}

@@ -16,6 +16,14 @@ const PUBLIC_PAGES: Record<string, { title: string; description: string }> = {
     title: `Criar conta grátis | ${BRAND}`,
     description: 'Crie sua conta grátis e monte um álbum de bilhetes com pacotinhos surpresa para quem você ama.',
   },
+  '/termos': {
+    title: `Termos de uso | ${BRAND}`,
+    description: 'As regras de uso do Potinho Digital: sua conta, o que você escreve, o que não pode e como o serviço funciona.',
+  },
+  '/privacidade': {
+    title: `Política de privacidade | ${BRAND}`,
+    description: 'Quais dados o Potinho Digital guarda, por que, com quem compartilha e como exercer seus direitos pela LGPD.',
+  },
 }
 
 const SECTION_TITLES: Array<[string, string]> = [

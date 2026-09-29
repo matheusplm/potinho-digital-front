@@ -43,6 +43,8 @@ const NotificationsPage = lazy(() => import('./pages/NotificationsPage').then((m
 const AdminOverviewPage = lazy(() => import('./pages/admin/AdminOverviewPage').then((m) => ({ default: m.AdminOverviewPage })))
 const AdminUsersPage = lazy(() => import('./pages/admin/AdminUsersPage').then((m) => ({ default: m.AdminUsersPage })))
 const AdminCollectionsPage = lazy(() => import('./pages/admin/AdminCollectionsPage').then((m) => ({ default: m.AdminCollectionsPage })))
+const AdminSupportPage = lazy(() => import('./pages/admin/AdminSupportPage').then((m) => ({ default: m.AdminSupportPage })))
+const LegalPage = lazy(() => import('./pages/LegalPage').then((m) => ({ default: m.LegalPage })))
 
 function RouteFallback() {
   return (
@@ -113,6 +115,8 @@ function AppRoutes() {
           <Route path="/redefinir-senha" element={<ResetPasswordPage />} />
           <Route path="/confirmar-troca-email" element={<ConfirmEmailChangePage />} />
           <Route path="/convite/:token" element={<InviteAcceptPage />} />
+          <Route path="/termos" element={<LegalPage doc="termos" />} />
+          <Route path="/privacidade" element={<LegalPage doc="privacidade" />} />
           {import.meta.env.DEV && <Route path="/test" element={<TestPage />} />}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
@@ -129,6 +133,8 @@ function AppRoutes() {
         <Route path="/redefinir-senha" element={<ResetPasswordPage />} />
         <Route path="/confirmar-troca-email" element={<ConfirmEmailChangePage />} />
         <Route path="/convite/:token" element={<InviteAcceptPage />} />
+        <Route path="/termos" element={<LegalPage doc="termos" />} />
+        <Route path="/privacidade" element={<LegalPage doc="privacidade" />} />
         <Route element={<Layout />}>
           <Route index element={<Navigate to="/home" replace />} />
           <Route path="home" element={<HomeRoute />} />
@@ -142,6 +148,7 @@ function AppRoutes() {
           <Route path="conta" element={<ContaPage />} />
           <Route path="admin/usuarios" element={<RequireAdmin><AdminUsersPage /></RequireAdmin>} />
           <Route path="admin/colecoes" element={<RequireAdmin><AdminCollectionsPage /></RequireAdmin>} />
+          <Route path="admin/suporte" element={<RequireAdmin><AdminSupportPage /></RequireAdmin>} />
         </Route>
         {import.meta.env.DEV && <Route path="test" element={<TestPage />} />}
         <Route path="*" element={<NotFoundPage />} />

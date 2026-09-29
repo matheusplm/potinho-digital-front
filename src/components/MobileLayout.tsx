@@ -8,6 +8,7 @@ import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import StopCircleOutlinedIcon from '@mui/icons-material/StopCircleOutlined'
 import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined'
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined'
+import SupportAgentOutlinedIcon from '@mui/icons-material/SupportAgentOutlined'
 import { Box, Tooltip, Typography } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
@@ -21,6 +22,7 @@ import { useSimulation } from '../context/SimulationContext'
 import { useReader } from '../context/ReaderContext'
 import { useBackground } from '../context/BackgroundContext'
 import { useCollectionsQuery, useMyNotificationsQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
+import { useSupportUnreadQuery } from '../hooks/useAdmin'
 import { collectionSlug } from '../utils/slug'
 import { isCollectionReader } from '../utils/collectionAccess'
 import { colors, radius } from '../design-system'
@@ -37,6 +39,7 @@ const ADMIN_NAV: NavItem[] = [
   { label: 'Visão geral', path: '/home', icon: <InsightsOutlinedIcon /> },
   { label: 'Usuários', path: '/admin/usuarios', icon: <PeopleAltOutlinedIcon /> },
   { label: 'Coleções', path: '/admin/colecoes', icon: <Inventory2Icon /> },
+  { label: 'Suporte', path: '/admin/suporte', icon: <SupportAgentOutlinedIcon /> },
 ]
 
 const WRITER_NAV: NavItem[] = [
@@ -72,6 +75,7 @@ export function MobileLayout() {
 
   const { data: myNotifications = [] } = useMyNotificationsQuery({ enabled: isReader })
   const hasUnreadNotifications = useMemo(() => myNotifications.some((n) => !n.readAt), [myNotifications])
+  const { data: supportUnread = 0 } = useSupportUnreadQuery()
 
   const { data: readerAch } = useReaderAchievementsQuery(readerActive?.id ?? '', { enabled: isReader && !!readerActive })
   const justUnlockedKey = (readerAch?.justUnlocked ?? []).join(',')
@@ -153,7 +157,8 @@ export function MobileLayout() {
             const isEnd = item.action === 'end-simulation'
             const showUnreadDot =
               (item.label === 'Coleção' && ((isActive && hasUnreadNotes) || (isReader && readerHasUnread))) ||
-              (item.label === 'Novidades' && hasUnreadNotifications)
+              (item.label === 'Novidades' && hasUnreadNotifications) ||
+              (item.path === '/admin/suporte' && supportUnread > 0)
             const navBox = (
               <Box
                 key={item.path + item.label}
