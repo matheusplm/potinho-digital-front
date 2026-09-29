@@ -146,7 +146,6 @@ export function ContaPage() {
         </Stack>
 
         <Stack spacing={2}>
-          {/* ── Perfil ── */}
           <Box sx={{ background: surfaceBg, backdropFilter: 'blur(16px)', borderRadius: radius.lg, border: `1px solid ${borderColor}`, overflow: 'hidden' }}>
             <Stack
               direction="row" alignItems="center" spacing={1.5}
@@ -218,7 +217,6 @@ export function ContaPage() {
             </Collapse>
           </Box>
 
-          {/* ── Email ── */}
           <Box sx={{ background: surfaceBg, backdropFilter: 'blur(16px)', borderRadius: radius.lg, border: `1px solid ${borderColor}`, overflow: 'hidden' }}>
             <Stack
               direction="row" alignItems="center" spacing={1.5}
@@ -317,7 +315,6 @@ export function ContaPage() {
             </Collapse>
           </Box>
 
-          {/* ── Senha ── */}
           <Box sx={{ background: surfaceBg, backdropFilter: 'blur(16px)', borderRadius: radius.lg, border: `1px solid ${borderColor}`, overflow: 'hidden' }}>
             <Stack
               direction="row" alignItems="center" spacing={1.5}
@@ -394,7 +391,6 @@ export function ContaPage() {
             </Collapse>
           </Box>
 
-          {/* ── Username standalone (se não tem) ── */}
           {!user?.username && (
             <Box sx={{ px: 1.5, py: 1.2, borderRadius: radius.md, background: `${theme.accent}0e`, border: `1px solid ${theme.accent}22` }}>
               <Stack direction="row" alignItems="center" spacing={1}>

@@ -152,7 +152,6 @@ export function DesktopLayout() {
   return (
     <Box sx={{ display: 'flex', height: '100dvh', overflow: 'hidden', background: theme.gradient }}>
 
-      {/* ── Sidebar ── */}
       <Box sx={{
         width: SIDEBAR_W, flexShrink: 0, height: '100%',
         display: 'flex', flexDirection: 'column',
@@ -166,7 +165,6 @@ export function DesktopLayout() {
 
         <Divider sx={{ borderColor: theme.surfaceBorder }} />
 
-        {/* User info */}
         <Box sx={{ px: 2, py: 1.6 }}>
           <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 700, color: theme.textOnBg, lineHeight: 1.2, wordBreak: 'break-word' }}>
             {user?.name}
@@ -178,7 +176,6 @@ export function DesktopLayout() {
 
         <Divider sx={{ borderColor: theme.surfaceBorder }} />
 
-        {/* Simulation indicator */}
         {isActive && session && (
           <>
             <Box sx={{
@@ -202,7 +199,6 @@ export function DesktopLayout() {
           </>
         )}
 
-        {/* Nav items */}
         <Stack sx={{ px: 0.7, py: 1.4, flex: '0 0 auto' }} spacing={0.3}>
           {items.map((item) => {
             const active = navValue === item.path
@@ -256,7 +252,6 @@ export function DesktopLayout() {
           })}
         </Stack>
 
-        {/* Collection switcher */}
         {readerCollections.length > 1 && (
           <>
             <Divider sx={{ borderColor: theme.surfaceBorder }} />
@@ -314,7 +309,6 @@ export function DesktopLayout() {
           </>
         )}
 
-        {/* Spacer */}
         <Box sx={{ flex: 1 }} />
 
         <Divider sx={{ borderColor: theme.surfaceBorder }} />
@@ -413,7 +407,6 @@ export function DesktopLayout() {
         <Copyright color={theme.textOnBgMuted} sx={{ px: 2, pt: 1, pb: 2 }} />
       </Box>
 
-      {/* ── Content area ── */}
       <Box sx={{ flex: 1, height: '100%', overflow: 'hidden', position: 'relative' }}>
         <SimulationBanner />
         {location.pathname === '/home' && !isActive && persona !== 'admin' && !tour.step && <PushPrompt />}
