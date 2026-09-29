@@ -68,7 +68,7 @@ export function readerName(email: string) {
 function refillsFor(pack: CollectionPack, access: CollectionAccess) {
   if (pack.status !== 'active') return false
   if (pack.distribution === 'all_with_access') return true
-  return pack.distribution === 'selected_readers' && access.packIds.includes(pack.id)
+  return pack.distribution === 'selected_readers' && (access.packIds ?? []).includes(pack.id)
 }
 
 function opensPerDay(pack: CollectionPack) {

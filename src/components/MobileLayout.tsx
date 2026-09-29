@@ -24,6 +24,7 @@ import { useCollectionsQuery, useMyNotificationsQuery, useReaderAchievementsQuer
 import { collectionSlug } from '../utils/slug'
 import { isCollectionReader } from '../utils/collectionAccess'
 import { colors, radius } from '../design-system'
+import { useTour } from '../tour/TourContext'
 
 interface NavItem {
   label: string
@@ -49,6 +50,7 @@ export function MobileLayout() {
   const navigate = useNavigate()
   const { user, persona } = useUser()
   const { theme } = useBackground()
+  const tour = useTour()
   const { isActive, session, endSimulation, hasUnreadNotes } = useSimulation()
   const { hasUnread: readerHasUnread, activeCollectionId } = useReader()
   const [simulateOpen, setSimulateOpen] = useState(false)
@@ -125,7 +127,7 @@ export function MobileLayout() {
     <Box sx={{ width: '100%', maxWidth: 480, height: '100dvh', mx: 'auto', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <FloatingMenu />
       <SimulationBanner />
-      {location.pathname === '/home' && !isActive && persona !== 'admin' && <PushPrompt />}
+      {location.pathname === '/home' && !isActive && persona !== 'admin' && !tour.step && <PushPrompt />}
 
       <Box component="main" sx={{
         flex: 1,
@@ -155,6 +157,7 @@ export function MobileLayout() {
             const navBox = (
               <Box
                 key={item.path + item.label}
+                data-tour={`nav-${item.path.split('/')[1]}`}
                 onClick={() => {
                   if (item.action === 'simulate') {
                     setSimulateOpen(true)

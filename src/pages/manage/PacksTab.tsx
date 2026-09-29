@@ -96,7 +96,7 @@ export function PacksTab({ cid }: PacksTabProps) {
 
   return (
     <>
-      <Stack spacing={1.4}>
+      <Stack spacing={1.4} data-tour="packs-panel">
         <Stack spacing={1.1}>
           <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Box>

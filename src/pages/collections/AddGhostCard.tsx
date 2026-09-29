@@ -29,7 +29,7 @@ export function AddGhostCard({ view, onClick, accent }: { view: ViewMode; onClic
 
   if (view === 'list') {
     return (
-      <Box onClick={onClick} sx={{
+      <Box data-tour="new-collection" onClick={onClick} sx={{
         ...base, display: 'flex', alignItems: 'center', gap: 1.4,
         px: 1.4, py: 1.1, borderRadius: radius.lg,
         background: `linear-gradient(135deg, ${accent}08, ${accent}04)`,
@@ -50,7 +50,7 @@ export function AddGhostCard({ view, onClick, accent }: { view: ViewMode; onClic
 
   if (view === 'grid') {
     return (
-      <Box onClick={onClick} sx={{ ...base, borderRadius: radius.xl, overflow: 'hidden', background: `${accent}06` }}>
+      <Box data-tour="new-collection" onClick={onClick} sx={{ ...base, borderRadius: radius.xl, overflow: 'hidden', background: `${accent}06` }}>
         <Box sx={{ aspectRatio: '4/3', background: `linear-gradient(135deg, ${accent}18, ${accent}30)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <PlusCircle size={42} accent={accent} />
         </Box>
@@ -67,7 +67,7 @@ export function AddGhostCard({ view, onClick, accent }: { view: ViewMode; onClic
   }
 
   return (
-    <Box onClick={onClick} sx={{ ...base, borderRadius: radius.xl, overflow: 'hidden', background: `${accent}06` }}>
+    <Box data-tour="new-collection" onClick={onClick} sx={{ ...base, borderRadius: radius.xl, overflow: 'hidden', background: `${accent}06` }}>
       <Box sx={{
         height: 84, position: 'relative', overflow: 'hidden',
         background: `linear-gradient(135deg, ${accent}18, ${accent}32)`,

@@ -11,6 +11,7 @@ import type {
   RarityConfig,
 } from '../types/note'
 import { toConfigId } from '../utils/slug'
+import { COLLECTION_TEMPLATES } from '../services/collectionTemplates'
 import { buildNoteView, drawReward } from './data'
 import { adminHandlers, MOCK_ADMIN_EMAIL } from './admin'
 import {
@@ -378,6 +379,27 @@ const collectionHandlers = [
     return HttpResponse.json(views)
   }),
 
+  http.post('/api/collections/from-template', async ({ request }) => {
+    await delay(420)
+    const { templateId } = (await request.json()) as { templateId: string; inviteEmail?: string }
+    const template = COLLECTION_TEMPLATES.find((item) => item.id === templateId)
+    if (!template) return HttpResponse.json({ message: 'Template não encontrado.' }, { status: 404 })
+    const now = new Date().toISOString()
+    const meta: Collection = {
+      id: nextId('col'), ownerId: db.users[0]?.id ?? 'user_writer', name: template.collection.name, emoji: template.collection.emoji,
+      description: template.tagline, theme: 'romance', access: 'owner', createdAt: now, updatedAt: now,
+    }
+    const collection = createEmptyCollection(meta)
+    const rarityId = collection.rarities[0]?.id ?? 'comum'
+    const typeId = collection.types[0]?.id ?? 'amor'
+    collection.notes = template.notes.map((note) => ({
+      id: nextId('note'), title: note.title, message: 'Edite este bilhete de exemplo com a sua mensagem.',
+      rarity: rarityId, typeId, createdAt: now, status: 'released' as const, releasedAt: now,
+    }))
+    db.collections.push(collection)
+    return HttpResponse.json({ collection: meta, inviteSent: false })
+  }),
+
   http.post('/api/collections', async ({ request }) => {
     await delay(280)
     const data = (await request.json()) as CollectionFormData
@@ -592,7 +614,7 @@ const collectionHandlers = [
     const isOwner = collection.meta.ownerId === user.id
     if (!isOwner && pack.distribution !== 'all_with_access') {
       const access = collection.access.find((entry) => entry.email.toLowerCase().trim() === user.email.toLowerCase().trim())
-      if (!access?.packIds.includes(pack.id)) {
+      if (!(access?.packIds ?? []).includes(pack.id)) {
         return HttpResponse.json({ message: 'Este pacotinho não está liberado para você.' }, { status: 403 })
       }
     }

@@ -23,7 +23,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { PushPrompt } from './PushPrompt'
 import { SimulateReaderSheet } from './SimulateReaderSheet'
 import { SimulationBanner } from './SimulationBanner'
-import { OnboardingOverlay, toast } from './ui'
+import { toast } from './ui'
 import { useUser, type Persona } from '../context/UserContext'
 import { useSimulation } from '../context/SimulationContext'
 import { useReader } from '../context/ReaderContext'
@@ -31,6 +31,7 @@ import { useNotificationToggle } from '../hooks/useNotificationToggle'
 import { useBackground } from '../context/BackgroundContext'
 import { ThemeSwatches } from './ThemeSwatches'
 import { MenuAction } from './MenuAction'
+import { useTour } from '../tour/TourContext'
 import { withAlpha } from '../utils/colorUtils'
 import { useCollectionsQuery, useMyNotificationsQuery, usePendingInvitesQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
 import { backgroundThemes, colors, font, radius } from '../design-system'
@@ -64,10 +65,10 @@ export function DesktopLayout() {
   const navigate = useNavigate()
   const { user, persona, setPersona, logout } = useUser()
   const { theme, maskLightCards, setMaskLightCards } = useBackground()
+  const tour = useTour()
   const { isActive, session, endSimulation, hasUnreadNotes } = useSimulation()
   const { hasUnread: readerHasUnread, activeCollectionId, setActiveCollectionId, unreadFor } = useReader()
   const [simulateOpen, setSimulateOpen] = useState(false)
-  const [showTutorial, setShowTutorial] = useState(false)
   const isReader = persona === 'reader' && !isActive
 
   const { data: collections = [] } = useCollectionsQuery()
@@ -212,6 +213,7 @@ export function DesktopLayout() {
             return (
               <Box
                 key={item.path + item.label}
+                data-tour={`nav-${item.path.split('/')[1]}`}
                 onClick={() => {
                   if (item.action === 'simulate') { setSimulateOpen(true); return }
                   if (item.action === 'end-simulation') { endSimulation(); navigate('/colecoes'); return }
@@ -340,7 +342,7 @@ export function DesktopLayout() {
                       py: 0.75, borderRadius: radius.md, cursor: enabled ? 'pointer' : 'default',
                       border: `1.5px solid ${active ? withAlpha(theme.accent, 34) : theme.surfaceBorder}`,
                       background: active ? withAlpha(theme.accent, 7) : 'transparent',
-                      opacity: enabled ? 1 : 0.4,
+                      opacity: enabled ? 1 : 0.6,
                       transition: 'all 0.14s',
                       '&:hover': enabled ? { background: active ? withAlpha(theme.accent, 9) : colors.fill.subtle } : undefined,
                     }}
@@ -403,8 +405,10 @@ export function DesktopLayout() {
             />
           )}
           <MenuAction icon={<ManageAccountsOutlinedIcon />} label="Minha conta" tone={theme.accent} labelColor={theme.textOnBg} onClick={() => navigate('/conta')} />
-          <MenuAction icon={<PlayCircleOutlineIcon />} label="Ver tutorial" tone={theme.accent} labelColor={theme.textOnBg} onClick={() => setShowTutorial(true)} />
-          <MenuAction icon={<LogoutIcon />} label="Sair" tone={colors.rose.main} labelColor={colors.rose.text} onClick={logout} />
+          {persona === 'writer' && (
+            <MenuAction icon={<PlayCircleOutlineIcon />} label="Ver tutorial" tone={theme.accent} labelColor={theme.textOnBg} onClick={tour.start} />
+          )}
+          <MenuAction icon={<LogoutIcon />} label="Sair" tone={colors.rose.text} labelColor={colors.rose.text} onClick={logout} />
         </Stack>
         <Copyright color={theme.textOnBgMuted} sx={{ px: 2, pt: 1, pb: 2 }} />
       </Box>
@@ -412,12 +416,11 @@ export function DesktopLayout() {
       {/* ── Content area ── */}
       <Box sx={{ flex: 1, height: '100%', overflow: 'hidden', position: 'relative' }}>
         <SimulationBanner />
-        {location.pathname === '/home' && !isActive && persona !== 'admin' && <PushPrompt />}
+        {location.pathname === '/home' && !isActive && persona !== 'admin' && !tour.step && <PushPrompt />}
         <Outlet />
       </Box>
 
       <SimulateReaderSheet open={simulateOpen} onClose={() => setSimulateOpen(false)} />
-      {showTutorial && <OnboardingOverlay onDismiss={() => setShowTutorial(false)} />}
     </Box>
   )
 }

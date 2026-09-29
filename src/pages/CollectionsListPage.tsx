@@ -24,6 +24,7 @@ import { KitConfirmDialog } from '../components/KitConfirmDialog'
 import type { Collection, CollectionFormData } from '../types/note'
 import { CollectionsFilterBar } from './collections/CollectionsFilterBar'
 import { CollectionFormDialog } from './collections/CollectionFormDialog'
+import { emitTour } from '../tour/events'
 import { CollectionCardView, CollectionGridItem, CollectionListItem } from './collections/CollectionCard'
 import { AddGhostCard } from './collections/AddGhostCard'
 
@@ -132,6 +133,7 @@ export function CollectionsListPage() {
     try {
       const { collection } = await createCollectionFromTemplate(template)
       await queryClient.invalidateQueries({ queryKey: queryKeys.collections() })
+      emitTour('collection-created', collection.id)
       toast.success('Coleção pronta! Deixamos bilhetes de exemplo para você editar. 💙')
       setKitToConfirm(null)
       navigate(`/colecoes/${collectionSlug(collection, queryClient.getQueryData<Collection[]>(queryKeys.collections()) ?? [])}/gerenciar`)

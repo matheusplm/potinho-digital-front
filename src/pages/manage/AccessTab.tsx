@@ -14,6 +14,7 @@ import { useBackground } from '../../context/BackgroundContext'
 import { useUser } from '../../context/UserContext'
 import type { CollectionInvite, CollectionPack } from '../../types/note'
 import { actionButtonSx } from './shared'
+import { TourHint } from '../../tour/TourHint'
 
 interface AccessTabProps { cid: string }
 
@@ -104,7 +105,8 @@ export function AccessTab({ cid }: AccessTabProps) {
   return (
     <>
       <Stack spacing={2}>
-        <Card sx={{ p: 2 }}>
+        <TourHint id="invite-form" />
+        <Card data-tour="invite-form" sx={{ p: 2 }}>
           <Stack spacing={1}>
             <Typography variant="label" sx={{ color: colors.text.muted }}>
               Convidar por email

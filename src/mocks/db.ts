@@ -170,6 +170,9 @@ function createInitialDb(): MockDb {
     ),
   ]
 
+  const legacyAccess = collections[1].access[0]
+  if (legacyAccess) delete legacyAccess.packIds
+
   return {
     users: [writer, reader],
     collections,

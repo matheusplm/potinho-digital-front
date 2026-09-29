@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api, ApiRequestError } from '../services/api'
+import { emitTour } from '../tour/events'
 import type { CollectionAchievementFormData, CollectionPackFormData, NoteFormData, NotifyConfig, PackStatusResponse, RarityConfig, NoteTypeConfig } from '../types/note'
 
 export const queryKeys = {
@@ -32,7 +33,10 @@ export function useCreateCollectionMutation() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: api.createCollection,
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.collections() }) },
+    onSuccess: (collection) => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.collections() })
+      emitTour('collection-created', collection.id)
+    },
   })
 }
 
@@ -97,7 +101,10 @@ export function useCreateCollectionNoteMutation(cid: string) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: NoteFormData) => api.createCollectionNote(cid, data),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.notes(cid) }) },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.notes(cid) })
+      emitTour('note-created', cid)
+    },
   })
 }
 
@@ -307,6 +314,7 @@ export function useReleaseNotesMutation(cid: string) {
       void queryClient.invalidateQueries({ queryKey: queryKeys.notes(cid) })
       void queryClient.invalidateQueries({ queryKey: queryKeys.play(cid) })
       void queryClient.invalidateQueries({ queryKey: queryKeys.collectionNotifications(cid) })
+      emitTour('notes-released', cid)
     },
   })
 }
@@ -421,6 +429,7 @@ export function useSendInviteMutation(cid: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.access(cid) })
       void queryClient.invalidateQueries({ queryKey: queryKeys.invites(cid) })
+      emitTour('invite-sent', cid)
     },
   })
 }

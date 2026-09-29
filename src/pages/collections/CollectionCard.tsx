@@ -96,6 +96,7 @@ export function CollectionCardView({ col, i, onClick, onEdit, onDelete, hasNews 
   const isOwner = isCollectionOwner(col, user?.id)
   return (
     <Card
+      data-tour={`collection-${col.id}`}
       onClick={onClick}
       sx={{
         p: 0, overflow: 'hidden', cursor: 'pointer',
@@ -154,6 +155,7 @@ export function CollectionGridItem({ col, i, onClick, onEdit, onDelete, hasNews 
   const isOwner = isCollectionOwner(col, user?.id)
   return (
     <Box
+      data-tour={`collection-${col.id}`}
       onClick={onClick}
       sx={{
         borderRadius: radius.xl, overflow: 'hidden', cursor: 'pointer',
@@ -206,6 +208,7 @@ export function CollectionListItem({ col, i, onClick, onEdit, onDelete, hasNews 
   const isOwner = isCollectionOwner(col, user?.id)
   return (
     <Box
+      data-tour={`collection-${col.id}`}
       onClick={onClick}
       sx={{
         display: 'flex', alignItems: 'center', gap: 1.4,

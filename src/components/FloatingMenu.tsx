@@ -12,7 +12,6 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
 import BlockIcon from '@mui/icons-material/Block'
 import { Box, Stack, Typography, Backdrop, IconButton, Tooltip } from '@mui/material'
 import { useMemo, useState } from 'react'
-import { OnboardingOverlay } from './ui'
 import { useNavigate } from 'react-router-dom'
 import { useUser, type Persona } from '../context/UserContext'
 import { isCollectionReader, personaCapabilities } from '../utils/collectionAccess'
@@ -20,6 +19,7 @@ import { useNotificationToggle } from '../hooks/useNotificationToggle'
 import { useBackground } from '../context/BackgroundContext'
 import { ThemeSwatches } from './ThemeSwatches'
 import { MenuAction } from './MenuAction'
+import { useTour } from '../tour/TourContext'
 import { useReader } from '../context/ReaderContext'
 import { useSimulation } from '../context/SimulationContext'
 import { useCollectionsQuery, usePendingInvitesQuery } from '../hooks/useNotes'
@@ -28,9 +28,9 @@ import { backgroundThemes, colors, font, menuIn, radius } from '../design-system
 
 export function FloatingMenu() {
   const [open, setOpen] = useState(false)
-  const [showTutorial, setShowTutorial] = useState(false)
   const { user, persona, setPersona, logout } = useUser()
   const { theme, maskLightCards, setMaskLightCards } = useBackground()
+  const tour = useTour()
   const { activeCollectionId, setActiveCollectionId, unreadFor } = useReader()
   const { isActive: simulating } = useSimulation()
   const navigate = useNavigate()
@@ -72,6 +72,8 @@ export function FloatingMenu() {
 
       <Box sx={{ position: 'fixed', top: 16, right: 'max(16px, calc((100vw - 480px) / 2 + 16px))', zIndex: 100 }}>
         <IconButton
+          aria-label={open ? 'Fechar menu' : 'Abrir menu'}
+          aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
           sx={{
             width: 36, height: 36, borderRadius: '50%',
@@ -149,7 +151,7 @@ export function FloatingMenu() {
                           py: 0.85, borderRadius: radius.md, cursor: enabled ? 'pointer' : 'default',
                           border: `1.5px solid ${active ? `${theme.accent}66` : theme.surfaceBorder}`,
                           background: active ? `${theme.accent}12` : 'transparent',
-                          opacity: enabled ? 1 : 0.4,
+                          opacity: enabled ? 1 : 0.6,
                           transition: 'background 0.12s, border-color 0.12s',
                           '&:hover': enabled ? { background: active ? `${theme.accent}18` : colors.fill.subtle } : undefined,
                         }}
@@ -283,15 +285,16 @@ export function FloatingMenu() {
                 />
               )}
               <MenuAction size="md" icon={<ManageAccountsOutlinedIcon />} label="Minha conta" tone={theme.accent} labelColor={theme.textOnBg} onClick={() => { setOpen(false); navigate('/conta') }} />
-              <MenuAction size="md" icon={<PlayCircleOutlineIcon />} label="Ver tutorial" tone={theme.accent} labelColor={theme.textOnBg} onClick={() => { setOpen(false); setShowTutorial(true) }} />
-              <MenuAction size="md" icon={<LogoutIcon />} label="Sair" tone={colors.rose.main} labelColor={colors.rose.text} onClick={() => { setOpen(false); logout() }} />
+              {persona === 'writer' && (
+                <MenuAction size="md" icon={<PlayCircleOutlineIcon />} label="Ver tutorial" tone={theme.accent} labelColor={theme.textOnBg} onClick={() => { setOpen(false); tour.start() }} />
+              )}
+              <MenuAction size="md" icon={<LogoutIcon />} label="Sair" tone={colors.rose.text} labelColor={colors.rose.text} onClick={() => { setOpen(false); logout() }} />
             </Stack>
             <Copyright color={theme.textOnBgMuted} sx={{ px: 1.5, pt: 0.5, pb: 1.5 }} />
           </Box>
         )}
       </Box>
 
-      {showTutorial && <OnboardingOverlay onDismiss={() => setShowTutorial(false)} />}
     </>
   )
 }
