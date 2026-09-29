@@ -179,7 +179,7 @@ export interface CollectionFormData {
 export interface CollectionAccess {
   collectionId: string
   email: string
-  packIds: string[]
+  packIds?: string[]
   packOpens?: Record<string, number>
   createdAt: string
 }
