@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { api } from '../services/api'
 import { Button, Card, Input, LoadingState, SegmentedControl, toast } from '../components/ui'
-import { OnboardingOverlay } from '../components/ui/OnboardingOverlay'
+import { useTour } from '../tour/TourContext'
 import { colors, font, gradients, radius, shadow } from '../design-system'
 import { RewardCard } from '../components/collection/RewardCard'
 import type { ImageLayout } from '../components/collection/RewardCard'
@@ -106,7 +106,7 @@ const SWATCHES = [
 export function TestPage() {
   const [seg, setSeg] = useState('a')
   const [seg2, setSeg2] = useState('create')
-  const [onboardingKey, setOnboardingKey] = useState(0)
+  const tour = useTour()
   const [inputVal, setInputVal] = useState('')
   const [passVal, setPassVal] = useState('')
   const [errorVal, setErrorVal] = useState('valor inválido')
@@ -268,10 +268,9 @@ export function TestPage() {
         </Section>
 
         <Section title="Onboarding">
-          <Button variant="primary" onClick={() => setOnboardingKey((k) => k + 1)}>
-            Abrir Onboarding
+          <Button variant="primary" onClick={tour.start}>
+            Abrir tutorial
           </Button>
-          {onboardingKey > 0 && <OnboardingOverlay key={onboardingKey} />}
         </Section>
 
         <Section title="Toast">

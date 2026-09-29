@@ -26,6 +26,7 @@ import { NoteDialog } from './NoteDialog'
 import { ReleaseDialog } from './ReleaseDialog'
 import { rarityTone } from '../../components/collection/rarityTone'
 import { ManageNoteCard } from './ManageNoteCard'
+import { TourHint } from '../../tour/TourHint'
 
 type NoteSort = 'newest' | 'oldest' | 'az' | 'rarity' | 'type'
 type NoteView = 'cards' | 'list' | 'compact'
@@ -172,7 +173,7 @@ export function NotesTab({ cid, intent }: NotesTabProps) {
             <Button variant="ghost" onClick={() => setImportDialogOpen(true)} sx={{ flex: '1 1 132px', py: 0.7, px: 1.2, fontSize: '0.76rem' }}>
               Importar JSON
             </Button>
-            <Button variant="primary" onClick={() => { setEditingNote(null); setNoteDialog(true) }} sx={{ flex: '1 1 94px', py: 0.7, px: 1.4, fontSize: '0.78rem' }}>
+            <Button variant="primary" data-tour="new-note" onClick={() => { setEditingNote(null); setNoteDialog(true) }} sx={{ flex: '1 1 94px', py: 0.7, px: 1.4, fontSize: '0.78rem' }}>
               <AddIcon sx={{ fontSize: 15, mr: 0.4 }} /> Novo
             </Button>
           </Stack>
@@ -186,7 +187,7 @@ export function NotesTab({ cid, intent }: NotesTabProps) {
             ]).map((option) => {
               const active = statusView === option.id
               return (
-                <Box key={option.id} onClick={() => setStatusView(option.id)} sx={{
+                <Box key={option.id} data-tour={option.id === 'drafts' ? 'drafts-toggle' : undefined} onClick={() => setStatusView(option.id)} sx={{
                   flex: 1, py: 0.8, borderRadius: radius.lg, cursor: 'pointer', textAlign: 'center',
                   background: active ? theme.accent : theme.surfaceBg,
                   border: `1.5px solid ${active ? theme.accent : theme.surfaceBorder}`,
@@ -206,7 +207,8 @@ export function NotesTab({ cid, intent }: NotesTabProps) {
 
         {statusView === 'drafts' && (
           <>
-            <Box sx={{
+            <TourHint id="drafts-bar" />
+            <Box data-tour="drafts-bar" sx={{
               position: 'sticky', top: 8, zIndex: 6,
               borderRadius: radius.xl, overflow: 'hidden',
               background: theme.surfaceBg, backdropFilter: 'blur(20px)',

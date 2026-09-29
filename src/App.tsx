@@ -13,6 +13,7 @@ import { UserProvider, useUser, type UserRole } from './context/UserContext'
 import { BackgroundProvider } from './context/BackgroundContext'
 import { SimulationProvider, useSimulation } from './context/SimulationContext'
 import { ReaderProvider } from './context/ReaderContext'
+import { TourProvider } from './tour/TourProvider'
 import { LoadingState } from './components/ui'
 import { clearAdminSession, useAdminSession } from './services/adminSession'
 import { ADMIN_QUERY_ROOT } from './hooks/useAdmin'
@@ -166,7 +167,9 @@ function App() {
           <BackgroundProvider>
             <ReaderProvider>
               <SimulationProvider>
-                <AppRoutes />
+                <TourProvider>
+                  <AppRoutes />
+                </TourProvider>
               </SimulationProvider>
             </ReaderProvider>
             <Toaster

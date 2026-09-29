@@ -7,6 +7,7 @@ import { colors, font, radius, liftOnDark } from '../../design-system'
 import { noteTypeIdList } from '../../utils/noteTypes'
 import { rarityTone } from '../../components/collection/rarityTone'
 import type { NoteFormData, NoteRecord, RarityConfig, NoteTypeConfig } from '../../types/note'
+import { TourHint } from '../../tour/TourHint'
 
 const ImagePicker = lazy(() => import('../../components/ImagePicker').then((m) => ({ default: m.ImagePicker })))
 
@@ -71,8 +72,9 @@ export function NoteDialog({ open, editing, rarities, types, cid, onClose }: {
       <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 700, color: colors.text.primary, pb: 1 }}>
         {editing ? 'Editar bilhete' : 'Novo bilhete'}
       </DialogTitle>
-      <DialogContent sx={{ pt: 0 }}>
+      <DialogContent data-tour={editing ? undefined : 'note-form'} sx={{ pt: 0 }}>
         <Stack spacing={2} sx={{ mt: 1 }}>
+          {!editing && <TourHint id="note-form" />}
           <Box>
             <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.5 }}>
               <Typography variant="sm" sx={{ fontWeight: 700, color: touched.title && errors.title ? colors.error.main : colors.text.secondary }}>Título</Typography>

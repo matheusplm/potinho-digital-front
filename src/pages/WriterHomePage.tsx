@@ -1,13 +1,11 @@
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, Menu, MenuItem, Skeleton, Stack, Typography } from '@mui/material'
 import { useQueryClient } from '@tanstack/react-query'
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { Button, EmptyState, LoadingState, ScrollablePage, SectionLabel } from '../components/ui'
-import { OnboardingOverlay } from '../components/ui/OnboardingOverlay'
 import { BonusPackDialog, type BonusPackTarget } from '../components/manage/BonusPackDialog'
-import { api } from '../services/api'
 import { colors, fadeIn, font } from '../design-system'
 import { useBackground } from '../context/BackgroundContext'
 import { FloatingParticles } from '../components/FloatingParticles'
@@ -20,7 +18,7 @@ import { TouchedSection } from './writer-home/TouchedSection'
 import { TodoSection } from './writer-home/TodoSection'
 
 export function WriterHomePage() {
-  const { user, patchUser } = useUser()
+  const { user } = useUser()
   const { theme } = useBackground()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -28,11 +26,6 @@ export function WriterHomePage() {
   const [giftMenu, setGiftMenu] = useState<{ reader: ReaderSummary; anchor: HTMLElement } | null>(null)
   const [gift, setGift] = useState<{ reader: ReaderSummary; target: BonusPackTarget } | null>(null)
   const [writeMenu, setWriteMenu] = useState<HTMLElement | null>(null)
-
-  const handleOnboardingDismiss = useCallback(async () => {
-    patchUser({ onboardingDone: true })
-    api.markOnboardingDone().catch(() => {})
-  }, [patchUser])
 
   const firstName = user?.name?.split(' ')[0] ?? ''
   const hour = new Date().getHours()
@@ -58,7 +51,6 @@ export function WriterHomePage() {
   return (
     <Box sx={{ height: '100%', position: 'relative', overflow: 'hidden', background: theme.gradient }}>
       <FloatingParticles />
-      {user?.onboardingDone === false && <OnboardingOverlay onDismiss={handleOnboardingDismiss} />}
       <FavoriteIcon sx={{
         position: 'absolute', bottom: -80, right: -80,
         fontSize: 500, color: 'rgba(29,78,216,0.05)', pointerEvents: 'none',

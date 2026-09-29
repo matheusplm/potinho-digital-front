@@ -7,6 +7,7 @@ import { useReleaseNotesMutation, useCollectionPacksQuery, useCollectionAccessQu
 import { useBackground } from '../../context/BackgroundContext'
 import { colors, font, radius } from '../../design-system'
 import type { CollectionAccess, NoteRecord, RarityConfig } from '../../types/note'
+import { TourHint } from '../../tour/TourHint'
 
 const CHIP_PREVIEW_LIMIT = 6
 
@@ -100,8 +101,9 @@ export function ReleaseDialog({ cid, notes, rarities, open, onClose }: {
         </Stack>
       </Box>
 
-      <DialogContent sx={{ pt: 2 }}>
+      <DialogContent data-tour="release-form" sx={{ pt: 2 }}>
         <Stack spacing={2.2}>
+          <TourHint id="release-form" />
           <Stack direction="row" spacing={0.6} sx={{ flexWrap: 'wrap', rowGap: 0.6 }}>
             {preview.map((note) => {
               const r = rarities.find((x) => x.id === note.rarity)

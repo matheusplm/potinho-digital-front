@@ -2,6 +2,7 @@ import { Box, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextFiel
 import { useEffect, useState } from 'react'
 import { Button, EmojiPickerInput, Input } from '../../components/ui'
 import { TemplateKitRow } from '../../components/TemplateKitRow'
+import { TourHint } from '../../tour/TourHint'
 import { COLLECTION_TEMPLATES } from '../../services/collectionTemplates'
 import type { CollectionTemplate } from '../../services/collectionTemplates'
 import { backgroundThemes, colors, font, radius } from '../../design-system'
@@ -40,8 +41,9 @@ export function CollectionFormDialog({ open, onClose, initial, onSubmit, isPendi
       <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 700, color: colors.text.primary, pb: 1 }}>
         {isEdit ? 'Editar coleção' : 'Nova coleção'}
       </DialogTitle>
-      <DialogContent sx={{ pt: 0 }}>
+      <DialogContent data-tour={isEdit ? undefined : 'collection-form'} sx={{ pt: 0 }}>
         <Stack spacing={2.5} sx={{ mt: 1 }}>
+          {!isEdit && <TourHint id="collection-form" />}
           {!isEdit && onSelectTemplate && !showTemplates && (
             <Stack direction="row" alignItems="center" spacing={1.2} sx={{
               p: 1.3, borderRadius: radius.lg, background: `${colors.primary.main}0f`, border: `1px solid ${colors.primary.main}30`,

@@ -31,6 +31,7 @@ export function SegmentedControl<T extends string>({ options, value, onChange }:
         return (
           <Box
             key={opt.id}
+            data-tour={`tab-${opt.id}`}
             onClick={() => onChange(opt.id)}
             sx={{
               flex: '1 1 28%', py: 1, px: 1.2, borderRadius: '8px', cursor: 'pointer',
