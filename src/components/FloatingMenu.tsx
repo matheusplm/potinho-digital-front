@@ -19,6 +19,7 @@ import { isCollectionReader, personaCapabilities } from '../utils/collectionAcce
 import { useNotificationToggle } from '../hooks/useNotificationToggle'
 import { useBackground } from '../context/BackgroundContext'
 import { ThemeSwatches } from './ThemeSwatches'
+import { MenuAction } from './MenuAction'
 import { useReader } from '../context/ReaderContext'
 import { useSimulation } from '../context/SimulationContext'
 import { useCollectionsQuery, usePendingInvitesQuery } from '../hooks/useNotes'
@@ -101,7 +102,7 @@ export function FloatingMenu() {
 
         {open && (
           <Box sx={{
-            position: 'absolute', top: 44, right: 0, width: 220,
+            position: 'absolute', top: 44, right: 0, width: 256,
             background: theme.surfaceBg, backdropFilter: 'blur(24px)',
             borderRadius: radius.lg,
             boxShadow: `0 16px 48px rgba(0,0,0,${theme.isDark ? '0.48' : '0.16'}), 0 2px 8px rgba(0,0,0,0.08)`,
@@ -132,9 +133,9 @@ export function FloatingMenu() {
                 </Typography>
                 <Stack direction="row" spacing={0.6}>
                   {([
-                    { role: 'reader' as const, label: 'Leitor', icon: <MenuBookOutlinedIcon sx={{ fontSize: 15 }} />, enabled: canReader || hasPendingInvites, disabledTip: 'Você ainda não tem acesso a nenhuma coleção como leitor' },
-                    { role: 'writer' as const, label: 'Escritor', icon: <EditOutlinedIcon sx={{ fontSize: 15 }} />, enabled: canWriter, disabledTip: 'Crie uma coleção para usar o modo escritor' },
-                    ...(user?.isAdmin ? [{ role: 'admin' as const, label: 'Admin', icon: <AdminPanelSettingsOutlinedIcon sx={{ fontSize: 15 }} />, enabled: true, disabledTip: '' }] : []),
+                    { role: 'reader' as const, label: 'Leitor', icon: <MenuBookOutlinedIcon sx={{ fontSize: 14 }} />, enabled: canReader || hasPendingInvites, disabledTip: 'Você ainda não tem acesso a nenhuma coleção como leitor' },
+                    { role: 'writer' as const, label: 'Escritor', icon: <EditOutlinedIcon sx={{ fontSize: 14 }} />, enabled: canWriter, disabledTip: 'Crie uma coleção para usar o modo escritor' },
+                    ...(user?.isAdmin ? [{ role: 'admin' as const, label: 'Admin', icon: <AdminPanelSettingsOutlinedIcon sx={{ fontSize: 14 }} />, enabled: true, disabledTip: '' }] : []),
                   ] satisfies Array<{ role: Persona; label: string; icon: React.ReactNode; enabled: boolean; disabledTip: string }>).map(({ role, label, icon, enabled, disabledTip }) => {
                     const active = persona === role
                     const showInviteDot = role === 'reader' && hasPendingInvites && persona !== 'reader'
@@ -143,7 +144,7 @@ export function FloatingMenu() {
                         key={role}
                         onClick={() => enabled && switchPersona(role)}
                         sx={{
-                          flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5,
+                          flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.4,
                           position: 'relative',
                           py: 0.85, borderRadius: radius.md, cursor: enabled ? 'pointer' : 'default',
                           border: `1.5px solid ${active ? `${theme.accent}66` : theme.surfaceBorder}`,
@@ -157,7 +158,7 @@ export function FloatingMenu() {
                           <Box sx={{ position: 'absolute', top: -3, right: -3, width: 10, height: 10, borderRadius: '50%', background: '#ef4444', border: '2px solid #fff', boxShadow: '0 1px 4px rgba(239,68,68,0.5)' }} />
                         )}
                         {icon}
-                        <Typography variant="md" sx={{ fontWeight: active ? 800 : 600, color: active ? theme.accent : theme.textOnBgMuted }}>
+                        <Typography variant="sm" noWrap sx={{ fontWeight: active ? 800 : 600, color: active ? theme.accent : theme.textOnBgMuted }}>
                           {label}
                         </Typography>
                       </Box>
@@ -243,9 +244,9 @@ export function FloatingMenu() {
               </Stack>
               <ThemeSwatches size={28} labelColor={theme.textOnBgMuted} />
               {theme.isDark && (
-                <Stack direction="row" spacing={1} alignItems="center" onClick={() => setMaskLightCards(!maskLightCards)} sx={{ mt: 1.2, cursor: 'pointer', userSelect: 'none' }}>
+                <Stack direction="row" spacing={1.1} alignItems="flex-start" onClick={() => setMaskLightCards(!maskLightCards)} sx={{ mt: 1.5, cursor: 'pointer', userSelect: 'none' }}>
                   <Box sx={{
-                    width: 34, height: 19, borderRadius: radius.full, flexShrink: 0, position: 'relative',
+                    width: 34, height: 19, mt: 0.1, borderRadius: radius.full, flexShrink: 0, position: 'relative',
                     background: maskLightCards ? theme.accent : 'rgba(255,255,255,0.18)', transition: 'background 0.18s',
                   }}>
                     <Box sx={{
@@ -253,11 +254,11 @@ export function FloatingMenu() {
                       background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.3)', transition: 'left 0.18s',
                     }} />
                   </Box>
-                  <Box>
-                    <Typography variant="sm" sx={{ fontWeight: 700, color: theme.textOnBg, lineHeight: 1.25 }}>
+                  <Box sx={{ minWidth: 0 }}>
+                    <Typography variant="sm" sx={{ fontWeight: 700, color: theme.textOnBg, lineHeight: 1.3 }}>
                       Suavizar bilhetes claros
                     </Typography>
-                    <Typography variant="xxs" sx={{ color: theme.textOnBgMuted }}>
+                    <Typography variant="xxs" sx={{ color: theme.textOnBgMuted, lineHeight: 1.35 }}>
                       aplica uma máscara escura sobre cards muito brancos
                     </Typography>
                   </Box>
@@ -265,121 +266,27 @@ export function FloatingMenu() {
               )}
             </Box>
 
-            {notifSupported && (
-              <>
-                <Box sx={{ height: '1px', bgcolor: theme.surfaceBorder, mx: 1.5 }} />
-                <Box sx={{ p: 1 }}>
-                  <Stack
-                    direction="row" spacing={1.4}
-                    onClick={() => { void handleNotificationToggle() }}
-                    sx={{
-                      alignItems: 'center', px: 1.4, py: 1, borderRadius: radius.md,
-                      cursor: notifStatus === 'denied' ? 'not-allowed' : 'pointer',
-                      opacity: notifStatus === 'denied' ? 0.5 : 1,
-                      transition: 'background 0.12s',
-                      '&:hover': notifStatus !== 'denied' ? { bgcolor: `${theme.accent}0e` } : undefined,
-                    }}
-                  >
-                    <Box sx={{
-                      width: 30, height: 30, borderRadius: radius.sm, flexShrink: 0,
-                      background: notifEnabled ? `${theme.accent}18` : colors.fill.medium,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      {notifStatus === 'denied'
-                        ? <BlockIcon sx={{ fontSize: 15, color: theme.textOnBgMuted }} />
-                        : notifEnabled
-                          ? <NotificationsActiveIcon sx={{ fontSize: 16, color: theme.accent }} />
-                          : <NotificationsNoneOutlinedIcon sx={{ fontSize: 16, color: theme.textOnBgMuted }} />
-                      }
-                    </Box>
-                    <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Typography variant="lg" sx={{ fontWeight: 700, color: theme.textOnBg }}>
-                        Notificações
-                      </Typography>
-                      <Typography variant="xs" sx={{ color: theme.textOnBgMuted }}>
-                        {notifStatus === 'denied' ? 'bloqueado pelo navegador' : notifEnabled ? 'ativo, toque para desligar' : 'toque para ativar'}
-                      </Typography>
-                    </Box>
-                  </Stack>
-                </Box>
-              </>
-            )}
-
             <Box sx={{ height: '1px', bgcolor: theme.surfaceBorder, mx: 1.5 }} />
 
-            <Box sx={{ p: 1 }}>
-              <Stack
-                direction="row" spacing={1.4}
-                onClick={() => { setOpen(false); navigate('/conta') }}
-                sx={{
-                  alignItems: 'center', px: 1.4, py: 1, cursor: 'pointer', borderRadius: radius.md,
-                  transition: 'background 0.12s',
-                  '&:hover': { bgcolor: `${theme.accent}0e` },
-                }}
-              >
-                <Box sx={{
-                  width: 30, height: 30, borderRadius: radius.sm, flexShrink: 0,
-                  background: `${theme.accent}14`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  <ManageAccountsOutlinedIcon sx={{ fontSize: 16, color: theme.accent }} />
-                </Box>
-                <Typography variant="lg" sx={{ fontWeight: 700, color: theme.textOnBg }}>
-                  Minha conta
-                </Typography>
-              </Stack>
-            </Box>
-
-            <Box sx={{ height: '1px', bgcolor: theme.surfaceBorder, mx: 1.5 }} />
-
-            <Box sx={{ p: 1 }}>
-              <Stack
-                direction="row" spacing={1.4}
-                onClick={() => { setOpen(false); setShowTutorial(true) }}
-                sx={{
-                  alignItems: 'center', px: 1.4, py: 1, cursor: 'pointer', borderRadius: radius.md,
-                  transition: 'background 0.12s',
-                  '&:hover': { bgcolor: `${theme.accent}0e` },
-                }}
-              >
-                <Box sx={{
-                  width: 30, height: 30, borderRadius: radius.sm, flexShrink: 0,
-                  background: `${theme.accent}14`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  <PlayCircleOutlineIcon sx={{ fontSize: 16, color: theme.accent }} />
-                </Box>
-                <Typography variant="lg" sx={{ fontWeight: 700, color: theme.textOnBg }}>
-                  Ver tutorial
-                </Typography>
-              </Stack>
-            </Box>
-
-            <Box sx={{ height: '1px', bgcolor: theme.surfaceBorder, mx: 1.5 }} />
-
-            <Box sx={{ p: 1 }}>
-              <Stack
-                direction="row" spacing={1.4}
-                onClick={() => { setOpen(false); logout() }}
-                sx={{ alignItems: 'center',
-                  px: 1.4, py: 1, cursor: 'pointer', borderRadius: radius.md,
-                  transition: 'background 0.12s',
-                  '&:hover': { bgcolor: `${colors.rose.main}12` },
-                }}
-              >
-                <Box sx={{
-                  width: 30, height: 30, borderRadius: radius.sm, flexShrink: 0,
-                  background: `${colors.rose.main}14`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  <LogoutIcon sx={{ fontSize: 16, color: colors.rose.text }} />
-                </Box>
-                <Typography variant="lg" sx={{ fontWeight: 700, color: colors.rose.text }}>
-                  Sair
-                </Typography>
-              </Stack>
-            </Box>
-            <Copyright color={theme.textOnBgMuted} sx={{ px: 1.5, pb: 1.5 }} />
+            <Stack spacing={0.3} sx={{ px: 0.7, pt: 1, pb: 0.5 }}>
+              {notifSupported && (
+                <MenuAction
+                  size="md"
+                  icon={notifStatus === 'denied' ? <BlockIcon /> : notifEnabled ? <NotificationsActiveIcon /> : <NotificationsNoneOutlinedIcon />}
+                  label="Notificações"
+                  tone={notifEnabled ? theme.accent : theme.textOnBgMuted}
+                  labelColor={theme.textOnBg}
+                  disabled={notifStatus === 'denied'}
+                  title={notifStatus === 'denied' ? 'Ative nas configurações do navegador' : undefined}
+                  onClick={() => { void handleNotificationToggle() }}
+                  badge={{ label: notifStatus === 'denied' ? 'bloqueadas' : notifEnabled ? 'ativas' : 'ativar', active: notifEnabled }}
+                />
+              )}
+              <MenuAction size="md" icon={<ManageAccountsOutlinedIcon />} label="Minha conta" tone={theme.accent} labelColor={theme.textOnBg} onClick={() => { setOpen(false); navigate('/conta') }} />
+              <MenuAction size="md" icon={<PlayCircleOutlineIcon />} label="Ver tutorial" tone={theme.accent} labelColor={theme.textOnBg} onClick={() => { setOpen(false); setShowTutorial(true) }} />
+              <MenuAction size="md" icon={<LogoutIcon />} label="Sair" tone={colors.rose.main} labelColor={colors.rose.text} onClick={() => { setOpen(false); logout() }} />
+            </Stack>
+            <Copyright color={theme.textOnBgMuted} sx={{ px: 1.5, pt: 0.5, pb: 1.5 }} />
           </Box>
         )}
       </Box>

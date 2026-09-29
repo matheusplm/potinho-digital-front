@@ -6,10 +6,10 @@ import { backgroundThemes, colors } from '../design-system'
 export function ThemeSwatches({ size = 28, labelColor }: { size?: number; labelColor: string }) {
   const { themeKey, setThemeKey } = useBackground()
   return (
-    <Stack spacing={1}>
+    <Stack spacing={1.2}>
       {([false, true] as const).map((dark) => (
         <Box key={String(dark)}>
-          <Typography variant="label" sx={{ color: labelColor, mb: 0.6 }}>
+          <Typography variant="xs" sx={{ color: labelColor, fontWeight: 600, mb: 0.7 }}>
             {dark ? 'Escuros' : 'Claros'}
           </Typography>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: size >= 28 ? 0.8 : 0.7 }}>
