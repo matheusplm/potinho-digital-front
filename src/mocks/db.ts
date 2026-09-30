@@ -7,6 +7,7 @@ import type {
   NoteRecord,
   NoteTypeConfig,
   RarityConfig,
+  UserNotification,
 } from '../types/note'
 import {
   cloneBonusPacks,
@@ -68,6 +69,7 @@ function cloneAchievements(collectionId: string): CollectionAchievement[] {
 interface MockDb {
   users: MockUser[]
   collections: CollectionState[]
+  notifications: UserNotification[]
   sequence: number
 }
 
@@ -89,16 +91,16 @@ function draftNote(id: string, title: string, message: string, rarity: string, t
   return { id, title, message, rarity, typeId, createdAt: hoursAgo(28), status: 'preview', releasedAt: null }
 }
 
-function buildCollection(meta: Collection, ownedIds: string[], favoriteIds: string[], extra: Partial<Pick<CollectionState, 'invites' | 'notes'>> = {}): CollectionState {
+function buildCollection(meta: Collection, ownedIds: string[], favoriteIds: string[], extra: Partial<Pick<CollectionState, 'invites' | 'notes' | 'access'>> = {}): CollectionState {
   return {
     meta,
     notes: [...cloneNotes(), ...(extra.notes ?? [])],
     rarities: cloneRarities(),
     types: cloneTypes(),
     packs: [...cloneStarterPacks(meta.id), ...cloneBonusPacks(meta.id)],
-    access: meta.access === 'owner'
+    access: extra.access ?? (meta.access === 'owner'
       ? [{ collectionId: meta.id, email: 'leitor@potinho.app', packIds: [], createdAt: '2026-04-21T09:00:00.000Z' }]
-      : [],
+      : []),
     invites: extra.invites ?? [],
     ownership: buildOwnership(ownedIds, favoriteIds),
     lastDailyOpenDate: null,
@@ -173,9 +175,81 @@ function createInitialDb(): MockDb {
   const legacyAccess = collections[1].access[0]
   if (legacyAccess) delete legacyAccess.packIds
 
+  const author: MockUser = {
+    id: 'user_author', name: 'Ju', email: 'autora@potinho.app', password: '123456',
+    role: 'writer',
+    token: 'mock-token-user_author',
+  }
+  const tester: MockUser = {
+    id: 'user_tester', name: 'Teste', email: 'teste@potinho.app', password: '123456',
+    role: 'reader',
+    token: 'mock-token-user_tester',
+  }
+
+  const testerCollection = buildCollection(
+    {
+      id: 'col_ju', ownerId: author.id, name: 'Cartinhas da Ju', emoji: '💌',
+      description: 'Bilhetes que a Ju escreveu pra você.', theme: 'lavender', access: 'owner',
+      createdAt: hoursAgo(24 * 20), updatedAt: hoursAgo(2),
+    },
+    ['note_001', 'note_002', 'note_006', 'note_011'],
+    ['note_006'],
+    {
+      notes: [
+        draftNote('note_ju_draft_1', 'Pôr do sol', 'Aquele pôr do sol só foi bonito porque você tava do lado.', 'raro', 'amor'),
+        draftNote('note_ju_draft_2', 'Sorvete de pistache', 'Prometo dividir o próximo, mesmo sendo o meu favorito.', 'comum', 'alegria'),
+      ],
+      access: [{
+        collectionId: 'col_ju', email: tester.email, packIds: ['bonus_carinho', 'bonus_lendario'],
+        packOpens: { bonus_carinho: 2, bonus_lendario: 1 }, createdAt: hoursAgo(24 * 18),
+      }],
+    },
+  )
+
+  const invitedCollection = buildCollection(
+    {
+      id: 'col_ju_viagem', ownerId: author.id, name: 'Diário de Viagem', emoji: '🗺️',
+      description: 'Tudo que a gente viveu na estrada.', theme: 'ocean', access: 'owner',
+      createdAt: hoursAgo(24 * 3), updatedAt: hoursAgo(24 * 3),
+    },
+    [],
+    [],
+    {
+      access: [],
+      invites: [{
+        token: 'convite-teste', collectionId: 'col_ju_viagem', email: tester.email, status: 'pending',
+        createdAt: hoursAgo(5), expiresAt: hoursAgo(-24 * 6),
+      }],
+    },
+  )
+
+  const notificationBase = {
+    userId: tester.id, collectionId: 'col_ju', collectionName: testerCollection.meta.name,
+    collectionEmoji: testerCollection.meta.emoji, inApp: true,
+  }
+  const notifications: UserNotification[] = [
+    {
+      ...notificationBase, notificationId: 'notif_teste_mimo', kind: 'bonus_pack',
+      message: 'Pra você abrir hoje à noite, com calma 💜', imageUrl: null,
+      payload: { packId: 'bonus_carinho', packName: 'Mimo de Carinho', packEmoji: '🤗', opens: 2 },
+      createdAt: hoursAgo(1), readAt: null,
+    },
+    {
+      ...notificationBase, notificationId: 'notif_teste_lancamento', kind: 'release',
+      message: 'Escrevi esses pensando naquele fim de semana na praia 🌊', imageUrl: null,
+      payload: { noteCount: 3 }, createdAt: hoursAgo(6), readAt: null,
+    },
+    {
+      ...notificationBase, notificationId: 'notif_teste_antiga', kind: 'release',
+      message: null, imageUrl: null, payload: { noteCount: 2 },
+      createdAt: hoursAgo(24 * 4), readAt: hoursAgo(24 * 3),
+    },
+  ]
+
   return {
-    users: [writer, reader],
-    collections,
+    users: [writer, reader, author, tester],
+    collections: [...collections, testerCollection, invitedCollection],
+    notifications,
     sequence: 100,
   }
 }

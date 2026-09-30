@@ -36,7 +36,7 @@ import { useTour } from '../tour/TourContext'
 import { withAlpha } from '../utils/colorUtils'
 import { useCollectionsQuery, useMyNotificationsQuery, usePendingInvitesQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
 import { useSupportUnreadQuery } from '../hooks/useAdmin'
-import { backgroundThemes, colors, font, radius } from '../design-system'
+import { backgroundThemes, bellRing, colors, dotPing, font, radius } from '../design-system'
 import { collectionSlug } from '../utils/slug'
 import { BrandMark, Copyright } from './Brand'
 import { isCollectionReader, personaCapabilities } from '../utils/collectionAccess'
@@ -209,8 +209,9 @@ export function DesktopLayout() {
           {items.map((item) => {
             const active = navValue === item.path
             const isEnd = item.action === 'end-simulation'
+            const newsAttention = item.label === 'Novidades' && (hasUnreadNotifications || hasPendingInvites) && !active
             const showDot = (item.label === 'Coleção' && ((isActive && hasUnreadNotes) || (isReader && readerHasUnread))) ||
-              (item.label === 'Novidades' && hasUnreadNotifications) ||
+              (item.label === 'Novidades' && (hasUnreadNotifications || hasPendingInvites)) ||
               (item.path === '/admin/suporte' && supportUnread > 0)
             const accentColor = isEnd ? colors.rose.main : theme.accent
             return (
@@ -236,7 +237,13 @@ export function DesktopLayout() {
                   },
                 }}
               >
-                <Box sx={{ position: 'relative', flexShrink: 0 }}>
+                <Box sx={{
+                  position: 'relative', flexShrink: 0, display: 'flex',
+                  ...(newsAttention ? {
+                    '& > svg': { animation: `${bellRing} 2.8s ease-in-out 0.4s infinite`, transformOrigin: '50% 15%' },
+                    '@media (prefers-reduced-motion: reduce)': { '& > svg': { animation: 'none' } },
+                  } : {}),
+                }}>
                   {item.icon}
                   {showDot && (
                     <Box sx={{
@@ -244,6 +251,13 @@ export function DesktopLayout() {
                       width: 7, height: 7, borderRadius: radius.full,
                       background: colors.rose.main,
                       border: `2px solid ${theme.isDark ? 'rgba(0,0,0,0.88)' : 'rgba(255,253,251,0.97)'}`,
+                      ...(newsAttention ? {
+                        '&::after': {
+                          content: '""', position: 'absolute', inset: -2, borderRadius: radius.full, background: colors.rose.main,
+                          animation: `${dotPing} 1.6s cubic-bezier(0,0,0.2,1) infinite`,
+                        },
+                        '@media (prefers-reduced-motion: reduce)': { '&::after': { animation: 'none', display: 'none' } },
+                      } : {}),
                     }} />
                   )}
                 </Box>

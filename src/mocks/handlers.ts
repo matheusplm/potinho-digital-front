@@ -5,9 +5,13 @@ import type {
   CollectionAchievementFormData,
   CollectionFormData,
   CollectionPack,
+  CollectionNotification,
   CollectionPackFormData,
+  InviteDetails,
   NoteFormData,
   NoteTypeConfig,
+  NotificationKind,
+  NotifyConfig,
   RarityConfig,
 } from '../types/note'
 import { toConfigId } from '../utils/slug'
@@ -372,16 +376,89 @@ function authorizeCollection(request: Request, cid: string, mode: 'read' | 'owne
   return { ok: true, user, collection }
 }
 
+function findInvite(token: string) {
+  for (const collection of db.collections) {
+    const invite = collection.invites.find((item) => item.token === token)
+    if (invite) return { collection, invite }
+  }
+  return null
+}
+
+function ownerName(collection: CollectionState) {
+  return db.users.find((user) => user.id === collection.meta.ownerId)?.name ?? 'Alguém'
+}
+
+function notifyReaders(collection: CollectionState, kind: NotificationKind, notify: NotifyConfig | undefined, payload: Record<string, unknown>, onlyEmail?: string) {
+  if (!notify?.channels?.inApp) return
+  const now = new Date().toISOString()
+  const notificationId = nextId('notif')
+  const readers = collection.access.filter((entry) => !onlyEmail || entry.email.toLowerCase() === onlyEmail.toLowerCase())
+  for (const entry of readers) {
+    const reader = db.users.find((user) => user.email.toLowerCase() === entry.email.toLowerCase())
+    if (!reader) continue
+    db.notifications.push({
+      userId: reader.id, collectionId: collection.meta.id, collectionName: collection.meta.name, collectionEmoji: collection.meta.emoji,
+      notificationId, kind, message: notify.message?.trim() || null, imageUrl: notify.imageUrl ?? null, inApp: true,
+      payload, createdAt: now, readAt: null,
+    })
+  }
+}
+
 const collectionHandlers = [
   http.get('/api/invites/pending', async ({ request }) => {
     await delay(120)
-    if (!resolveUser(tokenFrom(request))) return HttpResponse.json({ message: 'Não autenticado.' }, { status: 401 })
-    return HttpResponse.json([])
+    const user = resolveUser(tokenFrom(request))
+    if (!user) return HttpResponse.json({ message: 'Não autenticado.' }, { status: 401 })
+    const email = user.email.toLowerCase()
+    const now = Date.now()
+    return HttpResponse.json(db.collections.flatMap((collection) => collection.invites
+      .filter((invite) => invite.email.toLowerCase() === email && invite.status === 'pending' && Date.parse(invite.expiresAt) > now)
+      .map((invite) => ({
+        token: invite.token, collectionId: collection.meta.id, collectionName: collection.meta.name,
+        inviterName: ownerName(collection), expiresAt: invite.expiresAt,
+      }))))
   }),
 
-  http.get('/api/invite/:token', async () => {
+  http.get('/api/invite/:token', async ({ params, request }) => {
     await delay(160)
-    return HttpResponse.json({ success: false, error: 'INVITE_NOT_FOUND', message: 'Convite não encontrado ou expirado.' }, { status: 404 })
+    const found = findInvite(String(params.token))
+    if (!found) return HttpResponse.json({ success: false, error: 'INVITE_NOT_FOUND', message: 'Convite não encontrado ou expirado.' }, { status: 404 })
+    const user = resolveUser(tokenFrom(request))
+    const { collection, invite } = found
+    const details: InviteDetails = {
+      token: invite.token, collectionId: collection.meta.id, collectionName: collection.meta.name, inviterName: ownerName(collection),
+      email: invite.email, status: invite.status, expiresAt: invite.expiresAt,
+      isForMe: user ? user.email.toLowerCase() === invite.email.toLowerCase() : null,
+    }
+    return HttpResponse.json(details)
+  }),
+
+  http.post('/api/invite/:token/accept', async ({ params, request }) => {
+    await delay(300)
+    const user = resolveUser(tokenFrom(request))
+    if (!user) return HttpResponse.json({ error: 'UNAUTHORIZED' }, { status: 401 })
+    const found = findInvite(String(params.token))
+    if (!found) return HttpResponse.json({ error: 'INVITE_NOT_FOUND' }, { status: 404 })
+    const { collection, invite } = found
+    if (invite.email.toLowerCase() !== user.email.toLowerCase()) return HttpResponse.json({ error: 'INVITE_EMAIL_MISMATCH' }, { status: 403 })
+    if (invite.status === 'accepted') return HttpResponse.json({ error: 'INVITE_ALREADY_ACCEPTED' }, { status: 400 })
+    if (invite.status === 'rejected') return HttpResponse.json({ error: 'INVITE_ALREADY_HANDLED' }, { status: 400 })
+    invite.status = 'accepted'
+    if (!collection.access.some((entry) => entry.email.toLowerCase() === invite.email.toLowerCase())) {
+      collection.access.push({ collectionId: collection.meta.id, email: invite.email, packIds: [], createdAt: new Date().toISOString() })
+    }
+    return HttpResponse.json({ ok: true, collectionId: collection.meta.id })
+  }),
+
+  http.post('/api/invite/:token/reject', async ({ params, request }) => {
+    await delay(250)
+    const user = resolveUser(tokenFrom(request))
+    if (!user) return HttpResponse.json({ error: 'UNAUTHORIZED' }, { status: 401 })
+    const found = findInvite(String(params.token))
+    if (!found) return HttpResponse.json({ error: 'INVITE_NOT_FOUND' }, { status: 404 })
+    if (found.invite.email.toLowerCase() !== user.email.toLowerCase()) return HttpResponse.json({ error: 'INVITE_EMAIL_MISMATCH' }, { status: 403 })
+    found.invite.status = 'rejected'
+    return HttpResponse.json({ ok: true })
   }),
 
   http.get('/api/collections/trash', async ({ request }) => {
@@ -516,10 +593,15 @@ const collectionHandlers = [
     const email = decodeURIComponent(String(params.email))
     const access = collection.access.find((a) => a.email === email)
     if (!access) return notFound('Acesso não encontrado.')
-    const { packId, opens } = (await request.json()) as { packId: string; opens: number }
+    const { packId, opens, notify } = (await request.json()) as { packId: string; opens: number; notify?: NotifyConfig }
     if (!access.packOpens) access.packOpens = {}
     if (opens <= 0) delete access.packOpens[packId]
     else access.packOpens[packId] = (access.packOpens[packId] ?? 0) + opens
+    const pack = collection.packs.find((item) => item.id === packId)
+    if (opens > 0 && pack) {
+      if (!access.packIds?.includes(packId)) access.packIds = [...(access.packIds ?? []), packId]
+      notifyReaders(collection, 'bonus_pack', notify, { packId, packName: pack.name, packEmoji: pack.emoji, opens }, email)
+    }
     return HttpResponse.json(access)
   }),
 
@@ -638,10 +720,13 @@ const collectionHandlers = [
     const pack = collection.packs.find((p) => p.id === params.packId)
     if (!pack) return notFound('Pacotinho não encontrado.')
     const isOwner = collection.meta.ownerId === user.id
+    const readerAccess = isOwner ? undefined : collection.access.find((entry) => entry.email.toLowerCase().trim() === user.email.toLowerCase().trim())
     if (!isOwner && pack.distribution !== 'all_with_access') {
-      const access = collection.access.find((entry) => entry.email.toLowerCase().trim() === user.email.toLowerCase().trim())
-      if (!(access?.packIds ?? []).includes(pack.id)) {
+      if (!(readerAccess?.packIds ?? []).includes(pack.id) && !(readerAccess?.packOpens?.[pack.id])) {
         return HttpResponse.json({ message: 'Este pacotinho não está liberado para você.' }, { status: 403 })
+      }
+      if (pack.distribution === 'manual_bonus' && !(readerAccess?.packOpens?.[pack.id])) {
+        return HttpResponse.json({ error: 'PACK_EXHAUSTED', message: 'Você já usou todas as aberturas deste pacotinho.' }, { status: 409 })
       }
     }
     if (pack.status !== 'active') {
@@ -690,6 +775,10 @@ const collectionHandlers = [
       rewards.push({ id: reward.id, title: reward.title, message: note.message, rarity: reward.rarity, typeId: reward.typeId, isNew: reward.isNew })
     }
     collection.packOpens[pack.id] = { lastOpenAt: now.toISOString(), totalOpens: (packOpen?.totalOpens ?? 0) + 1 }
+    if (readerAccess?.packOpens?.[pack.id] && pack.distribution === 'manual_bonus') {
+      readerAccess.packOpens[pack.id] -= 1
+      if (readerAccess.packOpens[pack.id] <= 0) delete readerAccess.packOpens[pack.id]
+    }
     if (pack.category === 'daily') {
       collection.lastDailyOpenDate = todayKey(now)
     }
@@ -793,7 +882,7 @@ const collectionHandlers = [
     const auth = authorizeCollection(request, String(params.cid), 'owner')
     if (!auth.ok) return auth.response
     const { collection } = auth
-    const { noteIds, notify } = (await request.json()) as { noteIds: string[]; notify?: unknown }
+    const { noteIds, notify } = (await request.json()) as { noteIds: string[]; notify?: NotifyConfig }
     const now = new Date().toISOString()
     const targets = collection.notes.filter((n) => noteIds.includes(n.id) && n.status === 'preview' && !n.disabledAt)
     if (targets.length !== noteIds.length) {
@@ -803,6 +892,7 @@ const collectionHandlers = [
       note.status = 'released'
       note.releasedAt = now
     }
+    notifyReaders(collection, 'release', notify, { noteCount: noteIds.length, noteIds })
     return HttpResponse.json({
       release: { id: nextId('release'), collectionId: String(params.cid), noteIds, noteCount: noteIds.length, releasedAt: now },
       notified: !!notify,
@@ -814,18 +904,40 @@ const collectionHandlers = [
     return HttpResponse.json([])
   }),
 
-  http.get('/api/collections/:cid/notifications', async () => {
+  http.get('/api/collections/:cid/notifications', async ({ params, request }) => {
     await delay(120)
-    return HttpResponse.json([])
+    const auth = authorizeCollection(request, String(params.cid), 'owner')
+    if (!auth.ok) return auth.response
+    const sent = new Map<string, CollectionNotification>()
+    for (const item of db.notifications.filter((entry) => entry.collectionId === auth.collection.meta.id)) {
+      const current = sent.get(item.notificationId)
+      if (current) {
+        current.readersNotified += 1
+        continue
+      }
+      sent.set(item.notificationId, {
+        id: item.notificationId, collectionId: item.collectionId, kind: item.kind, message: item.message, imageUrl: item.imageUrl,
+        channels: { inApp: true, push: false, email: false }, payload: item.payload, readersNotified: 1, createdAt: item.createdAt,
+      })
+    }
+    return HttpResponse.json([...sent.values()].sort((a, b) => b.createdAt.localeCompare(a.createdAt)))
   }),
 
-  http.get('/api/notifications', async () => {
+  http.get('/api/notifications', async ({ request }) => {
     await delay(120)
-    return HttpResponse.json([])
+    const user = resolveUser(tokenFrom(request))
+    if (!user) return HttpResponse.json({ message: 'Não autenticado.' }, { status: 401 })
+    return HttpResponse.json(db.notifications
+      .filter((item) => item.userId === user.id)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt)))
   }),
 
-  http.patch('/api/notifications/:cid/:id/read', async () => {
+  http.patch('/api/notifications/:cid/:id/read', async ({ params, request }) => {
     await delay(100)
+    const user = resolveUser(tokenFrom(request))
+    if (!user) return HttpResponse.json({ message: 'Não autenticado.' }, { status: 401 })
+    const item = db.notifications.find((entry) => entry.userId === user.id && entry.collectionId === params.cid && entry.notificationId === params.id)
+    if (item && !item.readAt) item.readAt = new Date().toISOString()
     return HttpResponse.json({ read: true })
   }),
 
@@ -964,11 +1076,13 @@ const collectionHandlers = [
       const canSeeMessage = isOwner || ownership.owned.has(note.id)
       return { ...view, message: canSeeMessage ? note.message : '' }
     })
+    const grant = collection.access.find((entry) => entry.email.toLowerCase() === user.email.toLowerCase())
     return HttpResponse.json({
       total: items.length,
       owned: ownership.owned.size,
       items,
       daily: dailyStatus(collection.lastDailyOpenDate, new Date()),
+      packOpens: isOwner ? {} : grant?.packOpens ?? {},
     })
   }),
 

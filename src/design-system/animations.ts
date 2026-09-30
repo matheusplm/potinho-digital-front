@@ -114,3 +114,17 @@ export const floatHeart = (i: number) => keyframes`
   100% { transform: translateY(-100vh) rotate(${i % 2 === 0 ? 10 : -8}deg); opacity: 0; }
 `
 
+export const bellRing = keyframes`
+  0%, 45%, 100% { transform: rotate(0deg) scale(1); }
+  5%  { transform: rotate(16deg) scale(1.18); }
+  11% { transform: rotate(-14deg) scale(1.18); }
+  17% { transform: rotate(10deg) scale(1.14); }
+  23% { transform: rotate(-7deg) scale(1.1); }
+  29% { transform: rotate(4deg) scale(1.05); }
+  35% { transform: rotate(0deg) scale(1); }
+`
+
+export const dotPing = keyframes`
+  0%   { transform: scale(1); opacity: 0.75; }
+  80%, 100% { transform: scale(2.6); opacity: 0; }
+`

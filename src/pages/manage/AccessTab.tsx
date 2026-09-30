@@ -204,9 +204,23 @@ export function AccessTab({ cid }: AccessTabProps) {
                     <Typography variant="lg" sx={{ flex: 1, color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {a.email}
                     </Typography>
-                    <IconButton size="small" aria-label="ver coleção" onClick={() => navigate(`/colecoes/${slug}/gerenciar/leitores/${encodeURIComponent(a.email)}`)} sx={{ ...actionButtonSx('neutral'), flexShrink: 0 }}>
-                      <VisibilityOutlinedIcon sx={{ fontSize: 17 }} />
-                    </IconButton>
+                    <Tooltip title="Ver o que essa pessoa já abriu, favoritou e conquistou" placement="top" arrow>
+                      <Box
+                        component="button"
+                        type="button"
+                        aria-label={`Ver progresso de ${a.email}`}
+                        onClick={() => navigate(`/colecoes/${slug}/gerenciar/leitores/${encodeURIComponent(a.email)}`)}
+                        sx={{
+                          ...actionButtonSx('neutral'), cursor: 'pointer', font: 'inherit', flexShrink: 0,
+                          display: 'inline-flex', alignItems: 'center', gap: 0.5, px: 1, py: 0.6,
+                          fontSize: '0.74rem', fontWeight: 800, whiteSpace: 'nowrap',
+                          '&:focus-visible': { outline: `2px solid ${colors.primary.main}`, outlineOffset: 2 },
+                        }}
+                      >
+                        <VisibilityOutlinedIcon sx={{ fontSize: 16 }} />
+                        Progresso
+                      </Box>
+                    </Tooltip>
                   </Stack>
 
                   {accessBonusPacks.length > 0 && (
