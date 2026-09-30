@@ -3,7 +3,9 @@ import { Box, Stack, Typography } from '@mui/material'
 import { Card, LoadingState, ScrollablePage } from '../components/ui'
 import { useBackground } from '../context/BackgroundContext'
 import { FloatingParticles } from '../components/FloatingParticles'
-import { useMarkNotificationReadMutation, useMyNotificationsQuery } from '../hooks/useNotes'
+import { useMarkNotificationReadMutation, useMyNotificationsQuery, usePendingInvitesQuery } from '../hooks/useNotes'
+import { useNavigate } from 'react-router-dom'
+import { PendingInviteCard } from '../components/PendingInviteCard'
 import { colors, fadeIn, font, radius } from '../design-system'
 import type { UserNotification } from '../types/note'
 
@@ -24,10 +26,16 @@ function formatDateTime(iso: string): string {
 
 export function NotificationsPage() {
   const { theme } = useBackground()
+  const navigate = useNavigate()
   const { data: notifications = [], isLoading } = useMyNotificationsQuery()
+  const { data: pendingInvites = [], isLoading: invitesLoading } = usePendingInvitesQuery()
   const markRead = useMarkNotificationReadMutation()
 
   const unreadCount = notifications.filter((n) => !n.readAt).length
+  const summary = [
+    pendingInvites.length > 0 ? `${pendingInvites.length} convite${pendingInvites.length !== 1 ? 's' : ''} esperando` : null,
+    unreadCount > 0 ? `${unreadCount} não lida${unreadCount !== 1 ? 's' : ''}` : null,
+  ].filter(Boolean).join(' · ')
 
   function handleOpen(notification: UserNotification) {
     if (!notification.readAt) {
@@ -47,16 +55,24 @@ export function NotificationsPage() {
           <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.6rem', color: theme.textOnBg, lineHeight: 1.1 }}>
             Suas novidades
           </Typography>
-          {unreadCount > 0 && (
+          {summary && (
             <Typography variant="md" sx={{ color: theme.textOnBgMuted, fontStyle: 'italic', mt: 0.3 }}>
-              {unreadCount} não lida{unreadCount !== 1 ? 's' : ''}
+              {summary}
             </Typography>
           )}
         </Stack>
 
+        {pendingInvites.length > 0 && (
+          <Stack spacing={1.2} sx={{ mb: 2.4 }}>
+            {pendingInvites.map((invite) => (
+              <PendingInviteCard key={invite.token} invite={invite} onOpen={() => navigate(`/convite/${invite.token}`)} />
+            ))}
+          </Stack>
+        )}
+
         {isLoading && <LoadingState compact label="Carregando notificações" accent={theme.accent} textColor={theme.textOnBg} mutedColor={theme.textOnBgMuted} />}
 
-        {!isLoading && notifications.length === 0 && (
+        {!isLoading && !invitesLoading && notifications.length === 0 && pendingInvites.length === 0 && (
           <Box sx={{ textAlign: 'center', py: 6 }}>
             <Typography sx={{ fontSize: '2.4rem', mb: 1 }}>📭</Typography>
             <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 700, color: theme.textOnBg, mb: 0.5 }}>

@@ -10,4 +10,5 @@ export {
   shimmer, hintWiggle, sway,
   shineSweep, packCtaFloat, heartPulseAura, ghostPulse,
   dropFade, heartBeat, chevronPulse, floatHeart,
+  bellRing, dotPing,
 } from './animations'

@@ -1,11 +1,11 @@
 import FavoriteIcon from '@mui/icons-material/Favorite'
-import MailOutlineIcon from '@mui/icons-material/MailOutline'
 import ShuffleIcon from '@mui/icons-material/Shuffle'
 import { Box, LinearProgress, Stack, Typography } from '@mui/material'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, LoadingState, ScrollablePage, toast } from '../components/ui'
+import { PendingInviteCard } from '../components/PendingInviteCard'
 import { useBackground } from '../context/BackgroundContext'
 import { FloatingParticles } from '../components/FloatingParticles'
 import { useSimulation } from '../context/SimulationContext'
@@ -24,7 +24,7 @@ import {
   usePendingInvitesQuery,
   useReaderAchievementsQuery,
 } from '../hooks/useNotes'
-import { colors, fadeIn, font, ink, radius } from '../design-system'
+import { colors, fadeIn, font, radius } from '../design-system'
 import { isCollectionReader } from '../utils/collectionAccess'
 import { ApiRequestError } from '../services/api'
 import { simulatePackOpen } from '../utils/simulationPlay'
@@ -377,27 +377,9 @@ export function SimulatedReaderHomePage() {
                 Nenhum potinho por aqui ainda
               </Typography>
               {pendingInvites.length > 0 ? (
-                <Stack spacing={0.9} sx={{ width: '100%', maxWidth: 340 }}>
+                <Stack spacing={1.2} sx={{ width: '100%', maxWidth: 420, textAlign: 'left' }}>
                   {pendingInvites.map((invite) => (
-                    <Card key={invite.token} onClick={() => navigate(`/convite/${invite.token}`)} sx={{ p: 1.6, cursor: 'pointer', textAlign: 'left', transition: 'transform 0.16s', '&:hover': { transform: 'translateY(-2px)' } }}>
-                      <Stack direction="row" alignItems="center" spacing={1.2}>
-                        <Box sx={{ width: 40, height: 40, borderRadius: radius.lg, flexShrink: 0, background: 'linear-gradient(135deg,#1d4ed8,#7c3aed)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <MailOutlineIcon sx={{ fontSize: 20, color: '#fff' }} />
-                        </Box>
-                        <Box sx={{ flex: 1, minWidth: 0 }}>
-                          <Typography variant="label" sx={{ color: colors.primary.text }}>
-                            Convite esperando você
-                          </Typography>
-                          <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {invite.collectionName || 'Coleção'}
-                          </Typography>
-                          <Typography variant="sm" sx={{ color: colors.text.secondary }}>
-                            {invite.inviterName ? `de ${invite.inviterName}` : 'toque para abrir'}
-                          </Typography>
-                        </Box>
-                        <Typography variant="xl" sx={{ color: colors.primary.text, fontWeight: 900, flexShrink: 0 }}>→</Typography>
-                      </Stack>
-                    </Card>
+                    <PendingInviteCard key={invite.token} invite={invite} onOpen={() => navigate(`/convite/${invite.token}`)} />
                   ))}
                 </Stack>
               ) : (
@@ -480,18 +462,6 @@ export function SimulatedReaderHomePage() {
                 )
               })}
             </Stack>
-          )}
-
-          {isRealReader && pendingInvites.length > 0 && (
-            <Card onClick={() => navigate(`/convite/${pendingInvites[0].token}`)} sx={{ p: 1.15, mb: 1.35, cursor: 'pointer', border: '1.5px solid #dbeafe', background: 'linear-gradient(135deg,#eff6ff,#fce7f3)', transition: 'transform 0.16s', '&:hover': { transform: 'translateY(-1px)' } }}>
-              <Stack direction="row" alignItems="center" spacing={1}>
-                <MailOutlineIcon sx={{ fontSize: 18, color: colors.primary.main, flexShrink: 0 }} />
-                <Typography variant="md" sx={{ flex: 1, minWidth: 0, fontWeight: 700, color: ink.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  Convite pendente: {pendingInvites[0].collectionName || 'Coleção'}
-                </Typography>
-                <Typography variant="xl" sx={{ color: colors.primary.main, fontWeight: 900, flexShrink: 0 }}>→</Typography>
-              </Stack>
-            </Card>
           )}
 
           <Stack direction="row" spacing={0.8} sx={{ mb: 1.35 }}>

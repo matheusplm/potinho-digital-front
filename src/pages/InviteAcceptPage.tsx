@@ -3,10 +3,12 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import HighlightOffIcon from '@mui/icons-material/HighlightOff'
 import MailOutlineIcon from '@mui/icons-material/MailOutline'
 import { Box, CircularProgress, Stack, Typography } from '@mui/material'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
+import { useReader } from '../context/ReaderContext'
+import { queryKeys } from '../hooks/useNotes'
 import { api, ApiRequestError } from '../services/api'
 import { Button, ConfirmDeleteDialog, toast } from '../components/ui'
 import { BrandMark } from '../components/Brand'
@@ -116,7 +118,9 @@ function StateBlock({ icon, title, children }: { icon: React.ReactNode; title: s
 
 export function InviteAcceptPage() {
   const { token = '' } = useParams<{ token: string }>()
-  const { user } = useUser()
+  const { user, setPersona } = useUser()
+  const { setActiveCollectionId } = useReader()
+  const queryClient = useQueryClient()
   const navigate = useNavigate()
   const [rejectConfirmOpen, setRejectConfirmOpen] = useState(false)
 
@@ -129,8 +133,14 @@ export function InviteAcceptPage() {
 
   const acceptMutation = useMutation({
     mutationFn: () => api.acceptInvite(token),
-    onSuccess: () => {
+    onSuccess: async ({ collectionId }) => {
       toast.success('Convite aceito! Bem-vindo à coleção.')
+      setActiveCollectionId(collectionId)
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.collections() }),
+        queryClient.invalidateQueries({ queryKey: ['pending-invites'] }),
+      ])
+      setPersona('reader')
       setTimeout(() => navigate('/home'), 1200)
     },
     onError: (e: Error) => {
@@ -143,6 +153,7 @@ export function InviteAcceptPage() {
     onSuccess: () => {
       setRejectConfirmOpen(false)
       toast.success('Convite recusado.')
+      void queryClient.invalidateQueries({ queryKey: ['pending-invites'] })
     },
     onError: (e: Error) => {
       setRejectConfirmOpen(false)
@@ -255,7 +266,7 @@ export function InviteAcceptPage() {
                   {PERKS.map((perk) => (
                     <Stack key={perk.text} direction="row" spacing={1.1} alignItems="center">
                       <Typography variant="xl" sx={{ lineHeight: 1 }}>{perk.emoji}</Typography>
-                      <Typography variant="lg" sx={{ color: 'rgba(30,58,95,0.72)' }}>{perk.text}</Typography>
+                      <Typography variant="lg" sx={{ color: 'rgba(30,58,95,0.72)', textAlign: 'left' }}>{perk.text}</Typography>
                     </Stack>
                   ))}
                 </Stack>
@@ -289,7 +300,7 @@ export function InviteAcceptPage() {
                   {PERKS.map((perk) => (
                     <Stack key={perk.text} direction="row" spacing={1.1} alignItems="center">
                       <Typography variant="xl" sx={{ lineHeight: 1 }}>{perk.emoji}</Typography>
-                      <Typography variant="lg" sx={{ color: 'rgba(30,58,95,0.72)' }}>{perk.text}</Typography>
+                      <Typography variant="lg" sx={{ color: 'rgba(30,58,95,0.72)', textAlign: 'left' }}>{perk.text}</Typography>
                     </Stack>
                   ))}
                 </Stack>

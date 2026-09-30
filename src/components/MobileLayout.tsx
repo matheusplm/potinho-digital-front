@@ -10,22 +10,22 @@ import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined'
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined'
 import SupportAgentOutlinedIcon from '@mui/icons-material/SupportAgentOutlined'
 import { Box, Tooltip, Typography } from '@mui/material'
-import { useEffect, useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { FloatingMenu } from './FloatingMenu'
 import { PushPrompt } from './PushPrompt'
 import { SimulateReaderSheet } from './SimulateReaderSheet'
 import { SimulationBanner } from './SimulationBanner'
-import { ScrollHint, toast } from './ui'
+import { LoadingState, ScrollHint, toast } from './ui'
 import { useUser } from '../context/UserContext'
 import { useSimulation } from '../context/SimulationContext'
 import { useReader } from '../context/ReaderContext'
 import { useBackground } from '../context/BackgroundContext'
-import { useCollectionsQuery, useMyNotificationsQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
+import { useCollectionsQuery, useMyNotificationsQuery, usePendingInvitesQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
 import { useSupportUnreadQuery } from '../hooks/useAdmin'
 import { collectionSlug } from '../utils/slug'
 import { isCollectionReader } from '../utils/collectionAccess'
-import { colors, radius } from '../design-system'
+import { bellRing, colors, dotPing, radius } from '../design-system'
 import { useTour } from '../tour/TourContext'
 
 interface NavItem {
@@ -75,6 +75,7 @@ export function MobileLayout() {
 
   const { data: myNotifications = [] } = useMyNotificationsQuery({ enabled: isReader })
   const hasUnreadNotifications = useMemo(() => myNotifications.some((n) => !n.readAt), [myNotifications])
+  const { data: pendingInvites = [] } = usePendingInvitesQuery({ enabled: !!user })
   const { data: supportUnread = 0 } = useSupportUnreadQuery()
 
   const { data: readerAch } = useReaderAchievementsQuery(readerActive?.id ?? '', { enabled: isReader && !!readerActive })
@@ -139,7 +140,9 @@ export function MobileLayout() {
         mt: bannerOffset,
         transition: 'margin-top 0.22s ease',
       }}>
-        <Outlet />
+        <Suspense fallback={<Box sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><LoadingState label="Carregando" /></Box>}>
+          <Outlet />
+        </Suspense>
       </Box>
 
       <ScrollHint />
@@ -155,9 +158,10 @@ export function MobileLayout() {
           {items.map((item) => {
             const active = navValue === item.path
             const isEnd = item.action === 'end-simulation'
+            const newsAttention = item.label === 'Novidades' && (hasUnreadNotifications || pendingInvites.length > 0) && !active
             const showUnreadDot =
               (item.label === 'Coleção' && ((isActive && hasUnreadNotes) || (isReader && readerHasUnread))) ||
-              (item.label === 'Novidades' && hasUnreadNotifications) ||
+              (item.label === 'Novidades' && (hasUnreadNotifications || pendingInvites.length > 0)) ||
               (item.path === '/admin/suporte' && supportUnread > 0)
             const navBox = (
               <Box
@@ -194,7 +198,9 @@ export function MobileLayout() {
                     color: active || isEnd ? (isEnd ? colors.rose.text : theme.accent) : theme.textOnBgMuted,
                     transition: 'color 0.18s, transform 0.22s cubic-bezier(0.16,1,0.3,1)',
                     transform: active ? 'scale(1.15)' : 'scale(1)',
+                    ...(newsAttention ? { animation: `${bellRing} 2.8s ease-in-out 0.4s infinite`, transformOrigin: '50% 15%' } : {}),
                   },
+                  '@media (prefers-reduced-motion: reduce)': { '& svg': { animation: 'none' } },
                 }}>
                   {item.icon}
                   {showUnreadDot && (
@@ -207,6 +213,13 @@ export function MobileLayout() {
                       borderRadius: radius.full,
                       background: colors.rose.main,
                       boxShadow: `0 0 0 3px ${theme.isDark ? 'rgba(0,0,0,0.88)' : 'rgba(255,253,251,0.96)'}, 0 0 12px ${colors.rose.glow}`,
+                      ...(newsAttention ? {
+                        '&::after': {
+                          content: '""', position: 'absolute', inset: 0, borderRadius: radius.full, background: colors.rose.main,
+                          animation: `${dotPing} 1.6s cubic-bezier(0,0,0.2,1) infinite`,
+                        },
+                        '@media (prefers-reduced-motion: reduce)': { '&::after': { animation: 'none', display: 'none' } },
+                      } : {}),
                     }} />
                   )}
                 </Box>

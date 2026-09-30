@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material'
-import { colors } from '../design-system'
+import { ink } from '../design-system'
 import type { CollectionTemplate } from '../services/collectionTemplates'
 
 export function TemplateKitRow({ template, busy, dimmed, onClick }: {
@@ -25,10 +25,10 @@ export function TemplateKitRow({ template, busy, dimmed, onClick }: {
         <Typography sx={{ fontSize: '1.15rem', lineHeight: 1 }}>{template.emoji}</Typography>
       </Box>
       <Box sx={{ flex: 1, minWidth: 0 }}>
-        <Typography variant="md" sx={{ fontWeight: 900, color: colors.text.primary, lineHeight: 1.2 }}>
+        <Typography variant="md" sx={{ fontWeight: 900, color: ink.primary, lineHeight: 1.2 }}>
           {template.title}
         </Typography>
-        <Typography variant="xs" sx={{ color: colors.text.secondary, lineHeight: 1.35, mt: 0.2 }}>
+        <Typography variant="xs" sx={{ color: ink.primary, opacity: 0.78, lineHeight: 1.35, mt: 0.2 }}>
           {busy ? '✨ Preparando sua coleção...' : template.tagline}
         </Typography>
       </Box>

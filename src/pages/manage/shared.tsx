@@ -9,17 +9,19 @@ export function actionButtonSx(tone: 'primary' | 'danger' | 'neutral' = 'neutral
     : tone === 'danger' ? colors.rose.main
     : colors.text.secondary
 
+  const tint = (percent: number) => `color-mix(in srgb, ${color} ${percent}%, transparent)`
+
   return {
     color,
     p: 0.75,
     borderRadius: radius.md,
-    background: `${color}12`,
-    border: `1px solid ${color}24`,
+    background: tint(7),
+    border: `1px solid ${tint(tone === 'neutral' ? 28 : 14)}`,
     transition: 'transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease',
     '&:hover': {
-      background: `${color}20`,
+      background: tint(12.5),
       transform: 'translateY(-1px) scale(1.05)',
-      boxShadow: `0 5px 14px ${color}22`,
+      boxShadow: `0 5px 14px ${tint(13)}`,
     },
   }
 }

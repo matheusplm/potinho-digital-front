@@ -19,12 +19,12 @@ import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
 import SupportAgentOutlinedIcon from '@mui/icons-material/SupportAgentOutlined'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import { Box, Divider, Stack, Typography } from '@mui/material'
-import { useEffect, useMemo, useState } from 'react'
+import { Suspense, startTransition, useEffect, useMemo, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { PushPrompt } from './PushPrompt'
 import { SimulateReaderSheet } from './SimulateReaderSheet'
 import { SimulationBanner } from './SimulationBanner'
-import { toast } from './ui'
+import { LoadingState, toast } from './ui'
 import { useUser, type Persona } from '../context/UserContext'
 import { useSimulation } from '../context/SimulationContext'
 import { useReader } from '../context/ReaderContext'
@@ -36,7 +36,7 @@ import { useTour } from '../tour/TourContext'
 import { withAlpha } from '../utils/colorUtils'
 import { useCollectionsQuery, useMyNotificationsQuery, usePendingInvitesQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
 import { useSupportUnreadQuery } from '../hooks/useAdmin'
-import { backgroundThemes, colors, font, radius } from '../design-system'
+import { backgroundThemes, bellRing, colors, dotPing, font, radius } from '../design-system'
 import { collectionSlug } from '../utils/slug'
 import { BrandMark, Copyright } from './Brand'
 import { isCollectionReader, personaCapabilities } from '../utils/collectionAccess'
@@ -149,8 +149,10 @@ export function DesktopLayout() {
     if (next === 'admin' && !user?.isAdmin) return
     if (next === 'writer' && !canWriter) return
     if (next === 'reader' && !canReader && !hasPendingInvites) return
-    setPersona(next)
-    navigate('/home')
+    startTransition(() => {
+      setPersona(next)
+      navigate('/home')
+    })
   }
 
   return (
@@ -207,8 +209,9 @@ export function DesktopLayout() {
           {items.map((item) => {
             const active = navValue === item.path
             const isEnd = item.action === 'end-simulation'
+            const newsAttention = item.label === 'Novidades' && (hasUnreadNotifications || hasPendingInvites) && !active
             const showDot = (item.label === 'Coleção' && ((isActive && hasUnreadNotes) || (isReader && readerHasUnread))) ||
-              (item.label === 'Novidades' && hasUnreadNotifications) ||
+              (item.label === 'Novidades' && (hasUnreadNotifications || hasPendingInvites)) ||
               (item.path === '/admin/suporte' && supportUnread > 0)
             const accentColor = isEnd ? colors.rose.main : theme.accent
             return (
@@ -234,7 +237,13 @@ export function DesktopLayout() {
                   },
                 }}
               >
-                <Box sx={{ position: 'relative', flexShrink: 0 }}>
+                <Box sx={{
+                  position: 'relative', flexShrink: 0, display: 'flex',
+                  ...(newsAttention ? {
+                    '& > svg': { animation: `${bellRing} 2.8s ease-in-out 0.4s infinite`, transformOrigin: '50% 15%' },
+                    '@media (prefers-reduced-motion: reduce)': { '& > svg': { animation: 'none' } },
+                  } : {}),
+                }}>
                   {item.icon}
                   {showDot && (
                     <Box sx={{
@@ -242,6 +251,13 @@ export function DesktopLayout() {
                       width: 7, height: 7, borderRadius: radius.full,
                       background: colors.rose.main,
                       border: `2px solid ${theme.isDark ? 'rgba(0,0,0,0.88)' : 'rgba(255,253,251,0.97)'}`,
+                      ...(newsAttention ? {
+                        '&::after': {
+                          content: '""', position: 'absolute', inset: -2, borderRadius: radius.full, background: colors.rose.main,
+                          animation: `${dotPing} 1.6s cubic-bezier(0,0,0.2,1) infinite`,
+                        },
+                        '@media (prefers-reduced-motion: reduce)': { '&::after': { animation: 'none', display: 'none' } },
+                      } : {}),
                     }} />
                   )}
                 </Box>
@@ -415,7 +431,9 @@ export function DesktopLayout() {
       <Box sx={{ flex: 1, height: '100%', overflow: 'hidden', position: 'relative' }}>
         <SimulationBanner />
         {location.pathname === '/home' && !isActive && persona !== 'admin' && !tour.step && <PushPrompt />}
-        <Outlet />
+        <Suspense fallback={<Box sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><LoadingState label="Carregando" /></Box>}>
+          <Outlet />
+        </Suspense>
       </Box>
 
       <SimulateReaderSheet open={simulateOpen} onClose={() => setSimulateOpen(false)} />

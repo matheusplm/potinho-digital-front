@@ -33,6 +33,8 @@ const TAB_PARAM: Record<string, Tab> = {
   bilhetes: 'notes', raridades: 'rarities', tipos: 'types', pacotinhos: 'packs', conquistas: 'achievements', acesso: 'access',
 }
 
+const TAB_SLUG = Object.fromEntries(Object.entries(TAB_PARAM).map(([param, id]) => [id, param])) as Record<Tab, string>
+
 function notesIntentFrom(params: URLSearchParams): NotesIntent | undefined {
   if (params.get('novo') === '1') return 'new'
   if (params.get('ver') === 'rascunhos') return 'drafts'
@@ -48,9 +50,25 @@ export function CollectionManagePage() {
   const [tab, setTab] = useState<Tab>(() => TAB_PARAM[searchParams.get('aba') ?? ''] ?? 'notes')
   const [notesIntent] = useState(() => notesIntentFrom(searchParams))
 
+  const tabFromUrl = TAB_PARAM[searchParams.get('aba') ?? '']
+
   useEffect(() => {
-    if (searchParams.toString()) setSearchParams({}, { replace: true })
+    if (tabFromUrl && tabFromUrl !== tab) setTab(tabFromUrl)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tabFromUrl])
+
+  useEffect(() => {
+    if (!searchParams.has('novo') && !searchParams.has('ver')) return
+    const next = new URLSearchParams(searchParams)
+    next.delete('novo')
+    next.delete('ver')
+    setSearchParams(next, { replace: true })
   }, [searchParams, setSearchParams])
+
+  const changeTab = (next: Tab) => {
+    setTab(next)
+    setSearchParams(next === 'notes' ? {} : { aba: TAB_SLUG[next] }, { replace: true })
+  }
 
   const { data: collections = [], isLoading: collectionsLoading } = useCollectionsQuery()
   const collection = findCollectionBySlug(collections, slug)
@@ -121,7 +139,7 @@ export function CollectionManagePage() {
         </Stack>
 
         <Box sx={{ mb: 2 }}>
-          <SegmentedControl options={TABS} value={tab} onChange={setTab} />
+          <SegmentedControl options={TABS} value={tab} onChange={changeTab} />
         </Box>
 
         {tab === 'notes' && <NotesTab cid={cid} intent={notesIntent} />}

@@ -8,7 +8,7 @@ import ViewListIcon from '@mui/icons-material/ViewList'
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove'
 import { Box, Chip, IconButton, Stack, Typography } from '@mui/material'
 import { useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { Button, Card, ChoiceChip, LoadingState, PageTitle, ScrollablePage, ScrollHint, toast } from '../components/ui'
 import { useBackground } from '../context/BackgroundContext'
@@ -52,6 +52,7 @@ const glassBtn = {
 export function ReaderCollectionPage() {
   const { slug = '', email: encodedEmail = '' } = useParams<{ slug: string; email: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
   const { theme } = useBackground()
   const { user } = useUser()
   const queryClient = useQueryClient()
@@ -116,11 +117,16 @@ export function ReaderCollectionPage() {
 
   const isLoading = collectionsLoading || viewLoading
 
+  function goBack() {
+    if (location.key !== 'default') navigate(-1)
+    else navigate(`/colecoes/${slug}/gerenciar?aba=acesso`)
+  }
+
   async function handleRevoke() {
     try {
       await revokeMutation.mutateAsync(email)
       toast.info(`Acesso removido de ${email}`)
-      navigate(`/colecoes/${slug}/gerenciar`)
+      navigate(`/colecoes/${slug}/gerenciar?aba=acesso`, { replace: true })
     } catch (e) {
       toast.error((e as Error).message || 'Erro ao revogar acesso.')
     }
@@ -147,7 +153,7 @@ export function ReaderCollectionPage() {
 
       <ScrollablePage sx={{ px: 2.5, py: 2.5 }}>
         <Stack direction="row" alignItems="center" spacing={1.2} sx={{ mb: 2.5 }}>
-          <IconButton size="small" aria-label="voltar" onClick={() => navigate(`/colecoes/${slug}/gerenciar`)} sx={{ ...glassBtn, color: theme.textOnBg }}>
+          <IconButton size="small" aria-label="voltar" onClick={goBack} sx={{ ...glassBtn, color: theme.textOnBg }}>
             <ArrowBackIcon sx={{ fontSize: 20 }} />
           </IconButton>
           <Box sx={{ flex: 1, minWidth: 0 }}>

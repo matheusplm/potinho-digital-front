@@ -6,15 +6,18 @@ import { resolvePersona, savedPersona } from '../utils/collectionAccess'
 export function PersonaBootstrap() {
   const { user, persona, personaReady, setPersona, markPersonaReady } = useUser()
   const { data: collections, isSuccess, isError } = useCollectionsQuery({ enabled: !!user })
-  const savedAtStart = useRef<{ userId: string; persona: Persona | null } | null>(null)
-  if (user && savedAtStart.current?.userId !== user.id) savedAtStart.current = { userId: user.id, persona: savedPersona(user.id) }
+  const pendingAdminRestore = useRef<Persona | null>(null)
 
   useEffect(() => {
     if (!user || personaReady) return
     if (isSuccess && collections) {
-      setPersona(resolvePersona(collections, user.id, user.role, user.isAdmin === true))
+      const wasAdmin = savedPersona(user.id) === 'admin'
+      const resolved = resolvePersona(collections, user.id, user.role, user.isAdmin === true)
+      pendingAdminRestore.current = wasAdmin && resolved !== 'admin' && user.isAdmin === undefined ? resolved : null
+      setPersona(resolved)
       markPersonaReady()
     } else if (isError) {
+      pendingAdminRestore.current = null
       setPersona(user.role)
       markPersonaReady()
     }
@@ -23,13 +26,19 @@ export function PersonaBootstrap() {
   useEffect(() => {
     if (!personaReady || !user) return
     if (persona === 'admin' && user.isAdmin === false) {
+      pendingAdminRestore.current = null
       setPersona(user.role)
       return
     }
-    const start = savedAtStart.current
-    if (persona !== 'admin' && user.isAdmin === true && start?.userId === user.id && start.persona === 'admin') {
-      savedAtStart.current = { userId: user.id, persona: null }
-      setPersona('admin')
+    const bootPersona = pendingAdminRestore.current
+    if (!bootPersona) return
+    if (persona !== bootPersona) {
+      pendingAdminRestore.current = null
+      return
+    }
+    if (user.isAdmin !== undefined) {
+      pendingAdminRestore.current = null
+      if (user.isAdmin) setPersona('admin')
     }
   }, [personaReady, persona, user, setPersona])
 
