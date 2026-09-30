@@ -5,7 +5,7 @@ import StarIcon from '@mui/icons-material/Star'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import { Box, Chip, IconButton, Stack, Typography } from '@mui/material'
 import { Card } from '../../components/ui'
-import { colors, font, radius, ink } from '../../design-system'
+import { colors, font, radius, ink, liftOnDark } from '../../design-system'
 import { actionButtonSx } from './shared'
 import { buildPackRules, formatPackSchedule, PACK_DISTRIBUTION_LABELS, PACK_STATUS_LABELS } from './packData'
 import type { CollectionPack } from '../../types/note'
@@ -39,7 +39,7 @@ export function PackPreviewCard({ pack, view, onEdit, onDelete, onSimulate, onSe
               <Chip label={isPrimary ? 'Principal' : PACK_STATUS_LABELS[pack.status]} size="small"
                 sx={{ height: 19, fontSize: '0.68rem', fontWeight: 900, background: isPrimary ? '#fef3c7' : isActive ? '#dcfce7' : 'rgba(255,255,255,0.62)', color: isPrimary ? '#b45309' : isActive ? '#15803d' : ink.secondary, flexShrink: 0, '& .MuiChip-label': { px: 0.75 } }} />
             </Stack>
-            <Typography sx={{ fontSize: compact ? '0.7rem' : '0.76rem', color: ink.secondary, lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: compact ? 2 : 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+            <Typography sx={{ fontSize: compact ? '0.7rem' : '0.76rem', color: ink.primary, opacity: 0.78, lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: compact ? 2 : 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
               {pack.description}
             </Typography>
           </Box>
@@ -51,7 +51,7 @@ export function PackPreviewCard({ pack, view, onEdit, onDelete, onSimulate, onSe
           {[['Cartas', `${pack.cardsPerOpen}`], ['Disponib.', formatPackSchedule(pack)], ['Distribuição', PACK_DISTRIBUTION_LABELS[pack.distribution]]].map(([label, value]) => (
             <Box key={label} sx={{ p: compact ? 0.75 : 0.9, borderRadius: radius.md, background: `${pack.accent}0f`, border: `1px solid ${pack.accent}18`, display: compact ? 'flex' : 'block', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
               <Typography variant="label" sx={{ color: colors.text.muted, mb: 0.25 }}>{label}</Typography>
-              <Typography sx={{ fontSize: compact ? '0.68rem' : '0.7rem', fontWeight: 800, color: pack.accent, lineHeight: 1.15, textAlign: compact ? 'right' : 'left', minWidth: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+              <Typography sx={{ fontSize: compact ? '0.68rem' : '0.7rem', fontWeight: 800, color: liftOnDark(pack.accent), lineHeight: 1.15, textAlign: compact ? 'right' : 'left', minWidth: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                 {value}
               </Typography>
             </Box>

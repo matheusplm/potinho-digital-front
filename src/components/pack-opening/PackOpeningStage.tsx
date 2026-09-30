@@ -78,7 +78,7 @@ function Rays({ style, visible }: { style: RevealStyle | undefined; visible: boo
   )
 }
 
-export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose, onViewCollection, onOpenReward }: {
+export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose, onViewCollection, onOpenReward, onReplay }: {
   open: boolean
   pack: StagePack | null
   rewards: CollectionDailyReward[] | null
@@ -86,6 +86,7 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
   types: NoteTypeConfig[]
   onClose: () => void
   onViewCollection?: () => void
+  onReplay?: () => void
   onOpenReward?: (reward: CollectionDailyReward) => void
 }) {
   const { theme } = useBackground()
@@ -123,8 +124,8 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
     setPhase('summary')
   }, [clearTimers])
 
-  useEffect(() => {
-    if (!open) return
+  const reset = useCallback(() => {
+    clearTimers()
     setPhase('intro')
     setIndex(0)
     setFlipped(false)
@@ -132,8 +133,18 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
     setTorn(false)
     setShowFor(null)
     setShaking(false)
+  }, [clearTimers])
+
+  useEffect(() => {
+    if (!open) return
+    reset()
     return clearTimers
-  }, [open, clearTimers])
+  }, [open, reset, clearTimers])
+
+  function replay() {
+    reset()
+    onReplay?.()
+  }
 
   const startBurst = useCallback(() => {
     if (reducedMotion || !items.length) {
@@ -362,8 +373,9 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
             )}
             {phase === 'summary' && (
               <Stack direction="row" spacing={1} sx={{ maxWidth: 480, mx: 'auto' }}>
-                <Button variant={onViewCollection ? 'ghost' : 'primary'} onClick={onClose} sx={{ flex: 1, py: 1.1 }}>{onViewCollection ? 'Guardar' : 'Fechar'}</Button>
+                <Button variant={onViewCollection || onReplay ? 'ghost' : 'primary'} onClick={onClose} sx={{ flex: 1, py: 1.1 }}>{onViewCollection ? 'Guardar' : 'Fechar'}</Button>
                 {onViewCollection && <Button variant="primary" onClick={onViewCollection} sx={{ flex: 1, py: 1.1, whiteSpace: 'nowrap' }}>Ver coleção</Button>}
+                {onReplay && <Button variant="primary" onClick={replay} sx={{ flex: 1, py: 1.1, whiteSpace: 'nowrap' }}>Simular de novo</Button>}
               </Stack>
             )}
           </Box>

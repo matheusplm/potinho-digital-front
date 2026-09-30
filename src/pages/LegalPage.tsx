@@ -210,10 +210,10 @@ export function LegalPage({ doc }: { doc: LegalDoc }) {
         <Typography component="h1" sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: { xs: '1.9rem', md: '2.4rem' }, color: colors.text.primary, lineHeight: 1.1 }}>
           {title}
         </Typography>
-        <Typography variant="lg" sx={{ mt: 1, color: colors.text.secondary }}>
+        <Typography variant="lg" sx={{ mt: 1, color: colors.text.primary }}>
           {intro}
         </Typography>
-        <Typography variant="sm" sx={{ mt: 0.6, color: colors.text.muted }}>
+        <Typography variant="sm" sx={{ mt: 0.6, color: colors.text.secondary }}>
           Última atualização: {UPDATED_AT}
         </Typography>
 
@@ -224,7 +224,7 @@ export function LegalPage({ doc }: { doc: LegalDoc }) {
                 {index + 1}. {section.title}
               </Typography>
               <Stack spacing={1.2} sx={{
-                color: colors.text.secondary, fontSize: '0.95rem', lineHeight: 1.65,
+                color: colors.text.primary, fontSize: '0.95rem', lineHeight: 1.65,
                 '& li': { mb: 0.6 },
                 '& a': { color: colors.primary.text, fontWeight: 700, wordBreak: 'break-all' },
                 '& strong': { color: colors.text.primary },
@@ -240,7 +240,7 @@ export function LegalPage({ doc }: { doc: LegalDoc }) {
         </Stack>
 
         <Box sx={{ mt: 5, pt: 3, borderTop: `1px solid ${colors.border.subtle}`, textAlign: 'center' }}>
-          <Typography variant="md" sx={{ color: colors.text.secondary, mb: 2 }}>
+          <Typography variant="md" sx={{ color: colors.text.primary, mb: 2 }}>
             Veja também: <Link to={`/${other}`} replace style={{ color: colors.primary.text, fontWeight: 700 }}>{DOCS[other].title}</Link>
           </Typography>
           <Copyright />

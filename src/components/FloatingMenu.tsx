@@ -11,7 +11,7 @@ import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNone
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
 import BlockIcon from '@mui/icons-material/Block'
 import { Box, Stack, Typography, Backdrop, IconButton, Tooltip } from '@mui/material'
-import { useMemo, useState } from 'react'
+import { startTransition, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUser, type Persona } from '../context/UserContext'
 import { isCollectionReader, personaCapabilities } from '../utils/collectionAccess'
@@ -64,9 +64,11 @@ export function FloatingMenu() {
     if (next === 'admin' && !user?.isAdmin) return
     if (next === 'writer' && !canWriter) return
     if (next === 'reader' && !canReader && !hasPendingInvites) return
-    setPersona(next)
     setOpen(false)
-    navigate('/home')
+    startTransition(() => {
+      setPersona(next)
+      navigate('/home')
+    })
   }
 
   return (

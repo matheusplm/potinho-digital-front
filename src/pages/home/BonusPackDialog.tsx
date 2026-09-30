@@ -45,7 +45,7 @@ export function BonusPackDialog({ pack, isRealReader, canOpen, block, opens, acc
       }}
     >
       {pack && (
-        <>
+        <Box data-pd-theme="light">
           <Box sx={{ p: 2, position: 'relative', background: 'radial-gradient(circle at 18% 0%, rgba(255,255,255,0.64), transparent 40%)' }}>
             <DialogTitle sx={{
               p: 0,
@@ -119,7 +119,7 @@ export function BonusPackDialog({ pack, isRealReader, canOpen, block, opens, acc
               </Button>
             </Stack>
           </DialogActions>
-        </>
+        </Box>
       )}
     </Dialog>
   )

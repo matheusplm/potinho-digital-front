@@ -10,13 +10,13 @@ import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined'
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined'
 import SupportAgentOutlinedIcon from '@mui/icons-material/SupportAgentOutlined'
 import { Box, Tooltip, Typography } from '@mui/material'
-import { useEffect, useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { FloatingMenu } from './FloatingMenu'
 import { PushPrompt } from './PushPrompt'
 import { SimulateReaderSheet } from './SimulateReaderSheet'
 import { SimulationBanner } from './SimulationBanner'
-import { ScrollHint, toast } from './ui'
+import { LoadingState, ScrollHint, toast } from './ui'
 import { useUser } from '../context/UserContext'
 import { useSimulation } from '../context/SimulationContext'
 import { useReader } from '../context/ReaderContext'
@@ -139,7 +139,9 @@ export function MobileLayout() {
         mt: bannerOffset,
         transition: 'margin-top 0.22s ease',
       }}>
-        <Outlet />
+        <Suspense fallback={<Box sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><LoadingState label="Carregando" /></Box>}>
+          <Outlet />
+        </Suspense>
       </Box>
 
       <ScrollHint />

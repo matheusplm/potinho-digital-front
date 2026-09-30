@@ -19,12 +19,12 @@ import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
 import SupportAgentOutlinedIcon from '@mui/icons-material/SupportAgentOutlined'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import { Box, Divider, Stack, Typography } from '@mui/material'
-import { useEffect, useMemo, useState } from 'react'
+import { Suspense, startTransition, useEffect, useMemo, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { PushPrompt } from './PushPrompt'
 import { SimulateReaderSheet } from './SimulateReaderSheet'
 import { SimulationBanner } from './SimulationBanner'
-import { toast } from './ui'
+import { LoadingState, toast } from './ui'
 import { useUser, type Persona } from '../context/UserContext'
 import { useSimulation } from '../context/SimulationContext'
 import { useReader } from '../context/ReaderContext'
@@ -149,8 +149,10 @@ export function DesktopLayout() {
     if (next === 'admin' && !user?.isAdmin) return
     if (next === 'writer' && !canWriter) return
     if (next === 'reader' && !canReader && !hasPendingInvites) return
-    setPersona(next)
-    navigate('/home')
+    startTransition(() => {
+      setPersona(next)
+      navigate('/home')
+    })
   }
 
   return (
@@ -415,7 +417,9 @@ export function DesktopLayout() {
       <Box sx={{ flex: 1, height: '100%', overflow: 'hidden', position: 'relative' }}>
         <SimulationBanner />
         {location.pathname === '/home' && !isActive && persona !== 'admin' && !tour.step && <PushPrompt />}
-        <Outlet />
+        <Suspense fallback={<Box sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><LoadingState label="Carregando" /></Box>}>
+          <Outlet />
+        </Suspense>
       </Box>
 
       <SimulateReaderSheet open={simulateOpen} onClose={() => setSimulateOpen(false)} />
