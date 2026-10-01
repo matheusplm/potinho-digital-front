@@ -7,6 +7,7 @@ import { useMediaQuery } from '@mui/material'
 import { MobileLayout } from './components/MobileLayout'
 import { DesktopLayout } from './components/DesktopLayout'
 import { PersonaBootstrap } from './components/PersonaBootstrap'
+import { NotificationPopup } from './components/NotificationPopup'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { RouteMeta } from './components/RouteMeta'
 import { UserProvider, useUser, type UserRole } from './context/UserContext'
@@ -127,6 +128,7 @@ function AppRoutes() {
   return (
     <Suspense fallback={<RouteFallback />}>
       <AdminSessionSync />
+      <NotificationPopup />
       <Routes>
         <Route path="/verificar-email" element={<VerifyEmailPage />} />
         <Route path="/esqueci-minha-senha" element={<ForgotPasswordPage />} />
