@@ -6,7 +6,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { Button, ScrollablePage, toast } from '../../components/ui'
 import { useBackground } from '../../context/BackgroundContext'
 import { useUser } from '../../context/UserContext'
-import { fadeIn, font, radius, spin, clipOverflow } from '../../design-system'
+import { colors, fadeIn, font, radius, spin, clipOverflow } from '../../design-system'
 import { useAdminOverviewQuery } from '../../hooks/useAdmin'
 import { ApiRequestError } from '../../services/api'
 import { clearAdminSession, type useAdminSession } from '../../services/adminSession'
@@ -139,7 +139,7 @@ export function AdminFrame<T>({ title, subtitle, query, generatedAt, skeleton, c
 
             {session && (
               <Stack direction="row" spacing={0.8} sx={{ flexWrap: 'wrap', rowGap: 0.8 }}>
-                <Pill tone={minutesLeft !== null && minutesLeft <= 5 ? '#f59e0b' : undefined} label={`Sessão admin: ${minutesLeft} minutos restantes`}>
+                <Pill tone={minutesLeft !== null && minutesLeft <= 5 ? colors.status.warning : undefined} label={`Sessão admin: ${minutesLeft} minutos restantes`}>
                   <LockOutlinedIcon />
                   <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>sessão ·</Box>
                   {minutesLeft ? `${minutesLeft} min` : '< 1 min'}

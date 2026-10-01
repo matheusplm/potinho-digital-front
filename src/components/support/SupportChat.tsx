@@ -2,7 +2,7 @@ import SendRoundedIcon from '@mui/icons-material/SendRounded'
 import { Box, CircularProgress, IconButton, InputBase, Stack, Typography, useMediaQuery } from '@mui/material'
 import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
 import { useBackground } from '../../context/BackgroundContext'
-import { radius } from '../../design-system'
+import { colors, radius } from '../../design-system'
 import type { MessageAuthor, SupportChatMessage } from '../../types/support'
 import { withAlpha } from '../../utils/colorUtils'
 
@@ -168,7 +168,7 @@ export function TicketStatusChip({ status, viewer }: { status: 'open' | 'answere
     : status === 'answered'
       ? viewer === 'admin' ? 'Respondido' : 'Respondemos'
       : viewer === 'admin' ? 'Esperando você' : 'Aguardando resposta'
-  const tone = status === 'done' ? '#22c55e' : status === 'answered' ? '#3b82f6' : '#f59e0b'
+  const tone = status === 'done' ? colors.status.success : status === 'answered' ? colors.status.info : colors.status.warning
   return (
     <Box component="span" sx={{
       display: 'inline-flex', alignItems: 'center', gap: 0.5, px: 0.9, py: 0.2, borderRadius: radius.full, flexShrink: 0,

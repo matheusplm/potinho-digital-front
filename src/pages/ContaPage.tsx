@@ -215,7 +215,7 @@ export function ContaPage() {
                   />
                   <Typography variant="xs" sx={{
                     mt: 0.4, pl: 0.3, fontWeight: usernameStatus === 'idle' ? 400 : 600,
-                    color: usernameStatus === 'available' ? '#22c55e' : (usernameStatus === 'taken' || usernameStatus === 'invalid') ? colors.rose.text : theme.textOnBgMuted,
+                    color: usernameStatus === 'available' ? colors.status.success : (usernameStatus === 'taken' || usernameStatus === 'invalid') ? colors.rose.text : theme.textOnBgMuted,
                   }}>
                     {usernameStatus === 'available' ? '✓ disponível' : usernameStatus === 'taken' ? 'já está em uso' : usernameStatus === 'invalid' ? 'Apenas letras minúsculas, números e _ (mín. 3)' : 'Identificador único, sem espaços.'}
                   </Typography>
@@ -255,10 +255,10 @@ export function ContaPage() {
                     {user?.email ?? '...'}
                   </Typography>
                   {user?.emailVerified === true && (
-                    <CheckCircleIcon sx={{ fontSize: 14, color: '#22c55e', flexShrink: 0 }} />
+                    <CheckCircleIcon sx={{ fontSize: 14, color: colors.status.success, flexShrink: 0 }} />
                   )}
                   {user?.emailVerified === false && (
-                    <ErrorOutlineIcon sx={{ fontSize: 14, color: '#f59e0b', flexShrink: 0 }} />
+                    <ErrorOutlineIcon sx={{ fontSize: 14, color: colors.status.warning, flexShrink: 0 }} />
                   )}
                 </Stack>
                 <Typography variant="sm" sx={{ color: theme.textOnBgMuted }}>
@@ -309,7 +309,7 @@ export function ContaPage() {
               ) : (
                 <Stack spacing={1.5} sx={{ px: 2, py: 2 }}>
                   <Stack direction="row" alignItems="flex-start" spacing={1}>
-                    <CheckCircleIcon sx={{ fontSize: 18, color: '#22c55e', mt: 0.1, flexShrink: 0 }} />
+                    <CheckCircleIcon sx={{ fontSize: 18, color: colors.status.success, mt: 0.1, flexShrink: 0 }} />
                     <Typography variant="md" sx={{ color: theme.textOnBg, lineHeight: 1.55 }}>
                       Email enviado para <strong>{pendingNewEmail}</strong>. Abra esse email e clique no link para confirmar a troca.
                     </Typography>

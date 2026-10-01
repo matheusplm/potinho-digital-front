@@ -366,7 +366,7 @@ export function DesktopLayout() {
                     }}
                   >
                     {showInviteDot && (
-                      <Box sx={{ position: 'absolute', top: -3, right: -3, width: 10, height: 10, borderRadius: '50%', background: '#ef4444', border: '2px solid #fff', boxShadow: '0 1px 4px rgba(239,68,68,0.5)' }} />
+                      <Box sx={{ position: 'absolute', top: -3, right: -3, width: 10, height: 10, borderRadius: '50%', background: colors.status.danger, border: '2px solid #fff', boxShadow: '0 1px 4px rgba(239,68,68,0.5)' }} />
                     )}
                     <Box sx={{ display: 'flex', '& svg': { fontSize: '0.9rem', color: active ? theme.accent : theme.textOnBgMuted } }}>{icon}</Box>
                     <Typography variant="sm" sx={{ fontWeight: active ? 700 : 500, color: active ? theme.accent : theme.textOnBgMuted }}>

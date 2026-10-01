@@ -72,7 +72,7 @@ export function ConfirmEmailChangePage() {
 
         {status === 'success' && (
           <Stack alignItems="center" spacing={2.5} sx={{ maxWidth: 320, textAlign: 'center' }}>
-            <MarkEmailReadIcon sx={{ fontSize: 64, color: '#22c55e', filter: 'drop-shadow(0 4px 16px rgba(34,197,94,0.3))' }} />
+            <MarkEmailReadIcon sx={{ fontSize: 64, color: colors.status.success, filter: 'drop-shadow(0 4px 16px rgba(34,197,94,0.3))' }} />
             <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.8rem', color: colors.text.primary }}>
               Email atualizado!
             </Typography>

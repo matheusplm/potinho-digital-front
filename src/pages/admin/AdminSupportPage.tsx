@@ -140,7 +140,7 @@ function ThreadView({ ticketId, onBack, onDeleted }: { ticketId: string; onBack?
             </Box>
             {ticket && (
               <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                <Pill onClick={toggleStatus} disabled={setStatus.isPending} tone={ticket.status === 'done' ? undefined : '#22c55e'} label={ticket.status === 'done' ? 'Reabrir conversa' : 'Marcar como resolvida'}>
+                <Pill onClick={toggleStatus} disabled={setStatus.isPending} tone={ticket.status === 'done' ? undefined : colors.status.success} label={ticket.status === 'done' ? 'Reabrir conversa' : 'Marcar como resolvida'}>
                   {ticket.status === 'done' ? <ReplayIcon /> : <CheckCircleOutlineIcon />}
                   {ticket.status === 'done' ? 'reabrir' : 'resolver'}
                 </Pill>

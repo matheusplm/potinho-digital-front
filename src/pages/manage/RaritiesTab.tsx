@@ -87,7 +87,7 @@ const formatOdds = (odds: number) => (odds % 1 === 0 ? String(odds) : odds.toFix
 
 const ODDS_TONE = {
   ok: { color: colors.success.main, text: colors.success.main, title: 'Distribuição de chances' },
-  warn: { color: '#f59e0b', text: '#b45309', title: 'Distribuição de chances' },
+  warn: { color: colors.status.warning, text: '#b45309', title: 'Distribuição de chances' },
   over: { color: colors.error.main, text: colors.error.main, title: '⚠ Soma ultrapassa 100%' },
 }
 

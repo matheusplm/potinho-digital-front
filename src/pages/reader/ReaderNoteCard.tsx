@@ -61,7 +61,7 @@ function rarityCardSx(r?: RarityConfig, compact = false, isDark = false) {
   }
 }
 
-export function NoteCard({ note, rarity, onClick }: { note: CollectionNoteView; rarity?: RarityConfig; onClick: () => void }) {
+export function ReaderNoteCard({ note, rarity, onClick }: { note: CollectionNoteView; rarity?: RarityConfig; onClick: () => void }) {
   const { theme, maskLightCards } = useBackground()
   return (
     <Box onClick={onClick} sx={rarityCardSx(rarity, false, theme.isDark && maskLightCards)}>
@@ -95,7 +95,7 @@ export function NoteCard({ note, rarity, onClick }: { note: CollectionNoteView; 
   )
 }
 
-export function NoteRow({ note, rarity, onClick }: { note: CollectionNoteView; rarity?: RarityConfig; onClick: () => void }) {
+export function ReaderNoteRow({ note, rarity, onClick }: { note: CollectionNoteView; rarity?: RarityConfig; onClick: () => void }) {
   const { theme, maskLightCards } = useBackground()
   return (
     <Box onClick={onClick} sx={{ ...rarityCardSx(rarity, true, theme.isDark && maskLightCards), py: 1, px: 1.4 }}>

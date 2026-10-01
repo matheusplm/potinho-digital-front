@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { Button, EmptyState, LoadingState, ScrollablePage, SectionLabel } from '../components/ui'
-import { BonusPackDialog, type BonusPackTarget } from '../components/manage/BonusPackDialog'
+import { SendGiftDialog, type GiftTarget } from '../components/manage/SendGiftDialog'
 import { colors, fadeIn, font, clipOverflow } from '../design-system'
 import { useBackground } from '../context/BackgroundContext'
 import { FloatingParticles } from '../components/FloatingParticles'
@@ -24,7 +24,7 @@ export function WriterHomePage() {
   const queryClient = useQueryClient()
   const home = useWriterHome()
   const [giftMenu, setGiftMenu] = useState<{ reader: ReaderSummary; anchor: HTMLElement } | null>(null)
-  const [gift, setGift] = useState<{ reader: ReaderSummary; target: BonusPackTarget } | null>(null)
+  const [gift, setGift] = useState<{ reader: ReaderSummary; target: GiftTarget } | null>(null)
   const [writeMenu, setWriteMenu] = useState<HTMLElement | null>(null)
 
   const firstName = user?.name?.split(' ')[0] ?? ''
@@ -144,7 +144,7 @@ export function WriterHomePage() {
         ))}
       </Menu>
 
-      <BonusPackDialog
+      <SendGiftDialog
         cid={gift?.reader.collection.id ?? ''}
         target={gift?.target ?? null}
         onClose={() => setGift(null)}

@@ -5,7 +5,7 @@ import { font, ink, radius } from '../../design-system'
 import { formatRemainingTime } from '../../utils/packCooldowns'
 import type { CollectionPack } from '../../types/note'
 
-export function BonusPackDialog({ pack, isRealReader, canOpen, block, opens, accrued, cooldownMs, isOpeningPack, accent, onClose, onOpen }: {
+export function OpenBonusDialog({ pack, isRealReader, canOpen, block, opens, accrued, cooldownMs, isOpeningPack, accent, onClose, onOpen }: {
   pack: CollectionPack | null
   isRealReader: boolean
   canOpen: boolean

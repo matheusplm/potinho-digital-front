@@ -1,3 +1,4 @@
+import { colors } from '../../design-system'
 export { timeAgo } from '../../utils/timeAgo'
 
 const MONTHS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez']
@@ -5,8 +6,8 @@ const MONTHS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', '
 export type ActivityTone = 'hot' | 'warm' | 'cold' | 'none'
 
 export const TONE_COLOR: Record<ActivityTone, string> = {
-  hot: '#22c55e',
-  warm: '#f59e0b',
+  hot: colors.status.success,
+  warm: colors.status.warning,
   cold: '#94a3b8',
   none: 'transparent',
 }
