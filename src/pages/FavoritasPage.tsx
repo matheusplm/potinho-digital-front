@@ -14,7 +14,7 @@ import {
   useCollectionTypesQuery,
   useToggleCollectionFavoriteMutation,
 } from '../hooks/useNotes'
-import { fadeIn, font } from '../design-system'
+import { fadeIn, font, clipOverflow } from '../design-system'
 import type { NoteTypeConfig } from '../types/note'
 
 export function FavoritasPage() {
@@ -32,7 +32,7 @@ export function FavoritasPage() {
   const isLoading = collectionsLoading || (!!cid && playLoading)
 
   return (
-    <Box sx={{ height: '100%', position: 'relative', overflow: 'hidden', background: theme.gradient }}>
+    <Box sx={{ height: '100%', position: 'relative', ...clipOverflow, background: theme.gradient }}>
       <FloatingParticles />
       <FavoriteIcon sx={{ position: 'absolute', bottom: -80, right: -70, fontSize: 460, color: 'rgba(225,29,72,0.05)', pointerEvents: 'none' }} />
       <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>

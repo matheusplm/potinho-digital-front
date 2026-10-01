@@ -10,16 +10,16 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import SupportAgentOutlinedIcon from '@mui/icons-material/SupportAgentOutlined'
 import { Box, CircularProgress, Collapse, Divider, Stack, Typography } from '@mui/material'
 import { useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useBackground } from '../context/BackgroundContext'
 import { FloatingParticles } from '../components/FloatingParticles'
-import { SupportDialog } from '../components/SupportDialog'
 import { DeleteAccountDialog } from '../components/DeleteAccountDialog'
 import { useUser } from '../context/UserContext'
 import { api } from '../services/api'
 import { useRetryAfter } from '../hooks/useRetryAfter'
+import { useMySupportUnreadQuery } from '../hooks/useSupport'
 import { Button, Input, ScrollablePage, toast } from '../components/ui'
-import { fadeIn, font, radius, colors } from '../design-system'
+import { fadeIn, font, radius, colors, clipOverflow } from '../design-system'
 
 type Section = 'profile' | 'email' | 'password'
 type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid'
@@ -46,7 +46,8 @@ export function ContaPage() {
   const [pendingNewEmail, setPendingNewEmail] = useState('')
   const emailRetry = useRetryAfter()
 
-  const [supportOpen, setSupportOpen] = useState(false)
+  const navigate = useNavigate()
+  const { data: supportUnread = 0 } = useMySupportUnreadQuery()
   const [deleteOpen, setDeleteOpen] = useState(false)
 
   const handleUsernameChange = (value: string) => {
@@ -145,7 +146,7 @@ export function ContaPage() {
   } as const
 
   return (
-    <Box sx={{ height: '100%', position: 'relative', overflow: 'hidden', background: theme.gradient }}>
+    <Box sx={{ height: '100%', position: 'relative', ...clipOverflow, background: theme.gradient }}>
       <FloatingParticles />
       <AccountCircleOutlinedIcon sx={{ position: 'absolute', bottom: -70, right: -60, fontSize: 420, color: `${theme.accent}08`, pointerEvents: 'none' }} />
 
@@ -417,9 +418,14 @@ export function ContaPage() {
           )}
 
           <Stack spacing={1.3} alignItems="center" sx={{ pt: 3, pb: 2 }}>
-            <Box component="button" type="button" onClick={() => setSupportOpen(true)} sx={quietLink}>
+            <Box component="button" type="button" onClick={() => navigate('/suporte', { state: { from: '/conta' } })} sx={quietLink}>
               <SupportAgentOutlinedIcon sx={{ fontSize: 17 }} />
               Falar com o suporte
+              {supportUnread > 0 && (
+                <Box component="span" sx={{ ml: 0.4, px: 0.8, py: 0.1, borderRadius: radius.full, fontSize: '0.68rem', fontWeight: 800, color: theme.onAccent, background: theme.accent }}>
+                  {supportUnread === 1 ? 'nova resposta' : `${supportUnread} respostas`}
+                </Box>
+              )}
             </Box>
             <Stack direction="row" spacing={1} alignItems="center" sx={{ '& a': { ...quietLink, fontSize: '0.78rem', fontWeight: 500 } }}>
               <Link to="/termos">Termos de uso</Link>
@@ -431,7 +437,6 @@ export function ContaPage() {
             </Box>
           </Stack>
         </Stack>
-        <SupportDialog open={supportOpen} onClose={() => setSupportOpen(false)} />
         <DeleteAccountDialog open={deleteOpen} onClose={() => setDeleteOpen(false)} />
       </ScrollablePage>
     </Box>

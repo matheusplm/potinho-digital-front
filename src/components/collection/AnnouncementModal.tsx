@@ -5,7 +5,7 @@ import { forwardRef, useMemo } from 'react'
 import type { ReactElement, Ref } from 'react'
 import { Button } from '../ui'
 import { useBackground } from '../../context/BackgroundContext'
-import { colors, font, radius } from '../../design-system'
+import { colors, font, radius, clipOverflow } from '../../design-system'
 import type { UserNotification } from '../../types/note'
 
 const SlideUp = forwardRef(function SlideUp(
@@ -94,7 +94,7 @@ export function AnnouncementModal({ notifications, onClose, onSeeAll }: {
       slotProps={{ paper: { sx: { background: theme.gradient } } }}
       aria-label="Novidades pra você"
     >
-      <Box sx={{ minHeight: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', px: 2.5, py: 4, position: 'relative', overflow: 'hidden' }}>
+      <Box sx={{ minHeight: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', px: 2.5, py: 4, position: 'relative', ...clipOverflow }}>
         <Box sx={{ position: 'absolute', top: -70, right: -70, fontSize: 260, opacity: theme.isDark ? 0.05 : 0.08, pointerEvents: 'none', userSelect: 'none' }}>
           {mixed ? '🎉' : first?.collectionEmoji ?? '💌'}
         </Box>

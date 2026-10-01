@@ -46,6 +46,7 @@ const AdminUsersPage = lazy(() => import('./pages/admin/AdminUsersPage').then((m
 const AdminCollectionsPage = lazy(() => import('./pages/admin/AdminCollectionsPage').then((m) => ({ default: m.AdminCollectionsPage })))
 const AdminSupportPage = lazy(() => import('./pages/admin/AdminSupportPage').then((m) => ({ default: m.AdminSupportPage })))
 const LegalPage = lazy(() => import('./pages/LegalPage').then((m) => ({ default: m.LegalPage })))
+const SupportPage = lazy(() => import('./pages/SupportPage').then((m) => ({ default: m.SupportPage })))
 
 function RouteFallback() {
   return (
@@ -148,6 +149,7 @@ function AppRoutes() {
           <Route path="colecoes/:slug/gerenciar" element={<RequireRole role="writer"><CollectionManagePage /></RequireRole>} />
           <Route path="colecoes/:slug/gerenciar/leitores/:email" element={<RequireRole role="writer"><ReaderCollectionPage /></RequireRole>} />
           <Route path="conta" element={<ContaPage />} />
+          <Route path="suporte" element={<SupportPage />} />
           <Route path="admin/usuarios" element={<RequireAdmin><AdminUsersPage /></RequireAdmin>} />
           <Route path="admin/colecoes" element={<RequireAdmin><AdminCollectionsPage /></RequireAdmin>} />
           <Route path="admin/suporte" element={<RequireAdmin><AdminSupportPage /></RequireAdmin>} />

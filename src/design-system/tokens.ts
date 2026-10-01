@@ -90,3 +90,8 @@ export const spacing = {
   '2xl': 48,
   '3xl': 64,
 }
+
+export const clipOverflow = {
+  overflow: 'hidden',
+  '@supports (overflow: clip)': { overflow: 'clip' },
+} as const

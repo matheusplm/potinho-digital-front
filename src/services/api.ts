@@ -1,4 +1,4 @@
-import type { AdminOverview, SupportMessage, SupportStatus } from '../types/admin'
+import type { AdminOverview, MySupportTicket, SupportChatMessage, SupportThread, SupportTicket } from '../types/admin'
 import type {
   Collection,
   CollectionAccess,
@@ -242,8 +242,13 @@ export const api = {
   me: () => request<{ id: string; name: string; role: string; email: string; username?: string; emailVerified?: boolean; onboardingDone: boolean | null; hasPassword?: boolean; isAdmin?: boolean }>('/auth/me'),
   deleteAccount: (confirmEmail: string, password?: string) =>
     request<{ ok: boolean }>('/auth/delete-account', { method: 'POST', body: JSON.stringify({ confirmEmail, password }) }),
-  sendSupportMessage: (message: string, page?: string) =>
-    request<{ id: string; createdAt: string }>('/api/support', { method: 'POST', body: JSON.stringify({ message, page }) }),
+  listMySupportTickets: () => request<MySupportTicket[]>('/api/support/tickets'),
+  mySupportUnread: () => request<{ unread: number }>('/api/support/unread'),
+  getMySupportTicket: (id: string) => request<SupportThread<MySupportTicket>>(`/api/support/tickets/${id}`),
+  createSupportTicket: (message: string, page?: string) =>
+    request<MySupportTicket>('/api/support/tickets', { method: 'POST', body: JSON.stringify({ message, page }) }),
+  replySupportTicket: (id: string, message: string) =>
+    request<{ ticket: MySupportTicket; message: SupportChatMessage }>(`/api/support/tickets/${id}/messages`, { method: 'POST', body: JSON.stringify({ message }) }),
   markOnboardingDone: () => request<{ ok: boolean }>('/auth/onboarding-done', { method: 'PATCH' }),
   updateMe: (data: { name?: string; username?: string }) =>
     request<{ id: string; name: string; email: string; username?: string }>('/auth/me', { method: 'PATCH', body: JSON.stringify(data) }),
@@ -415,9 +420,13 @@ export const api = {
     request<AdminOverview>('/api/admin/overview', { headers: { 'X-Admin-Token': adminToken } }),
   adminSupportUnread: () => request<{ unread: number }>('/api/admin/support/unread'),
   adminSupportList: (adminToken: string) =>
-    request<SupportMessage[]>('/api/admin/support', { headers: { 'X-Admin-Token': adminToken } }),
-  adminSupportStatus: (adminToken: string, id: string, status: SupportStatus) =>
-    request<SupportMessage>(`/api/admin/support/${id}`, { method: 'PATCH', headers: { 'X-Admin-Token': adminToken }, body: JSON.stringify({ status }) }),
+    request<SupportTicket[]>('/api/admin/support', { headers: { 'X-Admin-Token': adminToken } }),
+  adminSupportTicket: (adminToken: string, id: string) =>
+    request<SupportThread<SupportTicket>>(`/api/admin/support/${id}`, { headers: { 'X-Admin-Token': adminToken } }),
+  adminSupportReply: (adminToken: string, id: string, message: string) =>
+    request<{ ticket: SupportTicket; message: SupportChatMessage }>(`/api/admin/support/${id}/messages`, { method: 'POST', headers: { 'X-Admin-Token': adminToken }, body: JSON.stringify({ message }) }),
+  adminSupportStatus: (adminToken: string, id: string, status: 'open' | 'done') =>
+    request<SupportTicket>(`/api/admin/support/${id}`, { method: 'PATCH', headers: { 'X-Admin-Token': adminToken }, body: JSON.stringify({ status }) }),
   adminSupportDelete: (adminToken: string, id: string) =>
     request<{ ok: boolean }>(`/api/admin/support/${id}`, { method: 'DELETE', headers: { 'X-Admin-Token': adminToken } }),
 }

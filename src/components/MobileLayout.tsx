@@ -25,7 +25,7 @@ import { useCollectionsQuery, useMyNotificationsQuery, usePendingInvitesQuery, u
 import { useSupportUnreadQuery } from '../hooks/useAdmin'
 import { collectionSlug } from '../utils/slug'
 import { isCollectionReader } from '../utils/collectionAccess'
-import { bellRing, colors, dotPing, radius } from '../design-system'
+import { bellRing, colors, dotPing, radius, clipOverflow } from '../design-system'
 import { useTour } from '../tour/TourContext'
 
 interface NavItem {
@@ -136,7 +136,7 @@ export function MobileLayout() {
 
       <Box component="main" sx={{
         flex: 1,
-        overflow: 'hidden',
+        ...clipOverflow,
         mt: bannerOffset,
         transition: 'margin-top 0.22s ease',
       }}>

@@ -6,7 +6,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { Button, ScrollablePage, toast } from '../../components/ui'
 import { useBackground } from '../../context/BackgroundContext'
 import { useUser } from '../../context/UserContext'
-import { fadeIn, font, radius, spin } from '../../design-system'
+import { fadeIn, font, radius, spin, clipOverflow } from '../../design-system'
 import { useAdminOverviewQuery } from '../../hooks/useAdmin'
 import { ApiRequestError } from '../../services/api'
 import { clearAdminSession, type useAdminSession } from '../../services/adminSession'
@@ -110,7 +110,7 @@ export function AdminFrame<T>({ title, subtitle, query, generatedAt, skeleton, c
   }, [forbidden, user, setPersona])
 
   return (
-    <Box sx={{ height: '100%', position: 'relative', overflow: 'hidden', background: theme.gradient }}>
+    <Box sx={{ height: '100%', position: 'relative', ...clipOverflow, background: theme.gradient }}>
       <Box sx={{ position: 'absolute', top: -160, right: -120, width: 420, height: 420, borderRadius: '50%', background: `radial-gradient(circle, ${theme.accent}26, transparent 70%)`, pointerEvents: 'none' }} />
       <ScrollablePage sx={{ animation: `${fadeIn} 0.35s ease` }}>
         <Box sx={{ width: '100%', maxWidth: 1240, mx: 'auto', px: { xs: 1.6, md: 4 }, pt: { xs: 2.2, md: 3.5 }, pb: { xs: 13, md: 5 } }}>

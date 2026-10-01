@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { Button, EmptyState, LoadingState, ScrollablePage, SectionLabel } from '../components/ui'
 import { BonusPackDialog, type BonusPackTarget } from '../components/manage/BonusPackDialog'
-import { colors, fadeIn, font } from '../design-system'
+import { colors, fadeIn, font, clipOverflow } from '../design-system'
 import { useBackground } from '../context/BackgroundContext'
 import { FloatingParticles } from '../components/FloatingParticles'
 import { queryKeys } from '../hooks/useNotes'
@@ -49,7 +49,7 @@ export function WriterHomePage() {
   }
 
   return (
-    <Box sx={{ height: '100%', position: 'relative', overflow: 'hidden', background: theme.gradient }}>
+    <Box sx={{ height: '100%', position: 'relative', ...clipOverflow, background: theme.gradient }}>
       <FloatingParticles />
       <FavoriteIcon sx={{
         position: 'absolute', bottom: -80, right: -80,

@@ -1,6 +1,7 @@
 import { delay, http, HttpResponse } from 'msw'
-import type { AdminCollectionRow, AdminDailyPoint, AdminOverview, AdminUserRow, SupportMessage, SupportStatus } from '../types/admin'
+import type { AdminCollectionRow, AdminDailyPoint, AdminOverview, AdminUserRow } from '../types/admin'
 import { db, resolveUser } from './db'
+import { supportHandlers } from './support'
 
 export const MOCK_ADMIN_EMAIL = 'escritor@potinho.app'
 
@@ -14,41 +15,6 @@ const COLLECTIONS = [
 const DAY_MS = 86_400_000
 const SESSION_MS = 30 * 60_000
 const sessions = new Map<string, number>()
-let supportSeq = 0
-
-function supportId() {
-  supportSeq += 1
-  return `${Date.now().toString(36).padStart(9, '0')}${supportSeq.toString(16).padStart(12, '0')}`
-}
-
-const supportMessages: SupportMessage[] = [
-  {
-    id: supportId(), userId: 'mock-camila', name: 'Camila Souza', email: 'camila.souza@gmail.com',
-    message: 'Oi! Mandei o convite pro meu namorado mas ele disse que não chegou nada. Já pedi pra olhar o spam também 😕',
-    page: '/colecoes/nosso-cantinho/gerenciar', userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)',
-    status: 'new', createdAt: new Date(Date.now() - 40 * 60_000).toISOString(),
-  },
-  {
-    id: supportId(), userId: 'mock-diego', name: 'Diego', email: 'diego.m@outlook.com',
-    message: 'Seria muito legal poder agendar um pacotinho pra abrir só no dia do aniversário!',
-    page: '/home', userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-    status: 'read', createdAt: new Date(Date.now() - 26 * 3_600_000).toISOString(), readAt: new Date(Date.now() - 20 * 3_600_000).toISOString(),
-  },
-]
-
-export function addSupportMessage(user: { id: string; name: string; email: string }, message: string, page?: string) {
-  const record: SupportMessage = {
-    id: supportId(), userId: user.id, name: user.name, email: user.email, message, page: page ?? null,
-    userAgent: navigator.userAgent, status: 'new', createdAt: new Date().toISOString(),
-  }
-  supportMessages.unshift(record)
-  return record
-}
-
-export function forgetSupportMessagesOf(userId: string) {
-  for (let i = supportMessages.length - 1; i >= 0; i--) if (supportMessages[i].userId === userId) supportMessages.splice(i, 1)
-}
-
 function random(seed: number) {
   let state = seed
   return () => {
@@ -191,6 +157,13 @@ function authUser(request: Request) {
   return resolveUser(header?.startsWith('Bearer ') ? header.slice(7) : null)
 }
 
+function adminUserDenied(request: Request) {
+  const user = authUser(request)
+  if (!user) return HttpResponse.json({ error: 'UNAUTHORIZED' }, { status: 401 })
+  if (user.email !== MOCK_ADMIN_EMAIL) return HttpResponse.json({ error: 'FORBIDDEN' }, { status: 403 })
+  return null
+}
+
 function adminDenied(request: Request) {
   const user = authUser(request)
   if (!user) return HttpResponse.json({ error: 'UNAUTHORIZED' }, { status: 401 })
@@ -229,40 +202,5 @@ export const adminHandlers = [
     return HttpResponse.json(buildOverview())
   }),
 
-  http.get('/api/admin/support/unread', async ({ request }) => {
-    const user = authUser(request)
-    if (!user) return HttpResponse.json({ error: 'UNAUTHORIZED' }, { status: 401 })
-    if (user.email !== MOCK_ADMIN_EMAIL) return HttpResponse.json({ error: 'FORBIDDEN' }, { status: 403 })
-    return HttpResponse.json({ unread: supportMessages.filter((message) => message.status === 'new').length })
-  }),
-
-  http.get('/api/admin/support', async ({ request }) => {
-    await delay(300)
-    const denied = adminDenied(request)
-    if (denied) return denied
-    return HttpResponse.json(supportMessages)
-  }),
-
-  http.patch('/api/admin/support/:id', async ({ request, params }) => {
-    await delay(200)
-    const denied = adminDenied(request)
-    if (denied) return denied
-    const message = supportMessages.find((item) => item.id === params.id)
-    if (!message) return HttpResponse.json({ error: 'NOT_FOUND' }, { status: 404 })
-    const { status } = (await request.json()) as { status: SupportStatus }
-    const now = new Date().toISOString()
-    message.status = status
-    if (status === 'new') { delete message.readAt; delete message.doneAt }
-    if (status === 'read') { message.readAt ??= now; delete message.doneAt }
-    if (status === 'done') { message.readAt ??= now; message.doneAt = now }
-    return HttpResponse.json(message)
-  }),
-
-  http.delete('/api/admin/support/:id', async ({ request, params }) => {
-    const denied = adminDenied(request)
-    if (denied) return denied
-    const index = supportMessages.findIndex((item) => item.id === params.id)
-    if (index >= 0) supportMessages.splice(index, 1)
-    return HttpResponse.json({ ok: true })
-  }),
+  ...supportHandlers(adminDenied, adminUserDenied),
 ]

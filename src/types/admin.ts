@@ -79,18 +79,38 @@ export interface AdminOverview {
   collections: AdminCollectionRow[]
 }
 
-export type SupportStatus = 'new' | 'read' | 'done'
+export type TicketStatus = 'open' | 'answered' | 'done'
+export type MessageAuthor = 'user' | 'admin'
 
-export interface SupportMessage {
+export interface SupportTicket {
   id: string
   userId: string
   name: string
   email: string
-  message: string
+  status: TicketStatus
   page: string | null
   userAgent: string | null
-  status: SupportStatus
   createdAt: string
-  readAt?: string
-  doneAt?: string
+  updatedAt: string
+  lastMessageAt: string
+  lastMessagePreview: string
+  lastAuthor: MessageAuthor
+  messageCount: number
+  unreadForAdmin: boolean
+  unreadForUser: boolean
+}
+
+export type MySupportTicket = Omit<SupportTicket, 'unreadForAdmin' | 'userAgent' | 'email' | 'userId' | 'name'>
+
+export interface SupportChatMessage {
+  id: string
+  author: MessageAuthor
+  authorName: string
+  body: string
+  createdAt: string
+}
+
+export interface SupportThread<T> {
+  ticket: T
+  messages: SupportChatMessage[]
 }
