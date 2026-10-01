@@ -18,6 +18,10 @@ export const queryKeys = {
   readerAchievements: (cid: string) => ['reader-achievements', cid] as const,
   invites: (cid: string) => ['col-invites', cid] as const,
   myNotifications: () => ['my-notifications'] as const,
+  pendingInvites: () => ['pending-invites'] as const,
+  mySupportTickets: () => ['my-support-tickets'] as const,
+  mySupportUnread: () => ['my-support-unread'] as const,
+  mySupportTicket: (id: string | null) => ['my-support-ticket', id] as const,
   collectionNotifications: (cid: string) => ['col-notifications', cid] as const,
 }
 
@@ -63,7 +67,7 @@ export function useDeleteCollectionMutation() {
 
 export function usePendingInvitesQuery(options?: { enabled?: boolean }) {
   return useQuery({
-    queryKey: ['pending-invites'],
+    queryKey: queryKeys.pendingInvites(),
     queryFn: () => api.getMyPendingInvites(),
     staleTime: 60_000,
     enabled: options?.enabled ?? true,

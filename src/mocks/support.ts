@@ -1,5 +1,5 @@
 import { delay, http, HttpResponse } from 'msw'
-import type { MessageAuthor, SupportChatMessage, SupportTicket } from '../types/admin'
+import type { MessageAuthor, SupportChatMessage, SupportTicket } from '../types/support'
 import { resolveUser } from './db'
 
 interface MockTicket extends SupportTicket {

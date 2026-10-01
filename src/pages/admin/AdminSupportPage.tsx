@@ -11,9 +11,9 @@ import { useSearchParams } from 'react-router-dom'
 import { SupportChat, SupportComposer, TicketStatusChip } from '../../components/support/SupportChat'
 import { ConfirmDeleteDialog, toast } from '../../components/ui'
 import { useBackground } from '../../context/BackgroundContext'
-import { font, radius } from '../../design-system'
+import { colors, font, radius } from '../../design-system'
 import { SUPPORT_UNREAD_KEY, useSupportActions, useSupportTicketQuery, useSupportTicketsQuery } from '../../hooks/useAdmin'
-import type { SupportTicket } from '../../types/admin'
+import type { SupportTicket } from '../../types/support'
 import { withAlpha } from '../../utils/colorUtils'
 import { AdminFrame, Pill } from './AdminShell'
 import { SkeletonBlock } from './charts'
@@ -164,8 +164,8 @@ function ThreadView({ ticketId, onBack, onDeleted }: { ticketId: string; onBack?
           <ListItemIcon><MailOutlineIcon fontSize="small" /></ListItemIcon>
           Responder por e-mail
         </MenuItem>
-        <MenuItem onClick={() => { setMenuAnchor(null); setConfirmDelete(true) }} sx={{ color: '#e11d48' }}>
-          <ListItemIcon><DeleteOutlineIcon fontSize="small" sx={{ color: '#e11d48' }} /></ListItemIcon>
+        <MenuItem onClick={() => { setMenuAnchor(null); setConfirmDelete(true) }} sx={{ color: colors.rose.text }}>
+          <ListItemIcon><DeleteOutlineIcon fontSize="small" sx={{ color: colors.rose.text }} /></ListItemIcon>
           Apagar conversa
         </MenuItem>
       </Menu>

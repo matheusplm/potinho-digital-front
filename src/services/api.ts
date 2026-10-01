@@ -1,4 +1,5 @@
-import type { AdminOverview, MySupportTicket, SupportChatMessage, SupportThread, SupportTicket } from '../types/admin'
+import type { AdminOverview } from '../types/admin'
+import type { MySupportTicket, SupportChatMessage, SupportThread, SupportTicket } from '../types/support'
 import type {
   Collection,
   CollectionAccess,

@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useUser } from '../context/UserContext'
 import { api } from '../services/api'
-import type { MySupportTicket, SupportThread } from '../types/admin'
+import type { MySupportTicket, SupportThread } from '../types/support'
+import { queryKeys } from './useNotes'
 
-const MY_TICKETS_KEY = ['my-support-tickets']
-const MY_UNREAD_KEY = ['my-support-unread']
-const ticketKey = (id: string | null) => ['my-support-ticket', id]
+const MY_TICKETS_KEY = queryKeys.mySupportTickets()
+const MY_UNREAD_KEY = queryKeys.mySupportUnread()
+const ticketKey = queryKeys.mySupportTicket
 
 export function useMySupportTicketsQuery() {
   const { user } = useUser()

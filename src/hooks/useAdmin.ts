@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import { useUser } from '../context/UserContext'
 import { api, ApiRequestError } from '../services/api'
 import { clearAdminSession, useAdminSession } from '../services/adminSession'
-import type { SupportThread, SupportTicket } from '../types/admin'
+import type { SupportThread, SupportTicket } from '../types/support'
 
 export const ADMIN_QUERY_ROOT = 'admin'
 const SUPPORT_LIST_KEY = [ADMIN_QUERY_ROOT, 'support']

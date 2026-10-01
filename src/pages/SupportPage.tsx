@@ -7,7 +7,7 @@ import { toast } from '../components/ui'
 import { useBackground } from '../context/BackgroundContext'
 import { font, radius } from '../design-system'
 import { useMySupportActions, useMySupportTicketQuery, useMySupportTicketsQuery } from '../hooks/useSupport'
-import type { MySupportTicket } from '../types/admin'
+import type { MySupportTicket } from '../types/support'
 import { timeAgo } from '../utils/timeAgo'
 import { withAlpha } from '../utils/colorUtils'
 

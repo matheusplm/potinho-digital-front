@@ -3,7 +3,7 @@ import { Box, CircularProgress, IconButton, InputBase, Stack, Typography, useMed
 import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
 import { useBackground } from '../../context/BackgroundContext'
 import { radius } from '../../design-system'
-import type { MessageAuthor, SupportChatMessage } from '../../types/admin'
+import type { MessageAuthor, SupportChatMessage } from '../../types/support'
 import { withAlpha } from '../../utils/colorUtils'
 
 export const SUPPORT_MESSAGE_MAX = 2000
