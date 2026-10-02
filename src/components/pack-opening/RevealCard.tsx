@@ -5,16 +5,18 @@ import { badgePop, edgeGlow, haloPulse, hueSpin, ringBurst, tremble } from './mo
 import { withAlpha } from '../../utils/colorUtils'
 import { CARD_WIDTH, rainbowConic, type RevealItem, type Tier } from './tiers'
 import { BrandName } from '../Brand'
+import { PackIcon } from '../PackIcon'
 
 const GLOW_STRENGTH: Record<Tier, number> = { common: 18, rare: 45, epic: 70, legendary: 90 }
 const RING_MASK = 'radial-gradient(circle, transparent 63%, black 65%, black 69%, transparent 71%)'
 
-export function RevealCard({ item, flipped, backFill, accent, emoji, rarities, types, reducedMotion, onActivate, label }: {
+export function RevealCard({ item, flipped, backFill, accent, emoji, imageUrl, rarities, types, reducedMotion, onActivate, label }: {
   item: RevealItem
   flipped: boolean
   backFill: string
   accent: string
   emoji: string
+  imageUrl?: string | null
   rarities: RarityConfig[]
   types: NoteTypeConfig[]
   reducedMotion: boolean
@@ -73,7 +75,7 @@ export function RevealCard({ item, flipped, backFill, accent, emoji, rarities, t
               background: 'radial-gradient(circle at 35% 30%, rgba(255,255,255,0.95), rgba(255,255,255,0.5))',
               boxShadow: `0 10px 24px ${withAlpha(accent, 28)}`,
             }}>
-              {emoji}
+              <PackIcon emoji={emoji} imageUrl={imageUrl} size={68} />
             </Box>
             <BrandName size="1.1rem" color="rgba(30,41,59,0.75)" onLight />
             <Typography variant="sm" sx={{ fontWeight: 700, color: 'rgba(30,41,59,0.55)' }}>toque pra virar</Typography>

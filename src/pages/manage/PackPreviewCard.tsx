@@ -10,6 +10,7 @@ import { actionButtonSx } from './shared'
 import { buildPackRules, formatPackSchedule, PACK_DISTRIBUTION_LABELS, PACK_STATUS_LABELS } from './packData'
 import type { CollectionPack } from '../../types/note'
 import type { PackView } from './packData'
+import { PackIcon } from '../../components/PackIcon'
 
 export function PackPreviewCard({ pack, view, onEdit, onDelete, onSimulate, onSetPrimary }: {
   pack: CollectionPack; view: PackView
@@ -29,7 +30,7 @@ export function PackPreviewCard({ pack, view, onEdit, onDelete, onSimulate, onSe
         <Box sx={{ position: 'absolute', inset: 0, background: `radial-gradient(circle at 15% 0%, rgba(255,255,255,0.58), transparent 38%), radial-gradient(circle at 100% 100%, ${pack.accent}44, transparent 40%)`, pointerEvents: 'none' }} />
         <Stack direction="row" alignItems="center" spacing={1.1} sx={{ position: 'relative', zIndex: 1 }}>
           <Box sx={{ width: compact ? 38 : 44, height: compact ? 38 : 44, borderRadius: radius.lg, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.62)', border: '1px solid rgba(255,255,255,0.78)', boxShadow: `0 6px 18px ${pack.accent}24`, fontSize: compact ? '1.25rem' : '1.45rem' }}>
-            {pack.emoji}
+            <PackIcon emoji={pack.emoji} imageUrl={pack.imageUrl} size={compact ? 30 : 36} />
           </Box>
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <Stack direction="row" spacing={0.7} alignItems="flex-start" sx={{ mb: 0.25 }}>

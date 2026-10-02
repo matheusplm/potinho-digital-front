@@ -35,6 +35,15 @@ interface UserContextValue {
 const UserContext = createContext<UserContextValue | null>(null)
 const STORAGE_KEY = 'potinho-auth'
 
+function dropSavedAdminPersona(userId: string) {
+  try {
+    const key = `potinho-persona-${userId}`
+    if (localStorage.getItem(key) === 'admin') localStorage.removeItem(key)
+  } catch {
+    void 0
+  }
+}
+
 export function UserProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient()
   const [user, setUserState] = useState<AuthUser | null>(() => {
@@ -56,6 +65,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     if (userIdRef.current !== nextId) {
       queryClient.clear()
       userIdRef.current = nextId
+      if (u) dropSavedAdminPersona(u.id)
     }
     setAuthToken(u?.token ?? '')
     if (u) localStorage.setItem(STORAGE_KEY, JSON.stringify(u))

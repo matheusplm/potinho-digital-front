@@ -4,6 +4,8 @@ import { font } from '../../design-system'
 import { foilSweep, hintSlide, pouchEnter, pouchExit, pouchFloat, pouchShake, stripFly } from './motion'
 import { withAlpha } from '../../utils/colorUtils'
 import { vibrate } from './tiers'
+import { PackIcon } from '../PackIcon'
+import { PATTERN_BACKGROUNDS, resolvePackLook, type PackLook } from './packLook'
 
 export type PouchState = 'idle' | 'torn' | 'waiting' | 'exit'
 
@@ -27,10 +29,11 @@ function crimp(edge: 'top' | 'bottom', depth = 7): string {
 const TORN_EDGE = `polygon(${[0, 6, 11, 17, 24, 30, 37, 43, 50, 56, 63, 69, 76, 82, 89, 94, 100]
   .map((x, i) => `${x}% ${[3, 0, 4, 1, 5, 0, 3, 1, 4, 0, 5, 2, 3, 0, 4, 1, 3][i]}px`).join(', ')}, 100% calc(100% - 7px), ${Array.from({ length: TEETH * 2 + 1 }, (_, i) => `${100 - (i / (TEETH * 2)) * 100}% calc(100% - ${i % 2 === 0 ? 7 : 0}px)`).join(', ')})`
 
-export function PackPouch({ gradient, accent, emoji, name, state, onTorn, reducedMotion }: {
+export function PackPouch({ gradient, accent, emoji, look, name, state, onTorn, reducedMotion }: {
   gradient: string
   accent: string
   emoji: string
+  look?: PackLook
   name: string
   state: PouchState
   onTorn: () => void
@@ -45,6 +48,7 @@ export function PackPouch({ gradient, accent, emoji, name, state, onTorn, reduce
   const onTornRef = useRef(onTorn)
   onTornRef.current = onTorn
   const torn = state !== 'idle'
+  const { imageUrl, pattern, shine, showName } = resolvePackLook(look)
   const fill = gradient || `linear-gradient(135deg, ${accent}, ${withAlpha(accent, 55)})`
 
   const update = useCallback((value: number) => {
@@ -135,26 +139,26 @@ export function PackPouch({ gradient, accent, emoji, name, state, onTorn, reduce
             position: 'absolute', left: 0, right: 0, top: STRIP - 2, bottom: 0, background: fill, overflow: 'hidden',
             clipPath: torn ? TORN_EDGE : crimp('bottom'),
           }}>
-            <Box sx={{ position: 'absolute', inset: 0, background: 'radial-gradient(rgba(255,255,255,0.4) 1.2px, transparent 1.7px) 0 0 / 15px 15px', opacity: 0.55 }} />
+            {pattern !== 'none' && <Box sx={{ position: 'absolute', inset: 0, background: PATTERN_BACKGROUNDS[pattern], opacity: 0.55 }} />}
             <Box sx={{ position: 'absolute', inset: 0, background: `linear-gradient(160deg, transparent 35%, ${withAlpha(accent, 38)} 100%)` }} />
             <Box sx={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 25% 12%, rgba(255,255,255,0.75), transparent 45%), radial-gradient(circle at 85% 95%, rgba(0,0,0,0.16), transparent 50%)' }} />
             <Box sx={{ position: 'absolute', inset: 0, boxShadow: `inset 10px 0 18px -10px rgba(255,255,255,0.9), inset -12px 0 20px -10px ${withAlpha(accent, 45)}` }} />
-            <Box sx={{
+            {shine && <Box sx={{
               position: 'absolute', top: 0, bottom: 0, left: 0, width: '45%',
               background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)',
               animation: reducedMotion ? 'none' : `${foilSweep} 3.6s ease-in-out 1s infinite`,
-            }} />
+            }} />}
             <Box sx={{ position: 'absolute', inset: '12px 12px 18px', borderRadius: '16px', border: '1.5px solid rgba(255,255,255,0.65)' }} />
             <Box sx={{
-              position: 'absolute', left: '50%', top: '43%', transform: 'translate(-50%, -50%)',
+              position: 'absolute', left: '50%', top: showName ? '43%' : '50%', transform: 'translate(-50%, -50%)',
               width: 112, height: 112, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
               background: 'radial-gradient(circle at 35% 30%, rgba(255,255,255,0.95), rgba(255,255,255,0.55))',
               boxShadow: `inset 0 -6px 14px ${withAlpha(accent, 22)}, 0 10px 24px ${withAlpha(accent, 25)}`,
               fontSize: '3.6rem', lineHeight: 1,
             }}>
-              {emoji}
+              <PackIcon emoji={emoji} imageUrl={imageUrl} size={84} />
             </Box>
-            <Box sx={{ position: 'absolute', left: 0, right: 0, bottom: 34, display: 'flex', justifyContent: 'center', px: 2 }}>
+            {showName && <Box sx={{ position: 'absolute', left: 0, right: 0, bottom: 34, display: 'flex', justifyContent: 'center', px: 2 }}>
               <Typography variant="xl" sx={{
                 px: 1.4, py: 0.45, borderRadius: 99, maxWidth: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                 fontFamily: font.serif, fontWeight: 800, color: '#1e293b',
@@ -162,7 +166,7 @@ export function PackPouch({ gradient, accent, emoji, name, state, onTorn, reduce
               }}>
                 {name}
               </Typography>
-            </Box>
+            </Box>}
           </Box>
 
           {!torn && (

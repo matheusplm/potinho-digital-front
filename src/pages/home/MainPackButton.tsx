@@ -2,6 +2,7 @@ import { Box, Stack, Typography } from '@mui/material'
 import { Button } from '../../components/ui'
 import { colors, font, heartPulseAura, packCtaFloat, radius } from '../../design-system'
 import type { CollectionPack } from '../../types/note'
+import { PackIcon } from '../../components/PackIcon'
 
 export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLabel, cooldownProgress, isLoading, isOpeningPack, onOpen, onOpenAll, isRealReader, onResetCooldown, accent, accentMuted, accruedCount = 0 }: {
   pack: CollectionPack | undefined
@@ -104,7 +105,7 @@ export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLa
               <path fill="rgba(255,255,255,0.42)" d="M7.4 5.25c-1.9 0-3.2 1.42-3.2 3.28 0 .68.14 1.34.43 1.98.16.36.67.32.78-.06.55-1.91 1.72-3.35 3.46-4.23.42-.21.27-.97-.2-.97H7.4z" />
             </Box>
             <Typography sx={{ position: 'relative', zIndex: 1, fontSize: '4.1rem', lineHeight: 1, transform: 'translateY(-3px)', filter: 'drop-shadow(0 5px 12px rgba(0,0,0,0.18))' }}>
-              {pack?.emoji ?? collectionEmoji}
+              <PackIcon emoji={pack?.emoji ?? collectionEmoji} imageUrl={pack?.imageUrl} size={64} />
             </Typography>
             {hasAccrued && (
               <Box sx={{

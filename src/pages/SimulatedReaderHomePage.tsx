@@ -599,7 +599,7 @@ export function SimulatedReaderHomePage() {
 
       <PackOpeningStage
         open={stageOpen}
-        pack={stage ? { name: stage.pack.name, emoji: stage.pack.emoji || activeSession.collectionEmoji, gradient: stage.pack.gradient, accent: stage.pack.accent || theme.accent } : null}
+        pack={stage ? { ...stage.pack, emoji: stage.pack.emoji || activeSession.collectionEmoji, accent: stage.pack.accent || theme.accent } : null}
         rewards={stage?.rewards ?? null}
         rarities={rarities}
         types={types}

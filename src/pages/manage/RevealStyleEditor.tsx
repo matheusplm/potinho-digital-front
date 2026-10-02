@@ -78,6 +78,7 @@ export function RevealStyleEditor({ cid, form, rarities, onStyle, onField }: {
 
   const pack = packs.find((item) => item.status === 'active') ?? packs[0]
   const stagePack: StagePack = {
+    ...pack,
     name: pack?.name || 'Pacotinho de teste',
     emoji: pack?.emoji || '💌',
     gradient: pack?.gradient ?? '',
