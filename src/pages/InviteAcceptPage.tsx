@@ -138,7 +138,7 @@ export function InviteAcceptPage() {
       setActiveCollectionId(collectionId)
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: queryKeys.collections() }),
-        queryClient.invalidateQueries({ queryKey: ['pending-invites'] }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.pendingInvites() }),
       ])
       setPersona('reader')
       setTimeout(() => navigate('/home'), 1200)
@@ -153,7 +153,7 @@ export function InviteAcceptPage() {
     onSuccess: () => {
       setRejectConfirmOpen(false)
       toast.success('Convite recusado.')
-      void queryClient.invalidateQueries({ queryKey: ['pending-invites'] })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.pendingInvites() })
     },
     onError: (e: Error) => {
       setRejectConfirmOpen(false)

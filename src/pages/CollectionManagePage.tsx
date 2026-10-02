@@ -47,15 +47,8 @@ export function CollectionManagePage() {
   const { theme } = useBackground()
   const { user } = useUser()
   const [searchParams, setSearchParams] = useSearchParams()
-  const [tab, setTab] = useState<Tab>(() => TAB_PARAM[searchParams.get('aba') ?? ''] ?? 'notes')
+  const tab: Tab = TAB_PARAM[searchParams.get('aba') ?? ''] ?? 'notes'
   const [notesIntent] = useState(() => notesIntentFrom(searchParams))
-
-  const tabFromUrl = TAB_PARAM[searchParams.get('aba') ?? '']
-
-  useEffect(() => {
-    if (tabFromUrl && tabFromUrl !== tab) setTab(tabFromUrl)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tabFromUrl])
 
   useEffect(() => {
     if (!searchParams.has('novo') && !searchParams.has('ver')) return
@@ -66,7 +59,6 @@ export function CollectionManagePage() {
   }, [searchParams, setSearchParams])
 
   const changeTab = (next: Tab) => {
-    setTab(next)
     setSearchParams(next === 'notes' ? {} : { aba: TAB_SLUG[next] }, { replace: true })
   }
 

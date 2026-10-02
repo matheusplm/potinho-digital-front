@@ -103,7 +103,7 @@ export function FloatingMenu() {
             ))}
           </Stack>
           {((hasPendingInvites && persona !== 'reader') || adminHasNews) && !open && (
-            <Box sx={{ position: 'absolute', top: 2, right: 2, width: 10, height: 10, borderRadius: '50%', background: '#ef4444', border: '2px solid #fff', boxShadow: '0 1px 4px rgba(239,68,68,0.5)' }} />
+            <Box sx={{ position: 'absolute', top: 2, right: 2, width: 10, height: 10, borderRadius: '50%', background: colors.status.danger, border: '2px solid #fff', boxShadow: '0 1px 4px rgba(239,68,68,0.5)' }} />
           )}
         </IconButton>
 
@@ -162,7 +162,7 @@ export function FloatingMenu() {
                         }}
                       >
                         {showInviteDot && (
-                          <Box sx={{ position: 'absolute', top: -3, right: -3, width: 10, height: 10, borderRadius: '50%', background: '#ef4444', border: '2px solid #fff', boxShadow: '0 1px 4px rgba(239,68,68,0.5)' }} />
+                          <Box sx={{ position: 'absolute', top: -3, right: -3, width: 10, height: 10, borderRadius: '50%', background: colors.status.danger, border: '2px solid #fff', boxShadow: '0 1px 4px rgba(239,68,68,0.5)' }} />
                         )}
                         {icon}
                         <Typography variant="sm" noWrap sx={{ fontWeight: active ? 800 : 600, color: active ? theme.accent : theme.textOnBgMuted }}>

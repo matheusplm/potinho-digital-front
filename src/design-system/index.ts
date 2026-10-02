@@ -1,4 +1,4 @@
-export { colors, gradients, ink, radius, shadow, font, typography, zIndex, spacing, liftOnDark } from './tokens'
+export { colors, gradients, ink, radius, shadow, font, typography, zIndex, spacing, liftOnDark, clipOverflow } from './tokens'
 export { backgroundThemes, defaultBackgroundKey, getBackgroundTheme } from './backgrounds'
 export { THEME_STORAGE_KEY } from './themeBoot'
 export { contrastRatio, readableOn } from './contrast'

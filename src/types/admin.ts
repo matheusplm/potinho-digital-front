@@ -78,19 +78,3 @@ export interface AdminOverview {
   users: AdminUserRow[]
   collections: AdminCollectionRow[]
 }
-
-export type SupportStatus = 'new' | 'read' | 'done'
-
-export interface SupportMessage {
-  id: string
-  userId: string
-  name: string
-  email: string
-  message: string
-  page: string | null
-  userAgent: string | null
-  status: SupportStatus
-  createdAt: string
-  readAt?: string
-  doneAt?: string
-}

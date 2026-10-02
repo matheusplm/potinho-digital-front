@@ -8,7 +8,7 @@ import { useBackground } from '../../context/BackgroundContext'
 import { colors, font, radius } from '../../design-system'
 import type { CollectionAccess, NoteRecord, RarityConfig } from '../../types/note'
 import { TourHint } from '../../tour/TourHint'
-import { MAX_OPENS_PER_GRANT } from '../../components/manage/BonusPackDialog'
+import { MAX_OPENS_PER_GRANT } from '../../components/manage/SendGiftDialog'
 
 const CHIP_PREVIEW_LIMIT = 6
 

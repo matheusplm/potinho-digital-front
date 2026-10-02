@@ -15,6 +15,7 @@ export const colors = {
   error:     { main: '#e11d48', bg: 'rgba(255,228,230,0.92)', border: 'rgba(225,29,72,0.2)' },
   info:      { main: '#1d4ed8', bg: 'rgba(219,234,254,0.92)', border: 'rgba(29,78,216,0.2)' },
   love:      { main: '#e11d48', bg: 'rgba(255,228,236,0.95)', border: 'rgba(225,29,72,0.22)' },
+  status:    { success: '#22c55e', warning: '#f59e0b', danger: '#ef4444', info: '#3b82f6' },
 }
 
 export const ink = {
@@ -90,3 +91,8 @@ export const spacing = {
   '2xl': 48,
   '3xl': 64,
 }
+
+export const clipOverflow = {
+  overflow: 'hidden',
+  '@supports (overflow: clip)': { overflow: 'clip' },
+} as const

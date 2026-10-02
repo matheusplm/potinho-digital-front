@@ -6,7 +6,7 @@ import { useBackground } from '../context/BackgroundContext'
 import { FloatingParticles } from '../components/FloatingParticles'
 import { useActiveReaderCollection } from '../hooks/useActiveReaderCollection'
 import { useCollectionPlayQuery, useCollectionRaritiesQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
-import { colors, fadeIn, font, radius } from '../design-system'
+import { colors, fadeIn, font, radius, clipOverflow } from '../design-system'
 
 function formatDate(iso: string | null) {
   if (!iso) return ''
@@ -26,7 +26,7 @@ export function ConquistasPage() {
   const isLoading = collectionsLoading || (!!cid && (playLoading || achLoading))
 
   return (
-    <Box sx={{ height: '100%', position: 'relative', overflow: 'hidden', background: theme.gradient }}>
+    <Box sx={{ height: '100%', position: 'relative', ...clipOverflow, background: theme.gradient }}>
       <FloatingParticles />
       <EmojiEventsOutlinedIcon sx={{ position: 'absolute', bottom: -70, right: -60, fontSize: 420, color: 'rgba(225,29,72,0.05)', pointerEvents: 'none' }} />
       <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>

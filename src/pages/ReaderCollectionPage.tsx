@@ -27,8 +27,8 @@ import { findCollectionBySlug } from '../utils/slug'
 import { isCollectionOwner } from '../utils/collectionAccess'
 import { formatRemainingTime } from '../utils/packCooldowns'
 import { NoteDetailDialog } from '../components/collection/NoteDetailDialog'
-import { NoteCard, NoteRow } from './reader/NoteCard'
-import { BonusPackDialog } from '../components/manage/BonusPackDialog'
+import { ReaderNoteCard, ReaderNoteRow } from './reader/ReaderNoteCard'
+import { SendGiftDialog } from '../components/manage/SendGiftDialog'
 import { RevokeAccessDialog } from './reader/RevokeAccessDialog'
 import { SORT_CYCLE, SORT_LABEL, sortNotes } from './reader/readerUtils'
 import type { SortKey } from './reader/readerUtils'
@@ -304,13 +304,13 @@ export function ReaderCollectionPage() {
               ) : viewMode === 'grid' ? (
                 <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1.2 }}>
                   {filteredNotes.map((note) => (
-                    <NoteCard key={note.id} note={note} rarity={rarityById.get(note.rarity)} onClick={() => setViewingNote(note)} />
+                    <ReaderNoteCard key={note.id} note={note} rarity={rarityById.get(note.rarity)} onClick={() => setViewingNote(note)} />
                   ))}
                 </Box>
               ) : (
                 <Stack spacing={0.5}>
                   {filteredNotes.map((note) => (
-                    <NoteRow key={note.id} note={note} rarity={rarityById.get(note.rarity)} onClick={() => setViewingNote(note)} />
+                    <ReaderNoteRow key={note.id} note={note} rarity={rarityById.get(note.rarity)} onClick={() => setViewingNote(note)} />
                   ))}
                 </Stack>
               )}
@@ -325,7 +325,7 @@ export function ReaderCollectionPage() {
         <NoteDetailDialog note={viewingNote} rarities={rarities} types={types} onClose={() => setViewingNote(null)} />
       )}
 
-      <BonusPackDialog
+      <SendGiftDialog
         cid={cid}
         target={packOpensDialog ? { email, pack: packOpensDialog.pack, currentOpens: packOpensDialog.currentOpens } : null}
         onClose={() => setPackOpensDialog(null)}

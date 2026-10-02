@@ -5,8 +5,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { Button, EmptyState, LoadingState, ScrollablePage, SectionLabel } from '../components/ui'
-import { BonusPackDialog, type BonusPackTarget } from '../components/manage/BonusPackDialog'
-import { colors, fadeIn, font } from '../design-system'
+import { SendGiftDialog, type GiftTarget } from '../components/manage/SendGiftDialog'
+import { colors, fadeIn, font, clipOverflow } from '../design-system'
 import { useBackground } from '../context/BackgroundContext'
 import { FloatingParticles } from '../components/FloatingParticles'
 import { queryKeys } from '../hooks/useNotes'
@@ -24,7 +24,7 @@ export function WriterHomePage() {
   const queryClient = useQueryClient()
   const home = useWriterHome()
   const [giftMenu, setGiftMenu] = useState<{ reader: ReaderSummary; anchor: HTMLElement } | null>(null)
-  const [gift, setGift] = useState<{ reader: ReaderSummary; target: BonusPackTarget } | null>(null)
+  const [gift, setGift] = useState<{ reader: ReaderSummary; target: GiftTarget } | null>(null)
   const [writeMenu, setWriteMenu] = useState<HTMLElement | null>(null)
 
   const firstName = user?.name?.split(' ')[0] ?? ''
@@ -49,7 +49,7 @@ export function WriterHomePage() {
   }
 
   return (
-    <Box sx={{ height: '100%', position: 'relative', overflow: 'hidden', background: theme.gradient }}>
+    <Box sx={{ height: '100%', position: 'relative', ...clipOverflow, background: theme.gradient }}>
       <FloatingParticles />
       <FavoriteIcon sx={{
         position: 'absolute', bottom: -80, right: -80,
@@ -144,7 +144,7 @@ export function WriterHomePage() {
         ))}
       </Menu>
 
-      <BonusPackDialog
+      <SendGiftDialog
         cid={gift?.reader.collection.id ?? ''}
         target={gift?.target ?? null}
         onClose={() => setGift(null)}

@@ -37,7 +37,7 @@ import type { CollectionDailyReward, CollectionPack } from '../types/note'
 import { collectionSlug } from '../utils/slug'
 import { MainPackButton } from './home/MainPackButton'
 import { BonusPackRow } from './home/BonusPackRow'
-import { BonusPackDialog } from './home/BonusPackDialog'
+import { OpenBonusDialog } from './home/OpenBonusDialog'
 
 export function SimulatedReaderHomePage() {
   const queryClient = useQueryClient()
@@ -603,7 +603,7 @@ export function SimulatedReaderHomePage() {
         }}
       />
 
-      <BonusPackDialog
+      <OpenBonusDialog
         pack={selectedBonusPack}
         isRealReader={isRealReader}
         canOpen={selectedBonusPackCanOpen}

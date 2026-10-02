@@ -6,8 +6,8 @@ import { Box, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButto
 import { useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Button, Card, Input, LoadingState, toast } from '../../components/ui'
-import { BonusPackDialog } from '../../components/manage/BonusPackDialog'
-import type { BonusPackTarget } from '../../components/manage/BonusPackDialog'
+import { SendGiftDialog } from '../../components/manage/SendGiftDialog'
+import type { GiftTarget } from '../../components/manage/SendGiftDialog'
 import { useCollectionAccessQuery, useCollectionPacksQuery, useCollectionInvitesQuery, useCollectionNotificationsQuery, useSendInviteMutation, useCancelInviteMutation } from '../../hooks/useNotes'
 import { colors, font, radius } from '../../design-system'
 import { useBackground } from '../../context/BackgroundContext'
@@ -46,7 +46,7 @@ export function AccessTab({ cid }: AccessTabProps) {
   const cancelInviteMutation = useCancelInviteMutation(cid)
 
   const [emailInput, setEmailInput] = useState('')
-  const [packOpensDialog, setPackOpensDialog] = useState<BonusPackTarget | null>(null)
+  const [packOpensDialog, setPackOpensDialog] = useState<GiftTarget | null>(null)
 
   const accessBonusPacks = useMemo(
     () => packs.filter((pack) => pack.category !== 'daily' && pack.distribution !== 'all_with_access'),
@@ -294,7 +294,7 @@ export function AccessTab({ cid }: AccessTabProps) {
         )}
       </Stack>
 
-      <BonusPackDialog cid={cid} target={packOpensDialog} onClose={() => setPackOpensDialog(null)} />
+      <SendGiftDialog cid={cid} target={packOpensDialog} onClose={() => setPackOpensDialog(null)} />
     </>
   )
 }

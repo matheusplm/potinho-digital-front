@@ -17,7 +17,8 @@ import type {
 import { toConfigId } from '../utils/slug'
 import { COLLECTION_TEMPLATES } from '../services/collectionTemplates'
 import { buildNoteView, drawReward } from './data'
-import { addSupportMessage, adminHandlers, forgetSupportMessagesOf, MOCK_ADMIN_EMAIL } from './admin'
+import { adminHandlers, MOCK_ADMIN_EMAIL } from './admin'
+import { forgetSupportOf } from './support'
 import {
   createEmptyCollection,
   db,
@@ -245,18 +246,8 @@ const authHandlers = [
       collection.access = collection.access.filter((entry) => entry.email.toLowerCase() !== user.email.toLowerCase())
     })
     db.users = db.users.filter((candidate) => candidate.id !== user.id)
-    forgetSupportMessagesOf(user.id)
+    forgetSupportOf(user.id)
     return HttpResponse.json({ ok: true })
-  }),
-
-  http.post('/api/support', async ({ request }) => {
-    await delay(500)
-    const user = resolveUser(tokenFrom(request))
-    if (!user) return HttpResponse.json({ error: 'UNAUTHORIZED' }, { status: 401 })
-    const { message, page } = (await request.json()) as { message: string; page?: string }
-    if (message.trim().length < 5) return HttpResponse.json({ error: 'VALIDATION_ERROR' }, { status: 400 })
-    const record = addSupportMessage(user, message.trim(), page)
-    return HttpResponse.json({ id: record.id, createdAt: record.createdAt }, { status: 201 })
   }),
 
   http.post('/auth/verify-email', async ({ request }) => {

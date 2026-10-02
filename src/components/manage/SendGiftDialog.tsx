@@ -9,15 +9,15 @@ import type { CollectionPack } from '../../types/note'
 
 export const MAX_OPENS_PER_GRANT = 10
 
-export interface BonusPackTarget {
+export interface GiftTarget {
   email: string
   pack: CollectionPack
   currentOpens: number | undefined
 }
 
-export function BonusPackDialog({ cid, target, onClose, onSuccess }: {
+export function SendGiftDialog({ cid, target, onClose, onSuccess }: {
   cid: string
-  target: BonusPackTarget | null
+  target: GiftTarget | null
   onClose: () => void
   onSuccess?: () => void
 }) {

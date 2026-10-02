@@ -16,10 +16,11 @@ import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettin
 import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined'
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined'
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
+import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined'
 import SupportAgentOutlinedIcon from '@mui/icons-material/SupportAgentOutlined'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
-import { Box, Divider, Stack, Typography } from '@mui/material'
-import { Suspense, startTransition, useEffect, useMemo, useState } from 'react'
+import { Box, Divider, Popover, Stack, Typography } from '@mui/material'
+import { Suspense, startTransition, useEffect, useMemo, useRef, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { PushPrompt } from './PushPrompt'
 import { SimulateReaderSheet } from './SimulateReaderSheet'
@@ -36,7 +37,7 @@ import { useTour } from '../tour/TourContext'
 import { withAlpha } from '../utils/colorUtils'
 import { useCollectionsQuery, useMyNotificationsQuery, usePendingInvitesQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
 import { useSupportUnreadQuery } from '../hooks/useAdmin'
-import { backgroundThemes, bellRing, colors, dotPing, font, radius } from '../design-system'
+import { backgroundThemes, bellRing, colors, dotPing, font, radius, clipOverflow } from '../design-system'
 import { collectionSlug } from '../utils/slug'
 import { BrandMark, Copyright } from './Brand'
 import { isCollectionReader, personaCapabilities } from '../utils/collectionAccess'
@@ -72,6 +73,8 @@ export function DesktopLayout() {
   const { isActive, session, endSimulation, hasUnreadNotes } = useSimulation()
   const { hasUnread: readerHasUnread, activeCollectionId, setActiveCollectionId, unreadFor } = useReader()
   const [simulateOpen, setSimulateOpen] = useState(false)
+  const [themeOpen, setThemeOpen] = useState(false)
+  const themeAnchor = useRef<HTMLDivElement>(null)
   const isReader = persona === 'reader' && !isActive
 
   const { data: collections = [] } = useCollectionsQuery()
@@ -363,7 +366,7 @@ export function DesktopLayout() {
                     }}
                   >
                     {showInviteDot && (
-                      <Box sx={{ position: 'absolute', top: -3, right: -3, width: 10, height: 10, borderRadius: '50%', background: '#ef4444', border: '2px solid #fff', boxShadow: '0 1px 4px rgba(239,68,68,0.5)' }} />
+                      <Box sx={{ position: 'absolute', top: -3, right: -3, width: 10, height: 10, borderRadius: '50%', background: colors.status.danger, border: '2px solid #fff', boxShadow: '0 1px 4px rgba(239,68,68,0.5)' }} />
                     )}
                     <Box sx={{ display: 'flex', '& svg': { fontSize: '0.9rem', color: active ? theme.accent : theme.textOnBgMuted } }}>{icon}</Box>
                     <Typography variant="sm" sx={{ fontWeight: active ? 700 : 500, color: active ? theme.accent : theme.textOnBgMuted }}>
@@ -376,8 +379,47 @@ export function DesktopLayout() {
           </Box>
         )}
 
-        <Box sx={{ px: 2, pt: 1.25, pb: 1.75 }}>
-          <Typography variant="label" sx={{ color: theme.textOnBgMuted, mb: 1 }}>
+        <Divider sx={{ borderColor: theme.surfaceBorder }} />
+
+        <Stack spacing={0.3} sx={{ px: 0.7, pt: 1, pb: 0.5 }}>
+          {notifSupported && (
+            <MenuAction
+              icon={notifStatus === 'denied' ? <BlockIcon /> : notifEnabled ? <NotificationsActiveIcon /> : <NotificationsNoneOutlinedIcon />}
+              label="Notificações"
+              tone={notifEnabled ? theme.accent : theme.textOnBgMuted}
+              labelColor={theme.textOnBg}
+              disabled={notifStatus === 'denied'}
+              title={notifStatus === 'denied' ? 'Ative nas configurações do navegador' : undefined}
+              onClick={() => { void handleNotificationToggle() }}
+              badge={{ label: notifStatus === 'denied' ? 'bloqueadas' : notifEnabled ? 'ativas' : 'ativar', active: notifEnabled }}
+            />
+          )}
+          <Box ref={themeAnchor}>
+            <MenuAction
+              icon={<PaletteOutlinedIcon />}
+              label="Tema de fundo"
+              tone={theme.accent}
+              labelColor={theme.textOnBg}
+              onClick={() => setThemeOpen(true)}
+              badge={{ label: theme.label, active: false }}
+            />
+          </Box>
+          <MenuAction icon={<ManageAccountsOutlinedIcon />} label="Minha conta" tone={theme.accent} labelColor={theme.textOnBg} onClick={() => navigate('/conta')} />
+          {persona === 'writer' && (
+            <MenuAction icon={<PlayCircleOutlineIcon />} label="Ver tutorial" tone={theme.accent} labelColor={theme.textOnBg} onClick={tour.start} />
+          )}
+          <MenuAction icon={<LogoutIcon />} label="Sair" tone={colors.rose.text} labelColor={colors.rose.text} onClick={logout} />
+        </Stack>
+        <Copyright color={theme.textOnBgMuted} sx={{ px: 2, pt: 1, pb: 2 }} />
+        <Popover
+          open={themeOpen}
+          anchorEl={themeAnchor.current}
+          onClose={() => setThemeOpen(false)}
+          anchorOrigin={{ vertical: 'center', horizontal: 'right' }}
+          transformOrigin={{ vertical: 'center', horizontal: 'left' }}
+          slotProps={{ paper: { sx: { ml: 1.2, p: 2, width: 248, borderRadius: radius.lg, background: theme.surfaceBg, backdropFilter: 'blur(24px)', border: `1px solid ${theme.surfaceBorder}`, boxShadow: '0 18px 48px rgba(0,0,0,0.22)' } } }}
+        >
+          <Typography variant="label" sx={{ color: theme.textOnBgMuted, mb: 1, display: 'block' }}>
             Tema de fundo
           </Typography>
           <ThemeSwatches size={24} labelColor={theme.textOnBgMuted} />
@@ -402,33 +444,10 @@ export function DesktopLayout() {
               </Box>
             </Stack>
           )}
-        </Box>
-
-        <Divider sx={{ borderColor: theme.surfaceBorder }} />
-
-        <Stack spacing={0.3} sx={{ px: 0.7, pt: 1, pb: 0.5 }}>
-          {notifSupported && (
-            <MenuAction
-              icon={notifStatus === 'denied' ? <BlockIcon /> : notifEnabled ? <NotificationsActiveIcon /> : <NotificationsNoneOutlinedIcon />}
-              label="Notificações"
-              tone={notifEnabled ? theme.accent : theme.textOnBgMuted}
-              labelColor={theme.textOnBg}
-              disabled={notifStatus === 'denied'}
-              title={notifStatus === 'denied' ? 'Ative nas configurações do navegador' : undefined}
-              onClick={() => { void handleNotificationToggle() }}
-              badge={{ label: notifStatus === 'denied' ? 'bloqueadas' : notifEnabled ? 'ativas' : 'ativar', active: notifEnabled }}
-            />
-          )}
-          <MenuAction icon={<ManageAccountsOutlinedIcon />} label="Minha conta" tone={theme.accent} labelColor={theme.textOnBg} onClick={() => navigate('/conta')} />
-          {persona === 'writer' && (
-            <MenuAction icon={<PlayCircleOutlineIcon />} label="Ver tutorial" tone={theme.accent} labelColor={theme.textOnBg} onClick={tour.start} />
-          )}
-          <MenuAction icon={<LogoutIcon />} label="Sair" tone={colors.rose.text} labelColor={colors.rose.text} onClick={logout} />
-        </Stack>
-        <Copyright color={theme.textOnBgMuted} sx={{ px: 2, pt: 1, pb: 2 }} />
+        </Popover>
       </Box>
 
-      <Box sx={{ flex: 1, height: '100%', overflow: 'hidden', position: 'relative' }}>
+      <Box sx={{ flex: 1, height: '100%', ...clipOverflow, position: 'relative' }}>
         <SimulationBanner />
         {location.pathname === '/home' && !isActive && persona !== 'admin' && !tour.step && <PushPrompt />}
         <Suspense fallback={<Box sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><LoadingState label="Carregando" /></Box>}>

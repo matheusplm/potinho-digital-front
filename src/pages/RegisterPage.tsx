@@ -101,7 +101,7 @@ export function RegisterPage() {
   }
 
   const usernameHelperColor = () => {
-    if (usernameStatus === 'available') return '#22c55e'
+    if (usernameStatus === 'available') return colors.status.success
     if (usernameStatus === 'taken' || usernameStatus === 'invalid') return colors.rose.main
     return colors.text.muted
   }

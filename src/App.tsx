@@ -7,6 +7,7 @@ import { useMediaQuery } from '@mui/material'
 import { MobileLayout } from './components/MobileLayout'
 import { DesktopLayout } from './components/DesktopLayout'
 import { PersonaBootstrap } from './components/PersonaBootstrap'
+import { NotificationPopup } from './components/NotificationPopup'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { RouteMeta } from './components/RouteMeta'
 import { UserProvider, useUser, type UserRole } from './context/UserContext'
@@ -45,6 +46,7 @@ const AdminUsersPage = lazy(() => import('./pages/admin/AdminUsersPage').then((m
 const AdminCollectionsPage = lazy(() => import('./pages/admin/AdminCollectionsPage').then((m) => ({ default: m.AdminCollectionsPage })))
 const AdminSupportPage = lazy(() => import('./pages/admin/AdminSupportPage').then((m) => ({ default: m.AdminSupportPage })))
 const LegalPage = lazy(() => import('./pages/LegalPage').then((m) => ({ default: m.LegalPage })))
+const SupportPage = lazy(() => import('./pages/SupportPage').then((m) => ({ default: m.SupportPage })))
 
 function RouteFallback() {
   return (
@@ -127,6 +129,7 @@ function AppRoutes() {
   return (
     <Suspense fallback={<RouteFallback />}>
       <AdminSessionSync />
+      <NotificationPopup />
       <Routes>
         <Route path="/verificar-email" element={<VerifyEmailPage />} />
         <Route path="/esqueci-minha-senha" element={<ForgotPasswordPage />} />
@@ -146,6 +149,7 @@ function AppRoutes() {
           <Route path="colecoes/:slug/gerenciar" element={<RequireRole role="writer"><CollectionManagePage /></RequireRole>} />
           <Route path="colecoes/:slug/gerenciar/leitores/:email" element={<RequireRole role="writer"><ReaderCollectionPage /></RequireRole>} />
           <Route path="conta" element={<ContaPage />} />
+          <Route path="suporte" element={<SupportPage />} />
           <Route path="admin/usuarios" element={<RequireAdmin><AdminUsersPage /></RequireAdmin>} />
           <Route path="admin/colecoes" element={<RequireAdmin><AdminCollectionsPage /></RequireAdmin>} />
           <Route path="admin/suporte" element={<RequireAdmin><AdminSupportPage /></RequireAdmin>} />
