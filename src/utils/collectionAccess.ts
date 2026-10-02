@@ -1,5 +1,5 @@
 import type { Collection } from '../types/note'
-import type { Persona, UserRole } from '../context/UserContext'
+import type { Persona, UserRole } from '../types/user'
 
 export function isCollectionOwner(collection: Collection, userId?: string): boolean {
   if (!userId) return false

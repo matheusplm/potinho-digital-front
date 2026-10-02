@@ -1,0 +1,41 @@
+name: Checks
+
+on:
+  workflow_call:
+  pull_request:
+  push:
+    branches-ignore: [main]
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Tipos
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Regras de arquitetura
+        run: npm run arch
+
+      - name: Codigo e dependencias sem uso
+        run: npm run deadcode
+
+      - name: Codigo duplicado
+        run: npm run dupes
+
+      - name: Build com pre-render
+        run: npm run build
