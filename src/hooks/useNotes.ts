@@ -323,12 +323,12 @@ export function useReleaseNotesMutation(cid: string) {
   })
 }
 
-export function useMyNotificationsQuery(options?: { enabled?: boolean }) {
+export function useMyNotificationsQuery(options?: { enabled?: boolean; refetchInterval?: number }) {
   return useQuery({
     queryKey: queryKeys.myNotifications(),
     queryFn: () => api.getMyNotifications(),
     enabled: options?.enabled ?? true,
-    refetchInterval: 5 * 60_000,
+    refetchInterval: options?.refetchInterval ?? 5 * 60_000,
   })
 }
 

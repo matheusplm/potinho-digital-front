@@ -9,8 +9,15 @@ import { useTour } from '../tour/TourContext'
 import type { UserNotification } from '../types/note'
 
 const QUIET_ROUTES = /^\/(notificacoes|convite)(\/|$)/
+const CHECK_EVERY_MS = 60_000
+const RETRY_WHILE_BUSY_MS = 3_000
 
 const keyOf = (notification: UserNotification) => `${notification.collectionId}:${notification.notificationId}`
+const newestFirst = (a: UserNotification, b: UserNotification) => b.createdAt.localeCompare(a.createdAt)
+
+function anotherDialogOpen() {
+  return !!document.querySelector('.MuiDialog-root, .MuiDrawer-root')
+}
 
 export function NotificationPopup() {
   const { user, persona } = useUser()
@@ -20,32 +27,32 @@ export function NotificationPopup() {
   const location = useLocation()
   const navigate = useNavigate()
   const enabled = !!user && persona === 'reader' && !simulating
-  const { data: notifications = [], isSuccess } = useMyNotificationsQuery({ enabled })
+  const { data: notifications = [] } = useMyNotificationsQuery({ enabled, refetchInterval: CHECK_EVERY_MS })
   const markRead = useMarkNotificationReadMutation()
   const [shown, setShown] = useState<UserNotification[]>([])
+  const [retryTick, setRetryTick] = useState(0)
   const handled = useRef(new Set<string>())
-  const checkedPath = useRef<string | null>(null)
+
+  const quietRoute = QUIET_ROUTES.test(location.pathname)
 
   useEffect(() => {
-    if (!enabled || !isSuccess || shown.length > 0) return
-    if (checkedPath.current === location.pathname) return
-    checkedPath.current = location.pathname
-    if (QUIET_ROUTES.test(location.pathname) || tour.step) return
+    if (!enabled || shown.length > 0 || quietRoute || tour.step) return
     const fresh = notifications.filter((n) => n.inApp && !n.readAt && !handled.current.has(keyOf(n)))
-    if (fresh.length > 0) setShown(fresh)
-  }, [enabled, isSuccess, location.pathname, notifications, shown.length, tour.step])
-
-  useEffect(() => {
-    if (!enabled) checkedPath.current = null
-  }, [enabled])
+    if (fresh.length === 0) return
+    if (anotherDialogOpen()) {
+      const timer = window.setTimeout(() => setRetryTick((tick) => tick + 1), RETRY_WHILE_BUSY_MS)
+      return () => window.clearTimeout(timer)
+    }
+    setShown([...fresh].sort(newestFirst))
+  }, [enabled, notifications, shown.length, quietRoute, tour.step, retryTick, location.pathname])
 
   function dismiss() {
+    if (shown.length === 0) return
     for (const notification of shown) {
       handled.current.add(keyOf(notification))
       markRead.mutate({ cid: notification.collectionId, notificationId: notification.notificationId })
     }
-    const collections = new Set(shown.map((n) => n.collectionId))
-    if (collections.size === 1) setActiveCollectionId(shown[0].collectionId)
+    if (new Set(shown.map((n) => n.collectionId)).size === 1) setActiveCollectionId(shown[0].collectionId)
     setShown([])
   }
 
