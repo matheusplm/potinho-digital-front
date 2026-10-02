@@ -93,12 +93,14 @@ export type CollectionPackCategory = 'daily' | 'bonus' | 'guaranteed' | 'themati
 export type CollectionPackDistribution = 'all_with_access' | 'manual_bonus' | 'selected_readers'
 export type CollectionPackStatus = 'active' | 'draft' | 'disabled'
 export type CollectionPackScheduleMode = 'cooldown' | 'fixed_time'
+export type CollectionPackPattern = 'dots' | 'hearts' | 'stars' | 'stripes' | 'none'
 
 export interface CollectionPack {
   id: string
   collectionId: string
   name: string
   emoji: string
+  imageUrl?: string | null
   description: string
   category: CollectionPackCategory
   status: CollectionPackStatus
@@ -110,6 +112,9 @@ export interface CollectionPack {
   guaranteedRarityId: string | null
   gradient: string
   accent: string
+  pattern?: CollectionPackPattern
+  shine?: boolean
+  showName?: boolean
   scheduleMode: CollectionPackScheduleMode
   scheduleTime: string | null
   scheduleTimezone: string

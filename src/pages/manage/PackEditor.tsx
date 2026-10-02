@@ -1,23 +1,38 @@
 import CasinoOutlinedIcon from '@mui/icons-material/CasinoOutlined'
-import { Box, Chip, DialogActions, DialogContent, DialogTitle, Stack, TextField, Typography } from '@mui/material'
+import { Box, DialogActions, DialogContent, DialogTitle, Stack, TextField, Typography } from '@mui/material'
 import { useState } from 'react'
 import { AdvancedOptions, Button, ChoiceChip, EmojiPickerInput, HintText, Input, OptionTile, SectionLabel } from '../../components/ui'
 import { useCollectionNotesQuery, useCreateCollectionPackMutation, useCollectionPacksQuery, useUpdateCollectionPackMutation } from '../../hooks/useNotes'
 import { colors, font, ink, radius, liftOnDark } from '../../design-system'
-import { uniqueConfigId } from '../../utils/slug'
+import { isHexColor, uniqueConfigId } from '../../utils/slug'
 import { toast } from '../../components/ui'
-import { ColorRow } from './shared'
+import { ColorPickTile } from './shared'
+import { ImagePicker } from '../../components/ImagePicker'
+import { PATTERN_OPTIONS, resolvePackLook } from '../../components/pack-opening/packLook'
+import { PackPouchPreview } from './PackPouchPreview'
 import {
-  PACK_TEMPLATES, PACK_CATEGORY_LABELS, PACK_CATEGORY_OPTIONS, PACK_CATEGORY_HINTS,
-  PACK_STATUS_OPTIONS, PACK_STATUS_HINTS, PACK_STATUS_LABELS,
+  PACK_TEMPLATES, PACK_COLOR_PRESETS, gradientBase, pouchGradient, PACK_CATEGORY_LABELS, PACK_CATEGORY_OPTIONS, PACK_CATEGORY_HINTS,
+  PACK_STATUS_OPTIONS, PACK_STATUS_HINTS,
   PACK_DISTRIBUTION_OPTIONS, PACK_DISTRIBUTION_HINTS,
   PACK_RHYTHMS, PACK_RHYTHM_CUSTOM_HINT, detectRhythm, rhythmPatch,
-  formatPackSchedule, simulatePackOpening,
+  simulatePackOpening,
 } from './packData'
 import { PackSimulationDialog } from './PackSimulationDialog'
 import type { PackSimulation } from './packData'
 import { rarityTone } from '../../components/collection/rarityTone'
 import type { CollectionPack, CollectionPackFormData, RarityConfig, NoteTypeConfig } from '../../types/note'
+
+function CheckRow({ checked, label, hint, onClick }: { checked: boolean; label: string; hint?: string; onClick: () => void }) {
+  return (
+    <Stack direction="row" spacing={1} alignItems="flex-start" onClick={onClick} sx={{ cursor: 'pointer', px: 0.5, py: 0.2 }}>
+      <CheckSquare checked={checked} />
+      <Box>
+        <Typography variant="md" sx={{ fontWeight: 700, color: colors.text.primary, userSelect: 'none', lineHeight: 1.3 }}>{label}</Typography>
+        {hint && <Typography variant="xs" sx={{ color: colors.text.muted, mt: 0.15 }}>{hint}</Typography>}
+      </Box>
+    </Stack>
+  )
+}
 
 function CheckSquare({ checked }: { checked: boolean }) {
   return (
@@ -39,14 +54,21 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
   const { data: existingPacks = [] } = useCollectionPacksQuery(cid)
   const { data: notes = [] } = useCollectionNotesQuery(cid)
   const [form, setForm] = useState<CollectionPackFormData>(pack ? {
-    name: pack.name, emoji: pack.emoji, description: pack.description, category: pack.category, status: pack.status,
+    name: pack.name, emoji: pack.emoji, imageUrl: pack.imageUrl ?? null, description: pack.description, category: pack.category, status: pack.status,
     distribution: pack.distribution, cardsPerOpen: pack.cardsPerOpen, cooldownHours: pack.cooldownHours,
     allowedTypeIds: pack.allowedTypeIds, allowedRarityIds: pack.allowedRarityIds, guaranteedRarityId: pack.guaranteedRarityId,
     gradient: pack.gradient, accent: pack.accent, scheduleMode: pack.scheduleMode ?? 'cooldown',
     scheduleTime: pack.scheduleTime ?? null, scheduleTimezone: pack.scheduleTimezone ?? 'America/Sao_Paulo',
     cumulative: pack.cumulative ?? false, maxAccumulated: pack.maxAccumulated ?? 3,
+    pattern: pack.pattern ?? 'dots', shine: pack.shine ?? true, showName: pack.showName ?? true,
   } : { ...PACK_TEMPLATES[0] })
   const [simulation, setSimulation] = useState<PackSimulation | null>(null)
+  const [wantsImageIcon, setWantsImageIcon] = useState(false)
+  const [wantsCustomColor, setWantsCustomColor] = useState(false)
+  const iconIsImage = Boolean(form.imageUrl) || wantsImageIcon
+  const look = resolvePackLook(form)
+  const activePreset = PACK_COLOR_PRESETS.find((preset) => preset.gradient === form.gradient && preset.accent === form.accent)
+  const colorIsCustom = wantsCustomColor || !activePreset
   const createMutation = useCreateCollectionPackMutation(cid)
   const updateMutation = useUpdateCollectionPackMutation(cid)
   const isPending = createMutation.isPending || updateMutation.isPending
@@ -123,12 +145,6 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
     }
   }
 
-  const statusChipStyle = form.status === 'active'
-    ? { background: '#dcfce7', color: '#15803d' }
-    : form.status === 'draft'
-      ? { background: 'rgba(255,255,255,0.72)', color: ink.secondary }
-      : { background: 'rgba(0,0,0,0.12)', color: ink.secondary }
-
   return (
     <>
       <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 700, color: colors.text.primary, pb: 1 }}>
@@ -151,7 +167,7 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
                     <Stack direction="row" alignItems="center" spacing={0.8}>
                       <Typography sx={{ fontSize: '1.1rem' }}>{template.emoji}</Typography>
                       <Box sx={{ minWidth: 0 }}>
-                        <Typography variant="sm" sx={{ fontWeight: 900, color: colors.text.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <Typography variant="sm" sx={{ fontWeight: 900, color: ink.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {template.name}
                         </Typography>
                         <Typography variant="xs" sx={{ fontWeight: 800, color: template.accent }}>
@@ -165,45 +181,19 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
             </Box>
           )}
 
-          <Box sx={{ borderRadius: radius.xl, overflow: 'hidden', border: `1.5px solid ${form.accent}2e`, boxShadow: `0 8px 22px ${form.accent}16` }}>
-            <Box sx={{ p: 1.5, background: form.gradient, position: 'relative', overflow: 'hidden' }}>
-              <Box sx={{ position: 'absolute', inset: 0, background: `radial-gradient(circle at 15% 0%, rgba(255,255,255,0.58), transparent 38%), radial-gradient(circle at 100% 100%, ${form.accent}44, transparent 40%)`, pointerEvents: 'none' }} />
-              <Stack direction="row" alignItems="center" spacing={1.1} sx={{ position: 'relative', zIndex: 1 }}>
-                <Box sx={{ width: 44, height: 44, borderRadius: radius.lg, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.62)', border: '1px solid rgba(255,255,255,0.78)', boxShadow: `0 6px 18px ${form.accent}24`, fontSize: '1.45rem' }}>
-                  {form.emoji}
-                </Box>
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Stack direction="row" spacing={0.7} alignItems="center" sx={{ mb: 0.5 }}>
-                    <Typography variant="xl" sx={{ flex: 1, minWidth: 0, fontFamily: font.serif, fontWeight: 800, color: ink.primary, lineHeight: 1.15, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {form.name.trim() || 'Meu pacotinho'}
-                    </Typography>
-                    <Chip label={PACK_STATUS_LABELS[form.status]} size="small"
-                      sx={{ height: 19, fontSize: '0.66rem', fontWeight: 900, flexShrink: 0, ...statusChipStyle, '& .MuiChip-label': { px: 0.75 } }} />
-                  </Stack>
-                  <Stack direction="row" spacing={0.5} sx={{ flexWrap: 'wrap', rowGap: 0.4 }}>
-                    {[`🃏 ${form.cardsPerOpen} carta${form.cardsPerOpen === 1 ? '' : 's'}`, formatPackSchedule(form)].map((text) => (
-                      <Box key={text} sx={{ px: 0.8, py: 0.25, borderRadius: radius.full, background: 'rgba(255,255,255,0.62)', border: '1px solid rgba(255,255,255,0.78)' }}>
-                        <Typography variant="xxs" sx={{ fontWeight: 800, color: form.accent }}>{text}</Typography>
-                      </Box>
-                    ))}
-                  </Stack>
-                </Box>
-              </Stack>
-            </Box>
-            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ px: 1.5, py: 0.7, background: colors.surface.paper, borderTop: `1px solid ${colors.border.subtle}` }}>
-              <Typography variant="xxs" sx={{ fontWeight: 800, color: colors.text.muted, textTransform: 'uppercase', letterSpacing: 0.6 }}>
-                Prévia ao vivo
+          <Box sx={{ borderRadius: radius.xl, overflow: 'hidden', border: `1px solid ${colors.border.subtle}`, background: colors.fill.subtle }}>
+            <PackPouchPreview form={form} />
+            <Stack direction="row" alignItems="center" justifyContent={{ xs: 'center', sm: 'space-between' }} spacing={1} sx={{ px: 1.5, py: 0.7, background: colors.surface.paper, borderTop: `1px solid ${colors.border.subtle}` }}>
+              <Typography variant="xxs" sx={{ display: { xs: 'none', sm: 'block' }, fontWeight: 800, color: colors.text.muted, textTransform: 'uppercase', letterSpacing: 0.6 }}>
+                Prévia da abertura
               </Typography>
-              <Button variant="ghost" onClick={runSimulation} sx={{ py: 0.45, px: 1.1, fontSize: '0.73rem' }}>
+              <Button variant="ghost" onClick={runSimulation} sx={{ py: 0.45, px: 1.1, fontSize: '0.73rem', whiteSpace: 'nowrap' }}>
                 <CasinoOutlinedIcon sx={{ fontSize: 14, mr: 0.4 }} /> Simular abertura
               </Button>
             </Stack>
           </Box>
 
-          <Stack direction="row" spacing={1.5}>
-            <Input label="Nome" value={form.name} onChange={(e) => set('name', e.target.value)} sx={{ flex: 1 }} />
-            <EmojiPickerInput label="Emoji" value={form.emoji} onChange={(emoji) => set('emoji', emoji)} />
-          </Stack>
+          <Input label="Nome" value={form.name} onChange={(e) => set('name', e.target.value)} fullWidth />
 
           <Stack direction="row" spacing={1.5} alignItems="center">
             <Input label="Cartas por abertura" type="number" value={form.cardsPerOpen}
@@ -237,12 +227,7 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
             {form.scheduleMode === 'fixed_time' && (
               <Stack spacing={1} sx={{ mt: 1.2 }}>
                 <Input label="Horário (BRT)" type="time" value={form.scheduleTime ?? '06:00'} onChange={(e) => set('scheduleTime', e.target.value || null)} sx={{ width: 170 }} inputProps={{ step: 60 }} />
-                <Stack direction="row" spacing={1} alignItems="center" sx={{ px: 0.5, py: 0.3, cursor: 'pointer' }} onClick={() => set('cumulative', !form.cumulative)}>
-                  <CheckSquare checked={form.cumulative} />
-                  <Typography variant="md" sx={{ fontWeight: 700, color: colors.text.primary, userSelect: 'none' }}>
-                    Acumular slots não abertos
-                  </Typography>
-                </Stack>
+                <CheckRow checked={form.cumulative} label="Acumular slots não abertos" onClick={() => set('cumulative', !form.cumulative)} />
                 {form.cumulative && (
                   <Input label="Máximo acumulado" type="number" value={form.maxAccumulated} onChange={(e) => set('maxAccumulated', Math.max(1, Number(e.target.value) || 1))} inputProps={{ min: 1, max: 30 }} sx={{ width: 170 }} />
                 )}
@@ -250,19 +235,56 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
             )}
           </Box>
 
-          <Stack direction="row" spacing={1} alignItems="flex-start" onClick={() => set('status', form.status === 'active' ? 'draft' : 'active')} sx={{ cursor: 'pointer', px: 0.5 }}>
-            <CheckSquare checked={form.status === 'active'} />
-            <Box>
-              <Typography variant="md" sx={{ fontWeight: 700, color: colors.text.primary, userSelect: 'none', lineHeight: 1.3 }}>
-                Visível para os leitores
-              </Typography>
-              <Typography variant="xs" sx={{ color: colors.text.muted, mt: 0.15 }}>
-                {PACK_STATUS_HINTS[form.status]}
-              </Typography>
-            </Box>
-          </Stack>
+          <CheckRow checked={form.status === 'active'} label="Visível para os leitores" hint={PACK_STATUS_HINTS[form.status]} onClick={() => set('status', form.status === 'active' ? 'draft' : 'active')} />
 
           <AdvancedOptions>
+          <Box>
+            <SectionLabel sx={{ mb: 0.8 }}>Ícone do pacotinho</SectionLabel>
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 1, mb: 1.2 }}>
+              <OptionTile active={!iconIsImage} title={`${form.emoji} Emoji`} label="Emoji" onClick={() => { setWantsImageIcon(false); set('imageUrl', null) }} />
+              <OptionTile active={iconIsImage} title="🖼️ GIF ou imagem" label="GIF ou imagem" onClick={() => setWantsImageIcon(true)} />
+            </Box>
+            {iconIsImage
+              ? <ImagePicker value={form.imageUrl ?? null} onChange={(url) => set('imageUrl', url)} mediaType="stickers" label="GIF ou imagem" />
+              : <EmojiPickerInput label="Emoji" value={form.emoji} onChange={(emoji) => set('emoji', emoji)} />}
+          </Box>
+
+          <Box>
+            <SectionLabel hint="fundo e detalhes do pacotinho" sx={{ mb: 0.8 }}>Cor do pacotinho</SectionLabel>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, minmax(0, 1fr))', sm: 'repeat(3, minmax(0, 1fr))' }, gap: 0.7 }}>
+              <OptionTile active={colorIsCustom} onClick={() => setWantsCustomColor(true)} label="Cor personalizada" icon="🎛️" title="Personalizado" layout="row" />
+              {PACK_COLOR_PRESETS.map((preset) => (
+                <OptionTile
+                  key={preset.label}
+                  active={!colorIsCustom && activePreset === preset}
+                  onClick={() => { setWantsCustomColor(false); setForm((current) => ({ ...current, gradient: preset.gradient, accent: preset.accent })) }}
+                  label={`Cor ${preset.label}`}
+                  title={preset.label}
+                  layout="row"
+                  icon={<Box sx={{ width: 22, height: 22, flexShrink: 0, borderRadius: '50%', background: `radial-gradient(circle at 68% 68%, ${preset.accent} 0 4px, transparent 4.5px), ${preset.gradient}`, boxShadow: `0 0 0 2px ${colors.surface.base}, 0 2px 8px rgba(15,23,42,0.18)` }} />}
+                />
+              ))}
+            </Box>
+            {colorIsCustom && (
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' }, gap: 0.7, mt: 1.2 }}>
+                <ColorPickTile title="Fundo" hint="a cor do pacotinho" fill={form.gradient} value={gradientBase(form.gradient, isHexColor(form.accent) ? form.accent : '#e11d48')} onPick={(color) => set('gradient', pouchGradient(color))} />
+                <ColorPickTile title="Destaque" hint="brilho, sombra e linha de rasgar" fill={form.accent} value={isHexColor(form.accent) ? form.accent : '#e11d48'} onPick={(color) => set('accent', color)} />
+              </Box>
+            )}
+          </Box>
+
+            <Box>
+              <SectionLabel sx={{ mb: 0.8 }}>Estampa</SectionLabel>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6 }}>
+                {PATTERN_OPTIONS.map((option) => (
+                  <ChoiceChip key={option.id} label={option.label} selected={look.pattern === option.id} onClick={() => set('pattern', option.id)} />
+                ))}
+              </Box>
+            </Box>
+            <Stack spacing={0.8}>
+              <CheckRow checked={look.shine} label="Brilho metalizado" hint="Um reflexo passando pelo pacotinho." onClick={() => set('shine', !look.shine)} />
+              <CheckRow checked={look.showName} label="Mostrar o nome no pacotinho" onClick={() => set('showName', !look.showName)} />
+            </Stack>
                 <Box>
                   <SectionLabel sx={{ mb: 0.8 }}>Descrição</SectionLabel>
                   <TextField multiline rows={2} fullWidth placeholder="Descrição do pacotinho..." value={form.description}
@@ -340,8 +362,6 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
                   <HintText>Pelo menos uma carta dessa raridade sai em toda abertura.</HintText>
                 </Box>
 
-                <ColorRow label="Gradiente" field="gradient" value={form.gradient} onChange={(field, value) => set(field as 'gradient', value)} />
-                <ColorRow label="Cor destaque" field="accent" value={form.accent} onChange={(field, value) => set(field as 'accent', value)} />
           </AdvancedOptions>
         </Stack>
       </DialogContent>

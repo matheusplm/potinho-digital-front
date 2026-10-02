@@ -12,10 +12,12 @@ import { PackPouch, type PouchState } from './PackPouch'
 import { RevealCard } from './RevealCard'
 import { withAlpha } from '../../utils/colorUtils'
 import { CARD_WIDTH, paint, rainbowConic, raysFill, revealOrder, showPalette, vibrate, type RevealItem, type RevealStyle, type Tier } from './tiers'
+import { PackIcon } from '../PackIcon'
+import type { PackLook } from './packLook'
 
 type Phase = 'intro' | 'waiting' | 'burst' | 'reveal' | 'summary'
 
-export interface StagePack {
+export interface StagePack extends PackLook {
   name: string
   emoji: string
   gradient: string
@@ -241,7 +243,7 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
                 display: 'inline-flex', alignItems: 'center', gap: 0.8, px: 1.4, py: 0.6, borderRadius: radius.full, maxWidth: '65%',
                 background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}`, backdropFilter: 'blur(12px)',
               }}>
-                <Box component="span" sx={{ fontSize: '1rem' }}>{pack.emoji}</Box>
+                <Box component="span" sx={{ fontSize: '1rem', display: 'inline-flex' }}><PackIcon emoji={pack.emoji} imageUrl={pack.imageUrl} size={20} /></Box>
                 <Typography variant="md" sx={{ fontWeight: 800, color: textColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{pack.name}</Typography>
               </Box>
             )}
@@ -264,6 +266,7 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
                     gradient={backFill}
                     accent={accent}
                     emoji={pack.emoji}
+                    look={pack}
                     name={pack.name}
                     state={pouchState}
                     onTorn={handleTorn}
@@ -303,6 +306,7 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
                     backFill={backFill}
                     accent={accent}
                     emoji={pack?.emoji ?? '💌'}
+                    imageUrl={pack?.imageUrl}
                     rarities={rarities}
                     types={types}
                     reducedMotion={reducedMotion}

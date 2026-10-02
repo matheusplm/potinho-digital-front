@@ -1,5 +1,6 @@
 import { Box, Stack, Typography } from '@mui/material'
-import { Input } from '../../components/ui'
+import { useRef } from 'react'
+import { Input, OptionTile } from '../../components/ui'
 import { colors, radius } from '../../design-system'
 import { isHexColor } from '../../utils/slug'
 
@@ -24,6 +25,37 @@ export function actionButtonSx(tone: 'primary' | 'danger' | 'neutral' = 'neutral
       boxShadow: `0 5px 14px ${tint(13)}`,
     },
   }
+}
+
+export function ColorPickTile({ title, hint, fill, value, onPick }: {
+  title: string; hint: string; fill: string; value: string; onPick: (color: string) => void
+}) {
+  const input = useRef<HTMLInputElement>(null)
+  return (
+    <OptionTile
+      active={false}
+      onClick={() => input.current?.click()}
+      label={`Escolher cor: ${title}`}
+      title={title}
+      hint={hint}
+      layout="row"
+      icon={(
+        <Box sx={{ position: 'relative', display: 'flex' }}>
+          <Box sx={{ width: 26, height: 26, flexShrink: 0, borderRadius: '50%', background: fill, boxShadow: `0 0 0 2px ${colors.surface.base}, 0 2px 8px rgba(15,23,42,0.18)` }} />
+          <input
+            ref={input}
+            type="color"
+            value={value}
+            tabIndex={-1}
+            aria-hidden
+            onClick={(e) => e.stopPropagation()}
+            onChange={(e) => onPick(e.target.value)}
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0, pointerEvents: 'none', border: 0, padding: 0 }}
+          />
+        </Box>
+      )}
+    />
+  )
 }
 
 export function ColorRow({ label, field, value, onChange }: {

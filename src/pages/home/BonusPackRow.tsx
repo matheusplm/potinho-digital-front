@@ -3,6 +3,7 @@ import { Box, Typography } from '@mui/material'
 import { colors, radius } from '../../design-system'
 import { formatCooldownBadge } from '../../utils/packCooldowns'
 import type { CollectionPack } from '../../types/note'
+import { PackIcon } from '../../components/PackIcon'
 
 export function BonusPackRow({ bonusPacks, isRealReader, packOpens, packAvailableCounts, getCooldownMs, onSelect }: {
   bonusPacks: CollectionPack[]
@@ -81,7 +82,7 @@ export function BonusPackRow({ bonusPacks, isRealReader, packOpens, packAvailabl
               } : {}),
             }}
           >
-            {pack.emoji}
+            <PackIcon emoji={pack.emoji} imageUrl={pack.imageUrl} size={38} />
             {onCooldown && (
               <Box sx={{
                 position: 'absolute',

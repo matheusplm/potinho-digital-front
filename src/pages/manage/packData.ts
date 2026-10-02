@@ -8,6 +8,34 @@ const PACK_DEFAULT_SCHEDULE: Pick<CollectionPackFormData, 'scheduleMode' | 'sche
   scheduleMode: 'cooldown', scheduleTime: null, scheduleTimezone: 'America/Sao_Paulo', cumulative: false, maxAccumulated: 3,
 }
 
+const hexByte = (value: number) => Math.round(value).toString(16).padStart(2, '0')
+
+function lighten(hex: string, amount: number) {
+  const digits = hex.slice(1)
+  const full = digits.length === 3 ? digits.split('').map((c) => c + c).join('') : digits
+  return `#${[0, 2, 4].map((i) => hexByte(parseInt(full.slice(i, i + 2), 16) * (1 - amount) + 255 * amount)).join('')}`
+}
+
+export function pouchGradient(base: string) {
+  return `linear-gradient(135deg,${lighten(base, 0.85)},${lighten(base, 0.55)},${base})`
+}
+
+export function gradientBase(gradient: string, fallback: string) {
+  const hexes = gradient.match(/#[0-9a-fA-F]{6}\b/g)
+  return hexes?.[hexes.length - 1] ?? fallback
+}
+
+export const PACK_COLOR_PRESETS: { label: string; gradient: string; accent: string }[] = [
+  { label: 'Rosa', gradient: 'linear-gradient(135deg,#fff1f2,#ffe4e6,#fbcfe8)', accent: '#e11d48' },
+  { label: 'Lilás', gradient: 'linear-gradient(135deg,#eef2ff,#e0e7ff,#f5d0fe)', accent: '#6366f1' },
+  { label: 'Roxo', gradient: 'linear-gradient(135deg,#faf5ff,#e9d5ff,#c4b5fd)', accent: '#7c3aed' },
+  { label: 'Pêssego', gradient: 'linear-gradient(135deg,#fff7ed,#fed7aa,#fde68a)', accent: '#f97316' },
+  { label: 'Amarelo', gradient: 'linear-gradient(135deg,#fefce8,#fef3c7,#fde68a)', accent: '#eab308' },
+  { label: 'Menta', gradient: 'linear-gradient(135deg,#f0fdf4,#bbf7d0,#a7f3d0)', accent: '#16a34a' },
+  { label: 'Céu', gradient: 'linear-gradient(135deg,#ecfeff,#cffafe,#f0abfc)', accent: '#06b6d4' },
+  { label: 'Noite', gradient: 'linear-gradient(135deg,#1e1b4b,#312e81,#6d28d9)', accent: '#a78bfa' },
+]
+
 export const PACK_TEMPLATES: CollectionPackFormData[] = [
   { id: 'daily', name: 'Pacotinho diário', emoji: '💌', description: 'O pacote padrão da coleção, liberado automaticamente por tempo.', cardsPerOpen: 1, cooldownHours: 24, distribution: 'all_with_access', status: 'active', category: 'daily', allowedTypeIds: [], allowedRarityIds: [], guaranteedRarityId: null, gradient: 'linear-gradient(135deg,#fff1f2,#ffe4e6,#fbcfe8)', accent: '#e11d48', ...PACK_DEFAULT_SCHEDULE },
   { id: 'daily_fixed', name: 'Diário hora fixa', emoji: '⏰', description: 'Liberado todo dia no mesmo horário. Slots acumulam se não forem abertos.', cardsPerOpen: 1, cooldownHours: null, distribution: 'all_with_access', status: 'active', category: 'daily', allowedTypeIds: [], allowedRarityIds: [], guaranteedRarityId: null, gradient: 'linear-gradient(135deg,#fff1f2,#ffe4e6,#fbcfe8)', accent: '#e11d48', scheduleMode: 'fixed_time', scheduleTime: '06:00', scheduleTimezone: 'America/Sao_Paulo', cumulative: true, maxAccumulated: 3 },
