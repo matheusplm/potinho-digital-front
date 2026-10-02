@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api, ApiRequestError } from '../services/api'
 import { emitTour } from '../tour/events'
-import type { CollectionAchievementFormData, CollectionPackFormData, NoteFormData, NotifyConfig, PackStatusResponse, RarityConfig, NoteTypeConfig } from '../types/note'
+import type { CollectionAchievementFormData, CollectionInvite, CollectionPackFormData, NoteFormData, NotifyConfig, PackStatusResponse, RarityConfig, NoteTypeConfig } from '../types/note'
 
 export const queryKeys = {
   collections: () => ['collections'] as const,
@@ -38,8 +38,10 @@ export function useCreateCollectionMutation() {
   return useMutation({
     mutationFn: api.createCollection,
     onSuccess: (collection) => {
-      void queryClient.invalidateQueries({ queryKey: queryKeys.collections() })
       emitTour('collection-created', collection.id)
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.collections() })
     },
   })
 }
@@ -49,7 +51,7 @@ export function useUpdateCollectionMutation() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Parameters<typeof api.updateCollection>[1] }) =>
       api.updateCollection(id, data),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.collections() }) },
+    onSettled: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.collections() }) },
   })
 }
 
@@ -58,7 +60,7 @@ export function useDeleteCollectionMutation() {
   return useMutation({
     mutationFn: ({ id, force, confirmName }: { id: string; force?: boolean; confirmName?: string }) =>
       api.deleteCollection(id, { force, confirmName }),
-    onSuccess: () => {
+    onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.collections() })
       void queryClient.invalidateQueries({ queryKey: queryKeys.collectionsTrash() })
     },
@@ -86,7 +88,7 @@ export function useRestoreCollectionMutation() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => api.restoreCollection(id),
-    onSuccess: () => {
+    onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.collections() })
       void queryClient.invalidateQueries({ queryKey: queryKeys.collectionsTrash() })
     },
@@ -106,8 +108,10 @@ export function useCreateCollectionNoteMutation(cid: string) {
   return useMutation({
     mutationFn: (data: NoteFormData) => api.createCollectionNote(cid, data),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: queryKeys.notes(cid) })
       emitTour('note-created', cid)
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.notes(cid) })
     },
   })
 }
@@ -116,7 +120,7 @@ export function useImportCollectionNotesMutation(cid: string) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (json: string) => api.importCollectionNotes(cid, json),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.notes(cid) }) },
+    onSettled: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.notes(cid) }) },
   })
 }
 
@@ -125,7 +129,7 @@ export function useUpdateCollectionNoteMutation(cid: string) {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<NoteFormData> }) =>
       api.updateCollectionNote(cid, id, data),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.notes(cid) }) },
+    onSettled: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.notes(cid) }) },
   })
 }
 
@@ -133,7 +137,7 @@ export function useDisableCollectionNoteMutation(cid: string) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => api.disableCollectionNote(cid, id),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.notes(cid) }) },
+    onSettled: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.notes(cid) }) },
   })
 }
 
@@ -141,7 +145,7 @@ export function useRestoreCollectionNoteMutation(cid: string) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => api.restoreCollectionNote(cid, id),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.notes(cid) }) },
+    onSettled: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.notes(cid) }) },
   })
 }
 
@@ -149,7 +153,7 @@ export function usePermanentlyDeleteCollectionNoteMutation(cid: string) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => api.permanentlyDeleteCollectionNote(cid, id),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.notes(cid) }) },
+    onSettled: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.notes(cid) }) },
   })
 }
 
@@ -161,7 +165,7 @@ export function useCreateCollectionRarityMutation(cid: string) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: Parameters<typeof api.createCollectionRarity>[1]) => api.createCollectionRarity(cid, data),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.rarities(cid) }) },
+    onSettled: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.rarities(cid) }) },
   })
 }
 
@@ -170,7 +174,7 @@ export function useUpdateCollectionRarityMutation(cid: string) {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<RarityConfig> }) =>
       api.updateCollectionRarity(cid, id, data),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.rarities(cid) }) },
+    onSettled: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.rarities(cid) }) },
   })
 }
 
@@ -178,7 +182,7 @@ export function useDeleteCollectionRarityMutation(cid: string) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => api.deleteCollectionRarity(cid, id),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.rarities(cid) }) },
+    onSettled: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.rarities(cid) }) },
   })
 }
 
@@ -186,7 +190,7 @@ export function useImportCollectionRaritiesMutation(cid: string) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (json: string) => api.importCollectionRarities(cid, json),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.rarities(cid) }) },
+    onSettled: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.rarities(cid) }) },
   })
 }
 
@@ -198,7 +202,7 @@ export function useCreateCollectionTypeMutation(cid: string) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: Parameters<typeof api.createCollectionType>[1]) => api.createCollectionType(cid, data),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.types(cid) }) },
+    onSettled: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.types(cid) }) },
   })
 }
 
@@ -207,7 +211,7 @@ export function useUpdateCollectionTypeMutation(cid: string) {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<NoteTypeConfig> }) =>
       api.updateCollectionType(cid, id, data),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.types(cid) }) },
+    onSettled: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.types(cid) }) },
   })
 }
 
@@ -215,7 +219,7 @@ export function useDeleteCollectionTypeMutation(cid: string) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => api.deleteCollectionType(cid, id),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.types(cid) }) },
+    onSettled: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.types(cid) }) },
   })
 }
 
@@ -223,7 +227,7 @@ export function useImportCollectionTypesMutation(cid: string) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (json: string) => api.importCollectionTypes(cid, json),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.types(cid) }) },
+    onSettled: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.types(cid) }) },
   })
 }
 
@@ -259,7 +263,7 @@ export function useCreateCollectionPackMutation(cid: string) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: CollectionPackFormData) => api.createCollectionPack(cid, data),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.packs(cid) }) },
+    onSettled: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.packs(cid) }) },
   })
 }
 
@@ -268,7 +272,7 @@ export function useUpdateCollectionPackMutation(cid: string) {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CollectionPackFormData> }) =>
       api.updateCollectionPack(cid, id, data),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.packs(cid) }) },
+    onSettled: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.packs(cid) }) },
   })
 }
 
@@ -276,7 +280,7 @@ export function useDeleteCollectionPackMutation(cid: string) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => api.deleteCollectionPack(cid, id),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.packs(cid) }) },
+    onSettled: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.packs(cid) }) },
   })
 }
 
@@ -288,7 +292,7 @@ export function useRevokeAccessMutation(cid: string) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (email: string) => api.revokeAccess(cid, email),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.access(cid) }) },
+    onSettled: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.access(cid) }) },
   })
 }
 
@@ -305,7 +309,7 @@ export function useAddPackOpensMutation(cid: string) {
   return useMutation({
     mutationFn: ({ email, packId, opens, notify }: { email: string; packId: string; opens: number; notify?: NotifyConfig }) =>
       api.addPackOpens(cid, email, packId, opens, notify),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.access(cid) }) },
+    onSettled: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.access(cid) }) },
   })
 }
 
@@ -315,10 +319,12 @@ export function useReleaseNotesMutation(cid: string) {
     mutationFn: ({ noteIds, notify }: { noteIds: string[]; notify?: NotifyConfig }) =>
       api.releaseCollectionNotes(cid, noteIds, notify),
     onSuccess: () => {
+      emitTour('notes-released', cid)
+    },
+    onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.notes(cid) })
       void queryClient.invalidateQueries({ queryKey: queryKeys.play(cid) })
       void queryClient.invalidateQueries({ queryKey: queryKeys.collectionNotifications(cid) })
-      emitTour('notes-released', cid)
     },
   })
 }
@@ -337,7 +343,7 @@ export function useMarkNotificationReadMutation() {
   return useMutation({
     mutationFn: ({ cid, notificationId }: { cid: string; notificationId: string }) =>
       api.markNotificationRead(cid, notificationId),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.myNotifications() }) },
+    onSettled: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.myNotifications() }) },
   })
 }
 
@@ -374,7 +380,7 @@ export function useToggleCollectionFavoriteMutation(cid: string) {
   return useMutation({
     mutationFn: ({ id, favorite }: { id: string; favorite: boolean }) =>
       api.setCollectionFavorite(cid, id, favorite),
-    onSuccess: () => {
+    onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.play(cid) })
       void queryClient.invalidateQueries({ queryKey: queryKeys.readerAchievements(cid) })
     },
@@ -397,7 +403,7 @@ export function useCreateCollectionAchievementMutation(cid: string) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: CollectionAchievementFormData) => api.createCollectionAchievement(cid, data),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.achievements(cid) }) },
+    onSettled: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.achievements(cid) }) },
   })
 }
 
@@ -406,7 +412,7 @@ export function useUpdateCollectionAchievementMutation(cid: string) {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CollectionAchievementFormData> }) =>
       api.updateCollectionAchievement(cid, id, data),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.achievements(cid) }) },
+    onSettled: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.achievements(cid) }) },
   })
 }
 
@@ -414,7 +420,7 @@ export function useDeleteCollectionAchievementMutation(cid: string) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => api.deleteCollectionAchievement(cid, id),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.achievements(cid) }) },
+    onSettled: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.achievements(cid) }) },
   })
 }
 
@@ -431,9 +437,11 @@ export function useSendInviteMutation(cid: string) {
   return useMutation({
     mutationFn: (email: string) => api.sendInvite(cid, email),
     onSuccess: () => {
+      emitTour('invite-sent', cid)
+    },
+    onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.access(cid) })
       void queryClient.invalidateQueries({ queryKey: queryKeys.invites(cid) })
-      emitTour('invite-sent', cid)
     },
   })
 }
@@ -442,6 +450,11 @@ export function useCancelInviteMutation(cid: string) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (email: string) => api.cancelInvite(cid, email),
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: queryKeys.invites(cid) }) },
+    onSuccess: (_result, email) => {
+      queryClient.setQueryData<CollectionInvite[]>(queryKeys.invites(cid), (list) => list?.filter((invite) => invite.email !== email))
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.invites(cid) })
+    },
   })
 }

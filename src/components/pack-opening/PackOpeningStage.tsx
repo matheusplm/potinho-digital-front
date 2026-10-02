@@ -94,7 +94,6 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
   const { play, layer } = useRevealEffect()
   const [phase, setPhase] = useState<Phase>('intro')
   const [index, setIndex] = useState(0)
-  const [flipped, setFlipped] = useState(false)
   const [leaving, setLeaving] = useState(false)
   const [torn, setTorn] = useState(false)
   const [showFor, setShowFor] = useState<number | null>(null)
@@ -128,7 +127,6 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
     clearTimers()
     setPhase('intro')
     setIndex(0)
-    setFlipped(false)
     setLeaving(false)
     setTorn(false)
     setShowFor(null)
@@ -165,10 +163,11 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
     else setPhase('waiting')
   }
 
-  function flip() {
-    if (!current || flipped) return
-    setFlipped(true)
-    const { rarity, style } = current
+  useEffect(() => {
+    if (phase !== 'reveal') return
+    const item = items[index]
+    if (!item) return
+    const { rarity, style } = item
     later(() => {
       setShowFor(index)
       if (style.vibrate) vibrate(FLIP_VIBRATION[style.tier])
@@ -179,7 +178,7 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
       const effect = normalizeRevealEffect(rarity?.revealEffect, rarity?.revealMedia, rarity?.revealEmoji, rarity?.emoji ?? '✨')
       play({ ...effect, palette: showPalette(style), anchor: cardRef.current?.getBoundingClientRect() ?? null })
     }, reducedMotion ? 0 : SHOW_DELAY_MS)
-  }
+  }, [phase, index, items, later, play, reducedMotion])
 
   function next() {
     if (leaving) return
@@ -190,7 +189,6 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
     setLeaving(true)
     later(() => {
       setIndex((value) => value + 1)
-      setFlipped(false)
       setLeaving(false)
     }, reducedMotion ? 0 : 320)
   }
@@ -235,7 +233,7 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
             position: 'absolute', inset: 0, pointerEvents: 'none',
             background: `radial-gradient(circle at 50% 46%, ${withAlpha(accent, theme.isDark ? 30 : 22)}, transparent 55%)`,
           }} />
-          <Rays style={current?.style} visible={!reducedMotion && phase === 'reveal' && flipped && showFor === index} />
+          <Rays style={current?.style} visible={!reducedMotion && phase === 'reveal' && showFor === index} />
 
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ position: 'relative', zIndex: 2, px: 2, pt: 'max(16px, env(safe-area-inset-top))', minHeight: 56 }}>
             {pack && (
@@ -301,19 +299,19 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
                 >
                   <RevealCard
                     item={current}
-                    flipped={flipped}
+                    flipped
                     backFill={backFill}
                     accent={accent}
                     emoji={pack?.emoji ?? '💌'}
                     rarities={rarities}
                     types={types}
                     reducedMotion={reducedMotion}
-                    onActivate={() => (flipped ? next() : flip())}
-                    label={flipped ? 'Próximo bilhete' : `Virar bilhete ${index + 1} de ${items.length}`}
+                    onActivate={next}
+                    label={index < items.length - 1 ? `Bilhete ${index + 1} de ${items.length}, toque pro próximo` : `Bilhete ${index + 1} de ${items.length}, toque pro resumo`}
                   />
                 </Box>
-                {flipped && showFor === index && !reducedMotion && SPARK_COUNT[current.style.tier] > 0 && <FlipShow key={`show-${index}`} style={current.style} />}
-                {!flipped && current.style.caption && (
+                {showFor === index && !reducedMotion && SPARK_COUNT[current.style.tier] > 0 && <FlipShow key={`show-${index}`} style={current.style} />}
+                {current.style.caption && (
                   <Typography variant="xl" aria-live="polite" sx={{
                     position: 'absolute', left: 0, right: 0, top: 'calc(100% + 18px)', textAlign: 'center',
                     fontFamily: font.serif, fontWeight: 800, color: textColor, animation: `${riseIn} 0.5s ease 0.4s both`,
@@ -355,7 +353,7 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
                   {items.map((_, i) => (
                     <Box key={i} sx={{
                       width: i === index ? 22 : 8, height: 8, borderRadius: 99, transition: 'all 0.25s',
-                      background: i < index || (i === index && flipped) ? accent : withAlpha(theme.textOnBg, 25),
+                      background: i <= index ? accent : withAlpha(theme.textOnBg, 25),
                     }} />
                   ))}
                 </Stack>}
@@ -365,8 +363,8 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
                       Ver todos
                     </Button>
                   )}
-                  <Button variant="primary" onClick={flipped ? next : flip} sx={{ flex: 1.4, py: 1.1 }}>
-                    {!flipped ? 'Virar' : index < items.length - 1 ? `Próximo (${index + 2}/${items.length})` : 'Ver resumo'}
+                  <Button variant="primary" onClick={next} sx={{ flex: 1.4, py: 1.1 }}>
+                    {index < items.length - 1 ? `Próximo (${index + 2}/${items.length})` : 'Ver resumo'}
                   </Button>
                 </Stack>
               </Stack>

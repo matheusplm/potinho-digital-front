@@ -34,7 +34,7 @@ export function RevealCard({ item, flipped, backFill, accent, emoji, rarities, t
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onActivate() } }}
       sx={{
         position: 'relative', width: CARD_WIDTH, perspective: '1400px', cursor: 'pointer', outline: 'none',
-        animation: !flipped && style.tremble && !reducedMotion ? `${tremble} ${style.tier === 'legendary' ? 0.12 : 0.2}s linear infinite` : 'none',
+        animation: style.tremble && !reducedMotion ? (flipped ? `${tremble} ${style.tier === 'legendary' ? 0.12 : 0.2}s linear 0.45s 4` : `${tremble} ${style.tier === 'legendary' ? 0.12 : 0.2}s linear infinite`) : 'none',
         borderRadius: '22px', '&:focus-visible': { outline: `3px solid ${accent}`, outlineOffset: 4 },
       }}
     >

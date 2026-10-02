@@ -4,7 +4,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { Box, IconButton, Stack, Typography } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Button, Card, LoadingState, ScrollablePage } from '../components/ui'
+import { Button, Card, LoadingState, ScrollablePage, toast } from '../components/ui'
 import { NoteDetailDialog } from '../components/collection/NoteDetailDialog'
 import { useCollectionPlayQuery, useCollectionRaritiesQuery, useCollectionTypesQuery, useCollectionsQuery, useCollectionNotesQuery, useToggleCollectionFavoriteMutation } from '../hooks/useNotes'
 import { useBackground } from '../context/BackgroundContext'
@@ -185,7 +185,7 @@ export function CollectionPlayPage() {
                 onSelect={handleSelectNote}
                 onToggleFavorite={(note) => {
                   if (isSimulating) { simulation.toggleFavorite(note.id, !note.favorite); return }
-                  favoriteMutation.mutate({ id: note.id, favorite: !note.favorite })
+                  favoriteMutation.mutate({ id: note.id, favorite: !note.favorite }, { onError: (error) => toast.error(error.message || 'Não deu pra favoritar agora. Confere sua conexão e tenta de novo.') })
                 }}
                 unreadIds={isSimulating ? simulation.unreadNoteIds : (cid ? reader.unreadFor(cid) : [])}
                 emptyHint={isSimulating ? 'Abra pacotinhos na tela inicial ou ajuste os filtros.' : 'Abra um pacotinho ou ajuste os filtros.'}

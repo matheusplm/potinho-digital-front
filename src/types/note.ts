@@ -52,6 +52,7 @@ export interface RarityRevealStyle {
   tremble?: boolean
   vibrate?: boolean
   caption?: string
+  custom?: boolean
 }
 
 export interface RarityConfig {

@@ -86,17 +86,24 @@ export function useSupportActions() {
     void queryClient.invalidateQueries({ queryKey: SUPPORT_UNREAD_KEY })
   }
 
+  const resyncTicket = (id: string) => {
+    void queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_ROOT, 'support-ticket', id] })
+    void queryClient.invalidateQueries({ queryKey: SUPPORT_LIST_KEY })
+  }
+
   const reply = useMutation({
     mutationFn: ({ id, message }: { id: string; message: string }) => api.adminSupportReply(token(), id, message),
     onSuccess: ({ ticket, message }) => {
       queryClient.setQueryData<SupportThread<SupportTicket>>([ADMIN_QUERY_ROOT, 'support-ticket', ticket.id], (thread) => thread && { ticket, messages: [...thread.messages, message] })
       syncTicket(ticket)
     },
+    onError: (_error, { id }) => resyncTicket(id),
   })
 
   const setStatus = useMutation({
     mutationFn: ({ id, status }: { id: string; status: 'open' | 'done' }) => api.adminSupportStatus(token(), id, status),
     onSuccess: syncTicket,
+    onError: (_error, { id }) => resyncTicket(id),
   })
 
   const remove = useMutation({
@@ -106,6 +113,7 @@ export function useSupportActions() {
       queryClient.removeQueries({ queryKey: [ADMIN_QUERY_ROOT, 'support-ticket', id] })
       void queryClient.invalidateQueries({ queryKey: SUPPORT_UNREAD_KEY })
     },
+    onError: () => { void queryClient.invalidateQueries({ queryKey: SUPPORT_LIST_KEY }) },
   })
 
   return { reply, setStatus, remove }
