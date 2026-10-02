@@ -5,7 +5,7 @@ export const REVEAL_EFFECTS: RevealEffectDefinition[] = [
     kind: 'none',
     label: 'Nada',
     icon: '🚫',
-    description: 'O bilhete vira e pronto, sem show extra.',
+    description: 'O bilhete chega e pronto, sem show extra.',
     usesMedia: false,
     defaultMedia: '',
     durationMs: 0,

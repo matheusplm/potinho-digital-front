@@ -23,6 +23,7 @@ import {
   useOpenCollectionPackMutation,
   usePendingInvitesQuery,
   useReaderAchievementsQuery,
+  queryKeys,
 } from '../hooks/useNotes'
 import { colors, fadeIn, font, radius } from '../design-system'
 import { isCollectionReader } from '../utils/collectionAccess'
@@ -330,7 +331,14 @@ export function SimulatedReaderHomePage() {
           setNow(Date.now())
           toast.info(error.message ?? 'Pacotinho ainda em cooldown.')
         } else {
-          toast.error((error as Error).message ?? 'Erro ao abrir pacotinho.')
+          await queryClient.invalidateQueries({ queryKey: queryKeys.play(cid) })
+          await queryClient.invalidateQueries({ queryKey: ['col-pack-statuses', cid] })
+          setNow(Date.now())
+          if (error instanceof ApiRequestError && error.code === 'NETWORK_ERROR') {
+            toast.error('Não deu pra confirmar a abertura', { description: 'Confere sua conexão. Se o pacotinho chegou a abrir, os bilhetes já estão no seu álbum.' })
+          } else {
+            toast.error((error as Error).message ?? 'Erro ao abrir pacotinho.')
+          }
         }
       } finally {
         setIsOpeningPack(false)

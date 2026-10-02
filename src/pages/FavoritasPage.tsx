@@ -1,7 +1,7 @@
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, Stack, Typography } from '@mui/material'
 import { useMemo, useState } from 'react'
-import { LoadingState, ScrollablePage } from '../components/ui'
+import { LoadingState, ScrollablePage, toast } from '../components/ui'
 import { NoteCard } from '../components/collection/NoteCard'
 import { NoteDetailDialog, type ReadableNote } from '../components/collection/NoteDetailDialog'
 import { useBackground } from '../context/BackgroundContext'
@@ -87,7 +87,7 @@ export function FavoritasPage() {
                 unread={cid ? reader.unreadFor(cid).includes(note.id) : false}
                 variant="grid"
                 onSelect={(n) => { if (cid) reader.markViewed(cid, n.id); setSelected(n) }}
-                onToggleFavorite={(n) => favoriteMutation.mutate({ id: n.id, favorite: !n.favorite })}
+                onToggleFavorite={(n) => favoriteMutation.mutate({ id: n.id, favorite: !n.favorite }, { onError: (error) => toast.error(error.message || 'Não deu pra favoritar agora. Confere sua conexão e tenta de novo.') })}
               />
             ))}
           </Box>

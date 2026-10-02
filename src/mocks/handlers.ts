@@ -24,6 +24,7 @@ import {
   db,
   findCollection,
   nextId,
+  ONE_OF_EACH_PACK_ID,
   resolveUser,
   type CollectionState,
   type MockUser,
@@ -745,6 +746,16 @@ const collectionHandlers = [
     const { ownership } = collection
     const rewards: Array<{ id: string; title: string; message: string; rarity: string; typeId: string; isNew: boolean }> = []
     const used = new Set<string>()
+    if (pack.id === ONE_OF_EACH_PACK_ID) {
+      const byRarity = collection.rarities.map((rarity) => eligible.filter((note) => note.rarity === rarity.id)).filter((pool) => pool.length > 0)
+      for (const pool of byRarity.sort(() => Math.random() - 0.5)) {
+        const note = pool[Math.floor(Math.random() * pool.length)]
+        const isNew = !ownership.owned.has(note.id)
+        if (isNew) { ownership.owned.add(note.id); ownership.obtainedAt[note.id] = now.toISOString() }
+        used.add(note.id)
+        rewards.push({ id: note.id, title: note.title, message: note.message, rarity: note.rarity, typeId: note.typeId, isNew })
+      }
+    }
     if (pack.guaranteedRarityId) {
       const pool = eligible.filter((n) => n.rarity === pack.guaranteedRarityId && !used.has(n.id))
       if (pool.length > 0) {
@@ -755,7 +766,7 @@ const collectionHandlers = [
         rewards.push({ id: note.id, title: note.title, message: note.message, rarity: note.rarity, typeId: note.typeId, isNew })
       }
     }
-    const count = Math.max(1, pack.cardsPerOpen)
+    const count = pack.id === ONE_OF_EACH_PACK_ID ? rewards.length : Math.max(1, pack.cardsPerOpen)
     while (rewards.length < count) {
       const pool = eligible.filter((n) => !used.has(n.id))
       if (pool.length === 0) break

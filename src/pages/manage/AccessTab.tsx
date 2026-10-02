@@ -87,12 +87,14 @@ export function AccessTab({ cid }: AccessTabProps) {
     }
   }
 
-  async function handleCancelInvite(email: string) {
+  async function handleCancelInvite(email: string): Promise<boolean> {
     try {
       await cancelInviteMutation.mutateAsync(email)
-      toast.success('Convite cancelado.')
+      toast.success('Convite cancelado', { description: `O link enviado para ${email} não funciona mais.` })
+      return true
     } catch (e) {
       toast.error((e as Error).message || 'Erro ao cancelar convite.')
+      return false
     }
   }
 
@@ -136,7 +138,7 @@ export function AccessTab({ cid }: AccessTabProps) {
                 effectiveStatus={effectiveStatus(invite)}
                 isMutating={sendInviteMutation.isPending || cancelInviteMutation.isPending}
                 onResend={() => void handleResendInvite(invite.email)}
-                onCancel={() => void handleCancelInvite(invite.email)}
+                onCancel={() => handleCancelInvite(invite.email)}
               />
             ))}
           </Stack>
@@ -154,7 +156,7 @@ export function AccessTab({ cid }: AccessTabProps) {
                 effectiveStatus={effectiveStatus(invite)}
                 isMutating={sendInviteMutation.isPending || cancelInviteMutation.isPending}
                 onResend={() => void handleResendInvite(invite.email)}
-                onCancel={() => void handleCancelInvite(invite.email)}
+                onCancel={() => handleCancelInvite(invite.email)}
               />
             ))}
           </Stack>
@@ -172,7 +174,7 @@ export function AccessTab({ cid }: AccessTabProps) {
                 effectiveStatus={effectiveStatus(invite)}
                 isMutating={false}
                 onResend={() => void handleResendInvite(invite.email)}
-                onCancel={() => void handleCancelInvite(invite.email)}
+                onCancel={() => handleCancelInvite(invite.email)}
                 hideActions
               />
             ))}
@@ -304,13 +306,21 @@ interface InviteRowProps {
   effectiveStatus: CollectionInvite['status']
   isMutating: boolean
   onResend: () => void
-  onCancel: () => void
+  onCancel: () => Promise<boolean>
   hideActions?: boolean
 }
 
 function InviteRow({ invite, effectiveStatus: status, isMutating, onResend, onCancel, hideActions }: InviteRowProps) {
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [cancelling, setCancelling] = useState(false)
   const statusColor = STATUS_COLOR[status]
+
+  const confirmCancel = async () => {
+    setCancelling(true)
+    const done = await onCancel()
+    setCancelling(false)
+    if (done) setConfirmOpen(false)
+  }
   const statusLabel = STATUS_LABEL[status]
   return (
     <>
@@ -350,7 +360,7 @@ function InviteRow({ invite, effectiveStatus: status, isMutating, onResend, onCa
         </Stack>
       </Card>
 
-      <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)} maxWidth="xs" fullWidth slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2 } } }}>
+      <Dialog open={confirmOpen} onClose={() => { if (!cancelling) setConfirmOpen(false) }} maxWidth="xs" fullWidth slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2 } } }}>
         <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, pb: 0.5 }}>
           Cancelar convite?
         </DialogTitle>
@@ -360,10 +370,10 @@ function InviteRow({ invite, effectiveStatus: status, isMutating, onResend, onCa
           </Typography>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
-          <Button variant="ghost" onClick={() => setConfirmOpen(false)} sx={{ flex: 1, fontSize: '0.82rem' }}>
+          <Button variant="ghost" onClick={() => setConfirmOpen(false)} disabled={cancelling} sx={{ flex: 1, fontSize: '0.82rem' }}>
             Manter
           </Button>
-          <Button variant="primary" onClick={() => { setConfirmOpen(false); onCancel() }} sx={{ flex: 1, fontSize: '0.82rem', background: colors.rose.main, '&:hover': { background: '#be123c' } }}>
+          <Button variant="rose" onClick={() => { void confirmCancel() }} loading={cancelling} disabled={cancelling} sx={{ flex: 1, fontSize: '0.82rem' }}>
             Cancelar convite
           </Button>
         </DialogActions>

@@ -200,11 +200,26 @@ function createInitialDb(): MockDb {
         draftNote('note_ju_draft_2', 'Sorvete de pistache', 'Prometo dividir o próximo, mesmo sendo o meu favorito.', 'comum', 'alegria'),
       ],
       access: [{
-        collectionId: 'col_ju', email: tester.email, packIds: ['bonus_carinho', 'bonus_lendario'],
-        packOpens: { bonus_carinho: 2, bonus_lendario: 1 }, createdAt: hoursAgo(24 * 18),
+        collectionId: 'col_ju', email: tester.email, packIds: ['bonus_carinho', 'bonus_lendario', ONE_OF_EACH_PACK_ID],
+        packOpens: { bonus_carinho: 2, bonus_lendario: 1, [ONE_OF_EACH_PACK_ID]: 50 }, createdAt: hoursAgo(24 * 18),
       }],
     },
   )
+  testerCollection.packs.push({
+    id: ONE_OF_EACH_PACK_ID, collectionId: 'col_ju', name: 'Um de cada', emoji: '🌈',
+    description: 'Pacote de teste: sempre vem um bilhete de cada raridade.',
+    category: 'bonus', status: 'active', distribution: 'manual_bonus', cardsPerOpen: 5, cooldownHours: null,
+    allowedTypeIds: [], allowedRarityIds: [], guaranteedRarityId: null,
+    gradient: 'linear-gradient(135deg,#fdf4ff,#e0f2fe,#fef9c3)', accent: '#a855f7',
+    scheduleMode: 'cooldown', scheduleTime: null, scheduleTimezone: 'America/Sao_Paulo', cumulative: false, maxAccumulated: 3,
+    createdAt: hoursAgo(24), updatedAt: hoursAgo(24),
+  } as CollectionPack)
+  const showcaseStyles: Record<string, Partial<RarityConfig>> = {
+    raro: { revealStyle: { tier: 'rare' } },
+    mitico: { revealStyle: { tier: 'epic', color: 'rainbow' }, revealEffect: 'sparkle' },
+    lendario: { revealStyle: { tier: 'legendary', color: 'gold' }, revealEffect: 'burst', revealMedia: '👑' },
+  }
+  testerCollection.rarities = testerCollection.rarities.map((rarity) => ({ ...rarity, ...(showcaseStyles[rarity.id] ?? {}) }))
 
   const invitedCollection = buildCollection(
     {
@@ -253,6 +268,8 @@ function createInitialDb(): MockDb {
     sequence: 100,
   }
 }
+
+export const ONE_OF_EACH_PACK_ID = 'pack_um_de_cada'
 
 export const db: MockDb = createInitialDb()
 

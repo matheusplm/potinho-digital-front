@@ -61,7 +61,7 @@ export function NoteCard({ note, r, ts = [], unread, variant, onSelect, onToggle
         {unread && (
           <Box sx={{ position: 'absolute', top: 2, left: 2, width: 11, height: 11, zIndex: 5, borderRadius: radius.full, background: colors.rose.main, boxShadow: `0 0 0 3px rgba(255,255,255,0.82), 0 0 14px ${colors.rose.glow}`, pointerEvents: 'none' }} />
         )}
-        <IconButton size="small" aria-label="favoritar bilhete" onClick={(event) => { event.stopPropagation(); onToggleFavorite(note) }} sx={{ position: 'absolute', top: 8, right: 8, p: 0.5, borderRadius: radius.md, zIndex: 5, color: note.favorite ? colors.rose.main : (r?.captionColor ?? ink.muted), background: note.favorite ? 'rgba(254,243,199,0.92)' : 'rgba(255,255,255,0.74)', border: `1px solid ${note.favorite ? 'rgba(234,179,8,0.38)' : 'rgba(255,255,255,0.68)'}`, backdropFilter: 'blur(8px)', boxShadow: '0 4px 12px rgba(15,23,42,0.08)' }}>
+        <IconButton size="small" aria-label={note.favorite ? "desfavoritar bilhete" : "favoritar bilhete"} onClick={(event) => { event.stopPropagation(); onToggleFavorite(note) }} sx={{ position: 'absolute', top: 8, right: 8, p: 0.5, borderRadius: radius.md, zIndex: 5, color: note.favorite ? colors.rose.main : (r?.captionColor ?? ink.muted), background: note.favorite ? 'rgba(254,243,199,0.92)' : 'rgba(255,255,255,0.74)', border: `1px solid ${note.favorite ? 'rgba(234,179,8,0.38)' : 'rgba(255,255,255,0.68)'}`, backdropFilter: 'blur(8px)', boxShadow: '0 4px 12px rgba(15,23,42,0.08)' }}>
           {note.favorite ? <StarIcon sx={{ fontSize: 16, color: '#eab308' }} /> : <StarBorderIcon sx={{ fontSize: 16 }} />}
         </IconButton>
         {variant === 'list' && (
@@ -108,7 +108,7 @@ export function NoteCard({ note, r, ts = [], unread, variant, onSelect, onToggle
           >
             {linkifyText(note.message ?? '')}
           </Typography>
-          <IconButton size="small" aria-label="favoritar bilhete" onClick={(event) => { event.stopPropagation(); onToggleFavorite(note) }} sx={{ position: 'absolute', top: 6, right: 6, p: 0.5, borderRadius: radius.md, color: note.favorite ? colors.rose.main : (r?.captionColor ?? ink.muted), background: note.favorite ? 'rgba(254,243,199,0.92)' : 'rgba(255,255,255,0.74)', border: `1px solid ${note.favorite ? 'rgba(234,179,8,0.38)' : 'rgba(255,255,255,0.68)'}`, backdropFilter: 'blur(8px)', boxShadow: '0 4px 12px rgba(15,23,42,0.08)' }}>
+          <IconButton size="small" aria-label={note.favorite ? "desfavoritar bilhete" : "favoritar bilhete"} onClick={(event) => { event.stopPropagation(); onToggleFavorite(note) }} sx={{ position: 'absolute', top: 6, right: 6, p: 0.5, borderRadius: radius.md, color: note.favorite ? colors.rose.main : (r?.captionColor ?? ink.muted), background: note.favorite ? 'rgba(254,243,199,0.92)' : 'rgba(255,255,255,0.74)', border: `1px solid ${note.favorite ? 'rgba(234,179,8,0.38)' : 'rgba(255,255,255,0.68)'}`, backdropFilter: 'blur(8px)', boxShadow: '0 4px 12px rgba(15,23,42,0.08)' }}>
             {note.favorite ? <StarIcon sx={{ fontSize: 16, color: '#eab308' }} /> : <StarBorderIcon sx={{ fontSize: 16 }} />}
           </IconButton>
           {variant === 'list' && textOverflowing && (

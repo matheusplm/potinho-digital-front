@@ -55,6 +55,7 @@ export function useMySupportActions() {
     onSuccess: (ticket) => {
       queryClient.setQueryData<MySupportTicket[]>(MY_TICKETS_KEY, (list) => [ticket, ...(list ?? [])])
     },
+    onError: () => { void queryClient.invalidateQueries({ queryKey: MY_TICKETS_KEY }) },
   })
 
   const reply = useMutation({
@@ -62,6 +63,10 @@ export function useMySupportActions() {
     onSuccess: ({ ticket, message }) => {
       queryClient.setQueryData<SupportThread<MySupportTicket>>(ticketKey(ticket.id), (thread) => thread && { ticket, messages: [...thread.messages, message] })
       queryClient.setQueryData<MySupportTicket[]>(MY_TICKETS_KEY, (list) => [ticket, ...(list ?? []).filter((item) => item.id !== ticket.id)])
+    },
+    onError: (_error, { id }) => {
+      void queryClient.invalidateQueries({ queryKey: ticketKey(id) })
+      void queryClient.invalidateQueries({ queryKey: MY_TICKETS_KEY })
     },
   })
 
