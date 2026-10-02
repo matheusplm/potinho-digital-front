@@ -12,7 +12,8 @@
     "arch": "depcruise src",
     "deadcode": "knip",
     "dupes": "jscpd",
-    "check": "npm run typecheck && npm run lint && npm run arch && npm run deadcode && npm run dupes"
+    "check": "npm run typecheck && npm run lint && npm run arch && npm run deadcode && npm run dupes",
+    "prepare": "husky"
   },
   "dependencies": {
     "@emoji-mart/data": "^1.2.1",
@@ -47,6 +48,7 @@
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.9",
     "globals": "^15.9.0",
+    "husky": "^9.1.7",
     "jscpd": "^5.4.0",
     "knip": "^6.39.0",
     "msw": "^2.13.4",
