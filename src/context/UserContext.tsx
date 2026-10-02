@@ -3,9 +3,9 @@ import { useQueryClient } from '@tanstack/react-query'
 import { api, onSessionRefresh, setAuthToken } from '../services/api'
 import { clearAdminSession } from '../services/adminSession'
 import { attachExistingPush, detachPushFromSession } from '../services/pushSubscription'
+import type { Persona, UserRole } from '../types/user'
 
-export type UserRole = 'writer' | 'reader'
-export type Persona = UserRole | 'admin'
+export type { Persona, UserRole }
 
 interface AuthUser {
   id: string

@@ -30,7 +30,12 @@ env:
   COMMIT_EMAIL: matheusmty@gmail.com
 
 jobs:
+  checks:
+    if: github.repository == 'matheusplm/potinho-digital-front'
+    uses: ./.github/workflows/checks.yml
+
   mirror:
+    needs: checks
     runs-on: ubuntu-latest
     # Trava anti-loop: se este arquivo acabar rodando em qualquer outro repo
     # (ex.: alguém restaurar o workflow no destino), o job não roda.

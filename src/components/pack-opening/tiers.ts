@@ -108,10 +108,6 @@ export function revealOrder(rewards: CollectionDailyReward[], rarities: RarityCo
     .sort((a, b) => TIER_RANK[a.style.tier] - TIER_RANK[b.style.tier] || (b.rarity?.odds ?? 100) - (a.rarity?.odds ?? 100))
 }
 
-export function vibrationFor(tier: Tier): number | number[] {
-  return tier === 'legendary' ? [30, 60, 90] : tier === 'epic' ? [25, 50] : 20
-}
-
 export function vibrate(pattern: number | number[]) {
   try {
     navigator.vibrate?.(pattern)

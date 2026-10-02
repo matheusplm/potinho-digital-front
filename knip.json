@@ -1,0 +1,6 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": ["src/entry-prerender.tsx", "scripts/*.mjs"],
+  "project": ["src/**/*.{ts,tsx}", "scripts/**/*.mjs"],
+  "ignoreExportsUsedInFile": true
+}
