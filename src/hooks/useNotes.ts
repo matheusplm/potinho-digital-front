@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { api, ApiRequestError } from '../services/api'
+import { useEffect, useRef } from 'react'
+import { api } from '../services/api'
 import { emitTour } from '../tour/events'
 import type { CollectionAchievementFormData, CollectionInvite, CollectionPackFormData, NoteFormData, NotifyConfig, PackStatusResponse, RarityConfig, NoteTypeConfig } from '../types/note'
 
@@ -18,6 +19,7 @@ export const queryKeys = {
   readerAchievements: (cid: string) => ['reader-achievements', cid] as const,
   invites: (cid: string) => ['col-invites', cid] as const,
   myNotifications: () => ['my-notifications'] as const,
+  notificationState: () => ['my-notifications-state'] as const,
   pendingInvites: () => ['pending-invites'] as const,
   mySupportTickets: () => ['my-support-tickets'] as const,
   mySupportUnread: () => ['my-support-unread'] as const,
@@ -235,27 +237,26 @@ export function useCollectionPacksQuery(cid: string) {
   return useQuery({ queryKey: queryKeys.packs(cid), queryFn: () => api.getCollectionPacks(cid), enabled: !!cid })
 }
 
+const PACK_STATUS_MIN_WAIT_MS = 15_000
+const PACK_STATUS_MAX_WAIT_MS = 5 * 60_000
+
+function nextPackStatusCheck(statuses: Record<string, PackStatusResponse | null> | undefined) {
+  const waits = Object.values(statuses ?? {})
+    .filter((status): status is PackStatusResponse => !!status && !status.canOpen)
+    .map((status) => Date.parse(status.nextAvailableAt) - Date.parse(status.serverTime))
+    .filter((ms) => ms > 0)
+  return Math.max(PACK_STATUS_MIN_WAIT_MS, Math.min(PACK_STATUS_MAX_WAIT_MS, ...waits.map((ms) => ms + 1_000)))
+}
+
 export function useCollectionPackStatusesQuery(cid: string, packIds: string[], enabled = true) {
   return useQuery({
     queryKey: queryKeys.packStatuses(cid, packIds),
     queryFn: async () => {
-      const entries = await Promise.all(
-        packIds.map(async (packId) => {
-          try {
-            const status = await api.getCollectionPackStatus(cid, packId)
-            return [packId, status] as const
-          } catch (error) {
-            if (error instanceof ApiRequestError && [404, 405].includes(error.status)) {
-              return [packId, null] as const
-            }
-            throw error
-          }
-        }),
-      )
-      return Object.fromEntries(entries) as Record<string, PackStatusResponse | null>
+      const all = await api.getCollectionPackStatuses(cid)
+      return Object.fromEntries(packIds.map((packId) => [packId, all[packId] ?? null])) as Record<string, PackStatusResponse | null>
     },
     enabled: !!cid && packIds.length > 0 && enabled,
-    refetchInterval: enabled ? 30_000 : false,
+    refetchInterval: (query) => (enabled ? nextPackStatusCheck(query.state.data) : false),
   })
 }
 
@@ -329,13 +330,30 @@ export function useReleaseNotesMutation(cid: string) {
   })
 }
 
-export function useMyNotificationsQuery(options?: { enabled?: boolean; refetchInterval?: number }) {
+export function useMyNotificationsQuery(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: queryKeys.myNotifications(),
     queryFn: () => api.getMyNotifications(),
     enabled: options?.enabled ?? true,
-    refetchInterval: options?.refetchInterval ?? 5 * 60_000,
   })
+}
+
+export function useNotificationsWatcher(enabled: boolean, checkEveryMs: number) {
+  const queryClient = useQueryClient()
+  const { data } = useQuery({
+    queryKey: queryKeys.notificationState(),
+    queryFn: () => api.getNotificationState(),
+    enabled,
+    refetchInterval: checkEveryMs,
+  })
+  const lastChange = useRef<string | null | undefined>(undefined)
+  useEffect(() => {
+    if (!data) return
+    if (lastChange.current !== undefined && lastChange.current !== data.changedAt) {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.myNotifications() })
+    }
+    lastChange.current = data.changedAt
+  }, [data, queryClient])
 }
 
 export function useMarkNotificationReadMutation() {

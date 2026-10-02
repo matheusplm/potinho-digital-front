@@ -644,6 +644,14 @@ const collectionHandlers = [
     })))
   }),
 
+  http.get('/api/collections/:cid/pack-statuses', async ({ params, request }) => {
+    await delay(120)
+    const auth = authorizeCollection(request, String(params.cid), 'read')
+    if (!auth.ok) return auth.response
+    const { collection } = auth
+    return HttpResponse.json(Object.fromEntries(collection.packs.map((pack) => [pack.id, packStatusResponse(collection, pack)])))
+  }),
+
   http.get('/api/collections/:cid/packs/:packId/status', async ({ params, request }) => {
     await delay(120)
     const auth = authorizeCollection(request, String(params.cid), 'read')
@@ -932,6 +940,18 @@ const collectionHandlers = [
     return HttpResponse.json(db.notifications
       .filter((item) => item.userId === user.id)
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt)))
+  }),
+
+  http.get('/api/notifications/state', async ({ request }) => {
+    await delay(60)
+    const user = resolveUser(tokenFrom(request))
+    if (!user) return HttpResponse.json({ message: 'Não autenticado.' }, { status: 401 })
+    const changes = db.notifications
+      .filter((item) => item.userId === user.id)
+      .flatMap((item) => [item.createdAt, item.readAt ?? ''])
+      .filter(Boolean)
+      .sort()
+    return HttpResponse.json({ changedAt: changes[changes.length - 1] ?? null })
   }),
 
   http.patch('/api/notifications/:cid/:id/read', async ({ params, request }) => {

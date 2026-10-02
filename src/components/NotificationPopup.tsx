@@ -4,12 +4,13 @@ import { AnnouncementModal } from './collection/AnnouncementModal'
 import { useReader } from '../context/ReaderContext'
 import { useSimulation } from '../context/SimulationContext'
 import { useUser } from '../context/UserContext'
-import { useMarkNotificationReadMutation, useMyNotificationsQuery } from '../hooks/useNotes'
+import { useMarkNotificationReadMutation, useMyNotificationsQuery, useNotificationsWatcher } from '../hooks/useNotes'
 import { useTour } from '../tour/TourContext'
 import type { UserNotification } from '../types/note'
 
 const QUIET_ROUTES = /^\/(notificacoes|convite)(\/|$)/
 const CHECK_EVERY_MS = 60_000
+const CHECK_EVERY_MS_OUTSIDE_READER = 5 * 60_000
 const RETRY_WHILE_BUSY_MS = 3_000
 
 const keyOf = (notification: UserNotification) => `${notification.collectionId}:${notification.notificationId}`
@@ -27,7 +28,8 @@ export function NotificationPopup() {
   const location = useLocation()
   const navigate = useNavigate()
   const enabled = !!user && persona === 'reader' && !simulating
-  const { data: notifications = [] } = useMyNotificationsQuery({ enabled, refetchInterval: CHECK_EVERY_MS })
+  useNotificationsWatcher(!!user && !simulating, persona === 'reader' ? CHECK_EVERY_MS : CHECK_EVERY_MS_OUTSIDE_READER)
+  const { data: notifications = [] } = useMyNotificationsQuery({ enabled })
   const markRead = useMarkNotificationReadMutation()
   const [shown, setShown] = useState<UserNotification[]>([])
   const [retryTick, setRetryTick] = useState(0)
