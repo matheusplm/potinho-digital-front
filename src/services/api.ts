@@ -344,6 +344,7 @@ export const api = {
   getCollectionNotifications: (cid: string) =>
     request<CollectionNotification[]>(`/api/collections/${cid}/notifications`),
   getMyNotifications: () => request<UserNotification[]>('/api/notifications'),
+  getNotificationState: () => request<{ changedAt: string | null }>('/api/notifications/state'),
   markNotificationRead: (cid: string, notificationId: string) =>
     request<{ read: boolean }>(`/api/notifications/${cid}/${notificationId}/read`, { method: 'PATCH' }),
   restoreCollectionNote: (cid: string, id: string) =>
@@ -376,8 +377,8 @@ export const api = {
     request<{ deleted: boolean }>(`/api/collections/${cid}/types/${id}`, { method: 'DELETE' }),
 
   getCollectionPacks: (cid: string) => request<CollectionPack[]>(`/api/collections/${cid}/packs`),
-  getCollectionPackStatus: (cid: string, packId: string) =>
-    request<PackStatusResponse>(`/api/collections/${cid}/packs/${packId}/status`),
+  getCollectionPackStatuses: (cid: string) =>
+    request<Record<string, PackStatusResponse>>(`/api/collections/${cid}/pack-statuses`),
   createCollectionPack: (cid: string, data: CollectionPackFormData) =>
     request<CollectionPack>(`/api/collections/${cid}/packs`, { method: 'POST', body: JSON.stringify(data) }),
   updateCollectionPack: (cid: string, id: string, data: Partial<CollectionPackFormData>) =>
