@@ -4,13 +4,12 @@ import { Box, IconButton, Stack, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Button, LoadingState, PageTitle, ScrollablePage, SegmentedControl, toast } from '../components/ui'
-import { useCollectionsQuery } from '../hooks/useNotes'
 import { useBackground } from '../context/BackgroundContext'
 import { FloatingParticles } from '../components/FloatingParticles'
 import { useUser } from '../context/UserContext'
 import { fadeIn, colors, font } from '../design-system'
 import { isCollectionOwner } from '../utils/collectionAccess'
-import { findCollectionBySlug } from '../utils/slug'
+import { useCollectionBySlug } from '../hooks/useCollectionBySlug'
 import { NotesTab, type NotesIntent } from './manage/NotesTab'
 import { RaritiesTab } from './manage/RaritiesTab'
 import { TypesTab } from './manage/TypesTab'
@@ -62,8 +61,7 @@ export function CollectionManagePage() {
     setSearchParams(next === 'notes' ? {} : { aba: TAB_SLUG[next] }, { replace: true })
   }
 
-  const { data: collections = [], isLoading: collectionsLoading } = useCollectionsQuery()
-  const collection = findCollectionBySlug(collections, slug)
+  const { collection, loading: collectionsLoading } = useCollectionBySlug(slug)
   const cid = collection?.id ?? ''
   const canManage = collection ? isCollectionOwner(collection, user?.id) : false
 

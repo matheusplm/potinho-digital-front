@@ -294,7 +294,7 @@ export function CollectionsListPage() {
           </>
         )}
 
-        {isWriter && !isLoading && (
+        {isWriter && !isLoading && (collections.length > 0 || trashItem) && (
           <Box sx={{
             mt: 2.5, p: 1.6, borderRadius: '16px',
             border: `1.5px dashed ${theme.accent}55`,

@@ -476,12 +476,14 @@ const collectionHandlers = [
 
   http.post('/api/collections/from-template', async ({ request }) => {
     await delay(420)
+    const owner = resolveUser(tokenFrom(request))
+    if (!owner) return HttpResponse.json({ message: 'Não autenticado.' }, { status: 401 })
     const { templateId } = (await request.json()) as { templateId: string; inviteEmail?: string }
     const template = COLLECTION_TEMPLATES.find((item) => item.id === templateId)
     if (!template) return HttpResponse.json({ message: 'Template não encontrado.' }, { status: 404 })
     const now = new Date().toISOString()
     const meta: Collection = {
-      id: nextId('col'), ownerId: db.users[0]?.id ?? 'user_writer', name: template.collection.name, emoji: template.collection.emoji,
+      id: nextId('col'), ownerId: owner.id, name: template.collection.name, emoji: template.collection.emoji,
       description: template.tagline, theme: 'romance', access: 'owner', createdAt: now, updatedAt: now,
     }
     const collection = createEmptyCollection(meta)
@@ -497,10 +499,12 @@ const collectionHandlers = [
 
   http.post('/api/collections', async ({ request }) => {
     await delay(280)
+    const owner = resolveUser(tokenFrom(request))
+    if (!owner) return HttpResponse.json({ message: 'Não autenticado.' }, { status: 401 })
     const data = (await request.json()) as CollectionFormData
     const now = new Date().toISOString()
     const meta: Collection = {
-      id: nextId('col'), ownerId: db.users[0]?.id ?? 'user_writer', ...data,
+      id: nextId('col'), ownerId: owner.id, ...data,
       access: 'owner', createdAt: now, updatedAt: now,
     }
     db.collections.push(createEmptyCollection(meta))

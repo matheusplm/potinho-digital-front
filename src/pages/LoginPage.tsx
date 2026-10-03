@@ -6,7 +6,7 @@ import type { TurnstileInstance } from '@marsidev/react-turnstile'
 import { useUser } from '../context/UserContext'
 import { api, ApiRequestError } from '../services/api'
 import { safeRedirect } from '../utils/safeRedirect'
-import { Button, Input, toast } from '../components/ui'
+import { Button, Input, PasswordInput, toast } from '../components/ui'
 import { GoogleSignInButton } from '../components/GoogleSignInButton'
 import { FloatingParticles } from '../components/FloatingParticles'
 import { useBackground } from '../context/BackgroundContext'
@@ -87,7 +87,7 @@ export function LoginPage() {
 
       <FloatingParticles />
 
-      <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 3, py: 2, animation: `${fadeSlide} 0.5s ease both` }} spacing={0}>
+      <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 3, py: 2, position: 'relative', zIndex: 1, animation: `${fadeSlide} 0.5s ease both` }} spacing={0}>
         <BrandLogo size={72} sx={{ mb: 3 }} />
 
         <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2.8rem', lineHeight: 1, color: colors.text.primary, textAlign: 'center', letterSpacing: '-0.5px' }}>
@@ -109,7 +109,7 @@ export function LoginPage() {
           <Stack spacing={2}>
             <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" fullWidth required />
             <Box>
-              <Input label="Senha" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" fullWidth required />
+              <PasswordInput label="Senha" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Sua senha" autoComplete="current-password" fullWidth required />
               <Typography sx={{ mt: 0.5, textAlign: 'right' }}>
                 <Link to="/esqueci-minha-senha" style={{ color: colors.primary.text, fontSize: '0.78rem', textDecoration: 'none', fontWeight: 600 }}>
                   Esqueci minha senha
