@@ -62,7 +62,8 @@ export function RouteMeta() {
     document.title = page?.title ?? (section ? `${section} · ${BRAND}` : BRAND)
     setMeta('meta[name="description"]', 'content', page?.description ?? DEFAULT_DESCRIPTION, () => Object.assign(document.createElement('meta'), { name: 'description' }))
     setMeta('meta[name="robots"]', 'content', page ? 'index, follow' : 'noindex, nofollow', () => Object.assign(document.createElement('meta'), { name: 'robots' }))
-    setMeta('link[rel="canonical"]', 'href', `${SITE_URL}${page ? path : '/'}`, () => Object.assign(document.createElement('link'), { rel: 'canonical' }))
+    if (page) setMeta('link[rel="canonical"]', 'href', `${SITE_URL}${path}`, () => Object.assign(document.createElement('link'), { rel: 'canonical' }))
+    else document.head.querySelector('link[rel="canonical"]')?.remove()
   }, [pathname])
 
   return null

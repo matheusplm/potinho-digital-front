@@ -103,8 +103,7 @@ export function useWriterHome() {
     const raritiesByCollection = new Map<string, RarityConfig[]>(owned.map((collection, index) => [collection.id, rarities.data[index] ?? []]))
 
     return {
-      loading: collectionsPending || accesses.pending || notes.pending || packs.pending,
-      readersLoading: accesses.pending || views.pending,
+      loading: collectionsPending || accesses.pending || invites.pending || notes.pending || packs.pending || rarities.pending || views.pending,
       hiddenReaders: readerTargets.length - visibleTargets.length,
       collections: collectionSummaries,
       readers,

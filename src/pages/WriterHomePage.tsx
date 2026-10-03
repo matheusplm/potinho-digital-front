@@ -31,7 +31,7 @@ export function WriterHomePage() {
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite'
   const hasCollections = home.collections.length > 0
-  const settled = !home.loading && !home.readersLoading
+  const settled = !home.loading
 
   function chooseGift(reader: ReaderSummary, pack: CollectionPack) {
     setGiftMenu(null)
@@ -78,7 +78,11 @@ export function WriterHomePage() {
             )}
           </Stack>
 
-          {!home.loading && !hasCollections && (
+          {!settled && (
+            <LoadingState compact label="Preparando seu potinho" accent={theme.accent} textColor={theme.textOnBg} mutedColor={theme.textOnBgMuted} />
+          )}
+
+          {settled && !hasCollections && (
             <EmptyState
               emoji="🫙"
               title="Seu primeiro potinho"
@@ -87,15 +91,13 @@ export function WriterHomePage() {
             />
           )}
 
-          {hasCollections && (
+          {settled && hasCollections && (
             <>
               <TouchedSection readers={home.readers} raritiesByCollection={home.raritiesByCollection} />
 
               <Stack spacing={1.2}>
                 <SectionLabel color={theme.textOnBgMuted}>🫶 Seus leitores</SectionLabel>
-                {home.readersLoading ? (
-                  <LoadingState compact label="Buscando seus leitores" accent={theme.accent} textColor={theme.textOnBg} mutedColor={theme.textOnBgMuted} />
-                ) : home.readers.length > 0 ? (
+                {home.readers.length > 0 ? (
                   <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))', gap: 1.5 }}>
                     {home.readers.map((reader) => <ReaderCard key={reader.key} reader={reader} onGift={startGift} />)}
                   </Box>
