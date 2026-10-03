@@ -1,0 +1,13 @@
+# Potinho Digital
+
+> Álbum de bilhetes digitais para quem você ama: você escreve as mensagens, monta pacotinhos surpresa e a pessoa abre e coleciona os bilhetes como figurinhas. Grátis, em português.
+
+Quem escreve cria coleções de bilhetes com raridades e tipos, define os pacotinhos (diário, bônus ou temáticos) e convida os leitores por e-mail. Quem lê abre os pacotinhos, coleciona os bilhetes, favorita os preferidos e desbloqueia conquistas. As áreas logadas são privadas e não devem ser rastreadas.
+
+## Páginas públicas
+
+- [Início](https://www.potinhodigital.com.br/): o que é o Potinho Digital e como funciona
+- [Criar conta grátis](https://www.potinhodigital.com.br/register): cadastro de quem escreve ou lê
+- [Entrar](https://www.potinhodigital.com.br/login): acesso à conta
+- [Termos de uso](https://www.potinhodigital.com.br/termos): regras de uso do serviço
+- [Política de privacidade](https://www.potinhodigital.com.br/privacidade): quais dados são guardados e os direitos pela LGPD
