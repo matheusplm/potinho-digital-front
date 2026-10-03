@@ -6,14 +6,14 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Button, Card, LoadingState, ScrollablePage, toast } from '../components/ui'
 import { NoteDetailDialog } from '../components/collection/NoteDetailDialog'
-import { useCollectionPlayQuery, useCollectionRaritiesQuery, useCollectionTypesQuery, useCollectionsQuery, useCollectionNotesQuery, useToggleCollectionFavoriteMutation } from '../hooks/useNotes'
+import { useCollectionPlayQuery, useCollectionRaritiesQuery, useCollectionTypesQuery, useCollectionNotesQuery, useToggleCollectionFavoriteMutation } from '../hooks/useNotes'
 import { useBackground } from '../context/BackgroundContext'
 import { FloatingParticles } from '../components/FloatingParticles'
 import { useUser } from '../context/UserContext'
 import { useSimulation } from '../context/SimulationContext'
 import { useReader } from '../context/ReaderContext'
 import { colors, fadeIn, font, radius } from '../design-system'
-import { findCollectionBySlug } from '../utils/slug'
+import { useCollectionBySlug } from '../hooks/useCollectionBySlug'
 import { isCollectionOwner } from '../utils/collectionAccess'
 import { noteTypeIdList } from '../utils/noteTypes'
 import { CollectionPanel } from '../components/album/CollectionPanel'
@@ -28,8 +28,7 @@ export function CollectionPlayPage() {
   const { theme } = useBackground()
   const reader = useReader()
 
-  const { data: collections = [], isLoading: collectionsLoading } = useCollectionsQuery()
-  const collection = findCollectionBySlug(collections, slug)
+  const { collection, loading: collectionsLoading } = useCollectionBySlug(slug)
   const cid = collection?.id ?? ''
   const collectionName = collection?.name
   const notFound = !collectionsLoading && !collection

@@ -18,12 +18,11 @@ import {
   useCollectionPacksQuery,
   useCollectionRaritiesQuery,
   useCollectionTypesQuery,
-  useCollectionsQuery,
   useReaderViewQuery,
   useRevokeAccessMutation,
 } from '../hooks/useNotes'
 import { colors, font, radius } from '../design-system'
-import { findCollectionBySlug } from '../utils/slug'
+import { useCollectionBySlug } from '../hooks/useCollectionBySlug'
 import { isCollectionOwner } from '../utils/collectionAccess'
 import { formatRemainingTime } from '../utils/packCooldowns'
 import { NoteDetailDialog } from '../components/collection/NoteDetailDialog'
@@ -58,8 +57,7 @@ export function ReaderCollectionPage() {
   const queryClient = useQueryClient()
   const email = decodeURIComponent(encodedEmail)
 
-  const { data: collections = [], isLoading: collectionsLoading } = useCollectionsQuery()
-  const collection = findCollectionBySlug(collections, slug)
+  const { collection, loading: collectionsLoading } = useCollectionBySlug(slug)
   const cid = collection?.id ?? ''
   const canManage = collection ? isCollectionOwner(collection, user?.id) : false
 

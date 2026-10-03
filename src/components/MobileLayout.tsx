@@ -132,7 +132,7 @@ export function MobileLayout() {
     <Box sx={{ width: '100%', maxWidth: 480, height: '100dvh', mx: 'auto', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <FloatingMenu />
       <SimulationBanner />
-      {location.pathname === '/home' && !isActive && persona !== 'admin' && !tour.step && <PushPrompt />}
+      {location.pathname === '/home' && !isActive && persona === 'reader' && !tour.step && <PushPrompt />}
 
       <Box component="main" sx={{
         flex: 1,

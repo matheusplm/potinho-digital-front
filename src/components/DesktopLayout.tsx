@@ -449,7 +449,7 @@ export function DesktopLayout() {
 
       <Box sx={{ flex: 1, height: '100%', ...clipOverflow, position: 'relative' }}>
         <SimulationBanner />
-        {location.pathname === '/home' && !isActive && persona !== 'admin' && !tour.step && <PushPrompt />}
+        {location.pathname === '/home' && !isActive && persona === 'reader' && !tour.step && <PushPrompt />}
         <Suspense fallback={<Box sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><LoadingState label="Carregando" /></Box>}>
           <Outlet />
         </Suspense>

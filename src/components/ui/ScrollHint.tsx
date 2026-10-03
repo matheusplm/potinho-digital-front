@@ -46,7 +46,7 @@ export function ScrollHint() {
   return (
     <Box sx={{
         position: 'fixed',
-        top: '43%',
+        bottom: 'calc(env(safe-area-inset-bottom, 0px) + 92px)',
         left: '50%',
         transform: 'translateX(-50%)',
         zIndex: 200,

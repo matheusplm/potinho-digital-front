@@ -625,7 +625,7 @@ const ThemesSection: FC<{ isDesktop: boolean }> = ({ isDesktop }) => {
             Maria 💙
           </Typography>
           <Typography variant="md" sx={{ color: active.textOnBgMuted, fontStyle: 'italic', mb: 2.5 }}>
-            suas coleções estão esperando por você
+            seu pacotinho do dia já chegou 💌
           </Typography>
           <Box sx={{
             background: active.surfaceBg, border: `1px solid ${active.surfaceBorder}`,
@@ -633,16 +633,25 @@ const ThemesSection: FC<{ isDesktop: boolean }> = ({ isDesktop }) => {
             display: 'flex', alignItems: 'center', gap: 1.5,
           }}>
             <Box sx={{ width: 36, height: 36, borderRadius: radius.md, background: `linear-gradient(135deg,${active.accent},${active.accent}88)`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '1rem' }}>
-              📦
+              💌
             </Box>
             <Box sx={{ flex: 1 }}>
               <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 700, color: active.isDark ? active.textOnBg : colors.text.primary, lineHeight: 1.2 }}>
-                Minhas coleções
+                Pacotinho do dia
               </Typography>
               <Typography variant="sm" sx={{ color: active.isDark ? active.textOnBgMuted : colors.text.secondary }}>
-                3 coleções criadas
+                Toque para abrir
               </Typography>
             </Box>
+          </Box>
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 1, mt: 1.2 }}>
+            {[['🎴', '12', 'coletados'], ['❤️', '4', 'favoritas'], ['🏅', '2', 'conquistas']].map(([emoji, value, label]) => (
+              <Box key={label} sx={{ background: active.surfaceBg, border: `1px solid ${active.surfaceBorder}`, borderRadius: radius.lg, py: 1, textAlign: 'center' }}>
+                <Typography variant="lg" sx={{ lineHeight: 1 }}>{emoji}</Typography>
+                <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.1rem', color: active.isDark ? active.textOnBg : colors.text.primary, lineHeight: 1.3 }}>{value}</Typography>
+                <Typography variant="xxs" sx={{ color: active.isDark ? active.textOnBgMuted : colors.text.secondary }}>{label}</Typography>
+              </Box>
+            ))}
           </Box>
         </Box>
         <Box sx={{ px: isDesktop ? 4 : 2.5, pb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>

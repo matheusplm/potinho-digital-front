@@ -1,11 +1,11 @@
-import { Box, CircularProgress, Stack, Typography } from '@mui/material'
+import { Box, Stack, Typography } from '@mui/material'
 import { useRef, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Turnstile } from '@marsidev/react-turnstile'
 import type { TurnstileInstance } from '@marsidev/react-turnstile'
 import { useUser } from '../context/UserContext'
 import { api } from '../services/api'
-import { Button, Input, toast } from '../components/ui'
+import { Button, Input, PasswordInput, toast } from '../components/ui'
 import { GoogleSignInButton } from '../components/GoogleSignInButton'
 import { ScrollHint } from '../components/ui/ScrollHint'
 import { FloatingParticles } from '../components/FloatingParticles'
@@ -15,60 +15,31 @@ import { brandAccent, brandGradient, colors, fadeSlide, font, gradients } from '
 
 const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined
 
-type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid'
-
-const USERNAME_RE = /^[a-z0-9_]+$/
-
-
 export function RegisterPage() {
   const darkTheme = useBackground().theme.isDark
   const navigate = useNavigate()
   const { setUser } = useUser()
-  const [form, setForm] = useState({ name: '', email: '', username: '', password: '', confirm: '' })
+  const [form, setForm] = useState({ name: '', email: '', password: '' })
   const [passwordTouched, setPasswordTouched] = useState(false)
-  const [confirmTouched, setConfirmTouched] = useState(false)
   const [loading, setLoading] = useState(false)
   const [captchaToken, setCaptchaToken] = useState<string | null>(SITE_KEY ? null : 'bypass')
   const widgetRef = useRef<TurnstileInstance>(null)
-  const [usernameStatus, setUsernameStatus] = useState<UsernameStatus>('idle')
-  const usernameTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [field]: e.target.value }))
 
-  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.toLowerCase()
-    setForm((f) => ({ ...f, username: value }))
-    if (usernameTimer.current) clearTimeout(usernameTimer.current)
-    if (!value.trim()) { setUsernameStatus('idle'); return }
-    if (!USERNAME_RE.test(value) || value.length < 3) { setUsernameStatus('invalid'); return }
-    setUsernameStatus('checking')
-    usernameTimer.current = setTimeout(async () => {
-      try {
-        const { available } = await api.checkUsername(value.trim())
-        setUsernameStatus(available ? 'available' : 'taken')
-      } catch {
-        setUsernameStatus('idle')
-      }
-    }, 700)
-  }
-
   const passwordError = passwordTouched && form.password.length < 6
-  const confirmError = confirmTouched && form.confirm !== form.password
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (usernameStatus === 'taken' || usernameStatus === 'invalid') return
     if (form.password.length < 6) { setPasswordTouched(true); return }
-    if (form.confirm !== form.password) { setConfirmTouched(true); return }
     const t = captchaToken
     if (!t) return
     setCaptchaToken(null)
     if (SITE_KEY) widgetRef.current?.reset()
     setLoading(true)
     try {
-      const username = form.username.trim() || undefined
-      await api.register(form.name, form.email, form.password, t, username)
+      await api.register(form.name, form.email, form.password, t)
       toast.success('Conta criada!', { description: 'Verifique seu email para ativar.' })
       navigate(`/verificar-email?email=${encodeURIComponent(form.email)}`)
     } catch (err: unknown) {
@@ -92,20 +63,6 @@ export function RegisterPage() {
     }
   }
 
-  const usernameHelperText = () => {
-    if (usernameStatus === 'checking') return ''
-    if (usernameStatus === 'available') return '✓ disponível'
-    if (usernameStatus === 'taken') return 'já está em uso'
-    if (usernameStatus === 'invalid') return 'Apenas letras minúsculas, números e _ (mín. 3 caracteres)'
-    return 'Identificador único. Pode ser definido depois.'
-  }
-
-  const usernameHelperColor = () => {
-    if (usernameStatus === 'available') return colors.status.success
-    if (usernameStatus === 'taken' || usernameStatus === 'invalid') return colors.rose.main
-    return colors.text.muted
-  }
-
   return (
     <Box sx={{
       minHeight: '100dvh',
@@ -121,7 +78,7 @@ export function RegisterPage() {
 
       <FloatingParticles />
 
-      <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 3, py: 5, animation: `${fadeSlide} 0.5s ease both` }} spacing={0}>
+      <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 3, py: 5, position: 'relative', zIndex: 1, animation: `${fadeSlide} 0.5s ease both` }} spacing={0}>
         <BrandLogo size={72} sx={{ mb: 3 }} />
 
         <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2.8rem', lineHeight: 1, color: colors.text.primary, textAlign: 'center', letterSpacing: '-0.5px' }}>
@@ -138,37 +95,13 @@ export function RegisterPage() {
           <Box component="form" onSubmit={handleSubmit}>
             <Stack spacing={2}>
               <Input label="Seu nome" value={form.name} onChange={set('name')} placeholder="Como te chamamos?" fullWidth required />
-              <Input label="Email" type="email" value={form.email} onChange={set('email')} placeholder="seu@email.com" fullWidth required />
-              <Box>
-                <Input
-                  label="Username (opcional)"
-                  value={form.username}
-                  onChange={handleUsernameChange}
-                  placeholder="@meunome"
-                  fullWidth
-                  inputProps={{ maxLength: 30 }}
-                  error={usernameStatus === 'taken' || usernameStatus === 'invalid'}
-                  InputProps={usernameStatus === 'checking' ? {
-                    endAdornment: <CircularProgress size={14} sx={{ color: colors.text.muted, mr: 0.5 }} />,
-                  } : undefined}
-                />
-                <Typography variant="sm" sx={{ color: usernameHelperColor(), mt: 0.5, pl: 0.5, fontWeight: usernameStatus === 'idle' ? 400 : 600 }}>
-                  {usernameHelperText()}
-                </Typography>
-              </Box>
-              <Input
-                label="Senha" type="password" value={form.password}
+              <Input label="Email" type="email" value={form.email} onChange={set('email')} placeholder="seu@email.com" autoComplete="email" fullWidth required />
+              <PasswordInput
+                label="Senha" value={form.password}
                 onChange={set('password')} onBlur={() => setPasswordTouched(true)}
-                placeholder="••••••••" fullWidth required
+                placeholder="Mínimo de 6 caracteres" autoComplete="new-password" fullWidth required
                 error={passwordError}
                 helperText={passwordError ? 'Mínimo de 6 caracteres' : undefined}
-              />
-              <Input
-                label="Confirmar senha" type="password" value={form.confirm}
-                onChange={set('confirm')} onBlur={() => setConfirmTouched(true)}
-                placeholder="••••••••" fullWidth required
-                error={confirmError}
-                helperText={confirmError ? 'As senhas não coincidem' : undefined}
               />
               {SITE_KEY && (
                 <Box sx={{ display: 'flex', justifyContent: 'center' }}>
@@ -184,7 +117,7 @@ export function RegisterPage() {
               )}
               <Button
                 variant="primary" type="submit" fullWidth loading={loading}
-                disabled={!captchaToken || usernameStatus === 'taken' || usernameStatus === 'checking' || usernameStatus === 'invalid'}
+                disabled={!captchaToken}
                 sx={{ mt: 0.5 }}
               >
                 Criar conta
