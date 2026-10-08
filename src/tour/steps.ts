@@ -155,7 +155,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: 'invite-form', chapter: 4,
-    title: 'Convide quem você ama',
+    title: 'Convide quem vai ler',
     body: 'Coloque o e-mail da pessoa e toque em Convidar. Ela recebe um convite pra começar a abrir os pacotinhos.',
     inline: true, place: 'manage',
     advance: { kind: 'event', name: 'invite-sent' },
