@@ -247,7 +247,7 @@ export function LandingPage() {
                 <Box>
                   <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 1.5 }}>
                     {visibleNotes.map((note) => (
-                      <DemoNoteCard key={note.id} note={note} />
+                      <DemoNoteCard key={note.id} note={note} fill />
                     ))}
                   </Box>
                   {visibleNotes.length === 0 && (
