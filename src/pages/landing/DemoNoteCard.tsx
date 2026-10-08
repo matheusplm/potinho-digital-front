@@ -1,8 +1,9 @@
 import { Box, Stack, Typography } from '@mui/material'
 import { font, radius, shadow, shimmer } from '../../design-system'
+import { DemoGif } from './DemoGif'
 import type { DemoNote } from './landingData'
 
-export function DemoNoteCard({ note }: { note: DemoNote }) {
+export function DemoNoteCard({ note, eager = false }: { note: DemoNote; eager?: boolean }) {
   return (
     <Box sx={{
       background: note.rarityBg, borderRadius: radius.xl,
@@ -27,6 +28,7 @@ export function DemoNoteCard({ note }: { note: DemoNote }) {
           {note.legendary ? '★' : '◆'}
         </Typography>
       </Stack>
+      {note.gif && <Box sx={{ mb: 1.2 }}><DemoGif gif={note.gif} height={150} eager={eager} /></Box>}
       <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: note.rarityColor, lineHeight: 1.25, mb: 0.6 }}>
         {note.title}
       </Typography>

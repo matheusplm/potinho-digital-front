@@ -12,6 +12,7 @@ export interface DemoNote {
   title: string
   content: string
   from: string
+  gif?: { id: string; alt: string; bg?: string }
 }
 
 const RARITY_STYLE = {
@@ -24,21 +25,24 @@ const RARITY_STYLE = {
 
 type DemoRarity = keyof typeof RARITY_STYLE
 
-function note(id: number, rarity: DemoRarity, type: string, title: string, content: string, from: string): DemoNote {
-  return { id, rarity, type, title, content, from, ...RARITY_STYLE[rarity] }
+function note(id: number, rarity: DemoRarity, type: string, title: string, content: string, from: string, gif?: DemoNote['gif']): DemoNote {
+  return { id, rarity, type, title, content, from, gif, ...RARITY_STYLE[rarity] }
 }
 
+export const gifSrc = (id: string) => `https://media.giphy.com/media/${id}/200w.webp`
+
 export const DEMO_NOTES: DemoNote[] = [
-  note(1, 'Lendário', '💕 Declaração', 'Desde você', 'Antes de você, eu achava que casa era um lugar. Hoje é qualquer canto onde você esteja rindo de uma piada que só a gente entende.', 'Davi, pra Lari'),
+  note(1, 'Lendário', '💕 Declaração', 'Desde você', 'Antes de você, eu achava que casa era um lugar. Hoje é qualquer canto onde você esteja rindo de uma piada que só a gente entende.', 'Davi, pra Lari', { id: '4AsBELtk803LS3dG4g', alt: 'Um coração sendo desenhado', bg: '#000' }),
   note(2, 'Épico', '💭 Memória', 'O carro que quebrou', 'Lembra do carro morrendo no meio da estrada e a gente rindo mais do que chorando? Foi ali que eu soube: contigo até perrengue vira história boa.', 'Tito, pra Nanda'),
   note(3, 'Raro', '✍️ Poesia', 'Cartas de navegação', 'Seus olhos guardam mares que nunca vi, mas já naveguei mil vezes nos meus sonhos. Me deixa ancorar por aqui mais um pouquinho?', 'Léo, pra Bia'),
-  note(4, 'Incomum', '😄 Humor', 'Empate técnico', 'Você rouba meu cobertor toda noite e meu coração todo dia. Placar: 1 a 1. Mas no cobertor eu estou perdendo feio.', 'Rafa, pra Gabi'),
-  note(5, 'Comum', '🤍 Carinho', 'Sem motivo nenhum', 'Pensei em você hoje do nada. Só porque sim, só porque você existe e deixa meus dias bem mais leves.', 'Cacá, pra Mari'),
+  note(4, 'Incomum', '😄 Humor', 'Empate técnico', 'Você rouba meu cobertor toda noite e meu coração todo dia. Placar: 1 a 1. Mas no cobertor eu estou perdendo feio.', 'Rafa, pra Gabi', { id: 'H5C8CevNMbpBqNqFjl', alt: 'Macaquinho olhando de lado, desconfiado' }),
+  note(5, 'Comum', '🌙 Saudade', 'Daqui, esperando', 'Hoje o dia está devagar e eu aqui, balançando as perninhas, esperando você chegar. Vem logo, que sem você tudo tem menos graça.', 'Nina, pra Vini', { id: '5uDNFrOi6VwrkFKBaj', alt: 'Batman sentado, balançando as pernas, com cara de tédio' }),
   note(6, 'Épico', '💕 Declaração', 'Quando a gente ficar velhinho', 'Quero ser aquele casal que ainda briga pra decidir qual lado da cama é de quem. Contanto que seja contigo, no mesmo colchão.', 'Teo, pra Clara'),
   note(7, 'Raro', '🏡 Família', 'Domingo na sua casa', 'Mãe, hoje entendi que o melhor tempero da sua comida é o domingo inteiro que vem junto. Obrigada por sempre guardar meu lugar na mesa.', 'Ju, pra mamãe'),
   note(8, 'Comum', '😄 Humor', 'O melhor café do mundo', 'Você faz o melhor café do mundo. Mas desconfio que só elogio pra você nunca me deixar preparar o meu.', 'Pedro, pra Lu'),
-  note(9, 'Incomum', '🤍 Carinho', 'Lembrete do dia', 'Se hoje foi pesado, lembra: você já sobreviveu a 100% dos seus dias ruins. Eu estou aqui, com um abraço guardado só pra você.', 'Dani, pra Rê'),
+  note(9, 'Incomum', '🤍 Carinho', 'Contagem regressiva', 'Faltam 3 dias pra te ver e eu já olhei o relógio umas 40 vezes. O tempo resolveu andar de bicicleta com o pneu furado.', 'Gui, pra Mel', { id: 'QBd2kLB5qDmysEXre9', alt: 'Mr. Bean olhando o relógio, esperando' }),
   note(10, 'Lendário', '🫶 Amizade', 'Dez anos depois', 'Dez anos de amizade e eu ainda não descobri como você sabe me fazer rir justo quando mais preciso. Nunca me ensina o truque.', 'Bia, pra Duda'),
+  note(11, 'Raro', '🤍 Carinho', 'Trouxe uma flor', 'Passei o dia pensando no que te dar e cheguei a esta conclusão: um sorriso bobo, uma flor e um abraço sem prazo de validade.', 'Caio, pra Lê', { id: 't8xgPfC5oNIRMrNooe', alt: 'Cachorro segurando uma flor' }),
 ]
 
 export const RARITY_FILTERS = ['Todos', 'Comum', 'Incomum', 'Raro', 'Épico', 'Lendário']

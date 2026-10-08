@@ -2,9 +2,10 @@ import { Box, Stack, Typography } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
 import { colors, font, hintWiggle, radius, shadow, shimmer, sway } from '../../design-system'
 import { DEMO_NOTES } from './landingData'
+import { DemoGif } from './DemoGif'
 import type { DemoNote } from './landingData'
 
-function CardContent({ note }: { note: DemoNote }) {
+function CardContent({ note, eager = false }: { note: DemoNote; eager?: boolean }) {
   return (
     <>
       {note.legendary && (
@@ -28,6 +29,7 @@ function CardContent({ note }: { note: DemoNote }) {
         <Typography variant="xs" sx={{ opacity: 0.4, lineHeight: 1 }}>💌</Typography>
       </Stack>
       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 0.7, py: 0.5, minHeight: 0 }}>
+        {note.gif && <DemoGif gif={note.gif} height={84} eager={eager} />}
         <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.2rem', color: note.rarityColor, lineHeight: 1.2 }}>
           {note.title}
         </Typography>
@@ -144,7 +146,7 @@ export function HeroCardStack() {
   return (
     <Box sx={{ flexShrink: 0 }}>
       <Box
-        sx={{ position: 'relative', width: 248, height: 328, userSelect: 'none', touchAction: 'pan-y' }}
+        sx={{ position: 'relative', width: 248, height: 404, userSelect: 'none', touchAction: 'pan-y' }}
         onMouseMove={(e) => handleMove(e.clientX, e.clientY)}
         onMouseUp={handleEnd}
         onMouseLeave={handleEnd}
@@ -173,7 +175,7 @@ export function HeroCardStack() {
             cursor: isDragging ? 'grabbing' : 'grab',
           })}
         >
-          <CardContent note={n0} />
+          <CardContent note={n0} eager />
         </Box>
       </Box>
       <Typography variant="xxs" sx={{ mt: 1.5, textAlign: 'center', color: colors.text.muted, letterSpacing: 0.3 }}>

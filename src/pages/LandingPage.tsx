@@ -166,7 +166,7 @@ export function LandingPage() {
               <Box sx={{ mt: 4, width: '100%', maxWidth: 320, position: 'relative' }}>
                 <Box sx={{ position: 'absolute', top: 10, left: 10, right: 10, bottom: -10, background: 'linear-gradient(135deg,#eff6ff,#dbeafe)', borderRadius: radius.xl, border: '1.5px solid rgba(29,78,216,0.22)' }} />
                 <Box sx={{ position: 'relative' }}>
-                  <DemoNoteCard note={DEMO_NOTES[0]} />
+                  <DemoNoteCard note={DEMO_NOTES[0]} eager />
                 </Box>
               </Box>
             </Stack>
