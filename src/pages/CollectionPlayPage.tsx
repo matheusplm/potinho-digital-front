@@ -3,10 +3,10 @@ import SettingsIcon from '@mui/icons-material/Settings'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { Box, IconButton, Stack, Typography } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { Button, Card, LoadingState, ScrollablePage, toast } from '../components/ui'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { Button, Card, ChoiceChip, LoadingState, ScrollablePage, toast } from '../components/ui'
 import { NoteDetailDialog } from '../components/collection/NoteDetailDialog'
-import { useCollectionPlayQuery, useCollectionRaritiesQuery, useCollectionTypesQuery, useCollectionNotesQuery, useToggleCollectionFavoriteMutation } from '../hooks/useNotes'
+import { useCollectionPlayQuery, useCollectionRaritiesQuery, useCollectionTypesQuery, useCollectionNotesQuery, useReaderAchievementsQuery, useToggleCollectionFavoriteMutation } from '../hooks/useNotes'
 import { useBackground } from '../context/BackgroundContext'
 import { FloatingParticles } from '../components/FloatingParticles'
 import { useUser } from '../context/UserContext'
@@ -17,6 +17,7 @@ import { useCollectionBySlug } from '../hooks/useCollectionBySlug'
 import { isCollectionOwner } from '../utils/collectionAccess'
 import { noteTypeIdList } from '../utils/noteTypes'
 import { CollectionPanel } from '../components/album/CollectionPanel'
+import { AchievementsList } from '../components/album/AchievementsList'
 import { AlbumSection, ALBUM_VIEW_KEY } from './play/AlbumSection'
 import type { AlbumView, AlbumSort, AlbumGroup, AlbumFilter } from './play/AlbumSection'
 import type { CollectionNoteView } from '../types/note'
@@ -47,14 +48,22 @@ export function CollectionPlayPage() {
   const [albumSort, setAlbumSort] = useState<AlbumSort>('recent')
   const [albumGroup, setAlbumGroup] = useState<AlbumGroup>('rarity')
   const [selectedNote, setSelectedNote] = useState<CollectionNoteView | null>(null)
-
-  const isLoading = collectionsLoading || (!!cid && (isSimulating ? notesLoading : playLoading))
+  const [searchParams, setSearchParams] = useSearchParams()
   const { data: rarities = [] } = useCollectionRaritiesQuery(cid)
   const { data: types = [] } = useCollectionTypesQuery(cid)
   const favoriteMutation = useToggleCollectionFavoriteMutation(cid)
 
   const isCollectionOwnerUser = collection ? isCollectionOwner(collection, user?.id) : false
   const isReaderView = !isSimulating && (persona === 'reader' || !isCollectionOwnerUser)
+
+  const { data: achData, isLoading: achLoading } = useReaderAchievementsQuery(cid, { enabled: isReaderView })
+  const achievements = achData?.achievements ?? []
+  const hasAchievements = isReaderView && achievements.length > 0
+  const unlockedCount = achievements.filter((a) => a.unlocked).length
+  const tab: 'album' | 'conquistas' = hasAchievements && searchParams.get('aba') === 'conquistas' ? 'conquistas' : 'album'
+  const changeTab = (next: 'album' | 'conquistas') => setSearchParams(next === 'album' ? {} : { aba: next }, { replace: true })
+
+  const isLoading = collectionsLoading || (!!cid && (isSimulating ? notesLoading : playLoading || (isReaderView && achLoading)))
   const isWriter = isCollectionOwnerUser && persona === 'writer' && !isSimulating
 
   function changeAlbumView(v: AlbumView) {
@@ -165,7 +174,16 @@ export function CollectionPlayPage() {
 
             <CollectionPanel play={play} rarities={rarities} />
 
-            {(isSimulating || discoveredItems.length > 0) && (
+            {hasAchievements && (
+              <Stack direction="row" spacing={0.8}>
+                <ChoiceChip surface="page" size="lg" label="📖 Álbum" selected={tab === 'album'} onClick={() => changeTab('album')} />
+                <ChoiceChip surface="page" size="lg" label={`🏅 Conquistas · ${unlockedCount}/${achievements.length}`} selected={tab === 'conquistas'} onClick={() => changeTab('conquistas')} />
+              </Stack>
+            )}
+
+            {tab === 'conquistas' && <AchievementsList achievements={achievements} />}
+
+            {tab === 'album' && (isSimulating || discoveredItems.length > 0) && (
               <AlbumSection
                 search={albumSearch} setSearch={setAlbumSearch}
                 filter={albumFilter} setFilter={setAlbumFilter}
@@ -191,7 +209,7 @@ export function CollectionPlayPage() {
               />
             )}
 
-            {!isSimulating && play.total > 0 && undiscoveredItems.length > 0 && (
+            {tab === 'album' && !isSimulating && play.total > 0 && undiscoveredItems.length > 0 && (
               <Stack spacing={1}>
                 <Box>
                   <Typography variant="sm" sx={{ fontWeight: 800, letterSpacing: 1.2, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>

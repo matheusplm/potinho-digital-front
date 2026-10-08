@@ -1,7 +1,7 @@
 {
   "name": "Potinho Digital",
   "short_name": "Potinho",
-  "description": "Bilhetes de amor em pacotinhos surpresa para quem você ama.",
+  "description": "Bilhetes em pacotinhos surpresa para alguém especial.",
   "lang": "pt-BR",
   "start_url": "/home",
   "scope": "/",

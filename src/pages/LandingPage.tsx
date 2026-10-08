@@ -15,7 +15,7 @@ import { backgroundThemes, colors, fadeInHero, fadeInRight, font, getBackgroundT
 import { useBackground } from '../context/BackgroundContext'
 import { ThemeSwatches } from '../components/ThemeSwatches'
 import { FloatingParticles } from '../components/FloatingParticles'
-import { AUDIENCES, CUSTOMIZATIONS, DEMO_NOTES, FEATURES, RARITY_COLOR, RARITY_FILTERS, STEPS } from './landing/landingData'
+import { AUDIENCES, CUSTOMIZATIONS, DEMO_NOTES, DEMO_RARITIES, FEATURES, RARITY_COLOR, RARITY_FILTERS, STEPS } from './landing/landingData'
 import { SectionTitle } from './landing/SectionTitle'
 import { DemoNoteCard } from './landing/DemoNoteCard'
 import { BrandLogo, BrandMark, BrandName, Copyright } from '../components/Brand'
@@ -57,7 +57,7 @@ export function LandingPage() {
     return () => window.removeEventListener('mousemove', onMove)
   }, [isDesktop])
 
-  const visibleNotes = activeRarity === 'Todos' ? DEMO_NOTES : DEMO_NOTES.filter((n) => n.rarity === activeRarity)
+  const visibleNotes = activeRarity === 'Todos' ? DEMO_NOTES : DEMO_NOTES.filter((n) => DEMO_RARITIES.find((r) => r.id === n.rarity)?.label === activeRarity)
 
   return (
     <Box sx={{
@@ -115,7 +115,7 @@ export function LandingPage() {
                 </Typography>
                 <Box sx={{ width: 56, height: 3, borderRadius: 2, background: 'linear-gradient(90deg,#1d4ed8,#e11d48)', mb: 3 }} />
                 <Typography sx={{ fontSize: '1.05rem', color: colors.text.secondary, lineHeight: 1.75, mb: 4, maxWidth: 440 }}>
-                  Escreva bilhetes especiais, monte pacotinhos surpresa e presenteie quem você ama com uma nova descoberta todo dia, como um álbum de figurinhas, só que com mensagens de verdade.
+                  Escreva bilhetes, monte pacotinhos e surpreenda alguém especial com uma nova descoberta todo dia, como um álbum de figurinhas, só que com mensagens de verdade.
                 </Typography>
                 <Stack direction="row" spacing={1.5} sx={{ mb: 2 }}>
                   <Button variant="primary" {...linkTo('/register')} sx={{ py: 1.4, px: 3.5, fontSize: '0.97rem' }}>
@@ -150,7 +150,7 @@ export function LandingPage() {
               </Typography>
               <Box sx={{ width: 44, height: 3, borderRadius: 2, background: 'linear-gradient(90deg,#1d4ed8,#e11d48)', mb: 2.5 }} />
               <Typography variant="xl" sx={{ color: colors.text.secondary, textAlign: 'center', lineHeight: 1.72, mb: 3.5, maxWidth: 310 }}>
-                Escreva bilhetes, monte pacotinhos surpresa e presenteie quem você ama com novas descobertas todo dia, como um álbum de figurinhas.
+                Escreva bilhetes, monte pacotinhos e surpreenda alguém especial com novas descobertas todo dia, como um álbum de figurinhas.
               </Typography>
               <Stack spacing={1.2} sx={{ width: '100%', maxWidth: 320 }}>
                 <Button variant="primary" fullWidth {...linkTo('/register')} sx={{ py: 1.35, fontSize: '0.97rem' }}>
@@ -166,7 +166,7 @@ export function LandingPage() {
               <Box sx={{ mt: 4, width: '100%', maxWidth: 320, position: 'relative' }}>
                 <Box sx={{ position: 'absolute', top: 10, left: 10, right: 10, bottom: -10, background: 'linear-gradient(135deg,#eff6ff,#dbeafe)', borderRadius: radius.xl, border: '1.5px solid rgba(29,78,216,0.22)' }} />
                 <Box sx={{ position: 'relative' }}>
-                  <DemoNoteCard note={DEMO_NOTES[0]} />
+                  <DemoNoteCard note={DEMO_NOTES[0]} eager />
                 </Box>
               </Box>
             </Stack>
@@ -247,7 +247,7 @@ export function LandingPage() {
                 <Box>
                   <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 1.5 }}>
                     {visibleNotes.map((note) => (
-                      <DemoNoteCard key={note.id} note={note} />
+                      <DemoNoteCard key={note.id} note={note} fill />
                     ))}
                   </Box>
                   {visibleNotes.length === 0 && (
@@ -435,7 +435,7 @@ export function LandingPage() {
               Pronto para começar?
             </Typography>
             <Typography variant="lg" sx={{ color: colors.text.secondary, lineHeight: 1.7, mb: 3.5, maxWidth: 400, mx: 'auto' }}>
-              Crie sua conta, monte sua coleção do zero e presenteie quem você ama com algo único, hoje mesmo.
+              Crie sua conta, monte sua coleção do zero e surpreenda alguém especial com algo único, hoje mesmo.
             </Typography>
             {isDesktop ? (
               <Stack direction="row" spacing={1.5} justifyContent="center">

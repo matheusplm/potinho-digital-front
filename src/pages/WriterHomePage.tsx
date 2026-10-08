@@ -86,7 +86,7 @@ export function WriterHomePage() {
             <EmptyState
               emoji="🫙"
               title="Seu primeiro potinho"
-              description="Crie uma coleção, escreva os bilhetes e convide quem você ama pra abrir os pacotinhos."
+              description="Crie uma coleção, escreva os bilhetes e convide quem vai ler pra abrir os pacotinhos."
               action={<Button variant="primary" onClick={() => navigate('/colecoes')} sx={{ mt: 1.5 }}>Criar minha coleção</Button>}
             />
           )}

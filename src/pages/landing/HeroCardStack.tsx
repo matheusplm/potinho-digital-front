@@ -1,51 +1,8 @@
-import { Box, Stack, Typography } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
-import { colors, font, hintWiggle, radius, shadow, shimmer, sway } from '../../design-system'
+import { colors, hintWiggle, sway } from '../../design-system'
+import { DemoNoteCard } from './DemoNoteCard'
 import { DEMO_NOTES } from './landingData'
-import type { DemoNote } from './landingData'
-
-function CardContent({ note }: { note: DemoNote }) {
-  return (
-    <>
-      {note.legendary && (
-        <Box sx={{
-          position: 'absolute', inset: 0, borderRadius: radius.xl,
-          background: 'linear-gradient(90deg,transparent 20%,rgba(253,230,138,0.35) 50%,transparent 80%)',
-          backgroundSize: '200% auto', animation: `${shimmer} 2.5s linear infinite`,
-          pointerEvents: 'none',
-        }} />
-      )}
-      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ flexShrink: 0, mb: 1 }}>
-        <Box sx={{
-          display: 'inline-flex', alignItems: 'center', gap: 0.4,
-          px: 0.7, py: 0.3, borderRadius: radius.full,
-          background: `${note.rarityColor}15`, border: `1px solid ${note.rarityColor}30`,
-        }}>
-          <Typography sx={{ fontSize: '0.58rem', fontWeight: 800, letterSpacing: 0.8, textTransform: 'uppercase', color: note.rarityColor }}>
-            {note.legendary ? '★' : '◆'} {note.rarity}
-          </Typography>
-        </Box>
-        <Typography variant="xs" sx={{ opacity: 0.4, lineHeight: 1 }}>💌</Typography>
-      </Stack>
-      <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', py: 0.5 }}>
-        <Typography variant="lg" sx={{ fontFamily: font.serif, color: note.rarityColor, lineHeight: 1.65, opacity: 0.88 }}>
-          {note.content}
-        </Typography>
-      </Box>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ flexShrink: 0, mt: 1 }}>
-        <Box sx={{
-          display: 'inline-flex', alignItems: 'center', px: 0.7, py: 0.25,
-          borderRadius: radius.full, background: `${note.rarityColor}10`, border: `1px solid ${note.rarityColor}20`,
-        }}>
-          <Typography variant="xxs" sx={{ fontWeight: 700, color: note.rarityColor }}>{note.type}</Typography>
-        </Box>
-        <Typography sx={{ fontSize: '0.52rem', fontWeight: 600, fontFamily: font.serif, color: note.rarityColor, opacity: 0.4, letterSpacing: 0.3 }}>
-          Potinho Digital
-        </Typography>
-      </Stack>
-    </>
-  )
-}
 
 export function HeroCardStack() {
   const [topIdx, setTopIdx] = useState(0)
@@ -126,28 +83,26 @@ export function HeroCardStack() {
     topTransition = 'transform 0.45s cubic-bezier(0.34,1.56,0.64,1)'
   }
 
-  const cardSx = (note: DemoNote, zIndex: number, transform: string, transition: string, extraSx?: object) => ({
+  const cardSx = (zIndex: number, transform: string, transition: string, extraSx?: object) => ({
     position: 'absolute' as const, inset: 0, zIndex,
     transform, transition,
-    background: note.rarityBg, borderRadius: radius.xl,
-    border: `1.5px solid ${note.border}`, boxShadow: note.glow || shadow.sm,
-    display: 'flex', flexDirection: 'column' as const, p: 1.75, overflow: 'hidden',
+    '& > *': { width: '100%', height: '100%' },
     ...extraSx,
   })
 
   return (
     <Box sx={{ flexShrink: 0 }}>
       <Box
-        sx={{ position: 'relative', width: 248, height: 328, userSelect: 'none', touchAction: 'pan-y' }}
+        sx={{ position: 'relative', width: 300, height: 292, userSelect: 'none', touchAction: 'pan-y' }}
         onMouseMove={(e) => handleMove(e.clientX, e.clientY)}
         onMouseUp={handleEnd}
         onMouseLeave={handleEnd}
       >
-        <Box sx={cardSx(n2, 1, 'translateY(16px) scale(0.9) rotate(6deg)', 'transform 0.3s ease')}>
-          <CardContent note={n2} />
+        <Box sx={cardSx(1, 'translateY(16px) scale(0.9) rotate(6deg)', 'transform 0.3s ease')}>
+          <DemoNoteCard note={n2} eager fill />
         </Box>
-        <Box sx={cardSx(n1, 5, 'translateY(8px) scale(0.95) rotate(-2deg)', 'transform 0.3s ease')}>
-          <CardContent note={n1} />
+        <Box sx={cardSx(5, 'translateY(8px) scale(0.95) rotate(-2deg)', 'transform 0.3s ease')}>
+          <DemoNoteCard note={n1} eager fill />
         </Box>
         <Box
           key={topIdx}
@@ -157,7 +112,7 @@ export function HeroCardStack() {
           onTouchStart={(e) => handleStart(e.touches[0].clientX, e.touches[0].clientY)}
           onTouchMove={(e) => handleMove(e.touches[0].clientX, e.touches[0].clientY)}
           onTouchEnd={handleEnd}
-          sx={cardSx(n0, 10, topTransform, topTransition, {
+          sx={cardSx(10, topTransform, topTransition, {
             opacity: topOpacity,
             animation: exitDir !== null || isDragging || isSnapping || isHovered
               ? 'none'
@@ -167,7 +122,7 @@ export function HeroCardStack() {
             cursor: isDragging ? 'grabbing' : 'grab',
           })}
         >
-          <CardContent note={n0} />
+          <DemoNoteCard note={n0} eager fill />
         </Box>
       </Box>
       <Typography variant="xxs" sx={{ mt: 1.5, textAlign: 'center', color: colors.text.muted, letterSpacing: 0.3 }}>

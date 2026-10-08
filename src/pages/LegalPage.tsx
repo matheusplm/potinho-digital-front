@@ -28,7 +28,7 @@ const TERMS: Section[] = [
   {
     title: 'O que é o Potinho',
     body: [
-      'O Potinho Digital é um lugar pra escrever bilhetes e entregar pra quem você ama em pacotinhos surpresa, como um álbum de figurinhas feito de mensagens. Ao criar uma conta ou usar o site, você concorda com estes termos e com a nossa Política de Privacidade.',
+      'O Potinho Digital é um lugar pra escrever bilhetes e entregar pra quem é especial pra você em pacotinhos surpresa, como um álbum de figurinhas feito de mensagens. Ao criar uma conta ou usar o site, você concorda com estes termos e com a nossa Política de Privacidade.',
     ],
   },
   {
