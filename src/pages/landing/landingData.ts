@@ -9,19 +9,36 @@ export interface DemoNote {
   border: string
   glow: string
   type: string
+  title: string
   content: string
+  from: string
+}
+
+const RARITY_STYLE = {
+  Lendário: { legendary: true, rarityColor: '#92400e', rarityBg: 'linear-gradient(135deg,#fffbeb,#fef3c7,#fde68a)', border: 'rgba(245,158,11,0.5)', glow: '0 8px 28px rgba(245,158,11,0.22)' },
+  Épico: { legendary: false, rarityColor: '#7c3aed', rarityBg: 'linear-gradient(135deg,#f5f3ff,#ede9fe)', border: 'rgba(124,58,237,0.35)', glow: '0 6px 22px rgba(124,58,237,0.18)' },
+  Raro: { legendary: false, rarityColor: '#1d4ed8', rarityBg: 'linear-gradient(135deg,#eff6ff,#dbeafe)', border: 'rgba(29,78,216,0.28)', glow: '0 6px 20px rgba(29,78,216,0.15)' },
+  Incomum: { legendary: false, rarityColor: '#16a34a', rarityBg: 'linear-gradient(135deg,#f0fdf4,#dcfce7)', border: 'rgba(22,163,74,0.28)', glow: '0 5px 18px rgba(22,163,74,0.12)' },
+  Comum: { legendary: false, rarityColor: '#64748b', rarityBg: 'linear-gradient(135deg,#f8fafc,#f1f5f9)', border: 'rgba(100,116,139,0.22)', glow: '' },
+} as const
+
+type DemoRarity = keyof typeof RARITY_STYLE
+
+function note(id: number, rarity: DemoRarity, type: string, title: string, content: string, from: string): DemoNote {
+  return { id, rarity, type, title, content, from, ...RARITY_STYLE[rarity] }
 }
 
 export const DEMO_NOTES: DemoNote[] = [
-  { id: 1, rarity: 'Lendário', legendary: true,  rarityColor: '#92400e', rarityBg: 'linear-gradient(135deg,#fffbeb,#fef3c7,#fde68a)', border: 'rgba(245,158,11,0.5)', glow: '0 8px 28px rgba(245,158,11,0.22)', type: '💕 Declaração', content: 'Você é o motivo de eu acordar feliz todo dia. Não precisaria de mais nada além de você.' },
-  { id: 2, rarity: 'Épico',    legendary: false, rarityColor: '#7c3aed', rarityBg: 'linear-gradient(135deg,#f5f3ff,#ede9fe)', border: 'rgba(124,58,237,0.35)', glow: '0 6px 22px rgba(124,58,237,0.18)', type: '💭 Memória', content: 'Lembra da nossa primeira viagem juntos? Cada detalhe ainda está guardado aqui dentro.' },
-  { id: 3, rarity: 'Raro',     legendary: false, rarityColor: '#1d4ed8', rarityBg: 'linear-gradient(135deg,#eff6ff,#dbeafe)', border: 'rgba(29,78,216,0.28)',  glow: '0 6px 20px rgba(29,78,216,0.15)',  type: '✍️ Poesia', content: 'Seus olhos guardam mares que nunca vi, mas já naveguei mil vezes nos meus sonhos.' },
-  { id: 4, rarity: 'Incomum',  legendary: false, rarityColor: '#16a34a', rarityBg: 'linear-gradient(135deg,#f0fdf4,#dcfce7)', border: 'rgba(22,163,74,0.28)',   glow: '0 5px 18px rgba(22,163,74,0.12)',  type: '😄 Humor', content: 'Você rouba meu cobertor toda noite. E meu coração todo dia. Empate técnico.' },
-  { id: 5, rarity: 'Comum',    legendary: false, rarityColor: '#64748b', rarityBg: 'linear-gradient(135deg,#f8fafc,#f1f5f9)', border: 'rgba(100,116,139,0.22)', glow: '',                                 type: '🤍 Carinho', content: 'Pensei em você hoje sem motivo nenhum. Só porque sim. Só porque você existe.' },
-  { id: 6, rarity: 'Épico',    legendary: false, rarityColor: '#7c3aed', rarityBg: 'linear-gradient(135deg,#f5f3ff,#ede9fe)', border: 'rgba(124,58,237,0.35)', glow: '0 6px 22px rgba(124,58,237,0.18)', type: '💕 Declaração', content: 'Cada momento contigo é o tipo de coisa que quero lembrar quando for velhinho.' },
-  { id: 7, rarity: 'Raro',     legendary: false, rarityColor: '#1d4ed8', rarityBg: 'linear-gradient(135deg,#eff6ff,#dbeafe)', border: 'rgba(29,78,216,0.28)',  glow: '0 6px 20px rgba(29,78,216,0.15)',  type: '💭 Memória', content: 'Aquela tarde de chuva assistindo série foi uma das melhores da minha vida inteira.' },
-  { id: 8, rarity: 'Comum',    legendary: false, rarityColor: '#64748b', rarityBg: 'linear-gradient(135deg,#f8fafc,#f1f5f9)', border: 'rgba(100,116,139,0.22)', glow: '',                                 type: '😄 Humor', content: 'Você faz o melhor café do mundo. Mas talvez eu só diga isso pra não preparar o meu.' },
-  { id: 9, rarity: 'Incomum',  legendary: false, rarityColor: '#16a34a', rarityBg: 'linear-gradient(135deg,#f0fdf4,#dcfce7)', border: 'rgba(22,163,74,0.28)',   glow: '0 5px 18px rgba(22,163,74,0.12)',  type: '🤍 Carinho', content: 'Obrigado por existir na minha vida. Isso muda tudo, sabe?' },
+  note(1, 'Lendário', '💕 Declaração', 'Desde você', 'Antes de você, eu achava que casa era um lugar. Hoje é qualquer canto onde você esteja rindo de uma piada que só a gente entende.', 'Davi, pra Lari'),
+  note(2, 'Épico', '💭 Memória', 'O carro que quebrou', 'Lembra do carro morrendo no meio da estrada e a gente rindo mais do que chorando? Foi ali que eu soube: contigo até perrengue vira história boa.', 'Tito, pra Nanda'),
+  note(3, 'Raro', '✍️ Poesia', 'Cartas de navegação', 'Seus olhos guardam mares que nunca vi, mas já naveguei mil vezes nos meus sonhos. Me deixa ancorar por aqui mais um pouquinho?', 'Léo, pra Bia'),
+  note(4, 'Incomum', '😄 Humor', 'Empate técnico', 'Você rouba meu cobertor toda noite e meu coração todo dia. Placar: 1 a 1. Mas no cobertor eu estou perdendo feio.', 'Rafa, pra Gabi'),
+  note(5, 'Comum', '🤍 Carinho', 'Sem motivo nenhum', 'Pensei em você hoje do nada. Só porque sim, só porque você existe e deixa meus dias bem mais leves.', 'Cacá, pra Mari'),
+  note(6, 'Épico', '💕 Declaração', 'Quando a gente ficar velhinho', 'Quero ser aquele casal que ainda briga pra decidir qual lado da cama é de quem. Contanto que seja contigo, no mesmo colchão.', 'Teo, pra Clara'),
+  note(7, 'Raro', '🏡 Família', 'Domingo na sua casa', 'Mãe, hoje entendi que o melhor tempero da sua comida é o domingo inteiro que vem junto. Obrigada por sempre guardar meu lugar na mesa.', 'Ju, pra mamãe'),
+  note(8, 'Comum', '😄 Humor', 'O melhor café do mundo', 'Você faz o melhor café do mundo. Mas desconfio que só elogio pra você nunca me deixar preparar o meu.', 'Pedro, pra Lu'),
+  note(9, 'Incomum', '🤍 Carinho', 'Lembrete do dia', 'Se hoje foi pesado, lembra: você já sobreviveu a 100% dos seus dias ruins. Eu estou aqui, com um abraço guardado só pra você.', 'Dani, pra Rê'),
+  note(10, 'Lendário', '🫶 Amizade', 'Dez anos depois', 'Dez anos de amizade e eu ainda não descobri como você sabe me fazer rir justo quando mais preciso. Nunca me ensina o truque.', 'Bia, pra Duda'),
 ]
 
 export const RARITY_FILTERS = ['Todos', 'Comum', 'Incomum', 'Raro', 'Épico', 'Lendário']

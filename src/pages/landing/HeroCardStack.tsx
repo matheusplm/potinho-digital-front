@@ -27,9 +27,15 @@ function CardContent({ note }: { note: DemoNote }) {
         </Box>
         <Typography variant="xs" sx={{ opacity: 0.4, lineHeight: 1 }}>💌</Typography>
       </Stack>
-      <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', py: 0.5 }}>
-        <Typography variant="lg" sx={{ fontFamily: font.serif, color: note.rarityColor, lineHeight: 1.65, opacity: 0.88 }}>
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 0.7, py: 0.5, minHeight: 0 }}>
+        <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.2rem', color: note.rarityColor, lineHeight: 1.2 }}>
+          {note.title}
+        </Typography>
+        <Typography sx={{ fontFamily: font.serif, fontSize: '1rem', color: note.rarityColor, lineHeight: 1.5, opacity: 0.88 }}>
           {note.content}
+        </Typography>
+        <Typography sx={{ fontFamily: font.serif, fontStyle: 'italic', fontSize: '0.86rem', color: note.rarityColor, opacity: 0.62 }}>
+          — {note.from}
         </Typography>
       </Box>
       <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ flexShrink: 0, mt: 1 }}>

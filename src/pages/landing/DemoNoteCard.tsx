@@ -27,8 +27,14 @@ export function DemoNoteCard({ note }: { note: DemoNote }) {
           {note.legendary ? '★' : '◆'}
         </Typography>
       </Stack>
-      <Typography variant="lg" sx={{ fontFamily: font.serif, color: note.rarityColor, lineHeight: 1.6, mb: 1.2 }}>
+      <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: note.rarityColor, lineHeight: 1.25, mb: 0.6 }}>
+        {note.title}
+      </Typography>
+      <Typography variant="lg" sx={{ fontFamily: font.serif, color: note.rarityColor, opacity: 0.88, lineHeight: 1.6, mb: 1 }}>
         {note.content}
+      </Typography>
+      <Typography variant="sm" sx={{ fontFamily: font.serif, fontStyle: 'italic', color: note.rarityColor, opacity: 0.62, mb: 1.2 }}>
+        — {note.from}
       </Typography>
       <Box sx={{
         display: 'inline-flex', alignItems: 'center', px: 0.9, py: 0.25,
