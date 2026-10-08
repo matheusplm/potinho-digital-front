@@ -90,8 +90,8 @@ function CardTag({ t, all }: { t?: NoteTypeConfig; all?: NoteTypeConfig[] }) {
   )
 }
 
-function ImgArea({ src, alt, previewMode, sx }: { src?: string | null; alt: string; previewMode?: boolean; sx?: object }) {
-  if (src) return <Box component="img" src={src} alt={alt} sx={{ ...IMG_SX, ...sx }} />
+function ImgArea({ src, alt, previewMode, sx, lazy }: { src?: string | null; alt: string; previewMode?: boolean; sx?: object; lazy?: boolean }) {
+  if (src) return <Box component="img" src={src} alt={alt} loading={lazy ? 'lazy' : undefined} sx={{ ...IMG_SX, ...sx }} />
   if (previewMode) return (
     <Box sx={{ ...IMG_SX, background: 'rgba(0,0,0,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', ...sx }}>
       <Typography sx={{ fontSize: '1.8rem', opacity: 0.18, userSelect: 'none' }}>🖼️</Typography>
@@ -100,9 +100,9 @@ function ImgArea({ src, alt, previewMode, sx }: { src?: string | null; alt: stri
   return null
 }
 
-export function RewardCard({ reward, rarities, types, onClick, imageLayout: imageLayoutProp, previewMode, expanded }: {
+export function RewardCard({ reward, rarities, types, onClick, imageLayout: imageLayoutProp, previewMode, expanded, lazyImage }: {
   reward: CollectionDailyReward; rarities: RarityConfig[]; types: NoteTypeConfig[]
-  onClick?: () => void; imageLayout?: NoteImageLayout; previewMode?: boolean; expanded?: boolean
+  onClick?: () => void; imageLayout?: NoteImageLayout; previewMode?: boolean; expanded?: boolean; lazyImage?: boolean
 }) {
   const r = rarities.find((x) => x.id === reward.rarity)
   const rewardTypes = (reward.typeIds?.length ? reward.typeIds : [reward.typeId]).map((id) => types.find((x) => x.id === id)).filter((x): x is NoteTypeConfig => !!x)
@@ -118,7 +118,7 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
     return (
       <Box onClick={onClick} sx={{ ...rarityCardSx(r), animation: `${cardIn} 0.55s cubic-bezier(0.16,1,0.3,1)`, cursor: onClick ? 'pointer' : 'default', p: 0, overflow: 'hidden', position: 'relative' }}>
         <Box sx={{ position: 'relative', width: '100%', height: 74 }}>
-          <ImgArea src={img} alt={reward.title} previewMode={previewMode} sx={{ position: 'absolute', inset: 0 }} />
+          <ImgArea lazy={lazyImage} src={img} alt={reward.title} previewMode={previewMode} sx={{ position: 'absolute', inset: 0 }} />
           <Box sx={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)' }} />
           <Stack spacing={0.8} sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, p: 2 }}>
             <CardChips r={r} isNew={reward.isNew} />
@@ -161,7 +161,7 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
     return (
       <Box onClick={onClick} sx={{ ...rarityCardSx(r), animation: `${cardIn} 0.55s cubic-bezier(0.16,1,0.3,1)`, cursor: onClick ? 'pointer' : 'default', p: 0, overflow: 'hidden' }}>
         <Box sx={{ width: '100%', height: 130, overflow: 'hidden' }}>
-          <ImgArea src={img} alt={reward.title} previewMode={previewMode} />
+          <ImgArea lazy={lazyImage} src={img} alt={reward.title} previewMode={previewMode} />
         </Box>
         <Stack spacing={1.5} sx={{ p: 2, position: 'relative', zIndex: 1 }}>
           <CardChips r={r} isNew={reward.isNew} />
@@ -177,7 +177,7 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
       <Box onClick={onClick} sx={{ ...rarityCardSx(r), animation: `${cardIn} 0.55s cubic-bezier(0.16,1,0.3,1)`, cursor: onClick ? 'pointer' : 'default', p: 0, overflow: 'hidden' }}>
         <Stack direction="row" sx={{ minHeight: 140 }}>
           <Box sx={{ width: 90, flexShrink: 0, overflow: 'hidden' }}>
-            <ImgArea src={img} alt={reward.title} previewMode={previewMode} sx={{ height: '100%' }} />
+            <ImgArea lazy={lazyImage} src={img} alt={reward.title} previewMode={previewMode} sx={{ height: '100%' }} />
           </Box>
           <Stack spacing={1.2} sx={{ flex: 1, p: 1.8, minWidth: 0 }}>
             <CardChips r={r} isNew={reward.isNew} />
@@ -199,7 +199,7 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
 
         {showImg && imageLayout === 'banner' && (
           <Box sx={{ borderRadius: radius.lg, overflow: 'hidden', width: '100%', height: 110 }}>
-            <ImgArea src={img} alt={reward.title} previewMode={previewMode} />
+            <ImgArea lazy={lazyImage} src={img} alt={reward.title} previewMode={previewMode} />
           </Box>
         )}
 
@@ -207,7 +207,7 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
           <Box sx={{ p: 1.15, borderRadius: radius.lg, background: 'rgba(255,255,255,0.68)', border: '1px solid rgba(255,255,255,0.58)', backdropFilter: 'blur(8px)', minWidth: 0 }}>
             <Stack direction={imageLayout.endsWith('right') ? 'row-reverse' : 'row'} spacing={1.2} alignItems="flex-start">
               <Box sx={{ flexShrink: 0, width: imageLayout.startsWith('circle') ? 56 : 64, height: imageLayout.startsWith('circle') ? 56 : 64, borderRadius: imageLayout.startsWith('circle') ? '50%' : radius.md, overflow: 'hidden' }}>
-                <ImgArea src={img} alt={reward.title} previewMode={previewMode} />
+                <ImgArea lazy={lazyImage} src={img} alt={reward.title} previewMode={previewMode} />
               </Box>
               <Box sx={{ minWidth: 0, flex: 1 }}>
                 <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.05rem', color: ink.primary, lineHeight: 1.3, overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampT }}>

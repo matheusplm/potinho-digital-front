@@ -1,51 +1,20 @@
-import { Box, Stack, Typography } from '@mui/material'
-import { font, radius, shadow, shimmer } from '../../design-system'
-import { DemoGif } from './DemoGif'
-import type { DemoNote } from './landingData'
+import { Box } from '@mui/material'
+import poweredByGiphy from '../../assets/giphy/powered-by-giphy-light.png'
+import { RewardCard } from '../../components/collection/RewardCard'
+import { DEMO_RARITIES, DEMO_TYPES, toReward, type DemoNote } from './landingData'
 
 export function DemoNoteCard({ note, eager = false }: { note: DemoNote; eager?: boolean }) {
   return (
-    <Box sx={{
-      background: note.rarityBg, borderRadius: radius.xl,
-      border: `1.5px solid ${note.border}`, boxShadow: note.glow || shadow.sm,
-      p: 2, position: 'relative', overflow: 'hidden',
-      transition: 'transform 0.18s, box-shadow 0.18s',
-      '&:hover': { transform: 'translateY(-2px)', boxShadow: note.glow ? note.glow.replace(')', ', 0.36)').replace('0.', '0.3') : shadow.md },
-    }}>
-      {note.legendary && (
-        <Box sx={{
-          position: 'absolute', inset: 0,
-          background: 'linear-gradient(90deg,transparent 20%,rgba(253,230,138,0.35) 50%,transparent 80%)',
-          backgroundSize: '200% auto', animation: `${shimmer} 2.8s linear infinite`,
-          pointerEvents: 'none', borderRadius: radius.xl,
-        }} />
+    <Box sx={{ position: 'relative' }}>
+      <RewardCard reward={toReward(note)} rarities={DEMO_RARITIES} types={DEMO_TYPES} expanded lazyImage={!eager} />
+      {note.gif && (
+        <Box
+          component="img"
+          src={poweredByGiphy}
+          alt="Powered by GIPHY"
+          sx={{ position: 'absolute', right: 10, bottom: 8, height: 9, opacity: 0.5, pointerEvents: 'none', zIndex: 2 }}
+        />
       )}
-      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
-        <Typography variant="xxs" sx={{ fontWeight: 800, letterSpacing: 1, textTransform: 'uppercase', color: note.rarityColor }}>
-          {note.rarity}
-        </Typography>
-        <Typography variant="xxs" sx={{ fontWeight: 600, color: note.rarityColor, opacity: 0.65 }}>
-          {note.legendary ? '★' : '◆'}
-        </Typography>
-      </Stack>
-      {note.gif && <Box sx={{ mb: 1.2 }}><DemoGif gif={note.gif} height={150} eager={eager} /></Box>}
-      <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: note.rarityColor, lineHeight: 1.25, mb: 0.6 }}>
-        {note.title}
-      </Typography>
-      <Typography variant="lg" sx={{ fontFamily: font.serif, color: note.rarityColor, opacity: 0.88, lineHeight: 1.6, mb: 1 }}>
-        {note.content}
-      </Typography>
-      <Typography variant="sm" sx={{ fontFamily: font.serif, fontStyle: 'italic', color: note.rarityColor, opacity: 0.62, mb: 1.2 }}>
-        — {note.from}
-      </Typography>
-      <Box sx={{
-        display: 'inline-flex', alignItems: 'center', px: 0.9, py: 0.25,
-        borderRadius: radius.full, background: `${note.rarityColor}12`, border: `1px solid ${note.rarityColor}20`,
-      }}>
-        <Typography variant="xxs" sx={{ fontWeight: 700, color: note.rarityColor }}>
-          {note.type}
-        </Typography>
-      </Box>
     </Box>
   )
 }

@@ -15,7 +15,7 @@ import { backgroundThemes, colors, fadeInHero, fadeInRight, font, getBackgroundT
 import { useBackground } from '../context/BackgroundContext'
 import { ThemeSwatches } from '../components/ThemeSwatches'
 import { FloatingParticles } from '../components/FloatingParticles'
-import { AUDIENCES, CUSTOMIZATIONS, DEMO_NOTES, FEATURES, RARITY_COLOR, RARITY_FILTERS, STEPS } from './landing/landingData'
+import { AUDIENCES, CUSTOMIZATIONS, DEMO_NOTES, DEMO_RARITIES, FEATURES, RARITY_COLOR, RARITY_FILTERS, STEPS } from './landing/landingData'
 import { SectionTitle } from './landing/SectionTitle'
 import { DemoNoteCard } from './landing/DemoNoteCard'
 import { BrandLogo, BrandMark, BrandName, Copyright } from '../components/Brand'
@@ -57,7 +57,7 @@ export function LandingPage() {
     return () => window.removeEventListener('mousemove', onMove)
   }, [isDesktop])
 
-  const visibleNotes = activeRarity === 'Todos' ? DEMO_NOTES : DEMO_NOTES.filter((n) => n.rarity === activeRarity)
+  const visibleNotes = activeRarity === 'Todos' ? DEMO_NOTES : DEMO_NOTES.filter((n) => DEMO_RARITIES.find((r) => r.id === n.rarity)?.label === activeRarity)
 
   return (
     <Box sx={{
