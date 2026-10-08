@@ -1,7 +1,8 @@
-import { Box, LinearProgress, Stack, Typography } from '@mui/material'
-import { useMemo } from 'react'
-import { Card } from '../ui'
-import { colors, font, radius } from '../../design-system'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import { Box, ButtonBase, Collapse, LinearProgress, Stack, Typography } from '@mui/material'
+import { useMemo, useState } from 'react'
+import { useBackground } from '../../context/BackgroundContext'
+import { colors, radius } from '../../design-system'
 import type { CollectionPlayView, RarityConfig } from '../../types/note'
 import { gradientTextSx } from '../../utils/colorUtils'
 
@@ -9,8 +10,9 @@ export function CollectionPanel({ play, rarities }: {
   play: CollectionPlayView
   rarities: RarityConfig[]
 }) {
+  const { theme } = useBackground()
+  const [open, setOpen] = useState(false)
   const completion = play.total > 0 ? Math.round((play.owned / play.total) * 100) : 0
-  const missing = Math.max(0, play.total - play.owned)
 
   const rarityRows = useMemo(() => {
     return [...rarities]
@@ -30,69 +32,65 @@ export function CollectionPanel({ play, rarities }: {
       .sort((a, b) => a.odds - b.odds)[0]
   }, [play.items, rarities])
 
+  const expandable = rarityRows.length > 0
+
   return (
-    <Card sx={{ p: 2 }}>
-      <Stack spacing={1.3}>
-        <Stack spacing={0.8}>
-          <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Typography variant="label" sx={{ color: colors.text.muted }}>
-              Sua coleção
-            </Typography>
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.1rem', color: colors.primary.text }}>
-              {completion}%
-            </Typography>
-          </Stack>
+    <Box>
+      <ButtonBase
+        disabled={!expandable}
+        onClick={() => setOpen((current) => !current)}
+        aria-expanded={expandable ? open : undefined}
+        aria-label={expandable ? 'ver progresso por raridade' : undefined}
+        sx={{ display: 'block', width: '100%', textAlign: 'left', borderRadius: radius.md, '&.Mui-disabled': { opacity: 1 } }}
+      >
+        <Stack direction="row" alignItems="center" spacing={1.2}>
+          <Typography variant="sm" sx={{ color: theme.textOnBgMuted, fontWeight: 700, whiteSpace: 'nowrap' }}>
+            {play.owned} de {play.total} coletados
+          </Typography>
           <LinearProgress variant="determinate" value={completion} sx={{
-            height: 7, borderRadius: radius.full, bgcolor: colors.fill.medium,
-            '& .MuiLinearProgress-bar': { borderRadius: radius.full, background: `linear-gradient(90deg, ${colors.primary.main}, ${colors.purple.main})` },
+            flex: 1, height: 4, borderRadius: radius.full, bgcolor: colors.fill.medium,
+            '& .MuiLinearProgress-bar': { borderRadius: radius.full, background: theme.accent },
           }} />
-          <Stack direction="row" justifyContent="space-between">
-            <Typography variant="sm" sx={{ color: colors.text.muted }}>
-              {play.owned} de {play.total} coletados
-            </Typography>
-            {missing > 0 && (
-              <Typography variant="sm" sx={{ color: colors.text.muted }}>
-                faltam {missing}
-              </Typography>
-            )}
-          </Stack>
+          <Typography variant="sm" sx={{ color: theme.textOnBg, fontWeight: 800 }}>{completion}%</Typography>
+          {expandable && (
+            <ExpandMoreIcon sx={{ fontSize: 18, color: theme.textOnBgMuted, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+          )}
         </Stack>
+      </ButtonBase>
 
-        {rarest && (
-          <Box sx={{
-            alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center',
-            px: 1, py: 0.4, borderRadius: radius.full,
-            background: rarest.chipBg, border: `1px solid ${rarest.borderColor}`,
-            fontSize: '0.68rem', fontWeight: 800,
-          }}>
-            <Box component="span" sx={gradientTextSx(rarest.chipColor)}>⭐ mais rara: {rarest.emoji} {rarest.label}</Box>
-          </Box>
-        )}
-
-        {rarityRows.length > 0 && (
-          <Stack spacing={0.7}>
-            {rarityRows.map(({ r, owned, total }) => {
-              const pct = total > 0 ? Math.round((owned / total) * 100) : 0
-              return (
-                <Box key={r.id}>
-                  <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.25 }}>
-                    <Typography variant="sm" sx={{ fontWeight: 700, color: colors.text.secondary }}>
-                      {r.emoji} {r.label}
-                    </Typography>
-                    <Typography variant="xs" sx={{ fontWeight: 800, color: owned === total ? colors.success.main : colors.text.muted }}>
-                      {owned}/{total}
-                    </Typography>
-                  </Stack>
-                  <LinearProgress variant="determinate" value={pct} sx={{
-                    height: 4, borderRadius: radius.full, bgcolor: colors.fill.medium,
-                    '& .MuiLinearProgress-bar': { borderRadius: radius.full, background: r.chipColor || colors.primary.main },
-                  }} />
-                </Box>
-              )
-            })}
-          </Stack>
-        )}
-      </Stack>
-    </Card>
+      <Collapse in={open} unmountOnExit>
+        <Stack spacing={0.9} sx={{ pt: 1.2 }}>
+          {rarest && (
+            <Box sx={{
+              alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center',
+              px: 1, py: 0.4, borderRadius: radius.full,
+              background: rarest.chipBg, border: `1px solid ${rarest.borderColor}`,
+              fontSize: '0.68rem', fontWeight: 800,
+            }}>
+              <Box component="span" sx={gradientTextSx(rarest.chipColor)}>⭐ mais rara: {rarest.emoji} {rarest.label}</Box>
+            </Box>
+          )}
+          {rarityRows.map(({ r, owned, total }) => {
+            const pct = total > 0 ? Math.round((owned / total) * 100) : 0
+            return (
+              <Box key={r.id}>
+                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.25 }}>
+                  <Typography variant="sm" sx={{ fontWeight: 700, color: theme.textOnBg }}>
+                    {r.emoji} {r.label}
+                  </Typography>
+                  <Typography variant="xs" sx={{ fontWeight: 800, color: theme.textOnBgMuted }}>
+                    {owned}/{total}
+                  </Typography>
+                </Stack>
+                <LinearProgress variant="determinate" value={pct} sx={{
+                  height: 4, borderRadius: radius.full, bgcolor: colors.fill.medium,
+                  '& .MuiLinearProgress-bar': { borderRadius: radius.full, background: r.chipColor || colors.primary.main },
+                }} />
+              </Box>
+            )
+          })}
+        </Stack>
+      </Collapse>
+    </Box>
   )
 }

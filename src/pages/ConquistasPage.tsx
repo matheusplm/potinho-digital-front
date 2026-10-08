@@ -1,138 +1,23 @@
-import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined'
-import { Box, LinearProgress, Stack, Typography } from '@mui/material'
-import { Card, EmptyState, LoadingState, ScrollablePage } from '../components/ui'
-import { CollectionPanel } from '../components/album/CollectionPanel'
+import { Box } from '@mui/material'
+import { Navigate } from 'react-router-dom'
+import { LoadingState } from '../components/ui'
 import { useBackground } from '../context/BackgroundContext'
-import { FloatingParticles } from '../components/FloatingParticles'
 import { useActiveReaderCollection } from '../hooks/useActiveReaderCollection'
-import { useCollectionPlayQuery, useCollectionRaritiesQuery, useReaderAchievementsQuery } from '../hooks/useNotes'
-import { colors, fadeIn, font, radius, clipOverflow } from '../design-system'
-
-function formatDate(iso: string | null) {
-  if (!iso) return ''
-  return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit' }).format(new Date(iso))
-}
+import { useCollectionsQuery } from '../hooks/useNotes'
+import { collectionSlug } from '../utils/slug'
 
 export function ConquistasPage() {
   const { theme } = useBackground()
-  const { collection, isLoading: collectionsLoading } = useActiveReaderCollection()
-  const cid = collection?.id ?? ''
-  const { data: play, isLoading: playLoading } = useCollectionPlayQuery(cid, { enabled: !!cid })
-  const { data: rarities = [] } = useCollectionRaritiesQuery(cid)
-  const { data: achData, isLoading: achLoading } = useReaderAchievementsQuery(cid)
+  const { collection, isLoading } = useActiveReaderCollection()
+  const { data: collections = [] } = useCollectionsQuery()
 
-  const achievements = achData?.achievements ?? []
-  const unlocked = achievements.filter((a) => a.unlocked).length
-  const isLoading = collectionsLoading || (!!cid && (playLoading || achLoading))
-
-  return (
-    <Box sx={{ height: '100%', position: 'relative', ...clipOverflow, background: theme.gradient }}>
-      <FloatingParticles />
-      <EmojiEventsOutlinedIcon sx={{ position: 'absolute', bottom: -70, right: -60, fontSize: 420, color: 'rgba(225,29,72,0.05)', pointerEvents: 'none' }} />
-      <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
-        <Stack spacing={0.3} sx={{ mb: 2.2 }}>
-          <Typography variant="md" sx={{ color: theme.textOnBgMuted, fontWeight: 700 }}>
-            🏅 Conquistas
-          </Typography>
-          <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.6rem', color: theme.textOnBg, lineHeight: 1.1 }}>
-            Suas conquistas
-          </Typography>
-          {collection && (
-            <Typography variant="sm" sx={{
-              display: 'inline-flex', alignItems: 'center', gap: 0.5, mt: 0.4,
-              fontWeight: 700, color: theme.textOnBgMuted,
-              bgcolor: `${theme.accent}14`, border: `1px solid ${theme.accent}28`,
-              borderRadius: '20px', px: 1, py: 0.25, alignSelf: 'flex-start',
-            }}>
-              {collection.emoji} {collection.name}
-            </Typography>
-          )}
-          {achData && (
-            <Typography variant="md" sx={{ color: theme.textOnBgMuted, fontStyle: 'italic', mt: 0.3 }}>
-              {unlocked} de {achievements.length} desbloqueadas
-            </Typography>
-          )}
-        </Stack>
-
-        {isLoading && (
-          <LoadingState label="Carregando conquistas" accent={theme.accent} textColor={theme.textOnBg} mutedColor={theme.textOnBgMuted} sx={{ minHeight: 320 }} />
-        )}
-
-        {!isLoading && !collection && (
-          <Stack spacing={1.2} alignItems="center" justifyContent="center" sx={{ minHeight: 320, textAlign: 'center' }}>
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.2rem', color: theme.textOnBg }}>
-              Nenhum potinho ativo
-            </Typography>
-            <Typography variant="lg" sx={{ color: theme.textOnBgMuted, maxWidth: 260 }}>
-              Abra um potinho pra começar a colecionar conquistas.
-            </Typography>
-          </Stack>
-        )}
-
-        {!isLoading && collection && (
-          <Stack spacing={2}>
-            {play && <CollectionPanel play={play} rarities={rarities} />}
-
-            {achData && achievements.length === 0 && (
-              <EmptyState
-                emoji="🏅"
-                title="Sem conquistas por aqui"
-                description="Esta coleção ainda não tem conquistas definidas."
-              />
-            )}
-
-            <Stack spacing={1}>
-              {achievements.map((a) => {
-                const pct = a.target > 0 ? Math.min(100, Math.round((a.current / a.target) * 100)) : 0
-                return (
-                  <Card key={a.id} sx={{
-                    p: 1.4, display: 'flex', alignItems: 'center', gap: 1.3,
-                    border: `1px solid ${a.unlocked ? `${theme.accent}33` : colors.border.subtle}`,
-                    background: a.unlocked ? `${theme.accent}0c` : undefined,
-                  }}>
-                    <Box sx={{
-                      width: 48, height: 48, borderRadius: radius.full, flexShrink: 0, fontSize: '1.5rem',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      background: a.unlocked ? `linear-gradient(135deg, ${theme.accent}22, ${theme.accent}44)` : colors.fill.medium,
-                      border: `1.5px solid ${a.unlocked ? `${theme.accent}88` : colors.border.subtle}`,
-                      filter: a.unlocked ? 'none' : 'grayscale(1)', opacity: a.unlocked ? 1 : 0.45,
-                    }}>
-                      {a.emoji}
-                    </Box>
-                    <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary }}>
-                          {a.label}
-                        </Typography>
-                        {a.unlocked && <Typography variant="md" sx={{ fontWeight: 900, color: colors.success.main }}>✓</Typography>}
-                      </Stack>
-                      <Typography variant="sm" sx={{ color: colors.text.secondary, mb: a.unlocked ? 0 : 0.5 }}>
-                        {a.description}
-                      </Typography>
-                      {a.unlocked && a.unlockedAt && (
-                        <Typography variant="sm" sx={{ fontWeight: 700, color: theme.accent }}>
-                          🏆 desbloqueada em {formatDate(a.unlockedAt)}
-                        </Typography>
-                      )}
-                      {!a.unlocked && (
-                        <Stack direction="row" alignItems="center" spacing={0.8}>
-                          <LinearProgress variant="determinate" value={pct} sx={{
-                            flex: 1, height: 5, borderRadius: radius.full, bgcolor: colors.fill.medium,
-                            '& .MuiLinearProgress-bar': { borderRadius: radius.full, background: theme.accent },
-                          }} />
-                          <Typography variant="xs" sx={{ fontWeight: 800, color: colors.text.muted }}>
-                            {a.current}/{a.target}
-                          </Typography>
-                        </Stack>
-                      )}
-                    </Box>
-                  </Card>
-                )
-              })}
-            </Stack>
-          </Stack>
-        )}
-      </ScrollablePage>
-    </Box>
-  )
+  if (isLoading) {
+    return (
+      <Box sx={{ height: '100%', background: theme.gradient }}>
+        <LoadingState label="Abrindo conquistas" accent={theme.accent} textColor={theme.textOnBg} mutedColor={theme.textOnBgMuted} sx={{ minHeight: 320 }} />
+      </Box>
+    )
+  }
+  if (!collection) return <Navigate to="/home" replace />
+  return <Navigate to={`/colecoes/${collectionSlug(collection, collections)}?aba=conquistas`} replace />
 }

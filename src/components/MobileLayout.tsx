@@ -1,7 +1,6 @@
 import HomeIcon from '@mui/icons-material/Home'
 import Inventory2Icon from '@mui/icons-material/Inventory2'
 import AutoStoriesOutlinedIcon from '@mui/icons-material/AutoStoriesOutlined'
-import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone'
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
@@ -95,7 +94,6 @@ export function MobileLayout() {
       return [
         { label: 'Início', path: '/home', icon: <HomeIcon /> },
         { label: 'Coleção', path: readerAlbumPath, icon: <AutoStoriesOutlinedIcon /> },
-        { label: 'Conquistas', path: '/conquistas', icon: <EmojiEventsOutlinedIcon /> },
         { label: 'Favoritas', path: '/favoritas', icon: <FavoriteBorderIcon /> },
         { label: 'Novidades', path: '/notificacoes', icon: <NotificationsNoneIcon /> },
       ]
