@@ -86,24 +86,23 @@ export function HeroCardStack() {
   const cardSx = (zIndex: number, transform: string, transition: string, extraSx?: object) => ({
     position: 'absolute' as const, inset: 0, zIndex,
     transform, transition,
-    display: 'flex', alignItems: 'center',
-    '& > *': { width: '100%' },
+    '& > *': { width: '100%', height: '100%' },
     ...extraSx,
   })
 
   return (
     <Box sx={{ flexShrink: 0 }}>
       <Box
-        sx={{ position: 'relative', width: 300, height: 400, userSelect: 'none', touchAction: 'pan-y' }}
+        sx={{ position: 'relative', width: 300, height: 292, userSelect: 'none', touchAction: 'pan-y' }}
         onMouseMove={(e) => handleMove(e.clientX, e.clientY)}
         onMouseUp={handleEnd}
         onMouseLeave={handleEnd}
       >
         <Box sx={cardSx(1, 'translateY(16px) scale(0.9) rotate(6deg)', 'transform 0.3s ease')}>
-          <DemoNoteCard note={n2} eager />
+          <DemoNoteCard note={n2} eager fill />
         </Box>
         <Box sx={cardSx(5, 'translateY(8px) scale(0.95) rotate(-2deg)', 'transform 0.3s ease')}>
-          <DemoNoteCard note={n1} eager />
+          <DemoNoteCard note={n1} eager fill />
         </Box>
         <Box
           key={topIdx}
@@ -123,7 +122,7 @@ export function HeroCardStack() {
             cursor: isDragging ? 'grabbing' : 'grab',
           })}
         >
-          <DemoNoteCard note={n0} eager />
+          <DemoNoteCard note={n0} eager fill />
         </Box>
       </Box>
       <Typography variant="xxs" sx={{ mt: 1.5, textAlign: 'center', color: colors.text.muted, letterSpacing: 0.3 }}>

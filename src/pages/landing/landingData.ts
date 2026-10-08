@@ -76,7 +76,7 @@ export const DEMO_NOTES: DemoNote[] = [
   note(6, 'mitico', 'declaracao', 'Quando a gente ficar velhinho', 'Quero ser aquele casal que ainda briga pra decidir qual lado da cama é de quem. Contanto que seja contigo, no mesmo colchão.'),
   note(7, 'raro', 'familia', 'Domingo na sua casa', 'Mãe, hoje entendi que o melhor tempero da sua comida é o domingo inteiro que vem junto. Obrigada por sempre guardar meu lugar na mesa.'),
   note(8, 'comum', 'humor', 'O melhor café do mundo', 'Você faz o melhor café do mundo. Mas desconfio que só elogio pra você nunca me deixar preparar o meu.'),
-  note(9, 'incomum', 'carinho', 'Contagem regressiva', 'Faltam 3 dias pra te ver e eu já olhei o relógio umas 40 vezes. O tempo resolveu andar de bicicleta com o pneu furado.', { id: 'QBd2kLB5qDmysEXre9', layout: 'banner' }),
+  note(9, 'incomum', 'carinho', 'Contagem regressiva', 'Faltam 3 dias pra te ver e eu já olhei o relógio umas 40 vezes. O tempo resolveu andar de bicicleta com o pneu furado.', { id: 'QBd2kLB5qDmysEXre9', layout: 'hero-overlay' }),
   note(10, 'lendario', 'amizade', 'Dez anos depois', 'Dez anos de amizade e eu ainda não descobri como você sabe me fazer rir justo quando mais preciso. Nunca me ensina o truque.'),
   note(11, 'raro', 'carinho', 'Trouxe uma flor', 'Passei o dia pensando no que te dar e cheguei a esta conclusão: um sorriso bobo, uma flor e um abraço sem prazo de validade.', { id: 't8xgPfC5oNIRMrNooe', layout: 'thumb-right' }),
 ]
