@@ -15,6 +15,7 @@ import { useUser } from '../../context/UserContext'
 import type { CollectionInvite, CollectionPack } from '../../types/note'
 import { actionButtonSx } from './shared'
 import { TourHint } from '../../tour/TourHint'
+import { isEmail } from '../../utils/slug'
 
 interface AccessTabProps { cid: string }
 
@@ -65,6 +66,10 @@ export function AccessTab({ cid }: AccessTabProps) {
   async function handleInvite() {
     const email = emailInput.trim()
     if (!email) return
+    if (!isEmail(email)) {
+      toast.error('Esse e-mail não parece válido. Confere se digitou certinho.')
+      return
+    }
     if (user?.email && email.toLowerCase() === user.email.toLowerCase()) {
       toast.error('Você não pode se convidar para a sua própria coleção.')
       return
