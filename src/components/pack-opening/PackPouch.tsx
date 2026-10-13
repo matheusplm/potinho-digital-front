@@ -81,6 +81,14 @@ export function PackPouch({ gradient, accent, emoji, look, name, state, onTorn, 
 
   useEffect(() => () => cancelAnimationFrame(frame.current), [])
 
+  function finishDrag() {
+    const current = drag.current
+    drag.current = null
+    if (!current || torn) return
+    const quickTap = !current.moved && performance.now() - current.t < 350
+    if (quickTap || progressRef.current > 0.35) autoTear()
+  }
+
   function relative(clientX: number) {
     const rect = pouchRef.current?.getBoundingClientRect()
     return rect ? (clientX - rect.left) / rect.width : 0
@@ -111,15 +119,11 @@ export function PackPouch({ gradient, accent, emoji, look, name, state, onTorn, 
             if (Math.abs(e.clientX - drag.current.x) > 8) drag.current.moved = true
             if (drag.current.moved) update(relative(e.clientX))
           }}
-          onPointerUp={() => {
-            const current = drag.current
-            drag.current = null
-            if (!current || torn) return
-            const quickTap = !current.moved && performance.now() - current.t < 350
-            if (quickTap || progressRef.current > 0.5) autoTear()
-          }}
+          onPointerUp={finishDrag}
+          onPointerCancel={finishDrag}
+          onLostPointerCapture={finishDrag}
           sx={{
-            position: 'relative', width: '100%', height: '100%', cursor: torn ? 'default' : 'grab', touchAction: 'pan-y',
+            position: 'relative', width: '100%', height: '100%', cursor: torn ? 'default' : 'grab', touchAction: 'none', WebkitUserSelect: 'none', userSelect: 'none', WebkitTouchCallout: 'none',
             transform: 'perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg))', transition: 'transform 0.18s ease-out',
             filter: `drop-shadow(0 24px 34px ${withAlpha(accent, 35)}) drop-shadow(0 6px 10px rgba(15,23,42,0.18))`,
             outline: 'none', '&:focus-visible': { filter: `drop-shadow(0 0 0 3px ${accent}) drop-shadow(0 24px 34px ${withAlpha(accent, 35)})` },
