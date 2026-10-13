@@ -163,11 +163,8 @@ export function LandingPage() {
               <Typography variant="sm" sx={{ mt: 2, color: colors.text.muted }}>
                 ✓ Gratuito &nbsp;·&nbsp; ✓ Sem cartão de crédito
               </Typography>
-              <Box sx={{ mt: 4, width: '100%', maxWidth: 320, position: 'relative' }}>
-                <Box sx={{ position: 'absolute', top: 10, left: 10, right: 10, bottom: -10, background: 'linear-gradient(135deg,#eff6ff,#dbeafe)', borderRadius: radius.xl, border: '1.5px solid rgba(29,78,216,0.22)' }} />
-                <Box sx={{ position: 'relative' }}>
-                  <DemoNoteCard note={DEMO_NOTES[0]} eager />
-                </Box>
+              <Box sx={{ mt: 4.5, display: 'flex', justifyContent: 'center', width: '100%' }}>
+                <HeroCardStack />
               </Box>
             </Stack>
           )}

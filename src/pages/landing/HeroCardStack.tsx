@@ -1,8 +1,11 @@
 import { Box, Typography } from '@mui/material'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import { colors, hintWiggle, sway } from '../../design-system'
 import { DemoNoteCard } from './DemoNoteCard'
 import { DEMO_NOTES } from './landingData'
+
+const TAP_SLOP = 8
+const TAP_MS = 300
 
 export function HeroCardStack() {
   const [topIdx, setTopIdx] = useState(0)
@@ -13,8 +16,9 @@ export function HeroCardStack() {
   const [hinting, setHinting] = useState(false)
   const [isSnapping, setIsSnapping] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
-  const dragStartRef = useRef({ x: 0, y: 0 })
+  const dragRef = useRef<{ x: number; y: number; t: number; id: number } | null>(null)
   const interactedRef = useRef(false)
+  const stackRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const t = setTimeout(() => { if (!interactedRef.current) setHinting(true) }, 1200)
@@ -27,38 +31,59 @@ export function HeroCardStack() {
     return () => clearTimeout(t)
   }, [hinting])
 
-  function handleStart(clientX: number, clientY: number) {
+  function advance(dir: 1 | -1) {
+    setExitDir(dir)
+    setTimeout(() => {
+      setTopIdx((i) => (i + 1) % DEMO_NOTES.length)
+      setExitDir(null)
+      setDragX(0)
+      setDragY(0)
+    }, 350)
+  }
+
+  function onPointerDown(e: PointerEvent<HTMLDivElement>) {
+    if (exitDir !== null) return
+    if (e.pointerType === 'mouse') e.preventDefault()
+    e.currentTarget.setPointerCapture(e.pointerId)
     interactedRef.current = true
     setHinting(false)
     setIsHovered(false)
     setIsDragging(true)
-    dragStartRef.current = { x: clientX, y: clientY }
+    dragRef.current = { x: e.clientX, y: e.clientY, t: performance.now(), id: e.pointerId }
   }
 
-  function handleMove(clientX: number, clientY: number) {
-    if (!isDragging) return
-    setDragX(clientX - dragStartRef.current.x)
-    setDragY(clientY - dragStartRef.current.y)
+  function onPointerMove(e: PointerEvent<HTMLDivElement>) {
+    const start = dragRef.current
+    if (!start || start.id !== e.pointerId) return
+    setDragX(e.clientX - start.x)
+    setDragY(e.clientY - start.y)
   }
 
-  function handleEnd() {
-    if (!isDragging) return
+  function finish(e: PointerEvent<HTMLDivElement>) {
+    const start = dragRef.current
+    if (!start || start.id !== e.pointerId) return
+    dragRef.current = null
     setIsDragging(false)
-    if (Math.abs(dragX) > 80) {
-      const dir: 1 | -1 = dragX > 0 ? 1 : -1
-      setExitDir(dir)
-      setTimeout(() => {
-        setTopIdx((i) => (i + 1) % DEMO_NOTES.length)
-        setExitDir(null)
-        setDragX(0)
-        setDragY(0)
-      }, 350)
-    } else {
-      setIsSnapping(true)
-      setDragX(0)
-      setDragY(0)
-      setTimeout(() => setIsSnapping(false), 460)
-    }
+    const dx = e.clientX - start.x
+    const dy = e.clientY - start.y
+    const width = stackRef.current?.offsetWidth ?? 300
+    const isTap = Math.abs(dx) < TAP_SLOP && Math.abs(dy) < TAP_SLOP && performance.now() - start.t < TAP_MS
+    if (isTap) { advance(1); return }
+    if (Math.abs(dx) > Math.min(80, width * 0.22)) { advance(dx > 0 ? 1 : -1); return }
+    setIsSnapping(true)
+    setDragX(0)
+    setDragY(0)
+    setTimeout(() => setIsSnapping(false), 460)
+  }
+
+  function cancel() {
+    if (!dragRef.current) return
+    dragRef.current = null
+    setIsDragging(false)
+    setIsSnapping(true)
+    setDragX(0)
+    setDragY(0)
+    setTimeout(() => setIsSnapping(false), 460)
   }
 
   const n0 = DEMO_NOTES[topIdx % DEMO_NOTES.length]
@@ -91,13 +116,8 @@ export function HeroCardStack() {
   })
 
   return (
-    <Box sx={{ flexShrink: 0 }}>
-      <Box
-        sx={{ position: 'relative', width: 300, height: 292, userSelect: 'none', touchAction: 'pan-y' }}
-        onMouseMove={(e) => handleMove(e.clientX, e.clientY)}
-        onMouseUp={handleEnd}
-        onMouseLeave={handleEnd}
-      >
+    <Box sx={{ flexShrink: 0, width: { xs: 'min(300px, calc(100vw - 56px))', md: 300 } }}>
+      <Box ref={stackRef} sx={{ position: 'relative', width: '100%', height: { xs: 344, md: 292 }, userSelect: 'none', WebkitUserSelect: 'none' }}>
         <Box sx={cardSx(1, 'translateY(16px) scale(0.9) rotate(6deg)', 'transform 0.3s ease')}>
           <DemoNoteCard note={n2} eager fill />
         </Box>
@@ -106,27 +126,36 @@ export function HeroCardStack() {
         </Box>
         <Box
           key={topIdx}
-          onMouseDown={(e) => { e.preventDefault(); handleStart(e.clientX, e.clientY) }}
-          onMouseEnter={() => { if (!isDragging && !isSnapping && exitDir === null) setIsHovered(true) }}
-          onMouseLeave={() => setIsHovered(false)}
-          onTouchStart={(e) => handleStart(e.touches[0].clientX, e.touches[0].clientY)}
-          onTouchMove={(e) => handleMove(e.touches[0].clientX, e.touches[0].clientY)}
-          onTouchEnd={handleEnd}
+          role="button"
+          tabIndex={0}
+          aria-label="Ver o próximo bilhete"
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={finish}
+          onPointerCancel={cancel}
+          onPointerEnter={(e) => { if (e.pointerType === 'mouse' && !isDragging && !isSnapping && exitDir === null) setIsHovered(true) }}
+          onPointerLeave={(e) => { if (e.pointerType === 'mouse') setIsHovered(false) }}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight') { e.preventDefault(); advance(1) } }}
           sx={cardSx(10, topTransform, topTransition, {
             opacity: topOpacity,
+            touchAction: 'pan-y',
+            WebkitTouchCallout: 'none',
+            WebkitTapHighlightColor: 'transparent',
+            '& img': { pointerEvents: 'none', WebkitUserDrag: 'none' },
             animation: exitDir !== null || isDragging || isSnapping || isHovered
               ? 'none'
               : hinting
               ? `${hintWiggle} 0.85s ease-in-out`
               : `${sway} 3s ease-in-out infinite`,
             cursor: isDragging ? 'grabbing' : 'grab',
+            outline: 'none',
           })}
         >
           <DemoNoteCard note={n0} eager fill />
         </Box>
       </Box>
-      <Typography variant="xxs" sx={{ mt: 1.5, textAlign: 'center', color: colors.text.muted, letterSpacing: 0.3 }}>
-        ← arraste para descobrir →
+      <Typography variant="xxs" sx={{ mt: 2, textAlign: 'center', color: colors.text.muted, letterSpacing: 0.3 }}>
+        ← arraste ou toque para descobrir →
       </Typography>
     </Box>
   )
