@@ -5,16 +5,23 @@ import { formatCooldownBadge } from '../../utils/packCooldowns'
 import type { CollectionPack } from '../../types/note'
 import { PackIcon } from '../../components/PackIcon'
 
-export function BonusPackRow({ bonusPacks, isRealReader, packOpens, packAvailableCounts, getCooldownMs, onSelect }: {
+export function BonusPackRow({ bonusPacks, isRealReader, packOpens, packAvailableCounts, getCooldownMs, onSelect, inline = false }: {
   bonusPacks: CollectionPack[]
   isRealReader: boolean
   packOpens: Record<string, number> | undefined
   packAvailableCounts: Record<string, number>
   getCooldownMs: (packId: string) => number
   onSelect: (pack: CollectionPack) => void
+  inline?: boolean
 }) {
   return (
-    <Box sx={{
+    <Box sx={inline ? {
+      display: 'flex',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      gap: 1.2,
+      pt: 0.4,
+    } : {
       position: 'absolute',
       left: 0,
       right: 0,
