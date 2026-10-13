@@ -11,8 +11,8 @@ import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNone
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
 import BlockIcon from '@mui/icons-material/Block'
 import { Box, Stack, Typography, Backdrop, IconButton, Tooltip } from '@mui/material'
-import { startTransition, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { startTransition, useEffect, useMemo, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useUser, type Persona } from '../context/UserContext'
 import { isCollectionReader, personaCapabilities } from '../utils/collectionAccess'
 import { useNotificationToggle } from '../hooks/useNotificationToggle'
@@ -29,6 +29,16 @@ import { backgroundThemes, colors, font, menuIn, radius } from '../design-system
 
 export function FloatingMenu() {
   const [open, setOpen] = useState(false)
+  const { pathname } = useLocation()
+
+  useEffect(() => setOpen(false), [pathname])
+
+  useEffect(() => {
+    if (!open) return
+    const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') setOpen(false) }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [open])
   const { user, persona, setPersona, logout } = useUser()
   const { theme, maskLightCards, setMaskLightCards } = useBackground()
   const tour = useTour()

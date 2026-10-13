@@ -107,7 +107,7 @@ export function CollectionManagePage() {
       <FavoriteIcon sx={{ position: 'absolute', bottom: -60, right: -60, fontSize: 400, color: 'rgba(225,29,72,0.04)', pointerEvents: 'none' }} />
 
       <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
-        <Stack direction="row" alignItems="center" spacing={1.2} sx={{ mb: 2.5 }}>
+        <Stack direction="row" alignItems="center" spacing={1.2} sx={{ mb: 2.5, pr: { xs: 6, md: 0 } }}>
           <IconButton
             size="small"
             aria-label="voltar para coleções"
@@ -123,7 +123,7 @@ export function CollectionManagePage() {
           >
             <ArrowBackIcon sx={{ fontSize: 20, filter: 'drop-shadow(0 1px 1px rgba(255,255,255,0.6))' }} />
           </IconButton>
-          <Box sx={{ flex: 1 }}>
+          <Box sx={{ flex: 1, minWidth: 0, '& .MuiTypography-body2': { display: { xs: 'none', sm: 'block' } } }}>
             <PageTitle title={collection?.name ?? 'Gerenciar'} subtitle="Bilhetes, raridades, tipos, pacotinhos e acessos" />
           </Box>
         </Stack>

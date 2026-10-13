@@ -28,6 +28,10 @@ export function uniqueConfigId(label: string, existingIds: string[]): string {
   return `${base}_${suffix}`
 }
 
+export function isEmail(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value)
+}
+
 export function isHexColor(value: string): boolean {
   return /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(value)
 }

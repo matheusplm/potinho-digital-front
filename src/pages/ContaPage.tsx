@@ -138,7 +138,7 @@ export function ContaPage() {
   const surfaceBg = theme.isDark ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.72)'
   const borderColor = colors.border.subtle
   const quietLink = {
-    all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 0.6,
+    all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 0.6, minHeight: 36, px: 0.5,
     color: theme.textOnBgMuted, fontSize: '0.84rem', fontWeight: 600, borderRadius: radius.sm,
     transition: 'color 0.15s',
     '&:hover': { color: theme.textOnBg },

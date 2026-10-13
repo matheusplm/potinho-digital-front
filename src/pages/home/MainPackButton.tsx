@@ -4,7 +4,7 @@ import { colors, font, heartPulseAura, packCtaFloat, radius } from '../../design
 import type { CollectionPack } from '../../types/note'
 import { PackIcon } from '../../components/PackIcon'
 
-export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLabel, cooldownProgress, isLoading, isOpeningPack, onOpen, onOpenAll, isRealReader, onResetCooldown, accent, accentMuted, accruedCount = 0 }: {
+export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLabel, cooldownProgress, isLoading, isOpeningPack, onOpen, onOpenAll, isRealReader, onResetCooldown, accent, accentMuted, accruedCount = 0, compact = false }: {
   pack: CollectionPack | undefined
   collectionEmoji: string
   mainCanOpen: boolean
@@ -19,12 +19,13 @@ export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLa
   accent: string
   accentMuted: string
   accruedCount?: number
+  compact?: boolean
 }) {
   const hasAccrued = mainCanOpen && accruedCount > 1
   return (
     <Stack spacing={1.2} alignItems="center" justifyContent="center" sx={{
       flex: 1,
-      minHeight: 390,
+      minHeight: compact ? 270 : 390,
       py: 1.2,
       borderRadius: radius.xl,
       background: 'radial-gradient(circle at 50% 42%, rgba(255,255,255,0.18), transparent 44%)',

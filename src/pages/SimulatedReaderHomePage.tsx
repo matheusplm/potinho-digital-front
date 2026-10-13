@@ -1,6 +1,6 @@
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import ShuffleIcon from '@mui/icons-material/Shuffle'
-import { Box, LinearProgress, Stack, Typography } from '@mui/material'
+import { Box, LinearProgress, Stack, Typography, useMediaQuery } from '@mui/material'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -150,6 +150,7 @@ export function SimulatedReaderHomePage() {
   const [packCooldowns, setPackCooldowns] = useState<Record<string, string>>({})
   const [packAvailableCounts, setPackAvailableCounts] = useState<Record<string, number>>({})
   const [now, setNow] = useState(() => Date.now())
+  const shortScreen = useMediaQuery('(max-height: 720px)', { noSsr: true })
 
   useEffect(() => {
     if (!isRealReader || !cid || activePacks.length === 0) return
@@ -472,7 +473,7 @@ export function SimulatedReaderHomePage() {
             </Stack>
           )}
 
-          <Stack direction="row" spacing={0.8} sx={{ mb: 1.35 }}>
+          <Stack direction="row" spacing={0.8} sx={{ mb: 1.35, display: shortScreen ? 'none' : 'flex' }}>
             {[
               { emoji: '🎴', value: play.owned, label: 'coletados', to: `/colecoes/${activeSession.collectionSlug}` },
               { emoji: '❤️', value: favCount, label: 'favoritas', to: '/favoritas' },
@@ -495,7 +496,7 @@ export function SimulatedReaderHomePage() {
             ))}
           </Stack>
 
-          <Stack spacing={1.15} sx={{ minHeight: 'calc(100dvh - 214px)' }}>
+          <Stack spacing={1.15} sx={{ minHeight: shortScreen ? undefined : 'calc(100dvh - 214px)' }}>
             <Card sx={{ p: 1.05, backdropFilter: 'blur(14px)' }}>
               <Stack spacing={0.65}>
                 {isLoading ? (
@@ -581,12 +582,24 @@ export function SimulatedReaderHomePage() {
               accent={theme.accent}
               accentMuted={theme.textOnBgMuted}
               accruedCount={mainPack ? (packAvailableCounts[mainPack.id] ?? 0) : 0}
+              compact={shortScreen}
             />
+            {shortScreen && bonusPacks.length > 0 && (
+              <BonusPackRow
+                inline
+                bonusPacks={bonusPacks}
+                isRealReader={isRealReader}
+                packOpens={play.packOpens}
+                packAvailableCounts={packAvailableCounts}
+                getCooldownMs={getBonusPackCooldownMs}
+                onSelect={setSelectedBonusPack}
+              />
+            )}
           </Stack>
         </Box>
       </ScrollablePage>
 
-      {bonusPacks.length > 0 && (
+      {!shortScreen && bonusPacks.length > 0 && (
         <BonusPackRow
           bonusPacks={bonusPacks}
           isRealReader={isRealReader}

@@ -195,10 +195,10 @@ export function PackEditor({ cid, pack, rarities, types, onClose }: {
 
           <Input label="Nome" value={form.name} onChange={(e) => set('name', e.target.value)} fullWidth />
 
-          <Stack direction="row" spacing={1.5} alignItems="center">
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 0.6, sm: 1.5 }} alignItems={{ xs: 'stretch', sm: 'center' }}>
             <Input label="Cartas por abertura" type="number" value={form.cardsPerOpen}
               onChange={(e) => set('cardsPerOpen', Math.max(1, Number(e.target.value) || 1))}
-              inputProps={{ min: 1, max: 20 }} sx={{ width: 170, flexShrink: 0 }} />
+              inputProps={{ min: 1, max: 20 }} sx={{ width: { xs: '100%', sm: 170 }, flexShrink: 0 }} />
             <Typography variant="xs" sx={{ color: colors.text.muted, lineHeight: 1.45, flex: 1 }}>
               Quantos bilhetes saem cada vez que a pessoa abre.
             </Typography>

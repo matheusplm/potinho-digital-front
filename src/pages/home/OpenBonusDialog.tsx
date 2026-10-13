@@ -93,7 +93,7 @@ export function OpenBonusDialog({ pack, isRealReader, canOpen, block, opens, acc
               </Stack>
             </Box>
           </DialogContent>
-          <DialogActions sx={{ px: 2, pb: 2, gap: 0.8, flexDirection: 'column' }}>
+          <DialogActions sx={{ px: 2, pb: 2, gap: 0.8, flexDirection: 'column', '& > :not(style) ~ :not(style)': { ml: 0 } }}>
             {effectiveCount > 1 && canOpen && !confirmAll && (
               <Button variant="primary" disabled={isOpeningPack} onClick={() => setConfirmAll(true)} sx={{ width: '100%', whiteSpace: 'nowrap' }}>
                 Abrir todos ({effectiveCount}x)

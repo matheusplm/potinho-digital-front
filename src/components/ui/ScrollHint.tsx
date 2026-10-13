@@ -17,6 +17,8 @@ function hasScrollableContent(): boolean {
   return false
 }
 
+const HINT_MS = 2600
+
 export function ScrollHint() {
   const [visible, setVisible] = useState(false)
   const location = useLocation()
@@ -30,6 +32,12 @@ export function ScrollHint() {
     }, 550)
     return () => clearTimeout(timerRef.current)
   }, [location.pathname])
+
+  useEffect(() => {
+    if (!visible) return
+    const timer = setTimeout(() => setVisible(false), HINT_MS)
+    return () => clearTimeout(timer)
+  }, [visible])
 
   useEffect(() => {
     const hide = () => setVisible(false)
