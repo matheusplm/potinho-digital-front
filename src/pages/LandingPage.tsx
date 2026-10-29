@@ -5,13 +5,15 @@ import { Box, ButtonBase, IconButton, Stack, Tooltip, Typography, useMediaQuery 
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, ScrollHint } from '../components/ui'
-import { brandAccent, colors, fadeInHero, fadeInRight, font, gradients } from '../design-system'
+import { brandAccent, colors, fadeInHero, fadeInRight, font, gradients, pageBaseColor } from '../design-system'
+import { useBackground } from '../context/BackgroundContext'
 import { AUDIENCES, DEMO_NOTES, DEMO_RARITIES, DETAILS, RARITY_COLOR, RARITY_FILTERS, STEPS } from './landing/landingData'
 import { SectionTitle } from './landing/SectionTitle'
 import { DemoNoteCard } from './landing/DemoNoteCard'
 import { BrandLogo, BrandName, Copyright } from '../components/Brand'
 import { HeroCardStack } from './landing/HeroCardStack'
 import { HandArrow, Squiggle, Stamp } from './landing/Doodles'
+import { ThemesShowcase } from './landing/ThemesShowcase'
 
 const INK_RED = '#c0392b'
 const PAGE_X = { xs: 2.5, md: 5 }
@@ -29,6 +31,7 @@ export function LandingPage() {
   })
   const isDesktop = useMediaQuery('(min-width: 900px)', { noSsr: true })
   const [activeRarity, setActiveRarity] = useState('Todos')
+  const { theme } = useBackground()
 
   const visibleNotes = activeRarity === 'Todos' ? DEMO_NOTES : DEMO_NOTES.filter((n) => DEMO_RARITIES.find((r) => r.id === n.rarity)?.label === activeRarity)
 
@@ -164,7 +167,7 @@ export function LandingPage() {
         )}
       </Box>
 
-      <Box component="section" sx={{ borderTop: `1px solid ${colors.border.subtle}`, borderBottom: `1px solid ${colors.border.subtle}`, background: 'rgba(233,220,195,0.35)' }}>
+      <Box component="section" sx={{ borderTop: `1px solid ${colors.border.subtle}`, borderBottom: `1px solid ${colors.border.subtle}`, background: colors.fill.subtle }}>
         <Box sx={{ maxWidth: 1180, mx: 'auto', px: PAGE_X, py: { xs: 7, md: 10 }, display: 'grid', gridTemplateColumns: { xs: '1fr', md: '0.8fr 1.2fr' }, gap: { xs: 3, md: 8 } }}>
           <Box>
             <SectionTitle kicker="nada vem pronto" sub="Tudo no potinho é você quem monta. Começa simples e vai mexendo conforme dá vontade.">
@@ -186,7 +189,9 @@ export function LandingPage() {
         </Box>
       </Box>
 
-      <Box component="section" sx={{ maxWidth: 1180, mx: 'auto', px: PAGE_X, py: { xs: 8, md: 12 } }}>
+      <ThemesShowcase />
+
+      <Box component="section" sx={{ maxWidth: 1180, mx: 'auto', px: PAGE_X, pb: { xs: 8, md: 12 }, pt: { xs: 2, md: 4 } }}>
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr auto' }, gap: { xs: 4, md: 8 }, alignItems: 'center' }}>
           <Box>
             <Typography sx={{ fontFamily: font.serif, fontWeight: 500, fontSize: { xs: '2rem', md: '2.9rem' }, lineHeight: 1.1, letterSpacing: '-0.02em', mb: 2, maxWidth: 680 }}>
@@ -205,7 +210,7 @@ export function LandingPage() {
               </Box>
             </Stack>
           </Box>
-          <Stamp color={INK_RED} sx={{ justifySelf: { xs: 'start', md: 'center' }, transform: 'rotate(6deg)', width: { xs: 128, md: 160 } }}>
+          <Stamp color={INK_RED} holeColor={pageBaseColor(theme)} sx={{ justifySelf: { xs: 'start', md: 'center' }, transform: 'rotate(6deg)', width: { xs: 128, md: 160 } }}>
             <Stack alignItems="center" spacing={0.8} sx={{ py: 1 }}>
               <BrandLogo size={isDesktop ? 64 : 52} />
               <Typography sx={{ fontFamily: font.sans, fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: INK_RED }}>

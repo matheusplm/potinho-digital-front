@@ -17,12 +17,12 @@ export function HandArrow({ color, flip = false, sx }: { color: string; flip?: b
   )
 }
 
-export function Stamp({ children, color, sx }: { children: React.ReactNode; color: string; sx?: SxProps<Theme> }) {
+export function Stamp({ children, color, holeColor, sx }: { children: React.ReactNode; color: string; holeColor: string; sx?: SxProps<Theme> }) {
   return (
     <Box sx={{
       p: '9px',
       background: '#fffdf7',
-      outline: '6px dotted #f4ede0',
+      outline: `6px dotted ${holeColor}`,
       outlineOffset: '-3px',
       filter: 'drop-shadow(1px 2px 0 rgba(60,42,20,0.18))',
       ...sx,

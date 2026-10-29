@@ -15,7 +15,14 @@ export interface BackgroundTheme {
   onAccent: string
 }
 
-export const PAPER_TEXTURE = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .25 0 0 0 0 .12 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"), #f4ede0`
+const GRAIN_LIGHT = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .25 0 0 0 0 .12 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")"
+const GRAIN_DARK = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .96 0 0 0 0 .9 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")"
+
+function paper(color: string, dark = false) {
+  return `${dark ? GRAIN_DARK : GRAIN_LIGHT}, ${color}`
+}
+
+export const PAPER_TEXTURE = paper('#f4ede0')
 
 const THEMES: Omit<BackgroundTheme, 'onAccent'>[] = [
   {
@@ -23,7 +30,7 @@ const THEMES: Omit<BackgroundTheme, 'onAccent'>[] = [
     label: 'Papel',
     emoji: '📜',
     particle: '',
-    gradient: PAPER_TEXTURE,
+    gradient: paper('#f4ede0'),
     accent: '#c0392b',
     textOnBg: '#2a241d',
     textOnBgMuted: '#6b6052',
@@ -36,12 +43,12 @@ const THEMES: Omit<BackgroundTheme, 'onAccent'>[] = [
     label: 'Romance',
     emoji: '💗',
     particle: '💗',
-    gradient: 'linear-gradient(165deg, #fdf4f6 0%, #fce7f0 40%, #eae9fc 100%)',
-    accent: '#db2777',
-    textOnBg: '#521c3d',
-    textOnBgMuted: '#7d4a63',
-    surfaceBg: 'rgba(255,255,255,0.82)',
-    surfaceBorder: 'rgba(0,0,0,0.07)',
+    gradient: paper('#f5e4e4'),
+    accent: '#b0325f',
+    textOnBg: '#4a1c2c',
+    textOnBgMuted: '#7a4f5c',
+    surfaceBg: '#fffaf8',
+    surfaceBorder: 'rgba(110,40,60,0.16)',
     isDark: false,
   },
   {
@@ -49,12 +56,12 @@ const THEMES: Omit<BackgroundTheme, 'onAccent'>[] = [
     label: 'Pôr do sol',
     emoji: '🌅',
     particle: '🧡',
-    gradient: 'linear-gradient(165deg, #fff7ec 0%, #ffe4c2 45%, #ffd2c0 100%)',
-    accent: '#ea580c',
-    textOnBg: '#5c2a0e',
-    textOnBgMuted: '#8f5432',
-    surfaceBg: 'rgba(255,255,255,0.82)',
-    surfaceBorder: 'rgba(0,0,0,0.07)',
+    gradient: paper('#f5e1c8'),
+    accent: '#b8501a',
+    textOnBg: '#4d2a12',
+    textOnBgMuted: '#7d5a40',
+    surfaceBg: '#fffaf2',
+    surfaceBorder: 'rgba(110,60,20,0.17)',
     isDark: false,
   },
   {
@@ -62,12 +69,12 @@ const THEMES: Omit<BackgroundTheme, 'onAccent'>[] = [
     label: 'Oceano',
     emoji: '🌊',
     particle: '🫧',
-    gradient: 'linear-gradient(165deg, #eefafd 0%, #d3eefa 45%, #dbe4fc 100%)',
-    accent: '#0284c7',
-    textOnBg: '#0d3c5b',
-    textOnBgMuted: '#41708f',
-    surfaceBg: 'rgba(255,255,255,0.82)',
-    surfaceBorder: 'rgba(0,0,0,0.07)',
+    gradient: paper('#e0eaee'),
+    accent: '#1f6a8f',
+    textOnBg: '#14313f',
+    textOnBgMuted: '#4f6a76',
+    surfaceBg: '#fbfdfd',
+    surfaceBorder: 'rgba(20,60,80,0.15)',
     isDark: false,
   },
   {
@@ -75,12 +82,12 @@ const THEMES: Omit<BackgroundTheme, 'onAccent'>[] = [
     label: 'Menta',
     emoji: '🌿',
     particle: '🌿',
-    gradient: 'linear-gradient(165deg, #f2fcf6 0%, #d9f3e5 45%, #cfeedd 100%)',
-    accent: '#059669',
-    textOnBg: '#134737',
-    textOnBgMuted: '#48745f',
-    surfaceBg: 'rgba(255,255,255,0.82)',
-    surfaceBorder: 'rgba(0,0,0,0.07)',
+    gradient: paper('#e0ecdf'),
+    accent: '#2f7a55',
+    textOnBg: '#173326',
+    textOnBgMuted: '#4f6a5a',
+    surfaceBg: '#fbfdf9',
+    surfaceBorder: 'rgba(30,70,45,0.15)',
     isDark: false,
   },
   {
@@ -88,12 +95,12 @@ const THEMES: Omit<BackgroundTheme, 'onAccent'>[] = [
     label: 'Pêssego',
     emoji: '🍑',
     particle: '🌸',
-    gradient: 'linear-gradient(165deg, #fff9f1 0%, #ffe6cf 45%, #ffd8ce 100%)',
-    accent: '#f97316',
-    textOnBg: '#63300f',
-    textOnBgMuted: '#96603a',
-    surfaceBg: 'rgba(255,255,255,0.82)',
-    surfaceBorder: 'rgba(0,0,0,0.07)',
+    gradient: paper('#f6e3d5'),
+    accent: '#c05a2a',
+    textOnBg: '#4f2a16',
+    textOnBgMuted: '#7f5c48',
+    surfaceBg: '#fffaf5',
+    surfaceBorder: 'rgba(110,60,30,0.16)',
     isDark: false,
   },
   {
@@ -101,12 +108,12 @@ const THEMES: Omit<BackgroundTheme, 'onAccent'>[] = [
     label: 'Lavanda',
     emoji: '💜',
     particle: '💜',
-    gradient: 'linear-gradient(165deg, #faf8ff 0%, #ebe4fc 45%, #f6e3f6 100%)',
-    accent: '#7c3aed',
-    textOnBg: '#3c2373',
-    textOnBgMuted: '#6f58a8',
-    surfaceBg: 'rgba(255,255,255,0.82)',
-    surfaceBorder: 'rgba(0,0,0,0.07)',
+    gradient: paper('#e8e2ef'),
+    accent: '#5f45a0',
+    textOnBg: '#2c2142',
+    textOnBgMuted: '#615775',
+    surfaceBg: '#fdfbff',
+    surfaceBorder: 'rgba(60,40,100,0.15)',
     isDark: false,
   },
   {
@@ -114,12 +121,12 @@ const THEMES: Omit<BackgroundTheme, 'onAccent'>[] = [
     label: 'Meia-noite',
     emoji: '🌙',
     particle: '⭐',
-    gradient: 'linear-gradient(165deg, #0b1322 0%, #1b2d4f 52%, #0e1930 100%)',
-    accent: '#60a5fa',
-    textOnBg: 'rgba(255,255,255,0.95)',
-    textOnBgMuted: 'rgba(255,255,255,0.72)',
-    surfaceBg: 'rgba(19,29,51,0.72)',
-    surfaceBorder: 'rgba(255,255,255,0.14)',
+    gradient: paper('#18202e', true),
+    accent: '#8fb4e8',
+    textOnBg: 'rgba(250,246,238,0.94)',
+    textOnBgMuted: 'rgba(250,246,238,0.62)',
+    surfaceBg: '#212b3c',
+    surfaceBorder: 'rgba(250,246,238,0.12)',
     isDark: true,
   },
   {
@@ -127,12 +134,12 @@ const THEMES: Omit<BackgroundTheme, 'onAccent'>[] = [
     label: 'Veludo',
     emoji: '💜',
     particle: '✨',
-    gradient: 'linear-gradient(165deg, #150b24 0%, #45206b 52%, #1b0f2e 100%)',
-    accent: '#e879f9',
-    textOnBg: 'rgba(255,255,255,0.95)',
-    textOnBgMuted: 'rgba(255,255,255,0.72)',
-    surfaceBg: 'rgba(36,20,58,0.72)',
-    surfaceBorder: 'rgba(255,255,255,0.14)',
+    gradient: paper('#221a2e', true),
+    accent: '#d2a2e6',
+    textOnBg: 'rgba(250,246,238,0.94)',
+    textOnBgMuted: 'rgba(250,246,238,0.62)',
+    surfaceBg: '#2d233b',
+    surfaceBorder: 'rgba(250,246,238,0.12)',
     isDark: true,
   },
   {
@@ -140,12 +147,12 @@ const THEMES: Omit<BackgroundTheme, 'onAccent'>[] = [
     label: 'Rosa noturno',
     emoji: '🌹',
     particle: '🌹',
-    gradient: 'linear-gradient(165deg, #1c0810 0%, #5c1631 52%, #250b16 100%)',
-    accent: '#fb7185',
-    textOnBg: 'rgba(255,255,255,0.95)',
-    textOnBgMuted: 'rgba(255,255,255,0.72)',
-    surfaceBg: 'rgba(48,15,29,0.72)',
-    surfaceBorder: 'rgba(255,255,255,0.14)',
+    gradient: paper('#28151b', true),
+    accent: '#ee9aa6',
+    textOnBg: 'rgba(250,246,238,0.94)',
+    textOnBgMuted: 'rgba(250,246,238,0.62)',
+    surfaceBg: '#341e25',
+    surfaceBorder: 'rgba(250,246,238,0.12)',
     isDark: true,
   },
   {
@@ -153,12 +160,12 @@ const THEMES: Omit<BackgroundTheme, 'onAccent'>[] = [
     label: 'Mar profundo',
     emoji: '🌊',
     particle: '🫧',
-    gradient: 'linear-gradient(165deg, #06141f 0%, #0e4059 52%, #09202f 100%)',
-    accent: '#38bdf8',
-    textOnBg: 'rgba(255,255,255,0.95)',
-    textOnBgMuted: 'rgba(255,255,255,0.72)',
-    surfaceBg: 'rgba(10,34,48,0.72)',
-    surfaceBorder: 'rgba(255,255,255,0.14)',
+    gradient: paper('#102128', true),
+    accent: '#7cc3dc',
+    textOnBg: 'rgba(250,246,238,0.94)',
+    textOnBgMuted: 'rgba(250,246,238,0.62)',
+    surfaceBg: '#182c34',
+    surfaceBorder: 'rgba(250,246,238,0.12)',
     isDark: true,
   },
   {
@@ -166,12 +173,12 @@ const THEMES: Omit<BackgroundTheme, 'onAccent'>[] = [
     label: 'Floresta',
     emoji: '🌲',
     particle: '🍃',
-    gradient: 'linear-gradient(165deg, #071309 0%, #175031 52%, #0b2114 100%)',
-    accent: '#4ade80',
-    textOnBg: 'rgba(255,255,255,0.95)',
-    textOnBgMuted: 'rgba(255,255,255,0.72)',
-    surfaceBg: 'rgba(13,38,24,0.72)',
-    surfaceBorder: 'rgba(255,255,255,0.14)',
+    gradient: paper('#14231a', true),
+    accent: '#8fcf9f',
+    textOnBg: 'rgba(250,246,238,0.94)',
+    textOnBgMuted: 'rgba(250,246,238,0.62)',
+    surfaceBg: '#1d2e23',
+    surfaceBorder: 'rgba(250,246,238,0.12)',
     isDark: true,
   },
 ]
@@ -179,6 +186,10 @@ const THEMES: Omit<BackgroundTheme, 'onAccent'>[] = [
 export const backgroundThemes: BackgroundTheme[] = THEMES.map((theme) => ({ ...theme, onAccent: readableOn(theme.accent) }))
 
 export const defaultBackgroundKey = 'papel'
+
+export function pageBaseColor(theme: BackgroundTheme) {
+  return theme.gradient.slice(theme.gradient.lastIndexOf(' ') + 1)
+}
 
 export function getBackgroundTheme(key: string): BackgroundTheme {
   return backgroundThemes.find((t) => t.key === key) ?? backgroundThemes[0]
