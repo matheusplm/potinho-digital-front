@@ -85,7 +85,7 @@ export function LoginPage() {
 
 
       <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 3, py: 2, position: 'relative', zIndex: 1, animation: `${fadeSlide} 0.5s ease both` }} spacing={0}>
-        <Door height={150} sx={{ mb: 2.5 }} />
+        <Door height={150} furnished sx={{ mb: 2.5 }} />
 
         <Typography component="h1" sx={{ fontFamily: font.serif, fontWeight: 500, fontSize: '2.3rem', lineHeight: 1.05, color: colors.text.primary, textAlign: 'center', letterSpacing: '-0.02em' }}>
           Potinho <Box component="span" sx={brandAccent()}>Digital</Box>

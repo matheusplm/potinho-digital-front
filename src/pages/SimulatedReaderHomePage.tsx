@@ -24,6 +24,7 @@ import {
   queryKeys,
 } from '../hooks/useNotes'
 import { colors, fadeIn, font, radius } from '../design-system'
+import { RoomGutters } from '../components/scene/RoomGutters'
 import { SillScene } from '../components/scene/WindowScene'
 import { isCollectionReader } from '../utils/collectionAccess'
 import { ApiRequestError } from '../services/api'
@@ -415,7 +416,7 @@ export function SimulatedReaderHomePage() {
 
   return (
     <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>
-
+      <RoomGutters />
       <ScrollablePage sx={{ px: 2.5, py: 2.2 }}>
         <Box sx={{ animation: `${fadeIn} 0.35s ease`, maxWidth: 720, mx: 'auto' }}>
           <Box sx={{ mb: 1.6 }}>

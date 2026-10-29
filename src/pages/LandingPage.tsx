@@ -14,7 +14,8 @@ import { HeroCardStack } from './landing/HeroCardStack'
 import { HandArrow, Squiggle } from './landing/Doodles'
 import { Door } from '../components/scene/Door'
 import { ThemesShowcase } from './landing/ThemesShowcase'
-import { WindowScene } from '../components/scene/WindowScene'
+import { SillScene, WindowScene } from '../components/scene/WindowScene'
+import { FurnitureSide } from '../components/scene/Furniture'
 
 const PAGE_X = { xs: 2.5, md: 5 }
 const TILTS = ['-0.7deg', '0.5deg', '-0.3deg', '0.8deg', '-0.5deg', '0.3deg']
@@ -86,7 +87,7 @@ export function LandingPage() {
           </Box>
 
           <Box className="pd-enter" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', animation: `${fadeInRight} 0.7s 0.2s ease both` }}>
-            <WindowScene width={{ xs: 'min(330px, calc(100vw - 60px))', md: 400 }} height={{ xs: 200, md: 280 }}>
+            <WindowScene width={{ xs: 'min(330px, calc(100vw - 76px))', md: 400 }} height={{ xs: 200, md: 280 }}>
               <Box sx={{ position: 'absolute', left: { xs: '50%', md: '16%' }, top: { xs: 112, md: 176 }, transform: 'translateX(-50%)', zIndex: 4 }}>
                 <HeroCardStack />
               </Box>
@@ -177,6 +178,11 @@ export function LandingPage() {
             <SectionTitle kicker="nada vem pronto" sub="Tudo no potinho é você quem monta. Começa simples e vai mexendo conforme dá vontade.">
               Dá pra mexer em tudo
             </SectionTitle>
+            <Box aria-hidden sx={{ display: 'flex', alignItems: 'flex-end', justifyContent: { xs: 'center', md: 'flex-start' }, gap: 1.5, mt: 4 }}>
+              <FurnitureSide side="left" size={58} sx={{ display: { xs: 'none', sm: 'flex' } }} />
+              <SillScene height={120} />
+              <FurnitureSide side="right" size={58} max={isDesktop ? 2 : 1} />
+            </Box>
           </Box>
           <Box component="dl" sx={{ m: 0 }}>
             {DETAILS.map((d, i) => (
@@ -214,7 +220,7 @@ export function LandingPage() {
               </Box>
             </Stack>
           </Box>
-          <Door height={isDesktop ? 260 : 200} letter mat="entra aí" sx={{ justifySelf: 'center' }} />
+          <Door height={isDesktop ? 260 : 144} letter furnished pieces={isDesktop ? 2 : 1} mat="entra aí" sx={{ justifySelf: 'center', mx: { xs: 'auto', md: 14 } }} />
         </Box>
       </Box>
 

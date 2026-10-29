@@ -76,7 +76,7 @@ export function RegisterPage() {
 
 
       <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 3, py: 5, position: 'relative', zIndex: 1, animation: `${fadeSlide} 0.5s ease both` }} spacing={0}>
-        <Door height={150} ajar mat="pode entrar" sx={{ mb: 2.5 }} />
+        <Door height={150} ajar furnished mat="pode entrar" sx={{ mb: 2.5 }} />
 
         <Typography component="h1" sx={{ fontFamily: font.serif, fontWeight: 500, fontSize: '2.3rem', lineHeight: 1.05, color: colors.text.primary, textAlign: 'center', letterSpacing: '-0.02em' }}>
           Criar <Box component="span" sx={brandAccent()}>conta</Box>

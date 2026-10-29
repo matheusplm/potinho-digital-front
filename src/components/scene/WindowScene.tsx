@@ -114,9 +114,9 @@ function Curtains({ color }: { color: string }) {
   } as const
   return (
     <>
-      <Box aria-hidden sx={{ position: 'absolute', top: -14, left: -22, right: -22, height: 7, zIndex: 6, background: '#6b5137', borderRadius: 4, border: '1.5px solid rgba(42,36,29,0.6)' }} />
-      <Box aria-hidden sx={{ ...drape, left: -16, borderRadius: '0 0 70% 0 / 0 0 22% 0', clipPath: 'polygon(0 0, 100% 0, 100% 52%, 40% 64%, 70% 100%, 0 100%)' }} />
-      <Box aria-hidden sx={{ ...drape, right: -16, borderRadius: '0 0 0 70% / 0 0 0 22%', clipPath: 'polygon(0 0, 100% 0, 100% 100%, 30% 100%, 60% 64%, 0 52%)' }} />
+      <Box aria-hidden sx={{ position: 'absolute', top: -14, left: -12, right: -12, height: 7, zIndex: 6, background: '#6b5137', borderRadius: 4, border: '1.5px solid rgba(42,36,29,0.6)' }} />
+      <Box aria-hidden sx={{ ...drape, left: -10, borderRadius: '0 0 70% 0 / 0 0 22% 0', clipPath: 'polygon(0 0, 100% 0, 100% 52%, 40% 64%, 70% 100%, 0 100%)' }} />
+      <Box aria-hidden sx={{ ...drape, right: -10, borderRadius: '0 0 0 70% / 0 0 0 22%', clipPath: 'polygon(0 0, 100% 0, 100% 100%, 30% 100%, 60% 64%, 0 52%)' }} />
     </>
   )
 }
