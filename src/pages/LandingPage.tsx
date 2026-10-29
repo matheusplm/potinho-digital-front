@@ -14,8 +14,8 @@ import { HeroCardStack } from './landing/HeroCardStack'
 import { HandArrow, Squiggle } from './landing/Doodles'
 import { Door } from '../components/scene/Door'
 import { ThemesShowcase } from './landing/ThemesShowcase'
-import { SillScene, WindowScene } from '../components/scene/WindowScene'
-import { FurnitureSide } from '../components/scene/Furniture'
+import { WindowScene } from '../components/scene/WindowScene'
+import { Room } from '../components/scene/Furniture'
 
 const PAGE_X = { xs: 2.5, md: 5 }
 const TILTS = ['-0.7deg', '0.5deg', '-0.3deg', '0.8deg', '-0.5deg', '0.3deg']
@@ -178,10 +178,8 @@ export function LandingPage() {
             <SectionTitle kicker="nada vem pronto" sub="Tudo no potinho é você quem monta. Começa simples e vai mexendo conforme dá vontade.">
               Dá pra mexer em tudo
             </SectionTitle>
-            <Box aria-hidden sx={{ display: 'flex', alignItems: 'flex-end', justifyContent: { xs: 'center', md: 'flex-start' }, gap: 1.5, mt: 4 }}>
-              <FurnitureSide side="left" size={58} sx={{ display: { xs: 'none', sm: 'flex' } }} />
-              <SillScene height={120} />
-              <FurnitureSide side="right" size={58} max={isDesktop ? 2 : 1} />
+            <Box sx={{ display: 'flex', justifyContent: { xs: 'center', md: 'flex-start' }, mt: 4, pl: { md: 3 } }}>
+              <Room windowHeight={isDesktop ? 130 : 112} pieces={1} />
             </Box>
           </Box>
           <Box component="dl" sx={{ m: 0 }}>
@@ -220,7 +218,7 @@ export function LandingPage() {
               </Box>
             </Stack>
           </Box>
-          <Door height={isDesktop ? 260 : 144} letter furnished pieces={isDesktop ? 2 : 1} mat="entra aí" sx={{ justifySelf: 'center', mx: { xs: 'auto', md: 14 } }} />
+          <Door height={isDesktop ? 260 : 144} furnished pieces={isDesktop ? 2 : 1} mat="entra aí" sx={{ justifySelf: 'center', mx: { xs: 'auto', md: 14 } }} />
         </Box>
       </Box>
 

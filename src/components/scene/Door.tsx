@@ -87,10 +87,9 @@ function Pots() {
   )
 }
 
-export function Door({ height = 200, ajar = false, letter = false, mat = 'bem-vindo', furnished = false, pieces = 2, sx }: {
+export function Door({ height = 200, ajar = false, mat = 'bem-vindo', furnished = false, pieces = 2, sx }: {
   height?: number
   ajar?: boolean
-  letter?: boolean
   mat?: string
   furnished?: boolean
   pieces?: number
@@ -133,11 +132,6 @@ export function Door({ height = 200, ajar = false, letter = false, mat = 'bem-vi
             {glass !== 'none' && shape !== 'greenhouse' && <Glass kind={glass} frame={frame} line={line} sky={theme.sky} />}
             {shape !== 'hatch' && (
               <Box sx={{ position: 'absolute', top: shape === 'round' ? '62%' : '57%', left: '24%', right: '24%', height: 6, background: BRASS, border: '1px solid rgba(0,0,0,0.4)', borderRadius: 1 }}>
-                {letter && (
-                  <Box sx={{ position: 'absolute', left: '18%', bottom: 2, width: '56%', height: 16, background: '#fffdf7', border: '1px solid rgba(42,36,29,0.55)', transform: 'rotate(-4deg)', transformOrigin: 'bottom left' }}>
-                    <Box sx={{ position: 'absolute', left: 0, right: 0, top: 0, height: 8, background: 'linear-gradient(to bottom right, transparent 48%, rgba(42,36,29,0.4) 49% 51%, transparent 52%) left / 50% 100% no-repeat, linear-gradient(to bottom left, transparent 48%, rgba(42,36,29,0.4) 49% 51%, transparent 52%) right / 50% 100% no-repeat' }} />
-                  </Box>
-                )}
               </Box>
             )}
             <Box sx={{ position: 'absolute', top: shape === 'round' ? '52%' : '50%', right: shape === 'hatch' ? '6%' : '10%', width: shape === 'hatch' ? 6 : 9, height: shape === 'hatch' ? 16 : 9, borderRadius: shape === 'hatch' ? 2 : '50%', background: BRASS, border: '1px solid rgba(0,0,0,0.45)', boxShadow: 'inset 1px 1px 0 rgba(255,255,255,0.45)' }} />

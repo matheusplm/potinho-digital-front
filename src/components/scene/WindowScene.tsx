@@ -8,19 +8,19 @@ import { FloatingParticles } from '../FloatingParticles'
 type Shape = 'sash' | 'arch' | 'round' | 'porthole' | 'submarine'
 type Decor = 'curtains' | 'shutters' | 'flowers' | 'plants' | null
 
-const LOOK: Record<string, { shape: Shape; decor: Decor }> = {
+const LOOK: Record<string, { shape: Shape; decor: Decor; horizon?: 'pines' | 'trees' }> = {
   papel: { shape: 'sash', decor: null },
   romance: { shape: 'arch', decor: 'curtains' },
   sunset: { shape: 'sash', decor: 'shutters' },
   ocean: { shape: 'porthole', decor: null },
-  mint: { shape: 'sash', decor: 'plants' },
+  mint: { shape: 'sash', decor: 'plants', horizon: 'trees' },
   peach: { shape: 'sash', decor: 'flowers' },
   lavender: { shape: 'round', decor: null },
   midnight: { shape: 'sash', decor: 'curtains' },
   velvet: { shape: 'arch', decor: 'curtains' },
   'rose-night': { shape: 'arch', decor: 'flowers' },
   'deep-ocean': { shape: 'submarine', decor: null },
-  'forest-night': { shape: 'sash', decor: 'shutters' },
+  'forest-night': { shape: 'sash', decor: 'shutters', horizon: 'pines' },
 }
 
 const drift = keyframes`
@@ -58,7 +58,34 @@ function Cloud({ top, scale, duration, delay }: { top: string; scale: number; du
   )
 }
 
-function Horizon({ shape, night }: { shape: Shape; night: boolean }) {
+function Pines({ night }: { night: boolean }) {
+  const far = night ? 'rgba(10,30,18,0.85)' : 'rgba(70,120,80,0.55)'
+  const near = night ? '#06140b' : '#3f6b45'
+  const tree = (x: number, h: number, w: number) => `M${x} 60 L${x} ${60 - h * 0.15} L${x - w} ${60 - h * 0.15} L${x} ${60 - h} L${x + w} ${60 - h * 0.15} L${x} ${60 - h * 0.15} Z`
+  return (
+    <Box component="svg" aria-hidden viewBox="0 0 300 60" preserveAspectRatio="xMidYMax slice" sx={{ position: 'absolute', left: 0, right: 0, bottom: 0, width: '100%', height: '46%', zIndex: 1 }}>
+      <path d={[14, 40, 66, 96, 122, 150, 178, 204, 232, 258, 286].map((x, i) => tree(x, 34 + (i % 3) * 6, 11)).join(' ')} fill={far} />
+      <path d={[0, 28, 58, 84, 112, 140, 168, 196, 224, 252, 280, 300].map((x, i) => tree(x, 44 + ((i * 7) % 14), 14)).join(' ')} fill={near} />
+      <rect x="0" y="56" width="300" height="4" fill={near} />
+    </Box>
+  )
+}
+
+function Trees() {
+  return (
+    <Box component="svg" aria-hidden viewBox="0 0 300 60" preserveAspectRatio="xMidYMax slice" sx={{ position: 'absolute', left: 0, right: 0, bottom: 0, width: '100%', height: '40%', zIndex: 1 }}>
+      <path d="M0 60 V40 Q 60 26 130 38 T 300 34 V60 Z" fill="rgba(120,170,120,0.55)" />
+      {[[30, 34, 16], [74, 30, 20], [118, 38, 14], [170, 28, 22], [222, 36, 15], [268, 30, 19]].map(([x, y, r]) => (
+        <g key={x}><rect x={x - 2} y={y} width="4" height={60 - y} fill="#5e3f27" /><circle cx={x} cy={y} r={r} fill="#5a9d62" /><circle cx={x - r * 0.45} cy={y + r * 0.2} r={r * 0.7} fill="#4f8f58" /></g>
+      ))}
+      <rect x="0" y="54" width="300" height="6" fill="#4f8f58" />
+    </Box>
+  )
+}
+
+function Horizon({ shape, night, horizon }: { shape: Shape; night: boolean; horizon?: 'pines' | 'trees' }) {
+  if (horizon === 'pines') return <Pines night={night} />
+  if (horizon === 'trees') return <Trees />
   if (shape === 'submarine') {
     return (
       <>
@@ -138,7 +165,8 @@ function Shutters({ color }: { color: string }) {
 function FlowerBox({ flowers }: { flowers: boolean }) {
   const blooms = flowers ? ['#e86a7a', '#f4b544', '#fffcf5', '#e86a7a', '#c86fb4', '#f4b544', '#e86a7a'] : []
   return (
-    <Box aria-hidden sx={{ position: 'absolute', left: 10, right: 10, bottom: '100%', height: 26, zIndex: 3, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', pointerEvents: 'none' }}>
+    <Box aria-hidden sx={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 36, zIndex: 2, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', px: 1, pb: '10px', pointerEvents: 'none' }}>
+      <Box sx={{ position: 'absolute', left: 4, right: 4, bottom: 0, height: 12, background: '#8a5e3b', border: '1.5px solid rgba(42,36,29,0.6)', borderBottom: 'none', borderRadius: '2px 2px 0 0', backgroundImage: 'repeating-linear-gradient(90deg, transparent 0 18px, rgba(0,0,0,0.18) 18px 19px)', zIndex: 1 }} />
       {Array.from({ length: 7 }, (_, i) => (
         <Box key={i} sx={{ position: 'relative', width: 12, height: 14 + ((i * 7) % 12) }}>
           <Box sx={{ position: 'absolute', bottom: 0, left: 5, width: 2, height: '100%', background: '#3f7a4a' }} />
@@ -184,7 +212,7 @@ export function WindowScene({ width, height, children, shelves = true, sx }: {
   sx?: SxProps<Theme>
 }) {
   const { theme } = useBackground()
-  const { shape, decor } = LOOK[theme.key] ?? LOOK.papel
+  const { shape, decor, horizon } = LOOK[theme.key] ?? LOOK.papel
   const night = theme.isDark
   const round = ROUND.includes(shape)
   const frame = shape === 'porthole' ? '#c2964a' : shape === 'submarine' ? '#4d5862' : night ? '#2b241d' : '#fbf6ea'
@@ -222,7 +250,8 @@ export function WindowScene({ width, height, children, shelves = true, sx }: {
             </>
           )}
           <FloatingParticles />
-          <Horizon shape={shape} night={night} />
+          <Horizon shape={shape} night={night} horizon={horizon} />
+          {(decor === 'flowers' || decor === 'plants') && <FlowerBox flowers={decor === 'flowers'} />}
           <Box aria-hidden sx={{ position: 'absolute', inset: 0, zIndex: 2, background: round ? 'radial-gradient(circle at 32% 28%, rgba(255,255,255,0.22), transparent 34%)' : 'linear-gradient(125deg, transparent 30%, rgba(255,255,255,0.14) 38%, transparent 46%)', pointerEvents: 'none' }} />
           {(shape === 'sash' || shape === 'arch' || shape === 'round') && (
             <>
@@ -237,7 +266,6 @@ export function WindowScene({ width, height, children, shelves = true, sx }: {
         height: 14, background: night ? '#2b241d' : '#e7d6b6', border: `2px solid ${night ? 'rgba(250,246,238,0.28)' : 'rgba(42,36,29,0.6)'}`, borderRadius: '2px',
         boxShadow: night ? '0 5px 0 rgba(0,0,0,0.3)' : '0 5px 0 rgba(60,42,20,0.12)', zIndex: 2,
       }}>
-        {(decor === 'flowers' || decor === 'plants') && <FlowerBox flowers={decor === 'flowers'} />}
         {shelves && <><Shelf side="left" /><Shelf side="right" /></>}
       </Box>
       {children}

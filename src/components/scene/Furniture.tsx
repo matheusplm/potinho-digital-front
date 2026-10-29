@@ -2,12 +2,29 @@ import { Box, type SxProps, type Theme } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { useBackground } from '../../context/BackgroundContext'
 import { themeInk } from '../../design-system'
+import { SillScene } from './WindowScene'
 
 const flicker = keyframes`
-  0%, 100% { opacity: 0.85; transform: scaleY(1); }
-  40%      { opacity: 1; transform: scaleY(1.08); }
-  70%      { opacity: 0.75; transform: scaleY(0.94); }
+  0%, 100% { opacity: 0.9; transform: scale(1, 1) skewX(0deg); }
+  25%      { opacity: 1; transform: scale(0.92, 1.12) skewX(-6deg); }
+  50%      { opacity: 0.8; transform: scale(1.06, 0.9) skewX(4deg); }
+  75%      { opacity: 1; transform: scale(0.96, 1.08) skewX(-3deg); }
 `
+
+const glowPulse = keyframes`
+  0%, 100% { opacity: 0.75; transform: translateX(-50%) scale(1); }
+  50%      { opacity: 1; transform: translateX(-50%) scale(1.08); }
+`
+
+function Flame({ d, fill, origin, duration, delay = 0 }: { d: string; fill: string; origin: string; duration: number; delay?: number }) {
+  return (
+    <Box component="path" d={d} sx={{
+      fill, stroke: 'none', transformBox: 'view-box', transformOrigin: origin,
+      animation: `${flicker} ${duration}s ease-in-out ${delay}s infinite`,
+      '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+    }} />
+  )
+}
 
 export type Piece =
   | 'armchair' | 'lamp' | 'fern' | 'monstera' | 'cactus' | 'table-books' | 'table-vase' | 'table-lamp'
@@ -15,22 +32,26 @@ export type Piece =
 
 type WallPiece = 'frame' | 'heart-frame' | 'wheel' | 'gauge' | 'clock' | 'lights'
 
-const SETS: Record<string, { left: Piece[]; right: Piece[]; wall: WallPiece; rug: boolean }> = {
-  papel: { left: ['lamp', 'armchair'], right: ['table-books', 'fern'], wall: 'frame', rug: true },
-  romance: { left: ['armchair'], right: ['table-vase'], wall: 'heart-frame', rug: true },
-  sunset: { left: ['armchair'], right: ['cactus'], wall: 'clock', rug: true },
-  ocean: { left: ['barrel'], right: ['fern'], wall: 'wheel', rug: false },
-  mint: { left: ['monstera'], right: ['table-vase', 'fern'], wall: 'frame', rug: false },
-  peach: { left: ['armchair'], right: ['table-vase'], wall: 'frame', rug: true },
-  lavender: { left: ['bookshelf'], right: ['beanbag'], wall: 'lights', rug: true },
-  midnight: { left: ['telescope'], right: ['table-lamp'], wall: 'clock', rug: false },
-  velvet: { left: ['armchair'], right: ['candelabra'], wall: 'frame', rug: true },
-  'rose-night': { left: ['table-vase'], right: ['armchair'], wall: 'heart-frame', rug: true },
-  'deep-ocean': { left: ['chest'], right: ['pipes'], wall: 'gauge', rug: false },
-  'forest-night': { left: ['stove'], right: ['armchair'], wall: 'frame', rug: true },
+const SETS: Record<string, { left: Piece[]; right: Piece[]; extra: Piece; wall: WallPiece; rug: boolean }> = {
+  papel: { left: ['lamp', 'armchair'], right: ['table-books', 'fern'], extra: 'bookshelf', wall: 'frame', rug: true },
+  romance: { left: ['armchair'], right: ['table-vase'], extra: 'fern', wall: 'heart-frame', rug: true },
+  sunset: { left: ['armchair'], right: ['cactus'], extra: 'table-books', wall: 'clock', rug: true },
+  ocean: { left: ['barrel'], right: ['fern'], extra: 'chest', wall: 'wheel', rug: false },
+  mint: { left: ['monstera'], right: ['table-vase', 'fern'], extra: 'table-books', wall: 'frame', rug: false },
+  peach: { left: ['armchair'], right: ['table-vase'], extra: 'fern', wall: 'frame', rug: true },
+  lavender: { left: ['bookshelf'], right: ['beanbag'], extra: 'table-lamp', wall: 'lights', rug: true },
+  midnight: { left: ['telescope'], right: ['table-lamp'], extra: 'bookshelf', wall: 'clock', rug: false },
+  velvet: { left: ['armchair'], right: ['candelabra'], extra: 'bookshelf', wall: 'frame', rug: true },
+  'rose-night': { left: ['table-vase'], right: ['armchair'], extra: 'fern', wall: 'heart-frame', rug: true },
+  'deep-ocean': { left: ['chest'], right: ['pipes'], extra: 'barrel', wall: 'gauge', rug: false },
+  'forest-night': { left: ['stove'], right: ['armchair'], extra: 'table-lamp', wall: 'frame', rug: true },
 }
 
 const INK = '#2a241d'
+
+function fabricFor(night: boolean) {
+  return night ? 'color-mix(in srgb, var(--pd-accent) 55%, #2a1d12)' : 'color-mix(in srgb, var(--pd-accent) 50%, #fffcf5)'
+}
 const WOOD = '#8a5e3b'
 const WOOD_DARK = '#5e3f27'
 
@@ -123,12 +144,14 @@ function PieceArt({ piece, size, fabric, night }: { piece: Piece; size: number; 
     case 'stove':
       return (
         <Box sx={{ position: 'relative' }}>
-          <Box sx={{ position: 'absolute', bottom: '10%', left: '50%', width: size * 1.4, height: size * 1.2, transform: 'translateX(-50%)', borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,150,60,0.45), transparent 62%)', pointerEvents: 'none' }} />
+          <Box sx={{ position: 'absolute', bottom: '10%', left: '50%', width: size * 1.6, height: size * 1.3, transform: 'translateX(-50%)', borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,150,60,0.5), transparent 62%)', pointerEvents: 'none', animation: `${glowPulse} 1.6s ease-in-out infinite` }} />
           <Svg w={50} h={90} size={size * 1.4}>
             <rect x="20" y="0" width="10" height="34" fill="#3a332c" />
             <rect x="6" y="34" width="38" height="44" rx="4" fill="#3a332c" />
             <rect x="12" y="46" width="26" height="22" rx="3" fill="#2a1d12" />
-            <path d="M18 66 C 16 58, 24 56, 22 48 C 30 54, 34 60, 30 66 Z" fill="#f29a3a" stroke="none" style={{ transformOrigin: '25px 66px', animation: `${flicker} 1.2s ease-in-out infinite` }} />
+            <Flame d="M15 66 C 13 58, 20 56, 19 47 C 27 53, 31 60, 28 66 Z" fill="#f2793a" origin="22px 66px" duration={0.9} />
+            <Flame d="M20 66 C 19 60, 25 57, 25 50 C 32 56, 35 61, 33 66 Z" fill="#f29a3a" origin="27px 66px" duration={1.25} delay={0.2} />
+            <Flame d="M21 66 C 21 62, 25 60, 25 56 C 29 60, 30 63, 29 66 Z" fill="#ffd36b" origin="25px 66px" duration={0.7} delay={0.1} />
             <path d="M10 78 v10 M40 78 v10" strokeWidth="3" />
           </Svg>
         </Box>
@@ -167,7 +190,7 @@ function PieceArt({ piece, size, fabric, night }: { piece: Piece; size: number; 
         <Box sx={{ position: 'relative' }}>
           <Box sx={{ position: 'absolute', top: -size * 0.2, left: '50%', width: size * 0.9, height: size * 0.7, transform: 'translateX(-50%)', borderRadius: '50%', background: `radial-gradient(circle, ${glow}, transparent 65%)`, pointerEvents: 'none' }} />
           <Svg w={44} h={90} size={size * 1.3}>
-            {[8, 22, 36].map((x, i) => <g key={x}><rect x={x - 3} y={i === 1 ? 8 : 16} width="6" height="14" fill="#fff4dc" /><path d={`M${x} ${i === 1 ? 6 : 14} c -2 -3, 0 -6, 0 -8 c 2 2, 2 5, 0 8`} fill="#f4b544" stroke="none" style={{ transformOrigin: `${x}px 14px`, animation: `${flicker} ${1 + i * 0.3}s ease-in-out infinite` }} /></g>)}
+            {[8, 22, 36].map((x, i) => <g key={x}><rect x={x - 3} y={i === 1 ? 8 : 16} width="6" height="14" fill="#fff4dc" /><Flame d={`M${x} ${i === 1 ? 6 : 14} c -2 -3, 0 -6, 0 -8 c 2 2, 2 5, 0 8`} fill="#f4b544" origin={`${x}px ${i === 1 ? 6 : 14}px`} duration={0.8 + i * 0.25} delay={i * 0.15} /></g>)}
             <path d="M8 30 Q 22 44, 36 30 M22 22 V 84 M12 86 H 32" fill="none" stroke="#c9a14e" strokeWidth="2.6" />
           </Svg>
         </Box>
@@ -207,7 +230,7 @@ function WallArt({ piece, size, night }: { piece: WallPiece; size: number; night
 export function FurnitureSide({ side, size = 70, max = 2, sx }: { side: 'left' | 'right'; size?: number; max?: number; sx?: SxProps<Theme> }) {
   const { theme } = useBackground()
   const set = SETS[theme.key] ?? SETS.papel
-  const fabric = theme.isDark ? 'color-mix(in srgb, var(--pd-accent) 55%, #2a1d12)' : 'color-mix(in srgb, var(--pd-accent) 50%, #fffcf5)'
+  const fabric = fabricFor(theme.isDark)
   const pieces = (side === 'left' ? set.left : set.right).slice(side === 'left' ? -max : 0, side === 'left' ? undefined : max)
   return (
     <Box aria-hidden sx={{ display: 'flex', alignItems: 'flex-end', gap: `${Math.round(size * 0.12)}px`, flexDirection: side === 'left' ? 'row' : 'row-reverse', pointerEvents: 'none', ...sx }}>
@@ -224,8 +247,25 @@ export function RoomCorner({ side, size = 80, sx }: { side: 'left' | 'right'; si
       {side === 'right' && <WallArt piece={set.wall} size={size * 1.4} night={theme.isDark} />}
       <Box sx={{ position: 'relative' }}>
         {set.rug && <Box sx={{ position: 'absolute', left: '-10%', right: '-10%', bottom: -10, height: 18, borderRadius: '50%', background: 'color-mix(in srgb, var(--pd-accent) 30%, transparent)', border: '1.5px dashed color-mix(in srgb, var(--pd-accent) 60%, transparent)' }} />}
-        <FurnitureSide side={side} size={size} sx={{ position: 'relative' }} />
+        <PieceArt piece={set.extra} size={size} fabric={fabricFor(theme.isDark)} night={theme.isDark} />
       </Box>
+    </Box>
+  )
+}
+
+export function Room({ windowHeight = 120, pieces = 2, sx }: { windowHeight?: number; pieces?: number; sx?: SxProps<Theme> }) {
+  const { theme } = useBackground()
+  const set = SETS[theme.key] ?? SETS.papel
+  const furniture = Math.round(windowHeight * 0.56)
+  return (
+    <Box aria-hidden sx={{ position: 'relative', display: 'inline-flex', flexDirection: 'column', alignItems: 'center', pointerEvents: 'none', ...sx }}>
+      <SillScene height={windowHeight} />
+      <Box sx={{ position: 'relative', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: `${Math.round(windowHeight * 0.5)}px`, mt: `${Math.round(windowHeight * 0.06)}px`, minWidth: windowHeight * 2 }}>
+        {set.rug && <Box sx={{ position: 'absolute', left: '4%', right: '4%', bottom: -8, height: 16, borderRadius: '50%', background: 'color-mix(in srgb, var(--pd-accent) 28%, transparent)', border: '1.5px dashed color-mix(in srgb, var(--pd-accent) 55%, transparent)' }} />}
+        <FurnitureSide side="left" size={furniture} max={pieces} sx={{ position: 'relative' }} />
+        <FurnitureSide side="right" size={furniture} max={pieces} sx={{ position: 'relative' }} />
+      </Box>
+      <Box sx={{ alignSelf: 'stretch', mx: -3, mt: '6px', height: 2, background: 'color-mix(in srgb, var(--pd-text-primary) 25%, transparent)' }} />
     </Box>
   )
 }
