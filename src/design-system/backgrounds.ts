@@ -22,8 +22,6 @@ function paper(color: string, dark = false) {
   return `${dark ? GRAIN_DARK : GRAIN_LIGHT}, ${color}`
 }
 
-export const PAPER_TEXTURE = paper('#f4ede0')
-
 const THEMES: Omit<BackgroundTheme, 'onAccent'>[] = [
   {
     key: 'papel',
