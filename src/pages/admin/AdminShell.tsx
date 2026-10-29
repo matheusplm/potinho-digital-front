@@ -40,7 +40,7 @@ export function Pill({ children, onClick, href, disabled, tone, label }: { child
       sx={{
         all: 'unset', boxSizing: 'border-box', display: 'inline-flex', alignItems: 'center', gap: 0.6, height: 32, px: 1.3,
         borderRadius: radius.full, fontSize: '0.76rem', fontWeight: 700, whiteSpace: 'nowrap', color,
-        background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}`, backdropFilter: 'blur(12px)',
+        background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}`,
         cursor: (onClick || href) && !disabled ? 'pointer' : 'default', opacity: disabled ? 0.6 : 1,
         transition: 'background 0.15s, border-color 0.15s',
         '&:hover': (onClick || href) && !disabled ? { borderColor: `${theme.accent}66` } : undefined,

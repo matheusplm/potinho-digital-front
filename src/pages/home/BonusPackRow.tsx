@@ -96,7 +96,6 @@ export function BonusPackRow({ bonusPacks, isRealReader, packOpens, packAvailabl
                 inset: 0,
                 borderRadius: radius.full,
                 background: 'rgba(15,23,42,0.46)',
-                backdropFilter: 'blur(1px)',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',

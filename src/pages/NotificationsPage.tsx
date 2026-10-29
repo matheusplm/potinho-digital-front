@@ -1,8 +1,6 @@
-import NotificationsIcon from '@mui/icons-material/Notifications'
 import { Box, Stack, Typography } from '@mui/material'
 import { Card, LoadingState, ScrollablePage } from '../components/ui'
 import { useBackground } from '../context/BackgroundContext'
-import { FloatingParticles } from '../components/FloatingParticles'
 import { useMarkNotificationReadMutation, useMyNotificationsQuery, usePendingInvitesQuery } from '../hooks/useNotes'
 import { useNavigate } from 'react-router-dom'
 import { PendingInviteCard } from '../components/PendingInviteCard'
@@ -45,8 +43,6 @@ export function NotificationsPage() {
 
   return (
     <Box sx={{ height: '100%', position: 'relative', ...clipOverflow, background: theme.gradient }}>
-      <FloatingParticles />
-      <NotificationsIcon sx={{ position: 'absolute', bottom: -80, right: -70, fontSize: 460, color: 'rgba(29,78,216,0.05)', pointerEvents: 'none' }} />
       <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
         <Stack spacing={0.3} sx={{ mb: 2.2 }}>
           <Typography variant="md" sx={{ color: theme.textOnBgMuted, fontWeight: 700 }}>

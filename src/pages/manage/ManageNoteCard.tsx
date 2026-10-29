@@ -248,7 +248,7 @@ export function ManageNoteCard({ note, view, r, noteTypes = [], mask, onOpen, on
             <Box sx={{ flex: 1 }} />
             <NoteActions selection={selection} onOpen={onOpen} onEdit={onEdit} onDisable={onDisable} />
           </Stack>
-          <Box sx={{ flex: 1, minWidth: 0, p: 1, borderRadius: radius.lg, background: 'rgba(255,255,255,0.68)', border: '1px solid rgba(255,255,255,0.58)', backdropFilter: 'blur(8px)' }}>
+          <Box sx={{ flex: 1, minWidth: 0, p: 1, borderRadius: radius.lg, background: 'rgba(255,255,255,0.68)', border: '1px solid rgba(255,255,255,0.58)' }}>
             <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 700, color: r?.textColor ?? ink.primary, mb: 0.3, display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
               {note.title}
             </Typography>

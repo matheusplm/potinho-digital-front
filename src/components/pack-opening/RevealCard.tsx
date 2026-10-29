@@ -1,4 +1,5 @@
 import { Box, Typography } from '@mui/material'
+import { themeInk } from '../../design-system'
 import type { NoteTypeConfig, RarityConfig } from '../../types/note'
 import { RewardCard } from '../collection/RewardCard'
 import { badgePop, edgeGlow, haloPulse, hueSpin, ringBurst, tremble } from './motion'
@@ -104,7 +105,7 @@ export function RevealCard({ item, flipped, backFill, accent, emoji, imageUrl, r
       {flipped && item.reward.isNew && (
         <Box sx={{
           position: 'absolute', top: -12, right: -6, px: 1.2, py: 0.4, borderRadius: 99, zIndex: 2,
-          background: 'linear-gradient(135deg, #f472b6, #fb7185)', color: '#fff', fontSize: '0.74rem', fontWeight: 900, letterSpacing: 0.6,
+          background: '#fffdf7', color: themeInk.ink, border: `1.5px solid ${themeInk.ink}`, fontSize: '0.74rem', fontWeight: 900, letterSpacing: 0.6,
           boxShadow: '0 6px 16px rgba(244,114,182,0.45)', animation: reducedMotion ? 'none' : `${badgePop} 0.5s cubic-bezier(.2,.9,.3,1.4) 0.55s both`,
         }}>
           NOVO ✨

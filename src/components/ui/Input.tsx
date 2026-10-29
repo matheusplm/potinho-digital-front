@@ -19,7 +19,6 @@ export function Input({ label, sx, ...props }: InputProps) {
           '& .MuiOutlinedInput-root': {
             borderRadius: radius.lg,
             bgcolor: colors.surface.base,
-            backdropFilter: 'blur(10px)',
             transition: 'box-shadow 0.2s',
             '& fieldset': { borderColor: colors.border.subtle, borderWidth: 1.5 },
             '&:hover fieldset': { borderColor: `rgba(29,78,216,0.4)` },

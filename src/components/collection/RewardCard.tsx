@@ -141,7 +141,7 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
         <Box sx={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.22)', zIndex: 0 }} />
         <Stack spacing={1.5} sx={{ position: 'relative', zIndex: 1 }}>
           <CardChips r={r} isNew={reward.isNew} />
-          <Box sx={{ p: 1.15, borderRadius: radius.lg, background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.7)' }}>
+          <Box sx={{ p: 1.15, borderRadius: radius.lg, background: 'rgba(255,255,255,0.82)', border: '1px solid rgba(255,255,255,0.7)' }}>
             <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.2rem', color: ink.primary, lineHeight: 1.3 }}>{reward.title}</Typography>
             <Typography sx={{ mt: 0.6, ...HAND_MESSAGE_SX, whiteSpace: 'pre-line' }}>{linkifyText(reward.message)}</Typography>
           </Box>

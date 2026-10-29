@@ -40,7 +40,7 @@ export function OpenBonusDialog({ pack, isRealReader, canOpen, block, opens, acc
           },
         },
         backdrop: {
-          sx: { background: 'rgba(15,23,42,0.18)', backdropFilter: 'blur(8px)' },
+          sx: { background: 'rgba(15,23,42,0.18)' },
         },
       }}
     >
@@ -72,7 +72,7 @@ export function OpenBonusDialog({ pack, isRealReader, canOpen, block, opens, acc
             </Typography>
           </Box>
           <DialogContent sx={{ px: 2, pt: 1.5, pb: 1 }}>
-            <Box sx={{ p: 1.25, borderRadius: radius.lg, background: 'rgba(255,255,255,0.72)', border: '1px solid rgba(255,255,255,0.62)', backdropFilter: 'blur(8px)' }}>
+            <Box sx={{ p: 1.25, borderRadius: radius.lg, background: 'rgba(255,255,255,0.72)', border: '1px solid rgba(255,255,255,0.62)' }}>
               <Typography variant="lg" sx={{ color: ink.secondary, lineHeight: 1.55, display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                 {pack.description || 'Abra este pacote especial para tentar descobrir novos bilhetinhos da coleção.'}
               </Typography>

@@ -64,7 +64,7 @@ export function DeleteAccountDialog({ open, onClose }: { open: boolean; onClose:
       onClose={close}
       maxWidth="xs"
       fullWidth
-      slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'var(--pd-surface-paper)', backdropFilter: 'blur(24px)' } } }}
+      slotProps={{ paper: { sx: { borderRadius: radius.xl, mx: 2, background: 'var(--pd-surface-paper)' } } }}
     >
       <Box component="form" onSubmit={submit}>
         <DialogTitle sx={{ fontFamily: font.serif, fontWeight: 700, color: colors.text.primary, pb: 0.5 }}>

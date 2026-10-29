@@ -1,4 +1,3 @@
-import FavoriteIcon from '@mui/icons-material/Favorite'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import SearchIcon from '@mui/icons-material/Search'
 import CloseIcon from '@mui/icons-material/Close'
@@ -12,7 +11,6 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { Button, Card, ChoiceChip, LoadingState, PageTitle, ScrollablePage, ScrollHint, toast } from '../components/ui'
 import { useBackground } from '../context/BackgroundContext'
-import { FloatingParticles } from '../components/FloatingParticles'
 import { useUser } from '../context/UserContext'
 import {
   useCollectionPacksQuery,
@@ -38,7 +36,6 @@ const glassBtn = {
   width: 38, height: 38,
   background: colors.glass.bg,
   border: `1.5px solid ${colors.glass.border}`,
-  backdropFilter: 'blur(14px)',
   boxShadow: '0 8px 24px rgba(15,23,42,0.08)',
   transition: 'transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease',
   '&:hover': {
@@ -133,7 +130,6 @@ export function ReaderCollectionPage() {
   if (!collectionsLoading && (!collection || !canManage)) {
     return (
       <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>
-        <FloatingParticles />
         <ScrollablePage sx={{ px: 2.5, py: 2.5, alignItems: 'center', justifyContent: 'center' }}>
           <Typography sx={{ color: theme.textOnBg }}>Coleção não encontrada.</Typography>
           <Button variant="primary" onClick={() => navigate('/home')} sx={{ mt: 2 }}>Voltar</Button>
@@ -146,8 +142,6 @@ export function ReaderCollectionPage() {
 
   return (
     <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>
-      <FloatingParticles />
-      <FavoriteIcon sx={{ position: 'absolute', bottom: -60, right: -60, fontSize: 400, color: 'rgba(225,29,72,0.04)', pointerEvents: 'none' }} />
 
       <ScrollablePage sx={{ px: 2.5, py: 2.5 }}>
         <Stack direction="row" alignItems="center" spacing={1.2} sx={{ mb: 2.5 }}>
@@ -229,7 +223,7 @@ export function ReaderCollectionPage() {
               </Typography>
               <Box sx={{
                 display: 'flex', alignItems: 'center', gap: 1, px: 1.4, py: 0.75, mb: 1,
-                background: colors.glass.bg, backdropFilter: 'blur(12px)',
+                background: colors.glass.bg,
                 border: `1.5px solid ${colors.glass.border}`, borderRadius: radius.lg,
               }}>
                 <SearchIcon sx={{ fontSize: 17, color: theme.textOnBgMuted, flexShrink: 0 }} />

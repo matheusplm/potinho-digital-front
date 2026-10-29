@@ -24,7 +24,7 @@ export function AchievementsList({ achievements }: { achievements: ReaderAchieve
             <Box sx={{
               width: 48, height: 48, borderRadius: radius.full, flexShrink: 0, fontSize: '1.5rem',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: a.unlocked ? `linear-gradient(135deg, ${theme.accent}22, ${theme.accent}44)` : colors.fill.medium,
+              background: a.unlocked ? `color-mix(in srgb, ${theme.accent} 18%, transparent)` : colors.fill.medium,
               border: `1.5px solid ${a.unlocked ? `${theme.accent}88` : colors.border.subtle}`,
               filter: a.unlocked ? 'none' : 'grayscale(1)', opacity: a.unlocked ? 1 : 0.45,
             }}>

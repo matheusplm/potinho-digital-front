@@ -8,7 +8,6 @@ import { api } from '../services/api'
 import { Button, Input, PasswordInput, toast } from '../components/ui'
 import { GoogleSignInButton } from '../components/GoogleSignInButton'
 import { ScrollHint } from '../components/ui/ScrollHint'
-import { FloatingParticles } from '../components/FloatingParticles'
 import { useBackground } from '../context/BackgroundContext'
 import { BrandLogo, Copyright } from '../components/Brand'
 import { brandAccent, brandGradient, colors, fadeSlide, font, gradients } from '../design-system'
@@ -73,10 +72,7 @@ export function RegisterPage() {
       overflowY: 'auto',
       background: gradients.page,
     }}>
-      <Box sx={{ position: 'absolute', top: -120, right: -120, width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(29,78,216,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
-      <Box sx={{ position: 'absolute', bottom: -80, left: -80, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
-      <FloatingParticles />
 
       <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 3, py: 5, position: 'relative', zIndex: 1, animation: `${fadeSlide} 0.5s ease both` }} spacing={0}>
         <BrandLogo size={72} sx={{ mb: 3 }} />

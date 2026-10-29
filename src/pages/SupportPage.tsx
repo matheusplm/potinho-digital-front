@@ -108,7 +108,7 @@ export function SupportPage() {
   }
 
   const panel = {
-    background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}`, backdropFilter: 'blur(16px)',
+    background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}`,
     borderRadius: radius.xl, overflow: 'hidden', minHeight: 0,
   } as const
 

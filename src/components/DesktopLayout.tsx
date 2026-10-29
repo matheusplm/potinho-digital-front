@@ -162,7 +162,7 @@ export function DesktopLayout() {
       <Box sx={{
         width: SIDEBAR_W, flexShrink: 0, height: '100%',
         display: 'flex', flexDirection: 'column',
-        background: theme.surfaceBg, backdropFilter: 'blur(20px)',
+        background: theme.surfaceBg,
         borderRight: `1px solid ${theme.surfaceBorder}`,
         overflowY: 'auto', overflowX: 'hidden',
         scrollbarWidth: 'thin',
@@ -415,7 +415,7 @@ export function DesktopLayout() {
           onClose={() => setThemeOpen(false)}
           anchorOrigin={{ vertical: 'center', horizontal: 'right' }}
           transformOrigin={{ vertical: 'center', horizontal: 'left' }}
-          slotProps={{ paper: { sx: { ml: 1.2, p: 2, width: 248, borderRadius: radius.lg, background: theme.surfaceBg, backdropFilter: 'blur(24px)', border: `1px solid ${theme.surfaceBorder}`, boxShadow: '0 18px 48px rgba(0,0,0,0.22)' } } }}
+          slotProps={{ paper: { sx: { ml: 1.2, p: 2, width: 248, borderRadius: radius.lg, background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}`, boxShadow: '0 18px 48px rgba(0,0,0,0.22)' } } }}
         >
           <Typography variant="label" sx={{ color: theme.textOnBgMuted, mb: 1, display: 'block' }}>
             Tema de fundo

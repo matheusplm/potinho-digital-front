@@ -28,7 +28,6 @@ export function SimulationBanner() {
         py: 0.85,
         borderRadius: radius.lg,
         background: theme.surfaceBg,
-        backdropFilter: 'blur(16px)',
         border: `1.5px solid ${colors.primary.main}28`,
         boxShadow: '0 10px 28px rgba(15,23,42,0.12)',
       }}>

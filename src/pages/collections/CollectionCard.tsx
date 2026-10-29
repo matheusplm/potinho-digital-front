@@ -15,7 +15,7 @@ const cardIn = (i: number) => keyframes`
 
 const overlayBtn = {
   width: 32, height: 32, borderRadius: '50%', cursor: 'pointer',
-  background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)',
+  background: 'rgba(255,255,255,0.95)',
   boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
   display: 'flex', alignItems: 'center', justifyContent: 'center',
   transition: 'transform 0.15s, box-shadow 0.15s',
@@ -159,7 +159,7 @@ export function CollectionGridItem({ col, i, onClick, onEdit, onDelete, hasNews 
       onClick={onClick}
       sx={{
         borderRadius: radius.xl, overflow: 'hidden', cursor: 'pointer',
-        background: colors.surface.base, backdropFilter: 'blur(12px)',
+        background: colors.surface.base,
         border: `1px solid ${colors.border.subtle}`,
         boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
         animation: `${cardIn(i)} ${0.28 + i * 0.04}s cubic-bezier(0.16,1,0.3,1) both`,
@@ -214,7 +214,7 @@ export function CollectionListItem({ col, i, onClick, onEdit, onDelete, hasNews 
         display: 'flex', alignItems: 'center', gap: 1.4,
         px: 1.5, py: 1.3,
         borderRadius: radius.xl, cursor: 'pointer',
-        background: colors.surface.base, backdropFilter: 'blur(12px)',
+        background: colors.surface.base,
         border: `1px solid ${colors.border.subtle}`,
         boxShadow: '0 1px 6px rgba(0,0,0,0.07)',
         animation: `${cardIn(i)} ${0.25 + i * 0.04}s cubic-bezier(0.16,1,0.3,1) both`,

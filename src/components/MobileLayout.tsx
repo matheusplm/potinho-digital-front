@@ -148,7 +148,7 @@ export function MobileLayout() {
       <Box sx={{
         flexShrink: 0,
         zIndex: 100,
-        background: theme.surfaceBg, backdropFilter: 'blur(20px)',
+        background: theme.surfaceBg,
         borderTop: `1px solid ${theme.surfaceBorder}`,
         pb: 'env(safe-area-inset-bottom, 0px)',
       }}>

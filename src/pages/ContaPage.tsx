@@ -12,7 +12,6 @@ import { Box, CircularProgress, Collapse, Divider, Stack, Typography } from '@mu
 import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useBackground } from '../context/BackgroundContext'
-import { FloatingParticles } from '../components/FloatingParticles'
 import { DeleteAccountDialog } from '../components/DeleteAccountDialog'
 import { useUser } from '../context/UserContext'
 import { api } from '../services/api'
@@ -147,8 +146,6 @@ export function ContaPage() {
 
   return (
     <Box sx={{ height: '100%', position: 'relative', ...clipOverflow, background: theme.gradient }}>
-      <FloatingParticles />
-      <AccountCircleOutlinedIcon sx={{ position: 'absolute', bottom: -70, right: -60, fontSize: 420, color: `${theme.accent}08`, pointerEvents: 'none' }} />
 
       <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
         <Stack spacing={0.3} sx={{ mb: 2.5 }}>
@@ -161,7 +158,7 @@ export function ContaPage() {
         </Stack>
 
         <Stack spacing={2}>
-          <Box sx={{ background: surfaceBg, backdropFilter: 'blur(16px)', borderRadius: radius.lg, border: `1px solid ${borderColor}`, overflow: 'hidden' }}>
+          <Box sx={{ background: surfaceBg, borderRadius: radius.lg, border: `1px solid ${borderColor}`, overflow: 'hidden' }}>
             <Stack
               direction="row" alignItems="center" spacing={1.5}
               onClick={() => {
@@ -232,7 +229,7 @@ export function ContaPage() {
             </Collapse>
           </Box>
 
-          <Box sx={{ background: surfaceBg, backdropFilter: 'blur(16px)', borderRadius: radius.lg, border: `1px solid ${borderColor}`, overflow: 'hidden' }}>
+          <Box sx={{ background: surfaceBg, borderRadius: radius.lg, border: `1px solid ${borderColor}`, overflow: 'hidden' }}>
             <Stack
               direction="row" alignItems="center" spacing={1.5}
               onClick={() => {
@@ -330,7 +327,7 @@ export function ContaPage() {
             </Collapse>
           </Box>
 
-          <Box sx={{ background: surfaceBg, backdropFilter: 'blur(16px)', borderRadius: radius.lg, border: `1px solid ${borderColor}`, overflow: 'hidden' }}>
+          <Box sx={{ background: surfaceBg, borderRadius: radius.lg, border: `1px solid ${borderColor}`, overflow: 'hidden' }}>
             <Stack
               direction="row" alignItems="center" spacing={1.5}
               onClick={() => {

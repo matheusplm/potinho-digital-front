@@ -36,7 +36,6 @@ export function PushPrompt() {
       maxWidth: 440,
       zIndex: 1200,
       background: `${theme.accent}18`,
-      backdropFilter: 'blur(20px)',
       border: `1.5px solid ${theme.accent}30`,
       borderLeft: `3px solid ${theme.accent}`,
       borderRadius: radius.xl,

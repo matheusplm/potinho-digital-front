@@ -51,7 +51,7 @@ const TEXT_VARIANTS: Record<TextVariant, CSSProperties> = {
   md: text('0.8rem'),
   lg: text('0.86rem'),
   xl: text('0.95rem'),
-  label: text('0.72rem', { fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.6px', color: colors.text.secondary }),
+  label: text('0.7rem', { fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: colors.text.secondary }),
   hint: text('0.68rem', { lineHeight: 1.45, color: colors.text.muted }),
 }
 
@@ -67,8 +67,8 @@ export const appTheme = createTheme({
   },
   typography: {
     fontFamily: font.sans,
-    h4: { fontWeight: 700, fontFamily: font.serif },
-    h5: { fontWeight: 700, fontFamily: font.serif },
+    h4: { fontWeight: 500, fontFamily: font.serif, letterSpacing: '-0.02em' },
+    h5: { fontWeight: 500, fontFamily: font.serif, letterSpacing: '-0.02em' },
     h6: { fontWeight: 600, fontFamily: font.serif },
     body1: { lineHeight: 1.6 },
     body2: { lineHeight: 1.6 },
@@ -86,7 +86,20 @@ export const appTheme = createTheme({
           background: 'var(--pd-surface-paper)',
           color: 'var(--pd-text-primary)',
           backgroundImage: 'none',
+          border: '1px solid var(--pd-border-subtle)',
+          borderRadius: radius.lg,
+          boxShadow: '3px 4px 0 rgba(42,36,29,0.18), 0 24px 48px -24px rgba(42,36,29,0.45)',
         },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: { borderRadius: radius.sm },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: { borderRadius: radius.md, background: 'var(--pd-surface-base)' },
       },
     },
     MuiDialogContentText: {

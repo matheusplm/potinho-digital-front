@@ -1,5 +1,5 @@
 import { Box, Stack, Typography } from '@mui/material'
-import { font, ink, packCtaFloat, radius, shineSweep } from '../design-system'
+import { colors, font, ink, packCtaFloat, radius, shineSweep } from '../design-system'
 import { Button } from './ui'
 
 export interface PendingInvite {
@@ -37,7 +37,7 @@ export function PendingInviteCard({ invite, onOpen }: { invite: PendingInvite; o
       }}
       sx={{
         position: 'relative', overflow: 'hidden', cursor: 'pointer', borderRadius: radius.xl, p: { xs: 1.8, sm: 2.1 },
-        background: 'linear-gradient(135deg,#eff6ff 0%,#fce7f3 55%,#ede9fe 100%)',
+        background: colors.surface.base,
         border: '1.5px solid rgba(29,78,216,0.22)',
         boxShadow: '0 14px 36px rgba(29,78,216,0.16), 0 2px 8px rgba(225,29,72,0.08)',
         transition: 'transform 0.18s ease, box-shadow 0.18s ease',

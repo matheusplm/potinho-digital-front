@@ -1,5 +1,4 @@
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
-import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, Stack, Typography } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -10,7 +9,6 @@ import {
   useDeleteCollectionMutation, useMyNotificationsQuery, useRestoreCollectionMutation, useUpdateCollectionMutation,
 } from '../hooks/useNotes'
 import { useBackground } from '../context/BackgroundContext'
-import { FloatingParticles } from '../components/FloatingParticles'
 import { useSimulation } from '../context/SimulationContext'
 import { useUser } from '../context/UserContext'
 import { colors, fadeIn, font } from '../design-system'
@@ -109,7 +107,6 @@ export function CollectionsListPage() {
   if (isActive && session) {
     return (
       <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>
-        <FloatingParticles />
         <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
           <LoadingState label="Voltando para a coleção" accent={theme.accent} textColor={theme.textOnBg} mutedColor={theme.textOnBgMuted} sx={{ minHeight: 360 }} />
         </ScrollablePage>
@@ -189,12 +186,6 @@ export function CollectionsListPage() {
 
   return (
     <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>
-      <FloatingParticles />
-      <FavoriteIcon sx={{
-        position: 'absolute', bottom: -80, right: -80,
-        fontSize: 440, color: theme.isDark ? 'rgba(255,255,255,0.03)' : 'rgba(225,29,72,0.04)',
-        pointerEvents: 'none',
-      }} />
 
       <ScrollablePage sx={{ px: 2.5, pt: 2.5, pb: 4, animation: `${fadeIn} 0.35s ease` }}>
         <Box sx={{ mb: 2.5 }}>
@@ -221,7 +212,7 @@ export function CollectionsListPage() {
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textAlign: 'center', py: isWriter ? 4 : 8 }}>
             <Box sx={{
               width: 72, height: 72, borderRadius: '50%',
-              background: `linear-gradient(135deg, ${theme.accent}22, ${theme.accent}44)`,
+              background: `color-mix(in srgb, ${theme.accent} 18%, transparent)`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
               <AutoAwesomeIcon sx={{ fontSize: 32, color: theme.accent, opacity: 0.7 }} />
@@ -298,7 +289,7 @@ export function CollectionsListPage() {
           <Box sx={{
             mt: 2.5, p: 1.6, borderRadius: '16px',
             border: `1.5px dashed ${theme.accent}55`,
-            background: colors.glass.bg, backdropFilter: 'blur(10px)',
+            background: colors.glass.bg,
           }}>
             <Stack direction="row" spacing={1.2} alignItems="center">
               <Typography sx={{ fontSize: '1.3rem', lineHeight: 1, flexShrink: 0, opacity: trashItem ? 1 : 0.55 }}>🗑️</Typography>

@@ -44,7 +44,6 @@ export function LoadingState({
           background: colors.glass.bg,
           border: `1px solid ${colors.glass.border}`,
           boxShadow: `0 10px 30px ${accent}22`,
-          backdropFilter: 'blur(14px)',
         }}>
           <CircularProgress size={compact ? 34 : 44} thickness={4} sx={{ color: accent, position: 'absolute' }} />
           <FavoriteIcon sx={{ fontSize: compact ? 15 : 18, color: accent, opacity: 0.82 }} />

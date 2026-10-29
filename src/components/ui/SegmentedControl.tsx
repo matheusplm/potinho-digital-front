@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material'
-import { colors } from '../../design-system'
+import { colors, radius, themeInk } from '../../design-system'
 import { useBackground } from '../../context/BackgroundContext'
 import type { ReactNode } from 'react'
 
@@ -20,30 +20,29 @@ export function SegmentedControl<T extends string>({ options, value, onChange }:
   const { theme } = useBackground()
   return (
     <Box sx={{
-      display: 'flex', flexWrap: 'wrap', p: 0.5, rowGap: 0.5,
-      borderRadius: '10px', bgcolor: theme.isDark ? 'rgba(0,0,0,0.35)' : 'rgba(0,0,0,0.06)',
+      display: 'flex', flexWrap: 'wrap', overflow: 'hidden',
+      borderRadius: radius.md, border: `1.5px solid ${theme.surfaceBorder}`, background: theme.surfaceBg,
     }}>
       {options.map((opt) => {
         const active = value === opt.id
-        const color = opt.activeColor ?? colors.primary.main
-        const activeBg = theme.isDark ? theme.accent : '#fff'
-        const activeTextColor = theme.isDark ? theme.onAccent : color
+        const color = active ? '#fffcf5' : theme.textOnBgMuted
         return (
           <Box
             key={opt.id}
             data-tour={`tab-${opt.id}`}
             onClick={() => onChange(opt.id)}
             sx={{
-              flex: '1 1 28%', py: 1, px: 1.2, borderRadius: '8px', cursor: 'pointer',
+              flex: '1 1 28%', py: 1, px: 1.2, cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.7,
-              bgcolor: active ? activeBg : 'transparent',
-              boxShadow: active ? (theme.isDark ? `0 1px 8px rgba(0,0,0,0.4)` : '0 1px 6px rgba(0,0,0,0.1)') : 'none',
-              transition: 'all 0.2s',
-              '& svg': { color: active ? activeTextColor : theme.textOnBgMuted, fontSize: 16, transition: 'color 0.2s' },
+              bgcolor: active ? opt.activeColor ?? themeInk.ink : 'transparent',
+              boxShadow: `inset 0 0 0 0.75px ${theme.surfaceBorder}`,
+              transition: 'background 0.15s',
+              '&:hover': active ? {} : { bgcolor: colors.fill.subtle },
+              '& svg': { color, fontSize: 16, transition: 'color 0.15s' },
             }}
           >
             {opt.icon}
-            <Typography variant="md" sx={{ fontWeight: 700, color: active ? activeTextColor : theme.textOnBgMuted, transition: 'color 0.2s', whiteSpace: 'nowrap' }}>
+            <Typography variant="md" sx={{ fontWeight: 600, color, transition: 'color 0.15s', whiteSpace: 'nowrap' }}>
               {opt.label}
             </Typography>
           </Box>

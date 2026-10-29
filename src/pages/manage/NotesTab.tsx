@@ -191,7 +191,6 @@ export function NotesTab({ cid, intent }: NotesTabProps) {
                   flex: 1, py: 0.8, borderRadius: radius.lg, cursor: 'pointer', textAlign: 'center',
                   background: active ? theme.accent : theme.surfaceBg,
                   border: `1.5px solid ${active ? theme.accent : theme.surfaceBorder}`,
-                  backdropFilter: 'blur(12px)',
                   boxShadow: active ? `0 6px 20px ${theme.accent}44` : 'none',
                   transition: 'all 0.18s ease',
                   '&:hover': active ? {} : { borderColor: `${theme.accent}55` },
@@ -211,7 +210,7 @@ export function NotesTab({ cid, intent }: NotesTabProps) {
             <Box data-tour="drafts-bar" sx={{
               position: 'sticky', top: 8, zIndex: 6,
               borderRadius: radius.xl, overflow: 'hidden',
-              background: theme.surfaceBg, backdropFilter: 'blur(20px)',
+              background: theme.surfaceBg,
               border: `1.5px solid ${selectedDraftIds.length > 0 ? `${theme.accent}66` : theme.surfaceBorder}`,
               boxShadow: selectedDraftIds.length > 0 ? `0 10px 34px ${theme.accent}38` : '0 8px 24px rgba(0,0,0,0.14)',
               transition: 'border-color 0.18s ease, box-shadow 0.18s ease',
@@ -273,7 +272,7 @@ export function NotesTab({ cid, intent }: NotesTabProps) {
           <Stack spacing={1}>
             <Box sx={{
               display: 'flex', alignItems: 'center', gap: 1, px: 1.4, py: 0.7,
-              background: theme.surfaceBg, backdropFilter: 'blur(12px)',
+              background: theme.surfaceBg,
               border: `1.5px solid ${theme.surfaceBorder}`, borderRadius: radius.lg,
             }}>
               <SearchIcon sx={{ fontSize: 17, color: theme.textOnBgMuted, flexShrink: 0 }} />
@@ -372,7 +371,7 @@ export function NotesTab({ cid, intent }: NotesTabProps) {
         )}
 
         {statusView === 'live' && trashedNotes.length > 0 && (
-          <Box sx={{ mt: 1.5, p: 1.4, borderRadius: radius.xl, border: `1.5px dashed ${theme.surfaceBorder}`, background: theme.surfaceBg, backdropFilter: 'blur(14px)' }}>
+          <Box sx={{ mt: 1.5, p: 1.4, borderRadius: radius.xl, border: `1.5px dashed ${theme.surfaceBorder}`, background: theme.surfaceBg }}>
             <Typography variant="label" sx={{ color: theme.textOnBgMuted, mb: 1 }}>
               🗑️ Lixeira
             </Typography>

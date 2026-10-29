@@ -80,11 +80,11 @@ export function AnnouncementModal({ notifications, onClose, onSeeAll }: {
       slots={{ transition: Pop }}
       aria-label="Novidades pra você"
       slotProps={{
-        backdrop: { sx: { background: 'rgba(15,23,42,0.28)', backdropFilter: 'blur(3px)' } },
+        backdrop: { sx: { background: 'rgba(15,23,42,0.28)' } },
         paper: {
           sx: {
             mx: 2, borderRadius: radius.xl, overflow: 'hidden', position: 'relative',
-            background: 'var(--pd-surface-paper)', backdropFilter: 'blur(24px)',
+            background: 'var(--pd-surface-paper)',
             border: `1.5px solid ${withAlpha(theme.accent, 30)}`,
             boxShadow: `0 24px 60px ${withAlpha(theme.accent, 22)}`,
             '&:hover [data-drain], &:focus-within [data-drain]': { animationPlayState: 'paused' },

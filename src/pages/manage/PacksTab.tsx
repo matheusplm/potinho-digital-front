@@ -130,7 +130,7 @@ export function PacksTab({ cid }: PacksTabProps) {
 
         {!packsLoading && packs.length === 0 && (
           <Stack spacing={1.4}>
-            <Box sx={{ p: 1.7, borderRadius: radius.xl, background: theme.surfaceBg, backdropFilter: 'blur(14px)', border: `1px solid ${theme.surfaceBorder}` }}>
+            <Box sx={{ p: 1.7, borderRadius: radius.xl, background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}` }}>
               <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: theme.textOnBg, mb: 0.3 }}>
                 O que é um pacotinho?
               </Typography>
