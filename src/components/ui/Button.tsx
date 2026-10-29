@@ -8,35 +8,34 @@ interface AppButtonProps extends Omit<ButtonProps, 'variant'> {
   loading?: boolean
 }
 
-const STYLES: Record<AppVariant, object> = {
-  primary: {
-    background: gradients.primary,
+const PRESS = {
+  transition: 'transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease',
+  '&:hover': { transform: 'translate(-1px,-1px)', boxShadow: '3px 3px 0 rgba(42,36,29,0.9)' },
+  '&:active': { transform: 'translate(1px,1px)', boxShadow: '0 0 0 rgba(42,36,29,0.9)' },
+  '&:disabled': { background: colors.border.medium, boxShadow: 'none', color: colors.text.muted, border: '1.5px solid transparent' },
+}
+
+function inked(color: string) {
+  return {
+    background: color,
+    color: '#fffcf5',
+    border: '1.5px solid #2a241d',
     boxShadow: shadow.primary,
-    color: '#fff',
-    '&:hover': { boxShadow: `0 8px 24px ${colors.primary.glow}`, background: gradients.primary },
-    '&:disabled': { background: colors.border.medium, boxShadow: 'none', color: colors.text.muted },
-  },
-  rose: {
-    background: gradients.rose,
-    boxShadow: shadow.rose,
-    color: '#fff',
-    '&:hover': { boxShadow: `0 8px 24px ${colors.rose.glow}`, background: gradients.rose },
-    '&:disabled': { background: colors.border.medium, boxShadow: 'none', color: colors.text.muted },
-  },
-  purple: {
-    background: gradients.purple,
-    boxShadow: shadow.purple,
-    color: '#fff',
-    '&:hover': { boxShadow: `0 8px 24px ${colors.purple.glow}`, background: gradients.purple },
-    '&:disabled': { background: colors.border.medium, boxShadow: 'none', color: colors.text.muted },
-  },
+    ...PRESS,
+    '&:hover': { ...PRESS['&:hover'], background: color },
+  }
+}
+
+const STYLES: Record<AppVariant, object> = {
+  primary: inked(gradients.primary),
+  rose: inked(gradients.rose),
+  purple: inked(gradients.purple),
   ghost: {
-    background: colors.surface.overlay,
-    backdropFilter: 'blur(8px)',
-    boxShadow: shadow.sm,
-    color: colors.primary.text,
-    border: `1.5px solid rgba(29,78,216,0.2)`,
-    '&:hover': { background: colors.surface.base, boxShadow: shadow.md },
+    background: 'transparent',
+    boxShadow: 'none',
+    color: colors.text.primary,
+    border: `1.5px solid ${colors.border.medium}`,
+    '&:hover': { background: colors.fill.subtle, borderColor: colors.text.secondary },
   },
 }
 
@@ -46,9 +45,9 @@ export function Button({ variant = 'primary', loading, children, sx, ...props }:
       {...props}
       disableElevation
       sx={{
-        borderRadius: radius.lg,
+        borderRadius: radius.md,
         py: 1.4,
-        fontWeight: 700,
+        fontWeight: 600,
         textTransform: 'none',
         fontSize: '0.97rem',
         letterSpacing: '0.01em',

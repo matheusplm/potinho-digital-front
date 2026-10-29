@@ -1,64 +1,13 @@
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, Stack, Typography } from '@mui/material'
-import { keyframes } from '@emotion/react'
-import { colors, ink, radius } from '../../design-system'
-import { themedCardBg, withAlpha } from '../../utils/colorUtils'
+import { colors, font, ink, radius } from '../../design-system'
 import { linkifyText } from '../../utils/linkify'
 import { useBackground } from '../../context/BackgroundContext'
 import type { CollectionNoteView, RarityConfig } from '../../types/note'
-
-const rarityShine = keyframes`
-  0%   { left: -45%; opacity: 0 }
-  20%  { opacity: 1 }
-  100% { left: 105%; opacity: 0 }
-`
+import { HAND_MESSAGE_SX, rarityCardSx as paperCardSx } from '../../components/collection/RewardCard'
 
 function rarityCardSx(r?: RarityConfig, compact = false, isDark = false) {
-  const glow = r?.glowColor || r?.borderColor || 'rgba(244,63,94,0.2)'
-  return {
-    p: compact ? 1.4 : 2,
-    borderRadius: compact ? radius.lg : radius.xl,
-    position: 'relative',
-    overflow: 'hidden',
-    isolation: 'isolate',
-    background: themedCardBg(r?.cardBg ?? ink.surface, isDark),
-    border: `1.5px solid ${r?.borderColor ?? ink.borderSubtle}`,
-    boxShadow: r
-      ? `${r.shadow || '0 4px 20px rgba(0,0,0,0.08)'}, 0 0 28px ${glow}`
-      : '0 2px 10px rgba(0,0,0,0.05)',
-    transition: 'transform 0.22s ease, box-shadow 0.22s ease',
-    cursor: 'pointer',
-    '&::before': {
-      content: '""',
-      position: 'absolute',
-      inset: 0,
-      zIndex: 0,
-      pointerEvents: 'none',
-      background: compact
-        ? `radial-gradient(circle at 12% 0%, rgba(255,255,255,0.42), transparent 38%), radial-gradient(circle at 92% 100%, ${glow}, transparent 34%)`
-        : `radial-gradient(circle at 12% 0%, rgba(255,255,255,0.58), transparent 36%), radial-gradient(circle at 95% 105%, ${glow}, transparent 42%)`,
-      opacity: compact ? 0.62 : 0.78,
-      mixBlendMode: 'soft-light',
-    },
-    '&::after': {
-      content: '""',
-      position: 'absolute',
-      top: '-35%',
-      left: '-45%',
-      zIndex: 0,
-      width: '38%',
-      height: '170%',
-      pointerEvents: 'none',
-      background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.42), transparent)',
-      animation: `${rarityShine} 4.4s ease-in-out infinite`,
-    },
-    '&:hover': {
-      transform: compact ? 'translateY(-1px)' : 'translateY(-2px) scale(1.01)',
-      boxShadow: r
-        ? `${r.shadow || '0 6px 24px rgba(0,0,0,0.1)'}, 0 0 40px ${glow}`
-        : '0 6px 20px rgba(0,0,0,0.1)',
-    },
-  }
+  return { ...paperCardSx(r, compact, isDark), cursor: 'pointer' }
 }
 
 export function ReaderNoteCard({ note, rarity, onClick }: { note: CollectionNoteView; rarity?: RarityConfig; onClick: () => void }) {
@@ -68,23 +17,23 @@ export function ReaderNoteCard({ note, rarity, onClick }: { note: CollectionNote
       <Box sx={{ position: 'relative', zIndex: 1 }}>
         <Stack spacing={0.8}>
           <Stack direction="row" alignItems="flex-start" justifyContent="space-between" spacing={0.5}>
-            <Typography variant="md" sx={{ fontWeight: 800, color: rarity?.textColor ?? ink.primary, lineHeight: 1.3, flex: 1 }}>
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 600, fontSize: '1.02rem', color: ink.primary, lineHeight: 1.25, flex: 1 }}>
               {note.title}
             </Typography>
             {note.favorite && <FavoriteIcon sx={{ fontSize: 13, color: colors.rose.main, flexShrink: 0, mt: 0.1 }} />}
           </Stack>
           {rarity && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <Box sx={{ width: 7, height: 7, borderRadius: radius.full, background: rarity.cardBg, flexShrink: 0, boxShadow: `0 0 5px ${rarity.glowColor || rarity.borderColor}` }} />
-              <Typography variant="label" sx={{ color: rarity.captionColor ?? ink.muted }}>
+              <Box sx={{ width: 7, height: 7, borderRadius: radius.full, background: rarity.borderColor, flexShrink: 0 }} />
+              <Typography variant="label" sx={{ color: ink.muted }}>
                 {rarity.emoji} {rarity.label}
               </Typography>
             </Box>
           )}
           {note.message && (
-            <Typography variant="xs" sx={{
-              color: rarity?.textColor ? withAlpha(rarity.textColor, 60) : ink.secondary,
-              lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', whiteSpace: 'pre-line',
+            <Typography sx={{
+              ...HAND_MESSAGE_SX, fontSize: '1.08rem', color: ink.secondary,
+              display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', whiteSpace: 'pre-line',
             }}>
               {linkifyText(note.message)}
             </Typography>
@@ -102,14 +51,14 @@ export function ReaderNoteRow({ note, rarity, onClick }: { note: CollectionNoteV
       <Box sx={{ position: 'relative', zIndex: 1 }}>
         <Stack direction="row" alignItems="center" spacing={1.2}>
           {rarity && (
-            <Box sx={{ width: 9, height: 9, borderRadius: radius.full, background: rarity.cardBg, flexShrink: 0, boxShadow: `0 0 7px ${withAlpha(rarity.glowColor || rarity.borderColor, 53)}` }} />
+            <Box sx={{ width: 9, height: 9, borderRadius: radius.full, background: rarity.borderColor, flexShrink: 0 }} />
           )}
           <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Typography variant="md" sx={{ fontWeight: 700, color: rarity?.textColor ?? ink.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 600, fontSize: '0.98rem', color: ink.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {note.title}
             </Typography>
             {rarity && (
-              <Typography variant="label" sx={{ color: rarity.captionColor ?? ink.muted }}>
+              <Typography variant="label" sx={{ color: ink.muted }}>
                 {rarity.emoji} {rarity.label}
               </Typography>
             )}

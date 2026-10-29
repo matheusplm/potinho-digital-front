@@ -1,4 +1,3 @@
-import FavoriteIcon from '@mui/icons-material/Favorite'
 import ShuffleIcon from '@mui/icons-material/Shuffle'
 import { Box, LinearProgress, Stack, Typography, useMediaQuery } from '@mui/material'
 import { useQueryClient } from '@tanstack/react-query'
@@ -419,103 +418,85 @@ export function SimulatedReaderHomePage() {
   return (
     <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>
       <FloatingParticles />
-      <Box sx={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}>
-        <FavoriteIcon sx={{ position: 'absolute', bottom: -80, right: -80, fontSize: 480, color: 'rgba(225,29,72,0.05)' }} />
-      </Box>
 
       <ScrollablePage sx={{ px: 2.5, py: 2.2 }}>
-        <Box sx={{ animation: `${fadeIn} 0.35s ease` }}>
-          <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 1.35 }}>
-            <Stack spacing={0.35} sx={{ flex: 1, minWidth: 0, mr: 1 }}>
-              <Typography variant="md" sx={{ color: theme.textOnBgMuted, fontWeight: 700 }}>
-                {isRealReader ? 'Para você' : 'Prévia do leitor'}
-              </Typography>
-              <Stack direction="row" alignItems="center" spacing={1} sx={{ minWidth: 0 }}>
-                <Typography sx={{ fontSize: '1.7rem', lineHeight: 1, flexShrink: 0, filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.16))' }}>
-                  {activeSession.collectionEmoji}
-                </Typography>
-                <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.55rem', color: theme.textOnBg, lineHeight: 1.05, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {activeSession.collectionName}
-                </Typography>
-              </Stack>
-              <Typography variant="md" sx={{ color: theme.textOnBgMuted, fontStyle: 'italic' }}>
-                seu potinho chegou 💌
-              </Typography>
-            </Stack>
-          </Stack>
+        <Box sx={{ animation: `${fadeIn} 0.35s ease`, maxWidth: 720, mx: 'auto' }}>
+          <Box sx={{ mb: 1.6 }}>
+            <Typography sx={{ fontFamily: font.hand, fontSize: '1.3rem', color: theme.accent, lineHeight: 1, mb: 0.4, transform: 'rotate(-1.5deg)', transformOrigin: 'left' }}>
+              {isRealReader ? `pra você${user?.name ? `, ${user.name.split(' ')[0]}` : ''}` : 'prévia do leitor'}
+            </Typography>
+            <Typography component="h1" sx={{ fontFamily: font.serif, fontWeight: 500, fontSize: '1.9rem', letterSpacing: '-0.02em', color: theme.textOnBg, lineHeight: 1.05, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {activeSession.collectionName}
+            </Typography>
+          </Box>
 
           {isRealReader && readerCollections.length > 1 && (
-            <Stack direction="row" spacing={0.6} sx={{ mb: 1.35, flexWrap: 'wrap', rowGap: 0.6 }}>
+            <Box role="tablist" aria-label="Seus potinhos" sx={{ display: 'flex', flexWrap: 'wrap', columnGap: 2.2, rowGap: 0.6, mb: 1.8, borderBottom: `1px solid ${theme.surfaceBorder}` }}>
               {readerCollections.map((c) => {
                 const active = c.id === readerCollection?.id
                 const hasNews = unreadNewsCids.has(c.id)
                 const hasPack = c.dailyCanOpen || (c.pendingBonusOpens ?? 0) > 0
                 return (
-                  <Box key={c.id} onClick={() => setActiveCollectionId(c.id)} sx={{
-                    px: 1.1, py: 0.45, borderRadius: radius.full, cursor: 'pointer', position: 'relative',
-                    background: active ? theme.accent : theme.surfaceBg,
-                    border: `1.5px solid ${active ? theme.accent : theme.surfaceBorder}`,
-                    backdropFilter: 'blur(10px)', transition: 'all 0.16s',
-                    '&:hover': active ? {} : { borderColor: `${theme.accent}55` },
+                  <Box key={c.id} role="tab" aria-selected={active} onClick={() => setActiveCollectionId(c.id)} sx={{
+                    pb: 0.8, mb: '-1px', cursor: 'pointer', position: 'relative', display: 'flex', alignItems: 'center', gap: 0.6,
+                    borderBottom: `2px solid ${active ? theme.textOnBg : 'transparent'}`,
+                    color: active ? theme.textOnBg : theme.textOnBgMuted,
+                    transition: 'color 0.15s, border-color 0.15s',
+                    '&:hover': { color: theme.textOnBg },
                   }}>
-                    <Typography variant="sm" sx={{ fontWeight: 800, color: active ? theme.onAccent : theme.textOnBgMuted, maxWidth: 170, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {c.emoji} {c.name}{hasNews ? ' 🎉' : ''}{hasPack ? ' 📦' : ''}
+                    <Typography sx={{ fontSize: '0.9rem', fontWeight: active ? 600 : 500, color: 'inherit', maxWidth: 170, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {c.emoji} {c.name}
                     </Typography>
-                    {(hasNews || hasPack) && !active && (
-                      <Box sx={{
-                        position: 'absolute', top: -3, right: -3, width: 9, height: 9, borderRadius: '50%',
-                        background: colors.rose.main, boxShadow: `0 0 0 2px rgba(255,253,251,0.95), 0 0 10px ${colors.rose.glow}`,
-                      }} />
+                    {(hasNews || hasPack) && (
+                      <Box aria-label={hasPack ? 'pacotinho disponível' : 'novidades'} sx={{ width: 7, height: 7, borderRadius: '50%', background: colors.rose.main, flexShrink: 0 }} />
                     )}
                   </Box>
                 )
               })}
-            </Stack>
+            </Box>
           )}
 
-          <Stack direction="row" spacing={0.8} sx={{ mb: 1.35, display: shortScreen ? 'none' : 'flex' }}>
+          <Stack direction="row" sx={{ mb: 1.6, display: shortScreen ? 'none' : 'flex', borderTop: `1px solid ${theme.surfaceBorder}`, borderBottom: `1px solid ${theme.surfaceBorder}` }}>
             {[
-              { emoji: '🎴', value: play.owned, label: 'coletados', to: `/colecoes/${activeSession.collectionSlug}` },
-              { emoji: '❤️', value: favCount, label: 'favoritas', to: '/favoritas' },
-              { emoji: '🏅', value: achievementsUnlocked, label: 'conquistas', to: '/conquistas' },
-            ].map((s) => (
-              <Box key={s.label} onClick={() => navigate(s.to)} sx={{
-                flex: 1, px: 1, py: 0.85, borderRadius: radius.lg, textAlign: 'center', cursor: 'pointer',
-                background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}`, backdropFilter: 'blur(12px)',
-                transition: 'transform 0.16s ease, border-color 0.16s ease',
-                '&:hover': { transform: 'translateY(-1px)', borderColor: `${theme.accent}55` },
+              { value: play.owned, label: 'coletados', to: `/colecoes/${activeSession.collectionSlug}` },
+              { value: favCount, label: favCount === 1 ? 'favorito' : 'favoritos', to: '/favoritas' },
+              { value: achievementsUnlocked, label: achievementsUnlocked === 1 ? 'conquista' : 'conquistas', to: '/conquistas' },
+            ].map((stat, i) => (
+              <Box key={stat.to} role="link" onClick={() => navigate(stat.to)} sx={{
+                flex: 1, py: 1, px: 1.2, cursor: 'pointer', display: 'flex', alignItems: 'baseline', gap: 0.7, justifyContent: 'center',
+                borderLeft: i === 0 ? 'none' : `1px solid ${theme.surfaceBorder}`,
+                '&:hover .pd-stat-label': { textDecoration: 'underline', textUnderlineOffset: 3 },
               }}>
-                <Typography variant="xl" sx={{ lineHeight: 1 }}>{s.emoji}</Typography>
-                <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.05rem', color: theme.textOnBg, lineHeight: 1.2, mt: 0.25 }}>
-                  {s.value}
+                <Typography sx={{ fontFamily: font.serif, fontWeight: 500, fontSize: '1.45rem', color: theme.textOnBg, lineHeight: 1 }}>
+                  {stat.value}
                 </Typography>
-                <Typography variant="xs" sx={{ fontWeight: 700, color: theme.textOnBgMuted }}>
-                  {s.label}
+                <Typography className="pd-stat-label" sx={{ fontSize: '0.8rem', color: theme.textOnBgMuted }}>
+                  {stat.label}
                 </Typography>
               </Box>
             ))}
           </Stack>
 
           <Stack spacing={1.15} sx={{ minHeight: shortScreen ? undefined : 'calc(100dvh - 214px)' }}>
-            <Card sx={{ p: 1.05, backdropFilter: 'blur(14px)' }}>
+            <Card sx={{ p: 1.4 }}>
               <Stack spacing={0.65}>
                 {isLoading ? (
                   <LoadingState compact label="Carregando coleção" accent={theme.accent} />
                 ) : (
                   <>
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
-                      <Typography variant="sm" sx={{ fontWeight: 800, color: colors.text.secondary }}>
-                        Coleção
+                      <Typography sx={{ fontFamily: font.serif, fontWeight: 600, fontSize: '1rem', color: colors.text.primary }}>
+                        Álbum
                       </Typography>
-                      <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.05rem', color: theme.accent }}>
+                      <Typography sx={{ fontFamily: font.serif, fontWeight: 500, fontSize: '1.05rem', color: colors.text.secondary }}>
                         {completion}%
                       </Typography>
                     </Stack>
                     <LinearProgress variant="determinate" value={completion} sx={{
-                      height: 7,
-                      borderRadius: radius.full,
-                      bgcolor: colors.border.subtle,
-                      '& .MuiLinearProgress-bar': { borderRadius: radius.full, background: `linear-gradient(90deg, ${colors.rose.main}, ${theme.accent})` },
+                      height: 5,
+                      borderRadius: radius.sm,
+                      bgcolor: colors.fill.medium,
+                      '& .MuiLinearProgress-bar': { borderRadius: radius.sm, background: theme.accent },
                     }} />
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
                       <Typography variant="sm" sx={{ color: colors.text.secondary }}>
@@ -524,7 +505,7 @@ export function SimulatedReaderHomePage() {
                       <Typography
                         variant="sm"
                         onClick={() => navigate(`/colecoes/${activeSession.collectionSlug}`)}
-                        sx={{ fontWeight: 800, color: theme.accent, cursor: 'pointer', flexShrink: 0, '&:hover': { textDecoration: 'underline' } }}
+                        sx={{ fontWeight: 600, color: colors.text.primary, cursor: 'pointer', flexShrink: 0, textDecoration: 'underline', textUnderlineOffset: 3, textDecorationColor: colors.border.medium, '&:hover': { textDecorationColor: colors.text.primary } }}
                       >
                         ver álbum →
                       </Typography>
@@ -535,16 +516,13 @@ export function SimulatedReaderHomePage() {
             </Card>
 
             {relerNote && ownedItems.length > 0 && (
-              <Card sx={{ p: 1.15, backdropFilter: 'blur(12px)' }}>
+              <Card sx={{ p: 1.4 }}>
                 <Stack direction="row" alignItems="center" spacing={1.1}>
-                  <Box sx={{ width: 38, height: 38, borderRadius: radius.lg, flexShrink: 0, fontSize: '1.15rem', display: 'flex', alignItems: 'center', justifyContent: 'center', background: `${theme.accent}16`, border: `1px solid ${theme.accent}26` }}>
-                    💭
-                  </Box>
                   <Box sx={{ flex: 1, minWidth: 0, cursor: 'pointer' }} onClick={() => setSelectedNote(relerNote)}>
-                    <Typography variant="label" sx={{ color: theme.accent }}>
-                      Pra reler agora
+                    <Typography sx={{ fontFamily: font.hand, fontSize: '1.15rem', color: theme.accent, lineHeight: 1 }}>
+                      pra reler agora
                     </Typography>
-                    <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, lineHeight: 1.25, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <Typography sx={{ fontFamily: font.serif, fontWeight: 500, fontSize: '1.15rem', color: colors.text.primary, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {relerNote.title}
                     </Typography>
                   </Box>

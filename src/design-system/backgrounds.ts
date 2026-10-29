@@ -15,7 +15,22 @@ export interface BackgroundTheme {
   onAccent: string
 }
 
+export const PAPER_TEXTURE = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .25 0 0 0 0 .12 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"), #f4ede0`
+
 const THEMES: Omit<BackgroundTheme, 'onAccent'>[] = [
+  {
+    key: 'papel',
+    label: 'Papel',
+    emoji: '📜',
+    particle: '',
+    gradient: PAPER_TEXTURE,
+    accent: '#c0392b',
+    textOnBg: '#2a241d',
+    textOnBgMuted: '#6b6052',
+    surfaceBg: '#fffcf5',
+    surfaceBorder: 'rgba(60,42,20,0.16)',
+    isDark: false,
+  },
   {
     key: 'romance',
     label: 'Romance',
@@ -163,7 +178,7 @@ const THEMES: Omit<BackgroundTheme, 'onAccent'>[] = [
 
 export const backgroundThemes: BackgroundTheme[] = THEMES.map((theme) => ({ ...theme, onAccent: readableOn(theme.accent) }))
 
-export const defaultBackgroundKey = 'romance'
+export const defaultBackgroundKey = 'papel'
 
 export function getBackgroundTheme(key: string): BackgroundTheme {
   return backgroundThemes.find((t) => t.key === key) ?? backgroundThemes[0]

@@ -1,8 +1,25 @@
 import { Box, Stack, Typography } from '@mui/material'
 import { Button } from '../../components/ui'
-import { colors, font, heartPulseAura, packCtaFloat, radius } from '../../design-system'
+import { colors, font, packCtaFloat } from '../../design-system'
 import type { CollectionPack } from '../../types/note'
 import { PackIcon } from '../../components/PackIcon'
+
+const INK = '#2a241d'
+const SEAL = '#c0392b'
+
+function Envelope({ sealed, children, size }: { sealed: boolean; children?: React.ReactNode; size: number }) {
+  const h = size * 0.68
+  return (
+    <Box sx={{ position: 'relative', width: size, height: h }}>
+      <Box component="svg" viewBox="0 0 220 150" sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', overflow: 'visible', filter: sealed ? 'drop-shadow(3px 4px 0 rgba(60,42,20,0.14)) drop-shadow(0 14px 18px rgba(60,42,20,0.18))' : 'none' }}>
+        <rect x="2" y="2" width="216" height="146" rx="4" fill={sealed ? '#fffdf7' : 'transparent'} stroke={INK} strokeOpacity={sealed ? 0.85 : 0.35} strokeWidth="2" strokeDasharray={sealed ? undefined : '6 5'} />
+        <path d="M2 148 L 92 82 M218 148 L 128 82" fill="none" stroke={INK} strokeOpacity={sealed ? 0.25 : 0.18} strokeWidth="1.5" />
+        <path d="M3 4 L 110 88 L 217 4" fill={sealed ? '#f3ead8' : 'none'} stroke={INK} strokeOpacity={sealed ? 0.85 : 0.35} strokeWidth="2" strokeLinejoin="round" strokeDasharray={sealed ? undefined : '6 5'} />
+      </Box>
+      {children}
+    </Box>
+  )
+}
 
 export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLabel, cooldownProgress, isLoading, isOpeningPack, onOpen, onOpenAll, isRealReader, onResetCooldown, accent, accentMuted, accruedCount = 0, compact = false }: {
   pack: CollectionPack | undefined
@@ -22,14 +39,9 @@ export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLa
   compact?: boolean
 }) {
   const hasAccrued = mainCanOpen && accruedCount > 1
+  const size = compact ? 200 : 236
   return (
-    <Stack spacing={1.2} alignItems="center" justifyContent="center" sx={{
-      flex: 1,
-      minHeight: compact ? 270 : 390,
-      py: 1.2,
-      borderRadius: radius.xl,
-      background: 'radial-gradient(circle at 50% 42%, rgba(255,255,255,0.18), transparent 44%)',
-    }}>
+    <Stack spacing={2} alignItems="center" justifyContent="center" sx={{ flex: 1, minHeight: compact ? 260 : 360, py: 1.5 }}>
       <Box
         role="button"
         aria-label={`Abrir ${pack?.name ?? 'pacote principal'}`}
@@ -43,163 +55,87 @@ export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLa
         }}
         onMouseDown={(event) => event.preventDefault()}
         sx={{
-          width: mainCanOpen ? 214 : 196,
-          height: mainCanOpen ? 194 : 184,
-          borderRadius: radius.full,
-          cursor: mainCanOpen ? 'pointer' : 'default',
-          background: 'transparent',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
           position: 'relative',
-          overflow: 'visible',
-          boxShadow: 'none',
-          transition: 'transform 0.22s ease, box-shadow 0.22s ease',
+          cursor: mainCanOpen ? 'pointer' : 'default',
           userSelect: 'none',
           WebkitUserSelect: 'none',
           WebkitTapHighlightColor: 'transparent',
           touchAction: 'manipulation',
-          animation: mainCanOpen ? `${packCtaFloat} 3.2s ease-in-out infinite` : undefined,
-          '&:hover': mainCanOpen ? { transform: 'translateY(-3px) scale(1.025)' } : {},
-          '&:active': mainCanOpen ? { transform: 'scale(0.98)' } : {},
+          outline: 'none',
+          transform: mainCanOpen ? 'rotate(-3deg)' : 'rotate(-1.5deg)',
+          transition: 'transform 0.2s ease',
+          '&:hover': mainCanOpen ? { transform: 'rotate(-1deg) translateY(-3px)' } : {},
+          '&:active': mainCanOpen ? { transform: 'rotate(-2deg) scale(0.98)' } : {},
+          '&:focus-visible': { outline: `2px dashed ${INK}`, outlineOffset: 8 },
         }}
       >
-        {mainCanOpen ? (
-          <Box sx={{ width: 184, height: 184, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 1, pointerEvents: 'none' }}>
-            <Box
-              component="svg"
-              viewBox="0 0 24 24"
-              sx={{
-                position: 'absolute',
-                inset: -12,
-                width: 'calc(100% + 24px)',
-                height: 'calc(100% + 24px)',
-                color: 'rgba(244,63,94,0.34)',
-                transformOrigin: '50% 50%',
-                animation: `${heartPulseAura} 1.85s ease-out infinite`,
-                pointerEvents: 'none',
-              }}
-            >
-              <path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.27 2 8.5 2 5.41 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.08C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.41 22 8.5c0 3.77-3.4 6.86-8.55 11.53L12 21.35z" />
-            </Box>
-            <Box
-              component="svg"
-              viewBox="0 0 24 24"
-              sx={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-                color: '#dc2626',
-                filter: 'drop-shadow(0 24px 34px rgba(225,29,72,0.42))',
-              }}
-            >
-              <defs>
-                <linearGradient id="main-pack-heart" x1="4" y1="3" x2="20" y2="21" gradientUnits="userSpaceOnUse">
-                  <stop offset="0%" stopColor="#fb7185" />
-                  <stop offset="42%" stopColor="#ef4444" />
-                  <stop offset="74%" stopColor="#dc2626" />
-                  <stop offset="100%" stopColor="#be123c" />
-                </linearGradient>
-              </defs>
-              <path fill="url(#main-pack-heart)" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.27 2 8.5 2 5.41 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.08C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.41 22 8.5c0 3.77-3.4 6.86-8.55 11.53L12 21.35z" />
-              <path fill="rgba(255,255,255,0.42)" d="M7.4 5.25c-1.9 0-3.2 1.42-3.2 3.28 0 .68.14 1.34.43 1.98.16.36.67.32.78-.06.55-1.91 1.72-3.35 3.46-4.23.42-.21.27-.97-.2-.97H7.4z" />
-            </Box>
-            <Typography sx={{ position: 'relative', zIndex: 1, fontSize: '4.1rem', lineHeight: 1, transform: 'translateY(-3px)', filter: 'drop-shadow(0 5px 12px rgba(0,0,0,0.18))' }}>
-              <PackIcon emoji={pack?.emoji ?? collectionEmoji} imageUrl={pack?.imageUrl} size={64} />
-            </Typography>
-            {hasAccrued && (
+        <Box sx={{ animation: mainCanOpen ? `${packCtaFloat} 3.4s ease-in-out infinite` : undefined }}>
+          <Envelope sealed={mainCanOpen} size={size}>
+            {mainCanOpen ? (
               <Box sx={{
-                position: 'absolute', top: 4, right: 4, zIndex: 2, minWidth: 28, height: 28, borderRadius: radius.full,
-                background: '#dc2626', border: '2px solid #fff', display: 'flex', alignItems: 'center',
-                justifyContent: 'center', px: 0.6, boxShadow: '0 2px 8px rgba(0,0,0,0.28)',
+                position: 'absolute', left: '50%', top: '58%', transform: 'translate(-50%,-50%)',
+                width: size * 0.3, height: size * 0.3, borderRadius: '47% 53% 50% 50% / 52% 48% 52% 48%',
+                background: `radial-gradient(circle at 38% 34%, #d4574a, ${SEAL} 60%, #962b20)`,
+                boxShadow: 'inset 0 0 0 4px rgba(0,0,0,0.08), 1px 2px 0 rgba(60,42,20,0.25)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <Typography variant="lg" sx={{ fontWeight: 900, color: '#fff', lineHeight: 1 }}>
-                  {accruedCount}x
+                <Box sx={{ width: '70%', height: '70%', borderRadius: '50%', border: '1.5px solid rgba(255,240,230,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <PackIcon emoji={pack?.emoji ?? collectionEmoji} imageUrl={pack?.imageUrl} size={size * 0.13} />
+                </Box>
+              </Box>
+            ) : (
+              <Box sx={{
+                position: 'absolute', left: '50%', top: '52%', transform: 'translate(-50%,-50%) rotate(-12deg)',
+                width: size * 0.5, height: size * 0.5, borderRadius: '50%',
+                border: `2px solid ${accent}`, outline: `1px solid ${accent}`, outlineOffset: 4,
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                color: accent, opacity: 0.55 + cooldownProgress * 0.4, background: 'rgba(255,253,247,0.6)',
+              }}>
+                <Typography sx={{ fontSize: '0.58rem', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', lineHeight: 1 }}>
+                  volta em
+                </Typography>
+                <Typography sx={{ fontFamily: font.serif, fontWeight: 600, fontSize: '1.05rem', lineHeight: 1.25, textAlign: 'center', px: 0.5 }}>
+                  {remainingLabel}
                 </Typography>
               </Box>
             )}
-          </Box>
-        ) : (
-          <Box sx={{ width: 176, height: 176, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', pointerEvents: 'none' }}>
-            <Box
-              component="svg"
-              viewBox="0 0 24 24"
-              sx={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-                color: 'rgba(255,255,255,0.54)',
-                filter: `drop-shadow(0 16px 28px ${accent}24)`,
-              }}
-            >
-              <path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.27 2 8.5 2 5.41 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.08C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.41 22 8.5c0 3.77-3.4 6.86-8.55 11.53L12 21.35z" />
-              <path
-                fill={accent}
-                opacity="0.22"
-                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.27 2 8.5 2 5.41 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.08C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.41 22 8.5c0 3.77-3.4 6.86-8.55 11.53L12 21.35z"
-                style={{ transformOrigin: 'center', transform: `scale(${0.72 + cooldownProgress * 0.28})` }}
-              />
-            </Box>
-            <Stack spacing={0.1} alignItems="center" sx={{ position: 'relative', zIndex: 1, transform: 'translateY(-4px)' }}>
-              <Typography sx={{ fontSize: '1.9rem', lineHeight: 1 }}>⏳</Typography>
-              <Typography sx={{ fontFamily: font.serif, fontWeight: 900, fontSize: '1.02rem', color: accent, lineHeight: 1.1 }}>
-                {remainingLabel}
-              </Typography>
-              <Typography variant="label" sx={{ color: accentMuted }}>
-                restante
-              </Typography>
-            </Stack>
+          </Envelope>
+        </Box>
+        {hasAccrued && (
+          <Box sx={{
+            position: 'absolute', top: -10, right: -12, transform: 'rotate(8deg)',
+            px: 0.9, py: 0.2, background: '#fffdf7', border: `1.5px solid ${SEAL}`, color: SEAL,
+            fontFamily: font.sans, fontWeight: 700, fontSize: '0.8rem', letterSpacing: '0.06em',
+          }}>
+            {accruedCount}x
           </Box>
         )}
       </Box>
-      {mainCanOpen && (
-        <Stack spacing={0.2} alignItems="center" sx={{
-          mt: -0.35, px: 1.6, py: 0.7, borderRadius: radius.xl,
-          background: colors.glass.bg, border: `1px solid ${colors.glass.border}`,
-          backdropFilter: 'blur(12px)', boxShadow: '0 8px 20px rgba(15,23,42,0.08)',
-        }}>
-          <Typography variant="xl" sx={{ color: colors.text.primary, fontFamily: font.serif, fontWeight: 850, lineHeight: 1.1 }}>
-            {hasAccrued ? `${accruedCount} pacotinhos disponíveis` : 'Pacotinho disponível'}
+
+      {mainCanOpen ? (
+        <Stack spacing={0.5} alignItems="center">
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 500, fontSize: '1.35rem', color: colors.text.primary, lineHeight: 1.1, textAlign: 'center' }}>
+            {hasAccrued ? `${accruedCount} pacotinhos te esperando` : 'Chegou um pacotinho'}
           </Typography>
-          <Typography variant="sm" sx={{ color: colors.text.secondary, fontWeight: 750, lineHeight: 1.2 }}>
-            toque no coração
+          <Typography sx={{ fontFamily: font.hand, fontSize: '1.3rem', color: accentMuted, lineHeight: 1 }}>
+            toca no envelope pra abrir
           </Typography>
           {hasAccrued && onOpenAll && (
-            <Box
-              role="button"
-              onClick={!isOpeningPack ? onOpenAll : undefined}
-              sx={{
-                mt: 0.4, px: 1.1, py: 0.4, borderRadius: radius.full, cursor: isOpeningPack ? 'default' : 'pointer',
-                background: accent, color: '#fff', fontSize: '0.72rem', fontWeight: 800,
-                opacity: isOpeningPack ? 0.6 : 1, transition: 'opacity 0.15s, transform 0.15s',
-                '&:hover': isOpeningPack ? {} : { transform: 'scale(1.03)' },
-              }}
-            >
-              Abrir tudo ({accruedCount}x)
-            </Box>
+            <Button variant="rose" onClick={onOpenAll} disabled={isOpeningPack} sx={{ mt: 1, py: 0.6, px: 1.6, fontSize: '0.82rem' }}>
+              Abrir todos ({accruedCount})
+            </Button>
           )}
         </Stack>
-      )}
-      {!mainCanOpen && (
-        <Stack spacing={0.45} alignItems="center" sx={{
-          px: 1.6, py: 0.9, borderRadius: radius.xl,
-          background: colors.glass.bg, border: `1px solid ${colors.glass.border}`,
-          backdropFilter: 'blur(12px)',
-        }}>
-          <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 850, color: colors.text.primary, textAlign: 'center', maxWidth: 280, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
-            Novo pacotinho em
+      ) : (
+        <Stack spacing={0.5} alignItems="center">
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 500, fontSize: '1.25rem', color: colors.text.primary, lineHeight: 1.15, textAlign: 'center' }}>
+            O próximo ainda está no correio
           </Typography>
-          <Typography variant="md" sx={{ color: colors.text.secondary, textAlign: 'center', maxWidth: 280, lineHeight: 1.45 }}>
-            {remainingLabel}
+          <Typography sx={{ fontFamily: font.hand, fontSize: '1.25rem', color: accentMuted, lineHeight: 1 }}>
+            chega em {remainingLabel}
           </Typography>
           {!isRealReader && (
-            <Button
-              variant="ghost"
-              onClick={onResetCooldown}
-              sx={{ mt: 0.45, py: 0.58, px: 1.25, fontSize: '0.72rem', background: colors.glass.bg, color: colors.text.primary, border: `1px solid ${colors.glass.border}`, '&:hover': { background: colors.glass.strong } }}
-            >
+            <Button variant="ghost" onClick={onResetCooldown} sx={{ mt: 0.8, py: 0.5, px: 1.25, fontSize: '0.74rem' }}>
               Resetar cooldown
             </Button>
           )}

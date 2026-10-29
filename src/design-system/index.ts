@@ -7,7 +7,7 @@ export {
   fadeIn, fadeInHero, fadeInRight, fadeSlide, spin,
   cardIn, menuIn,
   shimmer, hintWiggle, sway,
-  shineSweep, packCtaFloat, heartPulseAura, ghostPulse,
+  shineSweep, packCtaFloat, ghostPulse,
   dropFade, heartBeat, chevronPulse, floatHeart,
   bellRing, dotPing,
 } from './animations'

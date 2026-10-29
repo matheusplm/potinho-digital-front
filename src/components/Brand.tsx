@@ -8,14 +8,14 @@ export function BrandLogo({ size = 36, sx }: { size?: number; sx?: SxProps<Theme
   return (
     <Box
       component="img"
-      src="/potinho-icon.svg"
+      src="/potinho-icon-papel.svg"
       alt=""
       aria-hidden
       width={size}
       height={size}
       sx={mergeSx({
         width: size, height: size, flexShrink: 0, display: 'block',
-        filter: 'drop-shadow(0 4px 12px rgba(139,92,246,0.28))',
+        filter: 'drop-shadow(1px 2px 0 rgba(60,42,20,0.14))',
       }, sx)}
     />
   )

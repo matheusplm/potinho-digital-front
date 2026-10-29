@@ -231,29 +231,23 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
           animation: shaking ? `${screenShake} ${current?.style.tier === 'legendary' ? 0.7 : 0.45}s ease-out both` : 'none',
         }}>
           <FloatingParticles />
-          <Box aria-hidden sx={{
-            position: 'absolute', inset: 0, pointerEvents: 'none',
-            background: `radial-gradient(circle at 50% 46%, ${withAlpha(accent, theme.isDark ? 30 : 22)}, transparent 55%)`,
-          }} />
           <Rays style={current?.style} visible={!reducedMotion && phase === 'reveal' && showFor === index} />
 
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ position: 'relative', zIndex: 2, px: 2, pt: 'max(16px, env(safe-area-inset-top))', minHeight: 56 }}>
             {pack && (
-              <Box sx={{
-                display: 'inline-flex', alignItems: 'center', gap: 0.8, px: 1.4, py: 0.6, borderRadius: radius.full, maxWidth: '65%',
-                background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}`, backdropFilter: 'blur(12px)',
-              }}>
+              <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.8, maxWidth: '65%' }}>
                 <Box component="span" sx={{ fontSize: '1rem', display: 'inline-flex' }}><PackIcon emoji={pack.emoji} imageUrl={pack.imageUrl} size={20} /></Box>
-                <Typography variant="md" sx={{ fontWeight: 800, color: textColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{pack.name}</Typography>
+                <Typography sx={{ fontFamily: font.serif, fontWeight: 600, fontSize: '1rem', color: textColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{pack.name}</Typography>
               </Box>
             )}
             {showSkip && (
               <Box component="button" type="button" onClick={showSummary} sx={{
-                all: 'unset', cursor: 'pointer', px: 1.4, py: 0.6, borderRadius: radius.full, fontSize: '0.8rem', fontWeight: 800, color: textColor,
-                background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}`, backdropFilter: 'blur(12px)',
+                all: 'unset', cursor: 'pointer', px: 0.5, py: 0.6, fontSize: '0.88rem', fontWeight: 500, color: textColor,
+                textDecoration: 'underline', textUnderlineOffset: 4, textDecorationColor: theme.surfaceBorder,
+                '&:hover': { textDecorationColor: textColor },
                 '&:focus-visible': { outline: `2px solid ${accent}` },
               }}>
-                Pular ›
+                pular
               </Box>
             )}
           </Stack>
@@ -280,8 +274,8 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
                     }} />
                   )}
                 </Box>
-                <Typography aria-live="polite" sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.05rem', color: textColor, textAlign: 'center', minHeight: 26 }}>
-                  {phase === 'intro' ? 'Arraste na linha pra abrir ✂️' : phase === 'waiting' ? 'Sorteando seus bilhetes…' : ''}
+                <Typography aria-live="polite" sx={{ fontFamily: font.hand, fontSize: '1.5rem', color: mutedColor, textAlign: 'center', minHeight: 32, lineHeight: 1.2 }}>
+                  {phase === 'intro' ? 'puxa pela linha picotada pra abrir' : phase === 'waiting' ? 'sorteando seus bilhetes…' : ''}
                 </Typography>
               </Stack>
             )}
@@ -290,9 +284,9 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
               <Box sx={{ position: 'relative', zIndex: 0, width: CARD_WIDTH, transform: { md: 'scale(1.15)' }, transformOrigin: 'center' }}>
                 {items.slice(index + 1, index + 3).map((item, i) => (
                   <Box key={item.reward.id + i} aria-hidden sx={{
-                    position: 'absolute', inset: 0, borderRadius: '22px', background: backFill, border: '2px solid rgba(255,255,255,0.6)',
-                    transform: `translate3d(${(i + 1) * 8}px, ${(i + 1) * 10}px, 0) rotate(${(i + 1) * 3}deg)`, opacity: 0.8 - i * 0.25,
-                    boxShadow: '0 12px 30px rgba(15,23,42,0.18)', minHeight: 260,
+                    position: 'absolute', inset: 0, borderRadius: radius.md, background: '#fffdf7', border: '1px solid rgba(60,42,20,0.18)',
+                    transform: `translate3d(${(i + 1) * 6}px, ${(i + 1) * 8}px, 0) rotate(${(i + 1) * 2.5}deg)`, opacity: 0.9 - i * 0.3,
+                    boxShadow: '2px 3px 0 rgba(60,42,20,0.1)', minHeight: 260,
                   }} />
                 ))}
                 <Box
@@ -318,7 +312,7 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
                 {current.style.caption && (
                   <Typography variant="xl" aria-live="polite" sx={{
                     position: 'absolute', left: 0, right: 0, top: 'calc(100% + 18px)', textAlign: 'center',
-                    fontFamily: font.serif, fontWeight: 800, color: textColor, animation: `${riseIn} 0.5s ease 0.4s both`,
+                    fontFamily: font.hand, fontSize: '1.6rem', color: textColor, animation: `${riseIn} 0.5s ease 0.4s both`,
                   }}>
                     {current.style.caption}
                   </Typography>
@@ -328,18 +322,18 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
 
             {phase === 'summary' && (
               <Box sx={{ width: '100%', maxWidth: 530, maxHeight: '100%', overflowY: 'auto', px: 3, py: 2.5, animation: `${riseIn} 0.4s ease both` }}>
-                <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.6rem', color: textColor, textAlign: 'center', lineHeight: 1.15 }}>
-                  {items.length === 1 ? 'Você recebeu 1 bilhete 💌' : `Você recebeu ${items.length} bilhetes 💌`}
+                <Typography sx={{ fontFamily: font.serif, fontWeight: 500, fontSize: '1.9rem', letterSpacing: '-0.02em', color: textColor, textAlign: 'center', lineHeight: 1.1 }}>
+                  {items.length === 1 ? 'Chegou 1 bilhete' : `Chegaram ${items.length} bilhetes`}
                 </Typography>
-                <Typography variant="lg" sx={{ mt: 0.6, mb: 2, color: mutedColor, textAlign: 'center' }}>
-                  {newCount > 0 ? `${newCount} ${newCount === 1 ? 'novo' : 'novos'} na sua coleção ✨${onOpenReward ? ' · toque pra ler' : ''}` : onOpenReward ? 'Toque em um bilhete pra ler de novo' : ''}
+                <Typography sx={{ mt: 0.6, mb: 2.4, fontFamily: font.hand, fontSize: '1.3rem', color: mutedColor, textAlign: 'center', lineHeight: 1.2 }}>
+                  {newCount > 0 ? `${newCount} ${newCount === 1 ? 'novo' : 'novos'} no álbum${onOpenReward ? ', toca pra ler' : ''}` : onOpenReward ? 'toca num bilhete pra ler de novo' : ''}
                 </Typography>
-                <Stack spacing={1.2}>
+                <Stack spacing={2}>
                   {items.map((item, i) => (
                     <Box key={`${item.reward.id}-${i}`} sx={{ position: 'relative', animation: `${riseIn} 0.4s ease ${0.08 * i}s both` }}>
                       <RewardCard reward={{ ...item.reward, isNew: false }} rarities={rarities} types={types} onClick={onOpenReward ? () => onOpenReward(item.reward) : undefined} />
                       {item.reward.isNew && (
-                        <Box sx={{ position: 'absolute', top: -8, right: 8, px: 0.9, py: 0.2, borderRadius: 99, fontSize: '0.64rem', fontWeight: 900, color: '#fff', background: 'linear-gradient(135deg, #f472b6, #fb7185)', boxShadow: '0 4px 10px rgba(244,114,182,0.4)' }}>
+                        <Box sx={{ position: 'absolute', top: 10, right: 12, zIndex: 3, px: 0.8, py: 0.1, rotate: '8deg', fontSize: '0.66rem', fontWeight: 700, letterSpacing: '0.14em', color: '#c0392b', border: '1.5px solid #c0392b', borderRadius: '2px', background: 'rgba(255,253,247,0.85)' }}>
                           NOVO
                         </Box>
                       )}
@@ -356,7 +350,7 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
                 {items.length > 1 && <Stack direction="row" spacing={0.7} aria-label={`Bilhete ${index + 1} de ${items.length}`}>
                   {items.map((_, i) => (
                     <Box key={i} sx={{
-                      width: i === index ? 22 : 8, height: 8, borderRadius: 99, transition: 'all 0.25s',
+                      width: i === index ? 20 : 7, height: 7, borderRadius: '2px', transition: 'all 0.25s',
                       background: i <= index ? accent : withAlpha(theme.textOnBg, 25),
                     }} />
                   ))}

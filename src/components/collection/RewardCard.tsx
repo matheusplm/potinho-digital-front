@@ -1,43 +1,35 @@
 import { Box, Chip, Stack, Typography } from '@mui/material'
-import { keyframes } from '@emotion/react'
 import { cardIn, font, ink, radius } from '../../design-system'
-import { themedCardBg } from '../../utils/colorUtils'
 import type { CollectionDailyReward, NoteImageLayout, NoteTypeConfig, RarityConfig } from '../../types/note'
 import { RarityChip } from './RarityChip'
 import { linkifyText } from '../../utils/linkify'
 
 export type { NoteImageLayout as ImageLayout } from '../../types/note'
 
-const rarityShine = keyframes`0%{transform:translateX(-140%) rotate(18deg);opacity:0}20%{opacity:.55}55%,100%{transform:translateX(160%) rotate(18deg);opacity:0}`
-
 export function rarityCardSx(r?: RarityConfig, compact = false, isDark = false) {
-  const glow = r?.glowColor || r?.borderColor || 'rgba(244,63,94,0.2)'
+  const tone = r?.borderColor || 'rgba(60,42,20,0.3)'
   return {
-    p: compact ? 1.8 : 2.5,
-    borderRadius: compact ? radius.lg : radius.xl,
+    p: compact ? 1.8 : 2.4,
+    pt: compact ? 2.2 : 2.8,
+    borderRadius: radius.md,
     position: 'relative',
     overflow: 'hidden',
     isolation: 'isolate',
-    background: themedCardBg(r?.cardBg ?? ink.surface, isDark),
-    border: `1.5px solid ${r?.borderColor ?? ink.borderSubtle}`,
-    boxShadow: r ? `${r.shadow || '0 4px 20px rgba(0,0,0,0.08)'}, 0 0 34px ${glow}` : '0 4px 20px rgba(0,0,0,0.08)',
-    transition: 'transform 0.22s ease, box-shadow 0.22s ease',
+    background: isDark ? '#2b2620' : `linear-gradient(color-mix(in srgb, ${tone} 7%, transparent), color-mix(in srgb, ${tone} 7%, transparent)), #fffdf7`,
+    border: `1px solid color-mix(in srgb, ${tone} 45%, rgba(60,42,20,0.18))`,
+    boxShadow: '2px 3px 0 rgba(60,42,20,0.10), 0 10px 18px -12px rgba(60,42,20,0.35)',
+    transition: 'transform 0.18s ease, box-shadow 0.18s ease',
     '&::before': {
-      content: '""', position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none',
-      background: compact
-        ? `radial-gradient(circle at 12% 0%, rgba(255,255,255,0.42), transparent 38%), radial-gradient(circle at 92% 100%, ${glow}, transparent 34%)`
-        : `radial-gradient(circle at 12% 0%, rgba(255,255,255,0.58), transparent 36%), radial-gradient(circle at 95% 105%, ${glow}, transparent 42%)`,
-      opacity: compact ? 0.62 : 0.78, mixBlendMode: 'soft-light',
-    },
-    '&::after': {
-      content: '""', position: 'absolute', top: '-35%', left: '-45%', zIndex: 0,
-      width: '38%', height: '170%', pointerEvents: 'none',
-      background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.42), transparent)',
-      animation: `${rarityShine} 4.4s ease-in-out infinite`,
+      content: '""', position: 'absolute', top: 0, left: '50%', zIndex: 2, pointerEvents: 'none',
+      width: compact ? 54 : 72, height: compact ? 12 : 15,
+      transform: 'translateX(-50%) rotate(-1.5deg)',
+      background: `color-mix(in srgb, ${tone} 55%, transparent)`,
+      opacity: 0.8,
+      clipPath: 'polygon(3% 0, 97% 0, 100% 20%, 98% 50%, 100% 80%, 97% 100%, 3% 100%, 0 80%, 2% 50%, 0 20%)',
     },
     '&:hover': {
-      transform: compact ? 'translateY(-1px)' : 'translateY(-2px) scale(1.01)',
-      boxShadow: r ? `${r.shadow || '0 6px 24px rgba(0,0,0,0.1)'}, 0 0 44px ${glow}` : '0 8px 28px rgba(0,0,0,0.1)',
+      transform: compact ? 'translateY(-1px)' : 'translateY(-2px) rotate(-0.4deg)',
+      boxShadow: '3px 5px 0 rgba(60,42,20,0.12), 0 14px 22px -12px rgba(60,42,20,0.4)',
     },
   }
 }
@@ -60,17 +52,19 @@ function CardChips({ r, isNew }: { r?: RarityConfig; isNew: boolean }) {
   )
 }
 
+export const HAND_MESSAGE_SX = { fontFamily: font.hand, fontWeight: 500, fontSize: '1.32rem', color: ink.primary, lineHeight: 1.25, fontStyle: 'normal' } as const
+
 function CardTextBox({ title, message, children, expanded }: { title: string; message: string; children?: React.ReactNode; expanded?: boolean }) {
   const clampTitle = expanded ? {} : { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }
-  const clampMsg = expanded ? {} : { display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }
+  const clampMsg = expanded ? {} : { display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' }
   return (
-    <Box sx={{ p: 1.15, borderRadius: radius.lg, background: 'rgba(255,255,255,0.68)', border: '1px solid rgba(255,255,255,0.58)', backdropFilter: 'blur(8px)', minWidth: 0 }}>
+    <Box sx={{ minWidth: 0 }}>
       {children}
-      <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.2rem', color: ink.primary, lineHeight: 1.3, overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampTitle }}>
+      <Typography sx={{ fontFamily: font.serif, fontWeight: 600, fontSize: '1.22rem', color: ink.primary, lineHeight: 1.25, letterSpacing: '-0.01em', overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampTitle }}>
         {title}
       </Typography>
-      <Typography sx={{ mt: 0.75, fontSize: '0.9rem', color: ink.secondary, lineHeight: 1.65, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word', whiteSpace: 'pre-line', ...clampMsg }}>
-        &ldquo;{linkifyText(message)}&rdquo;
+      <Typography sx={{ mt: 0.6, ...HAND_MESSAGE_SX, overflowWrap: 'anywhere', wordBreak: 'break-word', whiteSpace: 'pre-line', ...clampMsg }}>
+        {linkifyText(message)}
       </Typography>
     </Box>
   )
@@ -80,9 +74,9 @@ function CardTag({ t, all }: { t?: NoteTypeConfig; all?: NoteTypeConfig[] }) {
   const list = all?.length ? all : t ? [t] : []
   if (list.length === 0) return null
   return (
-    <Stack direction="row" spacing={0.5} sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
+    <Stack direction="row" spacing={1.2} sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
       {list.map((item) => (
-        <Box key={item.id} sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, px: 1, py: 0.3, borderRadius: radius.full, background: item.tagBg, color: item.tagColor, fontSize: '0.68rem', fontWeight: 700, alignSelf: 'flex-start' }}>
+        <Box key={item.id} sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, color: item.tagColor, fontSize: '0.74rem', fontWeight: 600, letterSpacing: '0.02em', alignSelf: 'flex-start' }}>
           {item.emoji} {item.label}
         </Box>
       ))}
@@ -128,8 +122,8 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
           </Stack>
         </Box>
         <Stack spacing={1} sx={{ p: 2, position: 'relative', zIndex: 1 }}>
-          <Typography sx={{ fontSize: '0.9rem', color: ink.secondary, lineHeight: 1.65, fontStyle: 'italic', whiteSpace: 'pre-line', ...clampM }}>
-            &ldquo;{linkifyText(reward.message)}&rdquo;
+          <Typography sx={{ ...HAND_MESSAGE_SX, whiteSpace: 'pre-line', ...clampM }}>
+            {linkifyText(reward.message)}
           </Typography>
           <CardTag t={t} all={rewardTypes} />
         </Stack>
@@ -149,7 +143,7 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
           <CardChips r={r} isNew={reward.isNew} />
           <Box sx={{ p: 1.15, borderRadius: radius.lg, background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.7)' }}>
             <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.2rem', color: ink.primary, lineHeight: 1.3 }}>{reward.title}</Typography>
-            <Typography variant="xl" sx={{ mt: 0.75, color: ink.secondary, lineHeight: 1.65, fontStyle: 'italic', whiteSpace: 'pre-line' }}>&ldquo;{linkifyText(reward.message)}&rdquo;</Typography>
+            <Typography sx={{ mt: 0.6, ...HAND_MESSAGE_SX, whiteSpace: 'pre-line' }}>{linkifyText(reward.message)}</Typography>
           </Box>
           <CardTag t={t} all={rewardTypes} />
         </Stack>
@@ -181,8 +175,8 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
           </Box>
           <Stack spacing={1.2} sx={{ flex: 1, p: 1.8, minWidth: 0 }}>
             <CardChips r={r} isNew={reward.isNew} />
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.05rem', color: ink.primary, lineHeight: 1.3, overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampT }}>{reward.title}</Typography>
-            <Typography sx={{ fontSize: '0.82rem', color: ink.secondary, lineHeight: 1.55, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word', whiteSpace: 'pre-line', ...clampM }}>&ldquo;{linkifyText(reward.message)}&rdquo;</Typography>
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 600, fontSize: '1.08rem', color: ink.primary, lineHeight: 1.25, overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampT }}>{reward.title}</Typography>
+            <Typography sx={{ ...HAND_MESSAGE_SX, fontSize: '1.15rem', overflowWrap: 'anywhere', wordBreak: 'break-word', whiteSpace: 'pre-line', ...clampM }}>{linkifyText(reward.message)}</Typography>
             <CardTag t={t} all={rewardTypes} />
           </Stack>
         </Stack>
@@ -204,17 +198,17 @@ export function RewardCard({ reward, rarities, types, onClick, imageLayout: imag
         )}
 
         {isThumb && showImg ? (
-          <Box sx={{ p: 1.15, borderRadius: radius.lg, background: 'rgba(255,255,255,0.68)', border: '1px solid rgba(255,255,255,0.58)', backdropFilter: 'blur(8px)', minWidth: 0 }}>
+          <Box sx={{ minWidth: 0 }}>
             <Stack direction={imageLayout.endsWith('right') ? 'row-reverse' : 'row'} spacing={1.2} alignItems="flex-start">
               <Box sx={{ flexShrink: 0, width: imageLayout.startsWith('circle') ? 56 : 64, height: imageLayout.startsWith('circle') ? 56 : 64, borderRadius: imageLayout.startsWith('circle') ? '50%' : radius.md, overflow: 'hidden' }}>
                 <ImgArea lazy={lazyImage} src={img} alt={reward.title} previewMode={previewMode} />
               </Box>
               <Box sx={{ minWidth: 0, flex: 1 }}>
-                <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.05rem', color: ink.primary, lineHeight: 1.3, overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampT }}>
+                <Typography sx={{ fontFamily: font.serif, fontWeight: 600, fontSize: '1.08rem', color: ink.primary, lineHeight: 1.25, overflowWrap: 'anywhere', wordBreak: 'break-word', ...clampT }}>
                   {reward.title}
                 </Typography>
-                <Typography sx={{ mt: 0.5, fontSize: '0.83rem', color: ink.secondary, lineHeight: 1.55, fontStyle: 'italic', overflowWrap: 'anywhere', wordBreak: 'break-word', whiteSpace: 'pre-line', ...clampM }}>
-                  &ldquo;{linkifyText(reward.message)}&rdquo;
+                <Typography sx={{ mt: 0.4, ...HAND_MESSAGE_SX, fontSize: '1.18rem', overflowWrap: 'anywhere', wordBreak: 'break-word', whiteSpace: 'pre-line', ...clampM }}>
+                  {linkifyText(reward.message)}
                 </Typography>
               </Box>
             </Stack>

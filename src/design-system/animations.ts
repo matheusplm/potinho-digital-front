@@ -64,11 +64,6 @@ export const packCtaFloat = keyframes`
   50%     { transform: translateY(-4px) scale(1.055); }
 `
 
-export const heartPulseAura = keyframes`
-  from { opacity: 0.42; transform: scale(0.88); }
-  to   { opacity: 0; transform: scale(1.3); }
-`
-
 export const ghostPulse = keyframes`
   0%, 100% { transform: scale(1);   box-shadow: 0 0 0 0 rgba(0,0,0,0.12); }
   50%       { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(0,0,0,0); }

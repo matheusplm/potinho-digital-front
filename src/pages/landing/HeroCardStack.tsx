@@ -1,6 +1,6 @@
-import { Box, Typography } from '@mui/material'
+import { Box } from '@mui/material'
 import { useEffect, useRef, useState, type PointerEvent } from 'react'
-import { colors, hintWiggle, sway } from '../../design-system'
+import { hintWiggle, sway } from '../../design-system'
 import { DemoNoteCard } from './DemoNoteCard'
 import { DEMO_NOTES } from './landingData'
 
@@ -154,9 +154,6 @@ export function HeroCardStack() {
           <DemoNoteCard note={n0} eager fill />
         </Box>
       </Box>
-      <Typography variant="xxs" sx={{ mt: 2, textAlign: 'center', color: colors.text.muted, letterSpacing: 0.3 }}>
-        ← arraste ou toque para descobrir →
-      </Typography>
     </Box>
   )
 }

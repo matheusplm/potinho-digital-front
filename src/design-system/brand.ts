@@ -11,10 +11,7 @@ export function brandGradient(onLight = false) {
 
 export function brandAccent(onLight = false) {
   return {
-    background: brandGradient(onLight),
-    WebkitBackgroundClip: 'text',
-    backgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
+    color: onLight ? '#c0392b' : liftOnDark('#c0392b'),
     fontStyle: 'italic',
     pr: '0.08em',
   }
