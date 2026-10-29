@@ -5,7 +5,7 @@ import { Box, ButtonBase, IconButton, Stack, Tooltip, Typography, useMediaQuery 
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, ScrollHint } from '../components/ui'
-import { brandAccent, colors, fadeInHero, fadeInRight, font, gradients, pageBaseColor } from '../design-system'
+import { brandAccent, colors, fadeInHero, fadeInRight, font, gradients, pageBaseColor, themeInk } from '../design-system'
 import { useBackground } from '../context/BackgroundContext'
 import { AUDIENCES, DEMO_NOTES, DEMO_RARITIES, DETAILS, RARITY_COLOR, RARITY_FILTERS, STEPS } from './landing/landingData'
 import { SectionTitle } from './landing/SectionTitle'
@@ -14,8 +14,8 @@ import { BrandLogo, BrandName, Copyright } from '../components/Brand'
 import { HeroCardStack } from './landing/HeroCardStack'
 import { HandArrow, Squiggle, Stamp } from './landing/Doodles'
 import { ThemesShowcase } from './landing/ThemesShowcase'
+import { WindowScene } from '../components/scene/WindowScene'
 
-const INK_RED = '#c0392b'
 const PAGE_X = { xs: 2.5, md: 5 }
 const TILTS = ['-0.7deg', '0.5deg', '-0.3deg', '0.8deg', '-0.5deg', '0.3deg']
 
@@ -60,14 +60,14 @@ export function LandingPage() {
       <Box component="header" sx={{ maxWidth: 1180, mx: 'auto', px: PAGE_X, pt: { xs: 5, md: 9 }, pb: { xs: 7, md: 11 } }}>
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1.15fr 0.85fr' }, gap: { xs: 6, md: 8 }, alignItems: 'center' }}>
           <Box className="pd-enter" sx={{ animation: `${fadeInHero} 0.6s ease both` }}>
-            <Typography sx={{ fontFamily: font.hand, fontSize: { xs: '1.45rem', md: '1.7rem' }, color: INK_RED, transform: 'rotate(-2deg)', transformOrigin: 'left', mb: 1.5, lineHeight: 1 }}>
+            <Typography sx={{ fontFamily: font.hand, fontSize: { xs: '1.45rem', md: '1.7rem' }, color: colors.primary.text, transform: 'rotate(-2deg)', transformOrigin: 'left', mb: 1.5, lineHeight: 1 }}>
               um álbum de bilhetes, escrito por você
             </Typography>
             <Typography component="h1" sx={{ fontFamily: font.serif, fontWeight: 500, fontSize: { xs: '2.7rem', sm: '3.2rem', md: '4.1rem' }, lineHeight: 1.02, letterSpacing: '-0.025em', mb: 3 }}>
               Escreva bilhetes. Entregue{' '}
               <Box component="span" sx={{ position: 'relative', display: 'inline-block', whiteSpace: 'nowrap' }}>
                 <Box component="span" sx={brandAccent(true)}>um por dia.</Box>
-                <Squiggle color={INK_RED} sx={{ position: 'absolute', left: 0, right: 0, bottom: { xs: -6, md: -8 }, opacity: 0.75 }} />
+                <Squiggle color={colors.primary.text} sx={{ position: 'absolute', left: 0, right: 0, bottom: { xs: -6, md: -8 }, opacity: 0.75 }} />
               </Box>
             </Typography>
             <Typography sx={{ fontSize: { xs: '1rem', md: '1.1rem' }, color: colors.text.secondary, lineHeight: 1.7, maxWidth: 480, mb: 4 }}>
@@ -86,13 +86,18 @@ export function LandingPage() {
             </Typography>
           </Box>
 
-          <Box className="pd-enter" sx={{ position: 'relative', display: 'flex', justifyContent: 'center', animation: `${fadeInRight} 0.7s 0.2s ease both` }}>
-            <HeroCardStack />
-            <Box sx={{ position: 'absolute', top: { xs: -34, md: -46 }, right: { xs: 4, md: -8 }, display: 'flex', alignItems: 'flex-end', gap: 0.2, pointerEvents: 'none', transform: 'rotate(4deg)' }}>
-              <Typography sx={{ fontFamily: font.hand, fontSize: '1.25rem', color: colors.text.secondary, lineHeight: 1 }}>
+          <Box className="pd-enter" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', animation: `${fadeInRight} 0.7s 0.2s ease both` }}>
+            <WindowScene width={{ xs: 'min(330px, calc(100vw - 60px))', md: 400 }} height={{ xs: 200, md: 280 }}>
+              <Box sx={{ position: 'absolute', left: '50%', top: { xs: 112, md: 176 }, transform: 'translateX(-50%)', zIndex: 4 }}>
+                <HeroCardStack />
+              </Box>
+            </WindowScene>
+            <Box sx={{ height: { xs: 258, md: 196 } }} />
+            <Box sx={{ alignSelf: 'flex-end', mr: { xs: 1, md: 4 }, display: 'flex', alignItems: 'flex-start', gap: 0.2, pointerEvents: 'none', transform: 'rotate(-3deg)' }}>
+              <HandArrow color={colors.text.secondary} sx={{ transform: 'rotate(-150deg)', mt: -1 }} />
+              <Typography sx={{ fontFamily: font.hand, fontSize: '1.25rem', color: colors.text.secondary, lineHeight: 1, mt: 1.2 }}>
                 arrasta pro lado
               </Typography>
-              <HandArrow color={colors.text.secondary} flip sx={{ transform: 'scaleX(-1) rotate(-20deg)', mb: -2.5 }} />
             </Box>
           </Box>
         </Box>
@@ -108,7 +113,7 @@ export function LandingPage() {
           boxShadow: '2px 3px 0 rgba(60,42,20,0.08), 0 18px 30px -20px rgba(60,42,20,0.4)',
           transform: 'rotate(-0.6deg)',
           pl: { xs: 5.5, md: 9 }, pr: { xs: 2.5, md: 6 }, pt: 2.75, pb: 3,
-          '&::before': { content: '""', position: 'absolute', top: 0, bottom: 0, left: { xs: 30, md: 52 }, width: '1.5px', background: 'rgba(192,57,43,0.35)' },
+          '&::before': { content: '""', position: 'absolute', top: 0, bottom: 0, left: { xs: 30, md: 52 }, width: '1.5px', background: 'color-mix(in srgb, var(--pd-ink) 40%, transparent)' },
         }}>
           <Box sx={{ position: 'absolute', top: -12, left: '50%', width: 110, height: 24, transform: 'translateX(-50%) rotate(2deg)', background: 'rgba(222,205,170,0.75)', boxShadow: '0 1px 0 rgba(60,42,20,0.08)' }} />
           <Typography component="h2" sx={{ fontFamily: font.hand, fontWeight: 700, fontSize: { xs: '1.75rem', md: '2.1rem' }, lineHeight: '38px', color: colors.text.primary }}>
@@ -116,8 +121,8 @@ export function LandingPage() {
           </Typography>
           <Box component="ol" sx={{ m: 0, p: 0, listStyle: 'none' }}>
             {STEPS.map((step, i) => (
-              <Box component="li" key={step} sx={{ fontFamily: font.hand, fontSize: { xs: '1.4rem', md: '1.6rem' }, lineHeight: '38px', color: '#27408b' }}>
-                <Box component="span" sx={{ color: INK_RED, mr: 1 }}>{i + 1}.</Box>{step}
+              <Box component="li" key={step} sx={{ fontFamily: font.hand, fontSize: { xs: '1.4rem', md: '1.6rem' }, lineHeight: '38px', color: 'color-mix(in srgb, var(--pd-ink) 40%, #26356a)' }}>
+                <Box component="span" sx={{ color: themeInk.ink, mr: 1 }}>{i + 1}.</Box>{step}
               </Box>
             ))}
           </Box>
@@ -210,10 +215,10 @@ export function LandingPage() {
               </Box>
             </Stack>
           </Box>
-          <Stamp color={INK_RED} holeColor={pageBaseColor(theme)} sx={{ justifySelf: { xs: 'start', md: 'center' }, transform: 'rotate(6deg)', width: { xs: 128, md: 160 } }}>
+          <Stamp color={themeInk.ink} holeColor={pageBaseColor(theme)} sx={{ justifySelf: { xs: 'start', md: 'center' }, transform: 'rotate(6deg)', width: { xs: 128, md: 160 } }}>
             <Stack alignItems="center" spacing={0.8} sx={{ py: 1 }}>
               <BrandLogo size={isDesktop ? 64 : 52} />
-              <Typography sx={{ fontFamily: font.sans, fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: INK_RED }}>
+              <Typography sx={{ fontFamily: font.sans, fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: themeInk.ink }}>
                 Correio do potinho
               </Typography>
             </Stack>

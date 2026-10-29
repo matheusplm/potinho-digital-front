@@ -1,11 +1,12 @@
 import { Box, Stack, Typography } from '@mui/material'
 import { Button } from '../../components/ui'
-import { colors, font, packCtaFloat } from '../../design-system'
+import { colors, font, packCtaFloat, themeInk } from '../../design-system'
 import type { CollectionPack } from '../../types/note'
 import { PackIcon } from '../../components/PackIcon'
+import { WindowScene } from '../../components/scene/WindowScene'
 
 const INK = '#2a241d'
-const SEAL = '#c0392b'
+const SEAL = themeInk.ink
 
 function Envelope({ sealed, children, size }: { sealed: boolean; children?: React.ReactNode; size: number }) {
   const h = size * 0.68
@@ -21,7 +22,7 @@ function Envelope({ sealed, children, size }: { sealed: boolean; children?: Reac
   )
 }
 
-export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLabel, cooldownProgress, isLoading, isOpeningPack, onOpen, onOpenAll, isRealReader, onResetCooldown, accent, accentMuted, accruedCount = 0, compact = false }: {
+export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLabel, cooldownProgress, isLoading, isOpeningPack, onOpen, onOpenAll, isRealReader, onResetCooldown, accentMuted, accruedCount = 0, compact = false }: {
   pack: CollectionPack | undefined
   collectionEmoji: string
   mainCanOpen: boolean
@@ -33,83 +34,88 @@ export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLa
   onOpenAll?: () => void
   isRealReader: boolean
   onResetCooldown: () => void
-  accent: string
   accentMuted: string
   accruedCount?: number
   compact?: boolean
 }) {
   const hasAccrued = mainCanOpen && accruedCount > 1
-  const size = compact ? 200 : 236
+  const size = compact ? 168 : 200
   return (
-    <Stack spacing={2} alignItems="center" justifyContent="center" sx={{ flex: 1, minHeight: compact ? 260 : 360, py: 1.5 }}>
-      <Box
-        role="button"
-        aria-label={`Abrir ${pack?.name ?? 'pacote principal'}`}
-        tabIndex={mainCanOpen ? 0 : -1}
-        onClick={!isLoading && mainCanOpen && !isOpeningPack ? onOpen : undefined}
-        onKeyDown={(event) => {
-          if (!isLoading && mainCanOpen && !isOpeningPack && (event.key === 'Enter' || event.key === ' ')) {
-            event.preventDefault()
-            onOpen()
-          }
-        }}
-        onMouseDown={(event) => event.preventDefault()}
-        sx={{
-          position: 'relative',
-          cursor: mainCanOpen ? 'pointer' : 'default',
-          userSelect: 'none',
-          WebkitUserSelect: 'none',
-          WebkitTapHighlightColor: 'transparent',
-          touchAction: 'manipulation',
-          outline: 'none',
-          transform: mainCanOpen ? 'rotate(-3deg)' : 'rotate(-1.5deg)',
-          transition: 'transform 0.2s ease',
-          '&:hover': mainCanOpen ? { transform: 'rotate(-1deg) translateY(-3px)' } : {},
-          '&:active': mainCanOpen ? { transform: 'rotate(-2deg) scale(0.98)' } : {},
-          '&:focus-visible': { outline: `2px dashed ${INK}`, outlineOffset: 8 },
-        }}
-      >
-        <Box sx={{ animation: mainCanOpen ? `${packCtaFloat} 3.4s ease-in-out infinite` : undefined }}>
-          <Envelope sealed={mainCanOpen} size={size}>
-            {mainCanOpen ? (
-              <Box sx={{
-                position: 'absolute', left: '50%', top: '58%', transform: 'translate(-50%,-50%)',
-                width: size * 0.3, height: size * 0.3, borderRadius: '47% 53% 50% 50% / 52% 48% 52% 48%',
-                background: `radial-gradient(circle at 38% 34%, #d4574a, ${SEAL} 60%, #962b20)`,
-                boxShadow: 'inset 0 0 0 4px rgba(0,0,0,0.08), 1px 2px 0 rgba(60,42,20,0.25)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <Box sx={{ width: '70%', height: '70%', borderRadius: '50%', border: '1.5px solid rgba(255,240,230,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <PackIcon emoji={pack?.emoji ?? collectionEmoji} imageUrl={pack?.imageUrl} size={size * 0.13} />
+    <Stack spacing={2} alignItems="center" justifyContent="center" sx={{ flex: 1, minHeight: compact ? 300 : 400, py: 1.5 }}>
+      <Box sx={{ pb: `${size * 0.5}px` }}>
+        <WindowScene width={{ xs: 'min(300px, calc(100vw - 72px))', sm: 330 }} height={compact ? 150 : 196}>
+          <Box sx={{ position: 'absolute', left: '50%', bottom: 0, transform: 'translate(-50%, 62%)', zIndex: 4 }}>
+            <Box
+              role="button"
+              aria-label={`Abrir ${pack?.name ?? 'pacote principal'}`}
+              tabIndex={mainCanOpen ? 0 : -1}
+              onClick={!isLoading && mainCanOpen && !isOpeningPack ? onOpen : undefined}
+              onKeyDown={(event) => {
+                if (!isLoading && mainCanOpen && !isOpeningPack && (event.key === 'Enter' || event.key === ' ')) {
+                  event.preventDefault()
+                  onOpen()
+                }
+              }}
+              onMouseDown={(event) => event.preventDefault()}
+              sx={{
+                position: 'relative',
+                cursor: mainCanOpen ? 'pointer' : 'default',
+                userSelect: 'none',
+                WebkitUserSelect: 'none',
+                WebkitTapHighlightColor: 'transparent',
+                touchAction: 'manipulation',
+                outline: 'none',
+                transform: mainCanOpen ? 'rotate(-3deg)' : 'rotate(-1.5deg)',
+                transition: 'transform 0.2s ease',
+                '&:hover': mainCanOpen ? { transform: 'rotate(-1deg) translateY(-3px)' } : {},
+                '&:active': mainCanOpen ? { transform: 'rotate(-2deg) scale(0.98)' } : {},
+                '&:focus-visible': { outline: `2px dashed ${INK}`, outlineOffset: 8 },
+              }}
+            >
+              <Box sx={{ animation: mainCanOpen ? `${packCtaFloat} 3.4s ease-in-out infinite` : undefined }}>
+                <Envelope sealed={mainCanOpen} size={size}>
+                  {mainCanOpen ? (
+                    <Box sx={{
+                      position: 'absolute', left: '50%', top: '58%', transform: 'translate(-50%,-50%)',
+                      width: size * 0.3, height: size * 0.3, borderRadius: '47% 53% 50% 50% / 52% 48% 52% 48%',
+                      background: `radial-gradient(circle at 38% 34%, color-mix(in srgb, ${SEAL} 78%, #fff), ${SEAL} 60%, color-mix(in srgb, ${SEAL} 72%, #000))`,
+                      boxShadow: 'inset 0 0 0 4px rgba(0,0,0,0.08), 1px 2px 0 rgba(60,42,20,0.25)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <Box sx={{ width: '70%', height: '70%', borderRadius: '50%', border: '1.5px solid rgba(255,240,230,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <PackIcon emoji={pack?.emoji ?? collectionEmoji} imageUrl={pack?.imageUrl} size={size * 0.13} />
+                      </Box>
+                    </Box>
+                  ) : (
+                    <Box sx={{
+                      position: 'absolute', left: '50%', top: '52%', transform: 'translate(-50%,-50%) rotate(-12deg)',
+                      width: size * 0.5, height: size * 0.5, borderRadius: '50%',
+                      border: `2px solid ${SEAL}`, outline: `1px solid ${SEAL}`, outlineOffset: 4,
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                      color: SEAL, opacity: 0.55 + cooldownProgress * 0.4, background: 'rgba(255,253,247,0.6)',
+                    }}>
+                      <Typography sx={{ fontSize: '0.58rem', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', lineHeight: 1 }}>
+                        volta em
+                      </Typography>
+                      <Typography sx={{ fontFamily: font.serif, fontWeight: 600, fontSize: '1.05rem', lineHeight: 1.25, textAlign: 'center', px: 0.5 }}>
+                        {remainingLabel}
+                      </Typography>
+                    </Box>
+                  )}
+                </Envelope>
+              </Box>
+              {hasAccrued && (
+                <Box sx={{
+                  position: 'absolute', top: -10, right: -12, transform: 'rotate(8deg)',
+                  px: 0.9, py: 0.2, background: '#fffdf7', border: `1.5px solid ${SEAL}`, color: SEAL,
+                  fontFamily: font.sans, fontWeight: 700, fontSize: '0.8rem', letterSpacing: '0.06em',
+                }}>
+                  {accruedCount}x
                 </Box>
-              </Box>
-            ) : (
-              <Box sx={{
-                position: 'absolute', left: '50%', top: '52%', transform: 'translate(-50%,-50%) rotate(-12deg)',
-                width: size * 0.5, height: size * 0.5, borderRadius: '50%',
-                border: `2px solid ${accent}`, outline: `1px solid ${accent}`, outlineOffset: 4,
-                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                color: accent, opacity: 0.55 + cooldownProgress * 0.4, background: 'rgba(255,253,247,0.6)',
-              }}>
-                <Typography sx={{ fontSize: '0.58rem', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', lineHeight: 1 }}>
-                  volta em
-                </Typography>
-                <Typography sx={{ fontFamily: font.serif, fontWeight: 600, fontSize: '1.05rem', lineHeight: 1.25, textAlign: 'center', px: 0.5 }}>
-                  {remainingLabel}
-                </Typography>
-              </Box>
-            )}
-          </Envelope>
-        </Box>
-        {hasAccrued && (
-          <Box sx={{
-            position: 'absolute', top: -10, right: -12, transform: 'rotate(8deg)',
-            px: 0.9, py: 0.2, background: '#fffdf7', border: `1.5px solid ${SEAL}`, color: SEAL,
-            fontFamily: font.sans, fontWeight: 700, fontSize: '0.8rem', letterSpacing: '0.06em',
-          }}>
-            {accruedCount}x
+              )}
+            </Box>
           </Box>
-        )}
+        </WindowScene>
       </Box>
 
       {mainCanOpen ? (

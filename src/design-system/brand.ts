@@ -1,4 +1,4 @@
-import { liftOnDark } from './tokens'
+import { colors, liftOnDark, themeInk } from './tokens'
 
 const ACCENT = ['#1d4ed8', '#7c3aed', '#db2777']
 
@@ -11,7 +11,7 @@ export function brandGradient(onLight = false) {
 
 export function brandAccent(onLight = false) {
   return {
-    color: onLight ? '#c0392b' : liftOnDark('#c0392b'),
+    color: onLight ? themeInk.ink : colors.primary.text,
     fontStyle: 'italic',
     pr: '0.08em',
   }

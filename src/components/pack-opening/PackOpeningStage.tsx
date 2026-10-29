@@ -1,7 +1,7 @@
 import { Box, Dialog, Stack, Typography, useMediaQuery } from '@mui/material'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useBackground } from '../../context/BackgroundContext'
-import { font, radius } from '../../design-system'
+import { font, radius, themeInk } from '../../design-system'
 import { normalizeRevealEffect, useRevealEffect } from '../../effects'
 import type { CollectionDailyReward, NoteTypeConfig, RarityConfig } from '../../types/note'
 import { FloatingParticles } from '../FloatingParticles'
@@ -333,7 +333,7 @@ export function PackOpeningStage({ open, pack, rewards, rarities, types, onClose
                     <Box key={`${item.reward.id}-${i}`} sx={{ position: 'relative', animation: `${riseIn} 0.4s ease ${0.08 * i}s both` }}>
                       <RewardCard reward={{ ...item.reward, isNew: false }} rarities={rarities} types={types} onClick={onOpenReward ? () => onOpenReward(item.reward) : undefined} />
                       {item.reward.isNew && (
-                        <Box sx={{ position: 'absolute', top: 10, right: 12, zIndex: 3, px: 0.8, py: 0.1, rotate: '8deg', fontSize: '0.66rem', fontWeight: 700, letterSpacing: '0.14em', color: '#c0392b', border: '1.5px solid #c0392b', borderRadius: '2px', background: 'rgba(255,253,247,0.85)' }}>
+                        <Box sx={{ position: 'absolute', top: 10, right: 12, zIndex: 3, px: 0.8, py: 0.1, rotate: '8deg', fontSize: '0.66rem', fontWeight: 700, letterSpacing: '0.14em', color: themeInk.ink, border: `1.5px solid ${themeInk.ink}`, borderRadius: '2px', background: 'rgba(255,253,247,0.85)' }}>
                           NOVO
                         </Box>
                       )}

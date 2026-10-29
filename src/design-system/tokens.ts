@@ -27,9 +27,16 @@ export const ink = {
   borderMedium: 'rgba(60,42,20,0.2)',
 }
 
+export const themeInk = {
+  ink: 'var(--pd-ink)',
+  accent: 'var(--pd-accent)',
+  sky: 'var(--pd-sky)',
+  page: 'var(--pd-page-base)',
+}
+
 export const gradients = {
-  primary: colors.primary.main,
-  rose:    colors.rose.main,
+  primary: 'var(--pd-ink)',
+  rose:    'var(--pd-ink)',
   purple:  colors.purple.main,
   brand:   '#efe4cf',
   accent:  colors.rose.main,

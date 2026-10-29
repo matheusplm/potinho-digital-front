@@ -417,7 +417,6 @@ export function SimulatedReaderHomePage() {
 
   return (
     <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>
-      <FloatingParticles />
 
       <ScrollablePage sx={{ px: 2.5, py: 2.2 }}>
         <Box sx={{ animation: `${fadeIn} 0.35s ease`, maxWidth: 720, mx: 'auto' }}>
@@ -557,7 +556,6 @@ export function SimulatedReaderHomePage() {
                 setNow(Date.now())
                 toast.info('Cooldown resetado na prévia.')
               }}
-              accent={theme.accent}
               accentMuted={theme.textOnBgMuted}
               accruedCount={mainPack ? (packAvailableCounts[mainPack.id] ?? 0) : 0}
               compact={shortScreen}

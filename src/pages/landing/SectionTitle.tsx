@@ -5,7 +5,7 @@ export function SectionTitle({ children, sub, kicker }: { children: string; sub?
   return (
     <Box sx={{ mb: 3 }}>
       {kicker && (
-        <Typography sx={{ fontFamily: font.hand, fontSize: '1.35rem', color: '#c0392b', lineHeight: 1, mb: 0.8 }}>
+        <Typography sx={{ fontFamily: font.hand, fontSize: '1.35rem', color: colors.primary.text, lineHeight: 1, mb: 0.8 }}>
           {kicker}
         </Typography>
       )}

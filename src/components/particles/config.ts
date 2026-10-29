@@ -8,6 +8,7 @@ interface ThemeParticles {
 }
 
 const THEMES: Record<string, ThemeParticles> = {
+  papel: { behavior: 'hearts', colors: ['#c0392b', '#d9584a', '#e8a09a', '#3d5aa8'] },
   romance: { behavior: 'hearts', colors: ['#f472b6', '#fb7185', '#f9a8d4', '#e879f9'] },
   sunset: { behavior: 'hearts', colors: ['#fb923c', '#f97316', '#fdba74', '#fb7185'] },
   lavender: { behavior: 'hearts', colors: ['#a78bfa', '#c4b5fd', '#8b5cf6', '#f0abfc'] },

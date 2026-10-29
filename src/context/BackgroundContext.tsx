@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useLayoutEffect, useState, type ReactNode } from 'react'
-import { defaultBackgroundKey, getBackgroundTheme, THEME_STORAGE_KEY, type BackgroundTheme } from '../design-system'
+import { defaultBackgroundKey, getBackgroundTheme, themeCssVars, THEME_STORAGE_KEY, type BackgroundTheme } from '../design-system'
 
 interface BackgroundContextValue {
   theme: BackgroundTheme
@@ -50,7 +50,7 @@ export function BackgroundProvider({ children }: { children: ReactNode }) {
     const theme = getBackgroundTheme(themeKey)
     const root = document.documentElement
     root.setAttribute('data-pd-theme', theme.isDark ? 'dark' : 'light')
-    root.style.setProperty('--pd-page-bg', theme.gradient)
+    for (const [name, value] of Object.entries(themeCssVars(theme))) root.style.setProperty(name, value)
   }, [themeKey])
 
   const value: BackgroundContextValue = {

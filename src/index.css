@@ -20,6 +20,10 @@
   --pd-glass-band: rgba(255, 252, 245, 0.7);
   --pd-glass-band-border: rgba(60, 42, 20, 0.12);
   --pd-lift: 0%;
+  --pd-ink: #b5372a;
+  --pd-accent: #c0392b;
+  --pd-page-base: #f4ede0;
+  --pd-sky: linear-gradient(180deg, #a9cbe0 0%, #d6e6ec 55%, #f3e6cf 100%);
 }
 
 [data-pd-theme='dark'] {
