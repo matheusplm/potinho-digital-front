@@ -149,10 +149,10 @@ export function ContaPage() {
 
       <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
         <Stack spacing={0.3} sx={{ mb: 2.5 }}>
-          <Typography variant="md" sx={{ color: theme.textOnBgMuted, fontWeight: 700 }}>
-            👤 Conta
+          <Typography sx={{ fontFamily: font.hand, fontSize: '1.3rem', color: colors.primary.text, lineHeight: 1 }}>
+            seus dados
           </Typography>
-          <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.6rem', color: theme.textOnBg, lineHeight: 1.1 }}>
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 500, fontSize: '1.9rem', letterSpacing: '-0.02em', color: theme.textOnBg, lineHeight: 1.05 }}>
             Minha conta
           </Typography>
         </Stack>

@@ -9,8 +9,9 @@ import { Button, Input, PasswordInput, toast } from '../components/ui'
 import { GoogleSignInButton } from '../components/GoogleSignInButton'
 import { ScrollHint } from '../components/ui/ScrollHint'
 import { useBackground } from '../context/BackgroundContext'
-import { BrandLogo, Copyright } from '../components/Brand'
-import { brandAccent, brandGradient, colors, fadeSlide, font, gradients } from '../design-system'
+import { Copyright } from '../components/Brand'
+import { brandAccent, colors, fadeSlide, font, gradients } from '../design-system'
+import { Door } from '../components/scene/Door'
 
 const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined
 
@@ -75,16 +76,15 @@ export function RegisterPage() {
 
 
       <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 3, py: 5, position: 'relative', zIndex: 1, animation: `${fadeSlide} 0.5s ease both` }} spacing={0}>
-        <BrandLogo size={72} sx={{ mb: 3 }} />
+        <Door height={150} ajar mat="pode entrar" sx={{ mb: 2.5 }} />
 
-        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2.8rem', lineHeight: 1, color: colors.text.primary, textAlign: 'center', letterSpacing: '-0.5px' }}>
-          Criar
-        </Typography>
-        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2.8rem', lineHeight: 1.05, textAlign: 'center', letterSpacing: '-0.5px', mb: 1.5, ...brandAccent() }}>
-          Conta
+        <Typography component="h1" sx={{ fontFamily: font.serif, fontWeight: 500, fontSize: '2.3rem', lineHeight: 1.05, color: colors.text.primary, textAlign: 'center', letterSpacing: '-0.02em' }}>
+          Criar <Box component="span" sx={brandAccent()}>conta</Box>
         </Typography>
 
-        <Box sx={{ width: 40, height: 3, borderRadius: 2, background: brandGradient(), mb: 4 }} />
+        <Typography sx={{ fontFamily: font.hand, fontSize: '1.35rem', color: colors.text.secondary, mt: 0.5, mb: 3.5 }}>
+          a porta tá aberta, chega mais
+        </Typography>
 
         <Box sx={{ width: '100%', maxWidth: 320 }}>
           <GoogleSignInButton onCredential={handleGoogle} disabled={loading} />

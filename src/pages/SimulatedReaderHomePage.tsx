@@ -24,6 +24,7 @@ import {
   queryKeys,
 } from '../hooks/useNotes'
 import { colors, fadeIn, font, radius } from '../design-system'
+import { SillScene } from '../components/scene/WindowScene'
 import { isCollectionReader } from '../utils/collectionAccess'
 import { ApiRequestError } from '../services/api'
 import { simulatePackOpen } from '../utils/simulationPlay'
@@ -378,7 +379,7 @@ export function SimulatedReaderHomePage() {
         <ScrollablePage sx={{ px: 2.5, py: 2.5 }}>
           {isRealReader && !collectionsLoading ? (
             <Stack spacing={1.6} alignItems="center" justifyContent="center" sx={{ minHeight: 360, textAlign: 'center' }}>
-              <Typography sx={{ fontSize: '2.6rem', lineHeight: 1 }}>🫙</Typography>
+              <SillScene emoji="🫙" />
               <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.3rem', color: theme.textOnBg }}>
                 Nenhum potinho por aqui ainda
               </Typography>

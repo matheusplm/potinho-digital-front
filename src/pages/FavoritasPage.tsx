@@ -12,7 +12,8 @@ import {
   useCollectionTypesQuery,
   useToggleCollectionFavoriteMutation,
 } from '../hooks/useNotes'
-import { fadeIn, font, clipOverflow } from '../design-system'
+import { fadeIn, font, clipOverflow, colors } from '../design-system'
+import { SillScene } from '../components/scene/WindowScene'
 import type { NoteTypeConfig } from '../types/note'
 
 export function FavoritasPage() {
@@ -33,10 +34,10 @@ export function FavoritasPage() {
     <Box sx={{ height: '100%', position: 'relative', ...clipOverflow, background: theme.gradient }}>
       <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
         <Stack spacing={0.3} sx={{ mb: 2.2 }}>
-          <Typography variant="md" sx={{ color: theme.textOnBgMuted, fontWeight: 700 }}>
-            ❤️ Favoritas
+          <Typography sx={{ fontFamily: font.hand, fontSize: '1.3rem', color: colors.primary.text, lineHeight: 1 }}>
+            o que mais tocou
           </Typography>
-          <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.6rem', color: theme.textOnBg, lineHeight: 1.1 }}>
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 500, fontSize: '1.9rem', letterSpacing: '-0.02em', color: theme.textOnBg, lineHeight: 1.05 }}>
             Suas favoritas
           </Typography>
           {collection && (
@@ -62,7 +63,7 @@ export function FavoritasPage() {
 
         {!isLoading && favorites.length === 0 && (
           <Stack spacing={1.2} alignItems="center" justifyContent="center" sx={{ minHeight: 320, textAlign: 'center' }}>
-            <Typography sx={{ fontSize: '2.6rem' }}>💛</Typography>
+            <SillScene emoji="💛" />
             <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.2rem', color: theme.textOnBg }}>
               Nenhuma favorita ainda
             </Typography>

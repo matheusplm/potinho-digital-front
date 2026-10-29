@@ -5,14 +5,14 @@ import { Box, ButtonBase, IconButton, Stack, Tooltip, Typography, useMediaQuery 
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, ScrollHint } from '../components/ui'
-import { brandAccent, colors, fadeInHero, fadeInRight, font, gradients, pageBaseColor, themeInk } from '../design-system'
-import { useBackground } from '../context/BackgroundContext'
+import { brandAccent, colors, fadeInHero, fadeInRight, font, gradients, themeInk } from '../design-system'
 import { AUDIENCES, DEMO_NOTES, DEMO_RARITIES, DETAILS, RARITY_COLOR, RARITY_FILTERS, STEPS } from './landing/landingData'
 import { SectionTitle } from './landing/SectionTitle'
 import { DemoNoteCard } from './landing/DemoNoteCard'
 import { BrandLogo, BrandName, Copyright } from '../components/Brand'
 import { HeroCardStack } from './landing/HeroCardStack'
-import { HandArrow, Squiggle, Stamp } from './landing/Doodles'
+import { HandArrow, Squiggle } from './landing/Doodles'
+import { Door } from '../components/scene/Door'
 import { ThemesShowcase } from './landing/ThemesShowcase'
 import { WindowScene } from '../components/scene/WindowScene'
 
@@ -31,7 +31,6 @@ export function LandingPage() {
   })
   const isDesktop = useMediaQuery('(min-width: 900px)', { noSsr: true })
   const [activeRarity, setActiveRarity] = useState('Todos')
-  const { theme } = useBackground()
 
   const visibleNotes = activeRarity === 'Todos' ? DEMO_NOTES : DEMO_NOTES.filter((n) => DEMO_RARITIES.find((r) => r.id === n.rarity)?.label === activeRarity)
 
@@ -88,7 +87,7 @@ export function LandingPage() {
 
           <Box className="pd-enter" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', animation: `${fadeInRight} 0.7s 0.2s ease both` }}>
             <WindowScene width={{ xs: 'min(330px, calc(100vw - 60px))', md: 400 }} height={{ xs: 200, md: 280 }}>
-              <Box sx={{ position: 'absolute', left: '50%', top: { xs: 112, md: 176 }, transform: 'translateX(-50%)', zIndex: 4 }}>
+              <Box sx={{ position: 'absolute', left: { xs: '50%', md: '16%' }, top: { xs: 112, md: 176 }, transform: 'translateX(-50%)', zIndex: 4 }}>
                 <HeroCardStack />
               </Box>
             </WindowScene>
@@ -215,14 +214,7 @@ export function LandingPage() {
               </Box>
             </Stack>
           </Box>
-          <Stamp color={themeInk.ink} holeColor={pageBaseColor(theme)} sx={{ justifySelf: { xs: 'start', md: 'center' }, transform: 'rotate(6deg)', width: { xs: 128, md: 160 } }}>
-            <Stack alignItems="center" spacing={0.8} sx={{ py: 1 }}>
-              <BrandLogo size={isDesktop ? 64 : 52} />
-              <Typography sx={{ fontFamily: font.sans, fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: themeInk.ink }}>
-                Correio do potinho
-              </Typography>
-            </Stack>
-          </Stamp>
+          <Door height={isDesktop ? 260 : 200} letter mat="entra aí" sx={{ justifySelf: 'center' }} />
         </Box>
       </Box>
 

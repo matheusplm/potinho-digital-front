@@ -237,10 +237,6 @@ export function themeCssVars(theme: Omit<BackgroundTheme, 'onAccent'>): Record<s
   }
 }
 
-export function pageBaseColor(theme: BackgroundTheme) {
-  return theme.gradient.slice(theme.gradient.lastIndexOf(' ') + 1)
-}
-
 export function getBackgroundTheme(key: string): BackgroundTheme {
   return backgroundThemes.find((t) => t.key === key) ?? backgroundThemes[0]
 }

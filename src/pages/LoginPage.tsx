@@ -9,8 +9,9 @@ import { safeRedirect } from '../utils/safeRedirect'
 import { Button, Input, PasswordInput, toast } from '../components/ui'
 import { GoogleSignInButton } from '../components/GoogleSignInButton'
 import { useBackground } from '../context/BackgroundContext'
-import { BrandLogo, Copyright } from '../components/Brand'
-import { BRAND_TAGLINE, brandAccent, brandGradient, colors, fadeSlide, font, gradients } from '../design-system'
+import { Copyright } from '../components/Brand'
+import { BRAND_TAGLINE, brandAccent, colors, fadeSlide, font, gradients } from '../design-system'
+import { Door } from '../components/scene/Door'
 
 const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined
 
@@ -84,18 +85,13 @@ export function LoginPage() {
 
 
       <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 3, py: 2, position: 'relative', zIndex: 1, animation: `${fadeSlide} 0.5s ease both` }} spacing={0}>
-        <BrandLogo size={72} sx={{ mb: 3 }} />
+        <Door height={150} sx={{ mb: 2.5 }} />
 
-        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2.8rem', lineHeight: 1, color: colors.text.primary, textAlign: 'center', letterSpacing: '-0.5px' }}>
-          Potinho
-        </Typography>
-        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2.8rem', lineHeight: 1.05, textAlign: 'center', letterSpacing: '-0.5px', mb: 1.5, ...brandAccent() }}>
-          Digital
+        <Typography component="h1" sx={{ fontFamily: font.serif, fontWeight: 500, fontSize: '2.3rem', lineHeight: 1.05, color: colors.text.primary, textAlign: 'center', letterSpacing: '-0.02em' }}>
+          Potinho <Box component="span" sx={brandAccent()}>Digital</Box>
         </Typography>
 
-        <Box sx={{ width: 40, height: 3, borderRadius: 2, background: brandGradient(), mb: 1.5 }} />
-
-        <Typography variant="lg" sx={{ color: colors.text.secondary, fontStyle: 'italic', mb: 4 }}>
+        <Typography sx={{ fontFamily: font.hand, fontSize: '1.35rem', color: colors.text.secondary, mt: 0.5, mb: 3.5 }}>
           {BRAND_TAGLINE}
         </Typography>
 

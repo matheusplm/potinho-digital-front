@@ -5,6 +5,7 @@ import { useMarkNotificationReadMutation, useMyNotificationsQuery, usePendingInv
 import { useNavigate } from 'react-router-dom'
 import { PendingInviteCard } from '../components/PendingInviteCard'
 import { colors, fadeIn, font, radius, clipOverflow } from '../design-system'
+import { SillScene } from '../components/scene/WindowScene'
 import type { UserNotification } from '../types/note'
 
 function kindLabel(notification: UserNotification): string {
@@ -45,10 +46,10 @@ export function NotificationsPage() {
     <Box sx={{ height: '100%', position: 'relative', ...clipOverflow, background: theme.gradient }}>
       <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
         <Stack spacing={0.3} sx={{ mb: 2.2 }}>
-          <Typography variant="md" sx={{ color: theme.textOnBgMuted, fontWeight: 700 }}>
-            🔔 Notificações
+          <Typography sx={{ fontFamily: font.hand, fontSize: '1.3rem', color: colors.primary.text, lineHeight: 1 }}>
+            chegou correspondência?
           </Typography>
-          <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.6rem', color: theme.textOnBg, lineHeight: 1.1 }}>
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 500, fontSize: '1.9rem', letterSpacing: '-0.02em', color: theme.textOnBg, lineHeight: 1.05 }}>
             Suas novidades
           </Typography>
           {summary && (
@@ -70,7 +71,7 @@ export function NotificationsPage() {
 
         {!isLoading && !invitesLoading && notifications.length === 0 && pendingInvites.length === 0 && (
           <Box sx={{ textAlign: 'center', py: 6 }}>
-            <Typography sx={{ fontSize: '2.4rem', mb: 1 }}>📭</Typography>
+            <SillScene emoji="📭" />
             <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 700, color: theme.textOnBg, mb: 0.5 }}>
               Nada por aqui ainda
             </Typography>
