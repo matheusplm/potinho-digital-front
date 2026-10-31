@@ -120,15 +120,16 @@ export function Door({ height = 200, ajar = false, mat = 'bem-vindo', furnished 
       <Box sx={{ position: 'relative', width: width + 16, height, p: '7px', pb: 0, background: frame, border: `2px solid ${line}`, borderBottom: 'none', borderRadius: top }}>
         {decor === 'lantern' && <Lantern side="left" night={night} />}
         {decor === 'pots' && <Pots />}
-        {decor === 'stripes' && <Box sx={{ position: 'absolute', left: -10, right: -10, bottom: 0, height: 12, zIndex: 0, background: 'repeating-linear-gradient(45deg, #e3b42f 0 8px, #2a241d 8px 16px)', border: '1.5px solid #2a241d' }} />}
         <Box sx={{ position: 'relative', width: '100%', height: '100%', borderRadius: top, background: 'radial-gradient(ellipse at 50% 70%, #ffe7a8, #f3b866 70%, #c98a3c)', perspective: '600px' }}>
           <Box sx={{
             position: 'absolute', inset: 0, background: paint, border: `1.5px solid ${line}`, borderRadius: top,
+            overflow: shape === 'hatch' ? 'hidden' : undefined,
             transformOrigin: 'left center', transform: ajar ? 'rotateY(-32deg)' : 'none',
             boxShadow: ajar ? '6px 0 12px rgba(0,0,0,0.25)' : shape === 'hatch' ? 'inset 0 0 0 4px rgba(255,255,255,0.08), inset 0 -6px 0 rgba(0,0,0,0.2)' : 'none',
             backgroundImage: shape === 'panel' || shape === 'arch' ? 'repeating-linear-gradient(90deg, transparent 0 13px, rgba(0,0,0,0.05) 13px 14px)' : undefined,
           }}>
             {surface[shape]}
+            {decor === 'stripes' && <Box sx={{ position: 'absolute', left: 0, right: 0, bottom: '6%', height: '9%', background: 'repeating-linear-gradient(45deg, #e3b42f 0 8px, #2a241d 8px 16px)', borderTop: '1.5px solid #2a241d', borderBottom: '1.5px solid #2a241d' }} />}
             {glass !== 'none' && shape !== 'greenhouse' && <Glass kind={glass} frame={frame} line={line} sky={theme.sky} />}
             {shape !== 'hatch' && (
               <Box sx={{ position: 'absolute', top: shape === 'round' ? '62%' : '57%', left: '24%', right: '24%', height: 6, background: BRASS, border: '1px solid rgba(0,0,0,0.4)', borderRadius: 1 }}>

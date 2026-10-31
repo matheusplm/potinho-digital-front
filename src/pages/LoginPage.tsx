@@ -9,7 +9,7 @@ import { safeRedirect } from '../utils/safeRedirect'
 import { Button, Input, PasswordInput, toast } from '../components/ui'
 import { GoogleSignInButton } from '../components/GoogleSignInButton'
 import { useBackground } from '../context/BackgroundContext'
-import { BrandName, Copyright } from '../components/Brand'
+import { BrandLogo, BrandName, Copyright } from '../components/Brand'
 import { BRAND_TAGLINE, colors, fadeSlide, font, gradients } from '../design-system'
 import { Door } from '../components/scene/Door'
 
@@ -88,7 +88,10 @@ export function LoginPage() {
         <Door height={150} furnished sx={{ mb: 2.5 }} />
 
         <Typography component="h1" sx={{ m: 0 }}>
-          <BrandName size="2.3rem" sx={{ textAlign: 'center' }} />
+          <Stack direction="row" spacing={1.4} alignItems="center" justifyContent="center">
+            <BrandLogo size={58} />
+            <BrandName size="2.3rem" />
+          </Stack>
         </Typography>
 
         <Typography sx={{ fontFamily: font.hand, fontSize: '1.35rem', color: colors.text.secondary, mt: 0.5, mb: 3.5 }}>
