@@ -9,14 +9,16 @@ import { safeRedirect } from '../utils/safeRedirect'
 import { Button, Input, PasswordInput, toast } from '../components/ui'
 import { GoogleSignInButton } from '../components/GoogleSignInButton'
 import { useBackground } from '../context/BackgroundContext'
-import { BrandLogo, BrandName, Copyright } from '../components/Brand'
-import { BRAND_TAGLINE, colors, fadeSlide, font, gradients } from '../design-system'
+import { BrandName, Copyright } from '../components/Brand'
+import { OutsideScene, ViewPicker } from '../components/scene/OutsideScene'
+import { BRAND_TAGLINE, colors, fadeSlide, font, radius } from '../design-system'
 
 const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined
 
 
 export function LoginPage() {
-  const darkTheme = useBackground().theme.isDark
+  const { theme } = useBackground()
+  const darkTheme = theme.isDark
   const { setUser } = useUser()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -79,18 +81,21 @@ export function LoginPage() {
       position: 'relative',
       overflowX: 'hidden',
       overflowY: 'auto',
-      background: gradients.page,
     }}>
+      <OutsideScene />
 
-
-      <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 3, py: 2, position: 'relative', zIndex: 1, animation: `${fadeSlide} 0.5s ease both` }} spacing={0}>
-        <BrandLogo size={104} sx={{ mb: 2 }} />
+      <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 2, pt: 3, pb: { xs: 18, sm: 3 }, position: 'relative', zIndex: 1, animation: `${fadeSlide} 0.5s ease both` }} spacing={2.5}>
+        <Stack alignItems="center" sx={{
+          width: '100%', maxWidth: 380, px: { xs: 2.5, sm: 3.5 }, pt: 3, pb: 2.5,
+          background: theme.surfaceBg, border: `1.5px solid ${theme.surfaceBorder}`, borderRadius: radius.md,
+          boxShadow: '4px 6px 0 rgba(0,0,0,0.18), 0 24px 40px -24px rgba(0,0,0,0.45)',
+        }}>
 
         <Typography component="h1" sx={{ m: 0 }}>
           <BrandName size="2.3rem" sx={{ textAlign: 'center' }} />
         </Typography>
 
-        <Typography sx={{ fontFamily: font.hand, fontSize: '1.35rem', color: colors.text.secondary, mt: 0.5, mb: 3.5 }}>
+        <Typography sx={{ fontFamily: font.hand, fontSize: '1.35rem', color: colors.text.secondary, mt: 0.5, mb: 3 }}>
           {BRAND_TAGLINE}
         </Typography>
 
@@ -142,11 +147,13 @@ export function LoginPage() {
           </Stack>
         </Box>
 
-        <Typography variant="body2" sx={{ mt: 3.5, color: colors.text.secondary, fontSize: '0.85rem' }}>
+        <Typography variant="body2" sx={{ mt: 3, color: colors.text.secondary, fontSize: '0.85rem' }}>
           Ainda não tem conta?{' '}
           <Link to="/register" style={{ color: colors.primary.text, fontWeight: 700, textDecoration: 'none' }}>Criar conta</Link>
         </Typography>
-        <Copyright sx={{ mt: 4 }} />
+          <Copyright sx={{ mt: 2.5 }} />
+        </Stack>
+        <ViewPicker />
       </Stack>
     </Box>
   )

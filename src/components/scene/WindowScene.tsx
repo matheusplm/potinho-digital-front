@@ -5,7 +5,7 @@ import { useBackground } from '../../context/BackgroundContext'
 import { themeInk } from '../../design-system'
 import { FloatingParticles } from '../FloatingParticles'
 
-type Shape = 'sash' | 'arch' | 'round' | 'porthole' | 'submarine'
+export type Shape = 'sash' | 'arch' | 'round' | 'porthole' | 'submarine'
 type Decor = 'curtains' | 'shutters' | 'flowers' | 'plants' | null
 
 const LOOK: Record<string, { shape: Shape; decor: Decor; horizon?: 'pines' | 'trees' }> = {
@@ -42,7 +42,7 @@ const ROOFS = 'M0 60 V38 H18 V30 L30 20 L42 30 V38 H58 V26 H74 V34 H92 V22 L104 
 const LIT = [[22, 33], [64, 30], [98, 26], [108, 30], [140, 32], [154, 22], [170, 36], [202, 28], [236, 34], [252, 25], [286, 30]]
 const ROUND: Shape[] = ['round', 'porthole', 'submarine']
 
-function Cloud({ top, scale, duration, delay }: { top: string; scale: number; duration: number; delay: number }) {
+export function Cloud({ top, scale, duration, delay }: { top: string; scale: number; duration: number; delay: number }) {
   return (
     <Box aria-hidden sx={{
       position: 'absolute', top, left: 0, width: 96, height: 28, transform: `scale(${scale})`, transformOrigin: 'left top',
@@ -83,7 +83,7 @@ function Trees() {
   )
 }
 
-function Horizon({ shape, night, horizon }: { shape: Shape; night: boolean; horizon?: 'pines' | 'trees' }) {
+export function Horizon({ shape, night, horizon }: { shape: Shape; night: boolean; horizon?: 'pines' | 'trees' }) {
   if (horizon === 'pines') return <Pines night={night} />
   if (horizon === 'trees') return <Trees />
   if (shape === 'submarine') {
@@ -204,6 +204,10 @@ function Shelf({ side }: { side: 'left' | 'right' }) {
   )
 }
 
+export function sceneLook(key: string) {
+  return LOOK[key] ?? LOOK.papel
+}
+
 export function WindowScene({ width, height, children, shelves = true, sx }: {
   width: number | string | Record<string, number | string>
   height: number | Record<string, number>
@@ -212,7 +216,7 @@ export function WindowScene({ width, height, children, shelves = true, sx }: {
   sx?: SxProps<Theme>
 }) {
   const { theme } = useBackground()
-  const { shape, decor, horizon } = LOOK[theme.key] ?? LOOK.papel
+  const { shape, decor, horizon } = sceneLook(theme.key)
   const night = theme.isDark
   const round = ROUND.includes(shape)
   const frame = shape === 'porthole' ? '#c2964a' : shape === 'submarine' ? '#4d5862' : night ? '#2b241d' : '#fbf6ea'
