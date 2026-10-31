@@ -4,7 +4,8 @@ import { useBackground } from '../../context/BackgroundContext'
 import { backgroundThemes, font } from '../../design-system'
 import { FloatingParticles } from '../FloatingParticles'
 import { PotinhoMark } from '../PotinhoMark'
-import { Cloud, Horizon, sceneLook } from './WindowScene'
+import { Cloud, Horizon } from './WindowScene'
+import { sceneLook } from './sceneLook'
 
 const bob = keyframes`
   0%, 100% { transform: translateY(0) rotate(var(--tilt)); }
