@@ -9,8 +9,8 @@ import { safeRedirect } from '../utils/safeRedirect'
 import { Button, Input, PasswordInput, toast } from '../components/ui'
 import { GoogleSignInButton } from '../components/GoogleSignInButton'
 import { useBackground } from '../context/BackgroundContext'
-import { Copyright } from '../components/Brand'
-import { BRAND_TAGLINE, brandAccent, colors, fadeSlide, font, gradients } from '../design-system'
+import { BrandName, Copyright } from '../components/Brand'
+import { BRAND_TAGLINE, colors, fadeSlide, font, gradients } from '../design-system'
 import { Door } from '../components/scene/Door'
 
 const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined
@@ -87,8 +87,8 @@ export function LoginPage() {
       <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 3, py: 2, position: 'relative', zIndex: 1, animation: `${fadeSlide} 0.5s ease both` }} spacing={0}>
         <Door height={150} furnished sx={{ mb: 2.5 }} />
 
-        <Typography component="h1" sx={{ fontFamily: font.serif, fontWeight: 500, fontSize: '2.3rem', lineHeight: 1.05, color: colors.text.primary, textAlign: 'center', letterSpacing: '-0.02em' }}>
-          Potinho <Box component="span" sx={brandAccent()}>Digital</Box>
+        <Typography component="h1" sx={{ m: 0 }}>
+          <BrandName size="2.3rem" sx={{ textAlign: 'center' }} />
         </Typography>
 
         <Typography sx={{ fontFamily: font.hand, fontSize: '1.35rem', color: colors.text.secondary, mt: 0.5, mb: 3.5 }}>
