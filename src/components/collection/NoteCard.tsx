@@ -6,7 +6,6 @@ import { useEffect, useRef, useState } from 'react'
 import { Card } from '../ui'
 import { colors, font, ink, radius } from '../../design-system'
 import { linkifyText } from '../../utils/linkify'
-import { useBackground } from '../../context/BackgroundContext'
 import { RewardCard, rarityCardSx } from './RewardCard'
 import { RarityChip } from './RarityChip'
 import type { CollectionNoteView, NoteTypeConfig, RarityConfig } from '../../types/note'
@@ -17,7 +16,6 @@ export function NoteCard({ note, r, ts = [], unread, variant, onSelect, onToggle
   onSelect: (note: CollectionNoteView) => void
   onToggleFavorite: (note: CollectionNoteView) => void
 }) {
-  const { theme, maskLightCards } = useBackground()
   const grid = variant === 'grid'
 
   const [listExpanded, setListExpanded] = useState(false)
@@ -36,7 +34,7 @@ export function NoteCard({ note, r, ts = [], unread, variant, onSelect, onToggle
 
   if (!note.owned) {
     return (
-      <Card accent={r?.borderColor} sx={{ ...(rarityCardSx(r, true, theme.isDark && maskLightCards) as object), height: grid ? '100%' : undefined, opacity: 0.72, cursor: 'default' }}>
+      <Card accent={r?.borderColor} sx={{ ...(rarityCardSx(r, true) as object), height: grid ? '100%' : undefined, opacity: 0.72, cursor: 'default' }}>
         <Box sx={{ position: 'relative', minWidth: 0, height: '100%', p: 1, borderRadius: radius.lg, display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: 52 }}>
           <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.4, flexWrap: 'wrap', rowGap: 0.4 }}>
             {r && <RarityChip rarity={r} bordered />}
@@ -74,7 +72,7 @@ export function NoteCard({ note, r, ts = [], unread, variant, onSelect, onToggle
   }
 
   return (
-    <Card accent={r?.borderColor} onClick={() => onSelect(note)} sx={{ ...(rarityCardSx(r, true, theme.isDark && maskLightCards) as object), cursor: 'pointer', height: grid ? '100%' : undefined }}>
+    <Card accent={r?.borderColor} onClick={() => onSelect(note)} sx={{ ...(rarityCardSx(r, true) as object), cursor: 'pointer', height: grid ? '100%' : undefined }}>
       <Box sx={{ position: 'relative', zIndex: 1, height: '100%' }}>
         {unread && (
           <Box sx={{ position: 'absolute', top: -2, left: -2, width: 11, height: 11, zIndex: 3, borderRadius: radius.full, background: colors.rose.main, boxShadow: '0 0 0 2px #fffdf7' }} />

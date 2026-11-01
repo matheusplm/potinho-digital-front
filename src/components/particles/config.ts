@@ -11,7 +11,7 @@ const THEMES: Record<string, ThemeParticles> = {
   papel: { behavior: 'hearts', colors: ['#c0392b', '#d9584a', '#e8a09a', '#3d5aa8'] },
   romance: { behavior: 'hearts', colors: ['#f472b6', '#fb7185', '#f9a8d4', '#e879f9'] },
   sunset: { behavior: 'hearts', colors: ['#fb923c', '#f97316', '#fdba74', '#fb7185'] },
-  lavender: { behavior: 'stars', colors: ['#c4b5fd', '#f3d9a0', '#e9d5ff', '#ffffff'] },
+  lavender: { behavior: 'petals', colors: ['#b9a6e0', '#9c86c9', '#e9d5ff', '#d8c7f2'] },
   ocean: { behavior: 'bubbles', colors: ['#0ea5e9', '#38bdf8', '#22d3ee'] },
   'deep-ocean': { behavior: 'bubbles', colors: ['#38bdf8', '#67e8f9', '#a5f3fc'] },
   mint: { behavior: 'leaves', colors: ['#34d399', '#10b981', '#6ee7b7', '#a3e635'] },

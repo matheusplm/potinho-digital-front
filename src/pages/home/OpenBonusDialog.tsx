@@ -50,7 +50,7 @@ export function OpenBonusDialog({ pack, isRealReader, canOpen, block, opens, acc
             <DialogTitle sx={{
               p: 0,
               fontFamily: font.serif,
-              fontWeight: 850,
+              fontWeight: 700,
               fontSize: '1.18rem',
               color: ink.primary,
               lineHeight: 1.2,
@@ -77,16 +77,16 @@ export function OpenBonusDialog({ pack, isRealReader, canOpen, block, opens, acc
                 {pack.description || 'Abra este pacote especial para tentar descobrir novos bilhetinhos da coleção.'}
               </Typography>
               <Stack direction="row" spacing={0.7} sx={{ mt: 1, flexWrap: 'wrap', rowGap: 0.6 }}>
-                <Box sx={{ px: 0.85, py: 0.35, borderRadius: radius.full, background: `${pack.accent}18`, color: pack.accent, fontSize: '0.68rem', fontWeight: 850 }}>
+                <Box sx={{ px: 0.85, py: 0.35, borderRadius: radius.full, background: `${pack.accent}18`, color: pack.accent, fontSize: '0.68rem', fontWeight: 700 }}>
                   {pack.cardsPerOpen} bilhete{pack.cardsPerOpen !== 1 ? 's' : ''}
                 </Box>
                 {pack.cooldownHours != null && (
-                  <Box sx={{ px: 0.85, py: 0.35, borderRadius: radius.full, background: 'rgba(255,255,255,0.72)', color: ink.secondary, fontSize: '0.68rem', fontWeight: 800 }}>
+                  <Box sx={{ px: 0.85, py: 0.35, borderRadius: radius.full, background: 'rgba(255,255,255,0.72)', color: ink.secondary, fontSize: '0.68rem', fontWeight: 700 }}>
                     {pack.cooldownHours}h cooldown
                   </Box>
                 )}
                 {pack.guaranteedRarityId && (
-                  <Box sx={{ px: 0.85, py: 0.35, borderRadius: radius.full, background: 'rgba(255,247,237,0.9)', color: '#c2410c', fontSize: '0.68rem', fontWeight: 850 }}>
+                  <Box sx={{ px: 0.85, py: 0.35, borderRadius: radius.full, background: 'rgba(255,247,237,0.9)', color: '#c2410c', fontSize: '0.68rem', fontWeight: 700 }}>
                     garantia especial
                   </Box>
                 )}

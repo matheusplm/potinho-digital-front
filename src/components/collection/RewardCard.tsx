@@ -6,7 +6,7 @@ import { linkifyText } from '../../utils/linkify'
 
 export type { NoteImageLayout as ImageLayout } from '../../types/note'
 
-export function rarityCardSx(r?: RarityConfig, compact = false, isDark = false) {
+export function rarityCardSx(r?: RarityConfig, compact = false) {
   const tone = r?.borderColor || 'rgba(60,42,20,0.3)'
   return {
     p: compact ? 1.8 : 2.4,
@@ -15,7 +15,7 @@ export function rarityCardSx(r?: RarityConfig, compact = false, isDark = false) 
     position: 'relative',
     overflow: 'hidden',
     isolation: 'isolate',
-    background: isDark ? '#2b2620' : `linear-gradient(color-mix(in srgb, ${tone} 7%, transparent), color-mix(in srgb, ${tone} 7%, transparent)), #fffdf7`,
+    background: `linear-gradient(color-mix(in srgb, ${tone} 7%, transparent), color-mix(in srgb, ${tone} 7%, transparent)), #fffdf7`,
     border: `1px solid color-mix(in srgb, ${tone} 45%, rgba(60,42,20,0.18))`,
     boxShadow: '2px 3px 0 rgba(60,42,20,0.10), 0 10px 18px -12px rgba(60,42,20,0.35)',
     transition: 'transform 0.18s ease, box-shadow 0.18s ease',

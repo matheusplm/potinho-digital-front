@@ -111,7 +111,7 @@ export function CollectionPlayPage() {
   return (
     <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>
 
-      <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
+      <ScrollablePage narrow sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
         <Stack direction="row" alignItems="center" spacing={1.2} sx={{ mb: 3 }}>
           {!isSimulating && (
             <IconButton size="small" aria-label={isReaderView ? 'voltar para o início' : 'voltar para coleções'} onClick={() => navigate(isReaderView ? '/home' : '/colecoes')} sx={{ width: 38, height: 38, color: theme.textOnBg, background: colors.glass.bg, border: `1.5px solid ${colors.glass.border}`, boxShadow: '0 8px 24px rgba(15,23,42,0.08)', transition: 'transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease', '&:hover': { background: colors.glass.strong, transform: 'translateX(-2px) scale(1.04)', boxShadow: '0 10px 28px rgba(15,23,42,0.12)' }, '&:active': { transform: 'translateX(-1px) scale(0.98)' } }}>
@@ -161,7 +161,7 @@ export function CollectionPlayPage() {
                       Simulando leitor novo
                     </Typography>
                     <Typography variant="md" sx={{ color: colors.text.secondary, lineHeight: 1.35 }}>
-                      Abra pacotinhos, veja as cartinhas coletadas e favorite bilhetes como quem recebeu acesso.
+                      Abra pacotinhos, veja os bilhetes coletados e favorite bilhetes como quem recebeu acesso.
                     </Typography>
                   </Box>
                 </Stack>
@@ -208,19 +208,20 @@ export function CollectionPlayPage() {
             {tab === 'album' && !isSimulating && play.total > 0 && undiscoveredItems.length > 0 && (
               <Stack spacing={1}>
                 <Box>
-                  <Typography variant="sm" sx={{ fontWeight: 800, letterSpacing: 1.2, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
+                  <Typography variant="sm" sx={{ fontWeight: 700, letterSpacing: 1.2, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
                     Ainda por descobrir · {undiscoveredItems.length}
                   </Typography>
-                  <Typography variant="sm" sx={{ color: theme.textOnBgMuted, mt: 0.3, fontStyle: 'italic' }}>
-                    Continue abrindo pacotinhos para descobrir estas cartinhas 💌
+                  <Typography sx={{ fontFamily: font.hand, fontSize: '1.1rem', color: theme.textOnBgMuted, mt: 0.3 }}>
+                    abre mais pacotinhos pra descobrir esses
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
                   {undiscoveredItems.map((note) => {
                     const r = rarities.find((x) => x.id === note.rarity)
                     return (
-                      <Box key={note.id} sx={{ px: 1, py: 0.5, borderRadius: radius.full, background: 'rgba(255,255,255,0.08)', fontSize: '0.68rem', fontWeight: 700, color: theme.textOnBgMuted, display: 'flex', alignItems: 'center', gap: 0.4 }}>
-                        {r?.emoji ?? '📝'} ???
+                      <Box key={note.id} sx={{ width: 54, height: 68, borderRadius: '3px', border: `1.5px dashed ${theme.surfaceBorder}`, background: 'color-mix(in srgb, var(--pd-text-primary) 4%, transparent)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 0.3, color: theme.textOnBgMuted, transform: `rotate(${(note.id.length % 3) - 1}deg)` }}>
+                        <Box component="span" sx={{ fontSize: '1rem', opacity: 0.55, filter: 'grayscale(0.6)' }}>{r?.emoji ?? '📝'}</Box>
+                        <Box component="span" sx={{ fontFamily: font.hand, fontSize: '1.1rem', lineHeight: 1 }}>?</Box>
                       </Box>
                     )
                   })}

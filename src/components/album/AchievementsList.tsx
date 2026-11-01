@@ -32,10 +32,10 @@ export function AchievementsList({ achievements }: { achievements: ReaderAchieve
             </Box>
             <Box sx={{ flex: 1, minWidth: 0 }}>
               <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary }}>
+                <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 600, color: colors.text.primary }}>
                   {a.label}
                 </Typography>
-                {a.unlocked && <Typography variant="md" sx={{ fontWeight: 900, color: colors.success.main }}>✓</Typography>}
+                {a.unlocked && <Typography variant="md" sx={{ fontWeight: 700, color: colors.success.main }}>✓</Typography>}
               </Stack>
               <Typography variant="sm" sx={{ color: colors.text.secondary, mb: a.unlocked ? 0 : 0.5 }}>
                 {a.description}
@@ -48,10 +48,10 @@ export function AchievementsList({ achievements }: { achievements: ReaderAchieve
               {!a.unlocked && (
                 <Stack direction="row" alignItems="center" spacing={0.8}>
                   <LinearProgress variant="determinate" value={pct} sx={{
-                    flex: 1, height: 5, borderRadius: radius.full, bgcolor: colors.fill.medium,
-                    '& .MuiLinearProgress-bar': { borderRadius: radius.full, background: theme.accent },
+                    flex: 1, height: 5, borderRadius: radius.sm, bgcolor: colors.fill.medium,
+                    '& .MuiLinearProgress-bar': { borderRadius: radius.sm, background: theme.accent },
                   }} />
-                  <Typography variant="xs" sx={{ fontWeight: 800, color: colors.text.muted }}>
+                  <Typography variant="xs" sx={{ fontWeight: 700, color: colors.text.muted }}>
                     {a.current}/{a.target}
                   </Typography>
                 </Stack>

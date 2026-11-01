@@ -5,7 +5,7 @@ import { useBackground } from '../../context/BackgroundContext'
 import { themeInk } from '../../design-system'
 import { FloatingParticles } from '../FloatingParticles'
 import { sceneLook, type Shape } from './sceneLook'
-import { Celestial, Horizon } from './Horizons'
+import { Birds, Celestial, Horizon } from './Horizons'
 
 const drift = keyframes`
   from { transform: translateX(-140px); }
@@ -13,6 +13,7 @@ const drift = keyframes`
 `
 
 const ROUND: Shape[] = ['round', 'porthole', 'submarine']
+const METAL: Shape[] = ['porthole', 'submarine', 'viewport']
 
 export function Cloud({ top, scale, duration, delay }: { top: string; scale: number; duration: number; delay: number }) {
   return (
@@ -95,6 +96,24 @@ function FlowerBox({ flowers }: { flowers: boolean }) {
   )
 }
 
+function Balcony() {
+  return (
+    <Box aria-hidden component="svg" viewBox="0 0 120 40" preserveAspectRatio="none" sx={{ position: 'absolute', left: 0, right: 0, bottom: 0, width: '100%', height: '38%', zIndex: 2, pointerEvents: 'none' }}>
+      <path d="M-2 31 H122 V40 H-2 Z" fill="#cdb9a6" stroke="#2a241d" strokeWidth="1" />
+      <path d="M-2 31 H122" stroke="#efe2d4" strokeWidth="1.2" />
+      <path d="M-2 36 H122 V40 H-2 Z" fill="rgba(42,36,29,0.22)" />
+      <path d="M4 30 L116 30" stroke="rgba(0,0,0,0.18)" strokeWidth="3" />
+      <g fill="none" stroke="#2a241d" strokeLinecap="round">
+        {Array.from({ length: 13 }, (_, i) => <path key={i} d={`M${i * 10} 6 V31`} strokeWidth="1.6" />)}
+        {Array.from({ length: 12 }, (_, i) => <path key={`c${i}`} d={`M${i * 10 + 1} 17 q 4 -7 8 0 q -4 7 -8 0`} strokeWidth="1.2" />)}
+        <path d="M0 26 H120" strokeWidth="1.4" />
+      </g>
+      <rect x="-2" y="3" width="124" height="4" rx="1.5" fill="#3a2f26" stroke="#2a241d" strokeWidth="0.8" />
+      <path d="M0 3.9 H120" stroke="#8b7a6a" strokeWidth="0.9" />
+    </Box>
+  )
+}
+
 function Shelf({ side }: { side: 'left' | 'right' }) {
   const books = side === 'left'
     ? [{ w: 9, h: 30, c: themeInk.ink }, { w: 7, h: 26, c: '#d9c9a8' }, { w: 10, h: 33, c: 'color-mix(in srgb, var(--pd-ink) 45%, #3a3128)' }, { w: 8, h: 24, c: 'color-mix(in srgb, var(--pd-accent) 60%, #fffcf5)', tilt: 14 }]
@@ -127,14 +146,14 @@ export function WindowScene({ width, height, children, shelves = true, sx }: {
   sx?: SxProps<Theme>
 }) {
   const { theme } = useBackground()
-  const { shape, decor, horizon, sky, stained } = sceneLook(theme.key)
+  const { shape, decor, horizon, sky, stained, glow, frost } = sceneLook(theme.key)
   const night = theme.isDark
   const round = ROUND.includes(shape)
-  const frame = shape === 'porthole' ? '#c2964a' : shape === 'submarine' ? '#4d5862' : night ? '#2b241d' : '#fbf6ea'
+  const frame = shape === 'porthole' ? '#c2964a' : shape === 'submarine' ? '#4d5862' : shape === 'viewport' ? '#565170' : night ? '#2b241d' : '#fbf6ea'
   const line = '#2a241d'
-  const ring = shape === 'submarine' ? 22 : shape === 'porthole' ? 16 : 9
-  const outerRadius = round ? '50%' : shape === 'arch' ? '50% 50% 6px 6px / 38% 38% 6px 6px' : '8px 8px 0 0'
-  const innerRadius = round ? '50%' : shape === 'arch' ? '50% 50% 3px 3px / 36% 36% 3px 3px' : '3px'
+  const ring = shape === 'submarine' || shape === 'viewport' ? 22 : shape === 'porthole' ? 16 : 9
+  const outerRadius = round ? '50%' : shape === 'viewport' ? '46% / 50%' : shape === 'arch' ? '50% 50% 6px 6px / 38% 38% 6px 6px' : '8px 8px 0 0'
+  const innerRadius = round ? '50%' : shape === 'viewport' ? '44% / 50%' : shape === 'arch' ? '50% 50% 3px 3px / 36% 36% 3px 3px' : '3px'
   const bar = { position: 'absolute', background: frame, zIndex: 3, border: `1.5px solid ${line}` } as const
   const fabric = night ? 'color-mix(in srgb, var(--pd-accent) 45%, #1a1410)' : 'color-mix(in srgb, var(--pd-accent) 45%, #fffcf5)'
 
@@ -142,7 +161,7 @@ export function WindowScene({ width, height, children, shelves = true, sx }: {
     <Box sx={{ position: 'relative', width: round ? 'auto' : width, display: round ? 'flex' : 'block', flexDirection: 'column', alignItems: 'center', px: decor === 'shutters' ? '15%' : 0, ...sx }}>
       <Box sx={{
         position: 'relative', height, aspectRatio: round ? '1 / 1' : undefined, p: `${ring}px`, background: frame,
-        border: `2px solid ${line}`, borderBottom: round ? undefined : 'none', borderRadius: outerRadius,
+        border: `2px solid ${line}`, borderBottom: round || shape === 'viewport' ? undefined : 'none', borderRadius: outerRadius,
         boxShadow: round
           ? `inset 0 0 0 3px rgba(255,255,255,0.18), inset 0 -4px 0 rgba(0,0,0,0.2), 3px 4px 0 rgba(42,36,29,${night ? 0.35 : 0.15})`
           : night ? '3px 0 0 rgba(0,0,0,0.25)' : '3px 0 0 rgba(60,42,20,0.1)',
@@ -152,6 +171,7 @@ export function WindowScene({ width, height, children, shelves = true, sx }: {
         {decor === 'curtains' && <Curtains color={fabric} />}
         {shape === 'porthole' && <Rivets count={8} color="#d9b46a" inset={ring / 2 + 2} />}
         {shape === 'submarine' && <Rivets count={12} color="#8d99a3" inset={ring / 2 + 2} />}
+        {shape === 'viewport' && <Rivets count={14} color="#9b95b8" inset={ring / 2 + 2} />}
         <Box sx={{ position: 'relative', height: '100%', overflow: 'hidden', background: theme.sky, border: `1.5px solid ${line}`, borderRadius: innerRadius, containerType: 'inline-size' }}>
           <Celestial sky={sky} night={night} />
           {!night && sky !== 'none' && (
@@ -160,9 +180,14 @@ export function WindowScene({ width, height, children, shelves = true, sx }: {
               <Cloud top="40%" scale={0.6} duration={95} delay={-55} />
             </>
           )}
+          {!night && sky !== 'none' && <Birds />}
           <FloatingParticles />
           <Horizon shape={shape} night={night} horizon={horizon} />
           {(decor === 'flowers' || decor === 'plants') && <FlowerBox flowers={decor === 'flowers'} />}
+          {decor === 'balcony' && <Balcony />}
+          {glow && <Box aria-hidden sx={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '55%', zIndex: 2, pointerEvents: 'none', background: 'linear-gradient(0deg, rgba(255,200,110,0.28), transparent)' }} />}
+          {frost && <Box aria-hidden sx={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none', background: 'radial-gradient(ellipse 45% 32% at 0% 100%, rgba(235,245,250,0.55), transparent 70%), radial-gradient(ellipse 45% 32% at 100% 100%, rgba(235,245,250,0.55), transparent 70%), radial-gradient(ellipse 30% 20% at 100% 0%, rgba(235,245,250,0.35), transparent 70%)' }} />}
+          {!METAL.includes(shape) && <Box aria-hidden sx={{ position: 'absolute', inset: 0, zIndex: 3, pointerEvents: 'none', boxShadow: 'inset 4px 5px 0 rgba(0,0,0,0.12)', borderRadius: innerRadius }} />}
           {stained && <Box aria-hidden sx={{ position: 'absolute', left: 0, right: 0, top: 0, height: '54%', zIndex: 2, pointerEvents: 'none', opacity: 0.62, background: 'repeating-linear-gradient(45deg, rgba(20,8,10,0.85) 0 2px, transparent 2px 20px), repeating-linear-gradient(-45deg, rgba(20,8,10,0.85) 0 2px, transparent 2px 20px), conic-gradient(from 30deg at 50% 70%, #b3263f, #e0a73a, #2f6f73, #6b3f8a, #b3263f)' }} />}
           <Box aria-hidden sx={{ position: 'absolute', inset: 0, zIndex: 2, background: round ? 'radial-gradient(circle at 32% 28%, rgba(255,255,255,0.22), transparent 34%)' : 'linear-gradient(125deg, transparent 30%, rgba(255,255,255,0.14) 38%, transparent 46%)', pointerEvents: 'none' }} />
           {(shape === 'sash' || shape === 'arch' || shape === 'round') && (

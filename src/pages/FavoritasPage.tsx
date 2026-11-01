@@ -32,7 +32,7 @@ export function FavoritasPage() {
 
   return (
     <Box sx={{ height: '100%', position: 'relative', ...clipOverflow, background: theme.gradient }}>
-      <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
+      <ScrollablePage narrow sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
         <Stack spacing={0.3} sx={{ mb: 2.2 }}>
           <Typography sx={{ fontFamily: font.hand, fontSize: '1.3rem', color: colors.primary.text, lineHeight: 1 }}>
             o que mais tocou
@@ -43,16 +43,15 @@ export function FavoritasPage() {
           {collection && (
             <Typography variant="sm" sx={{
               display: 'inline-flex', alignItems: 'center', gap: 0.5, mt: 0.4,
-              fontWeight: 700, color: theme.textOnBgMuted,
-              bgcolor: `${theme.accent}14`, border: `1px solid ${theme.accent}28`,
-              borderRadius: '20px', px: 1, py: 0.25, alignSelf: 'flex-start',
+              fontWeight: 600, color: theme.textOnBgMuted,
+              alignSelf: 'flex-start',
             }}>
               {collection.emoji} {collection.name}
             </Typography>
           )}
           {favorites.length > 0 && (
-            <Typography variant="md" sx={{ color: theme.textOnBgMuted, fontStyle: 'italic', mt: 0.3 }}>
-              {favorites.length} cartinha{favorites.length !== 1 ? 's' : ''} que você mais ama
+            <Typography sx={{ fontFamily: font.hand, fontSize: '1.15rem', color: theme.textOnBgMuted, mt: 0.3 }}>
+              {favorites.length} {favorites.length !== 1 ? 'bilhetes guardados' : 'bilhete guardado'} com carinho
             </Typography>
           )}
         </Stack>
@@ -64,17 +63,17 @@ export function FavoritasPage() {
         {!isLoading && favorites.length === 0 && (
           <Stack spacing={1.2} alignItems="center" justifyContent="center" sx={{ minHeight: 320, textAlign: 'center' }}>
             <SillScene emoji="💛" />
-            <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.2rem', color: theme.textOnBg }}>
+            <Typography sx={{ fontFamily: font.serif, fontWeight: 500, fontSize: '1.3rem', color: theme.textOnBg }}>
               Nenhuma favorita ainda
             </Typography>
             <Typography variant="lg" sx={{ color: theme.textOnBgMuted, maxWidth: 260 }}>
-              Toque na estrelinha de uma cartinha pra guardá-la aqui.
+              Toca na estrelinha de um bilhete pra guardar ele aqui.
             </Typography>
           </Stack>
         )}
 
         {!isLoading && favorites.length > 0 && (
-          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1 }}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 1.5 }}>
             {favorites.map((note) => (
               <NoteCard
                 key={note.id}

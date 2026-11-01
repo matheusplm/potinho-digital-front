@@ -44,7 +44,7 @@ export function NotificationsPage() {
 
   return (
     <Box sx={{ height: '100%', position: 'relative', ...clipOverflow, background: theme.gradient }}>
-      <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
+      <ScrollablePage narrow sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
         <Stack spacing={0.3} sx={{ mb: 2.2 }}>
           <Typography sx={{ fontFamily: font.hand, fontSize: '1.3rem', color: colors.primary.text, lineHeight: 1 }}>
             chegou correspondência?
@@ -53,7 +53,7 @@ export function NotificationsPage() {
             Suas novidades
           </Typography>
           {summary && (
-            <Typography variant="md" sx={{ color: theme.textOnBgMuted, fontStyle: 'italic', mt: 0.3 }}>
+            <Typography sx={{ fontFamily: font.hand, fontSize: '1.15rem', color: theme.textOnBgMuted, mt: 0.3 }}>
               {summary}
             </Typography>
           )}
@@ -100,7 +100,7 @@ export function NotificationsPage() {
                 <Stack spacing={1}>
                   <Stack direction="row" alignItems="center" spacing={1}>
                     {unread && <Box sx={{ width: 9, height: 9, borderRadius: '50%', background: theme.accent, flexShrink: 0 }} />}
-                    <Typography variant="sm" sx={{ flex: 1, fontWeight: 800, color: colors.text.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <Typography variant="sm" sx={{ flex: 1, fontWeight: 700, color: colors.text.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {notification.collectionEmoji} {notification.collectionName}
                     </Typography>
                     <Typography variant="xs" sx={{ fontWeight: 700, color: colors.text.muted, flexShrink: 0 }}>
@@ -108,7 +108,7 @@ export function NotificationsPage() {
                     </Typography>
                   </Stack>
 
-                  <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, lineHeight: 1.3 }}>
+                  <Typography variant="xl" sx={{ fontFamily: font.serif, fontWeight: 600, color: colors.text.primary, lineHeight: 1.3 }}>
                     {kindLabel(notification)}
                   </Typography>
 

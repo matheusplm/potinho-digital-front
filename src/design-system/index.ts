@@ -8,6 +8,6 @@ export {
   cardIn, menuIn,
   shimmer, hintWiggle, sway,
   shineSweep, packCtaFloat, ghostPulse,
-  dropFade, heartBeat, chevronPulse, floatHeart,
+  chevronPulse, floatHeart,
   bellRing, dotPing,
 } from './animations'

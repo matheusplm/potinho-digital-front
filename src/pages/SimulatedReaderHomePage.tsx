@@ -381,7 +381,7 @@ export function SimulatedReaderHomePage() {
           {isRealReader && !collectionsLoading ? (
             <Stack spacing={1.6} alignItems="center" justifyContent="center" sx={{ minHeight: 360, textAlign: 'center' }}>
               <SillScene emoji="🫙" />
-              <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.3rem', color: theme.textOnBg }}>
+              <Typography sx={{ fontFamily: font.serif, fontWeight: 600, fontSize: '1.3rem', color: theme.textOnBg }}>
                 Nenhum potinho por aqui ainda
               </Typography>
               {pendingInvites.length > 0 ? (
@@ -523,6 +523,11 @@ export function SimulatedReaderHomePage() {
                     <Typography sx={{ fontFamily: font.serif, fontWeight: 500, fontSize: '1.15rem', color: colors.text.primary, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {relerNote.title}
                     </Typography>
+                    {relerNote.message && (
+                      <Typography sx={{ mt: 0.3, fontFamily: font.hand, fontWeight: 600, fontSize: '1.15rem', lineHeight: 1.2, color: colors.text.secondary, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere' }}>
+                        {relerNote.message}
+                      </Typography>
+                    )}
                   </Box>
                   {ownedItems.length > 1 && (
                     <Box

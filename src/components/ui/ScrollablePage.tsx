@@ -3,9 +3,10 @@ import type { ReactNode } from 'react'
 
 interface ScrollablePageProps extends BoxProps {
   children: ReactNode
+  narrow?: boolean
 }
 
-export function ScrollablePage({ children, sx, ...props }: ScrollablePageProps) {
+export function ScrollablePage({ children, sx, narrow = false, ...props }: ScrollablePageProps) {
   return (
     <Box
       sx={{
@@ -19,7 +20,7 @@ export function ScrollablePage({ children, sx, ...props }: ScrollablePageProps) 
       }}
       {...props}
     >
-      {children}
+      {narrow ? <Box sx={{ width: '100%', maxWidth: 760, mx: 'auto', display: 'flex', flexDirection: 'column', flex: 1 }}>{children}</Box> : children}
     </Box>
   )
 }

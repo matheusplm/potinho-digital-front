@@ -5,7 +5,7 @@ import { useLocation, useSearchParams } from 'react-router-dom'
 import { SupportChat, SupportComposer, TicketStatusChip } from '../components/support/SupportChat'
 import { toast } from '../components/ui'
 import { useBackground } from '../context/BackgroundContext'
-import { font, radius } from '../design-system'
+import { colors, font, radius, themeInk } from '../design-system'
 import { useMySupportActions, useMySupportTicketQuery, useMySupportTicketsQuery } from '../hooks/useSupport'
 import type { MySupportTicket } from '../types/support'
 import { timeAgo } from '../utils/timeAgo'
@@ -61,7 +61,7 @@ function ThreadHeader({ title, subtitle, onBack, status }: { title: string; subt
       </Box>
       <Box sx={{ flex: 1, minWidth: 0 }}>
         <Stack direction="row" alignItems="center" spacing={0.8} sx={{ flexWrap: 'wrap', rowGap: 0.4 }}>
-          <Typography sx={{ fontWeight: 800, color: theme.textOnBg, fontSize: '0.98rem', lineHeight: 1.25 }}>{title}</Typography>
+          <Typography sx={{ fontWeight: 700, color: theme.textOnBg, fontSize: '0.98rem', lineHeight: 1.25 }}>{title}</Typography>
           {status && <TicketStatusChip status={status} viewer="user" />}
         </Stack>
         <Typography variant="xs" sx={{ color: theme.textOnBgMuted, display: { xs: 'none', sm: 'block' } }}>{subtitle}</Typography>
@@ -115,8 +115,8 @@ export function SupportPage() {
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', background: theme.gradient, px: { xs: 1.5, md: 3 }, pt: { xs: 2, md: 2.8 }, pb: { xs: 1.5, md: 2.5 } }}>
       <Stack spacing={0.3} sx={{ mb: 1.8, pr: { xs: 6, md: 0 }, display: showList || isDesktop ? 'flex' : 'none' }}>
-        <Typography variant="md" sx={{ color: theme.textOnBgMuted, fontWeight: 700 }}>💬 Suporte</Typography>
-        <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.6rem', color: theme.textOnBg, lineHeight: 1.1 }}>
+        <Typography sx={{ fontFamily: font.hand, fontSize: '1.3rem', color: colors.primary.text, lineHeight: 1 }}>deu ruim ou tem ideia?</Typography>
+        <Typography sx={{ fontFamily: font.serif, fontWeight: 500, fontSize: '1.9rem', letterSpacing: '-0.02em', color: theme.textOnBg, lineHeight: 1.05 }}>
           Fale com a gente
         </Typography>
       </Stack>
@@ -131,8 +131,8 @@ export function SupportPage() {
                 onClick={() => select(NEW)}
                 sx={{
                   all: 'unset', boxSizing: 'border-box', width: '100%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.6,
-                  py: 1.1, borderRadius: radius.lg, fontWeight: 800, fontSize: '0.9rem', color: theme.onAccent, background: theme.accent,
-                  boxShadow: `0 6px 18px ${withAlpha(theme.accent, 30)}`,
+                  py: 1.1, borderRadius: radius.md, fontWeight: 700, fontSize: '0.92rem', color: themeInk.onButton, background: themeInk.button,
+                  border: '1.5px solid #2a241d', boxShadow: '2px 2px 0 rgba(42,36,29,0.9)',
                   '&:focus-visible': { outline: `2px solid ${theme.accent}`, outlineOffset: 2 },
                 }}
               >
@@ -165,7 +165,7 @@ export function SupportPage() {
                 intro={(
                   <Stack alignItems="center" spacing={1} sx={{ textAlign: 'center', py: { xs: 4, md: 7 }, px: 2 }}>
                     <Typography sx={{ fontSize: '2.4rem' }}>👋</Typography>
-                    <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.25rem', color: theme.textOnBg }}>Como a gente pode ajudar?</Typography>
+                    <Typography sx={{ fontFamily: font.serif, fontWeight: 600, fontSize: '1.25rem', color: theme.textOnBg }}>Como a gente pode ajudar?</Typography>
                     <Typography variant="md" sx={{ color: theme.textOnBgMuted, maxWidth: 360, lineHeight: 1.5 }}>
                       Conta o que aconteceu, uma dúvida ou uma ideia. Quanto mais detalhe, mais rápido a gente resolve.
                     </Typography>
@@ -195,7 +195,7 @@ export function SupportPage() {
             {!selected && isDesktop && (
               <Stack alignItems="center" justifyContent="center" spacing={1} sx={{ height: '100%', textAlign: 'center', px: 3 }}>
                 <Typography sx={{ fontSize: '2.4rem' }}>💬</Typography>
-                <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.2rem', color: theme.textOnBg }}>
+                <Typography sx={{ fontFamily: font.serif, fontWeight: 600, fontSize: '1.2rem', color: theme.textOnBg }}>
                   {tickets.length ? 'Escolha uma conversa' : 'Começa uma conversa'}
                 </Typography>
                 <Typography variant="md" sx={{ color: theme.textOnBgMuted, maxWidth: 320 }}>

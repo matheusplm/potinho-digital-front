@@ -47,10 +47,10 @@ export function Button({ variant = 'primary', loading, children, sx, ...props }:
       sx={{
         borderRadius: radius.md,
         py: 1.4,
-        fontWeight: 600,
+        fontWeight: 700,
         textTransform: 'none',
         fontSize: '0.97rem',
-        letterSpacing: '0.01em',
+        letterSpacing: '0.03em',
         ...STYLES[variant],
         ...sx,
       }}

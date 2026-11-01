@@ -1,31 +1,11 @@
+import ContentCutIcon from '@mui/icons-material/ContentCut'
 import { Box, ButtonBase, Tooltip, Typography } from '@mui/material'
-import { keyframes } from '@emotion/react'
 import { useBackground } from '../../context/BackgroundContext'
-import { backgroundThemes, font } from '../../design-system'
+import { backgroundThemes, colors, font } from '../../design-system'
 import { FloatingParticles } from '../FloatingParticles'
-import { PotinhoMark } from '../PotinhoMark'
 import { Cloud } from './WindowScene'
-import { Celestial, Horizon } from './Horizons'
+import { Birds, Celestial, Horizon } from './Horizons'
 import { sceneLook } from './sceneLook'
-
-const bob = keyframes`
-  0%, 100% { transform: translateY(0) rotate(var(--tilt)); }
-  50%      { transform: translateY(-10px) rotate(calc(var(--tilt) + 5deg)); }
-`
-
-const sway = keyframes`
-  0%, 100% { transform: rotate(var(--tilt)); }
-  50%      { transform: rotate(calc(var(--tilt) + 3deg)); }
-`
-
-type Spot = { left: string; bottom: string; size: number; tilt: number; float?: boolean }
-
-function spots(shape: string, horizon?: string): Spot[] {
-  if (shape === 'porthole') return [{ left: '10%', bottom: 'calc(34% - 70px)', size: 120, tilt: -18, float: true }, { left: '78%', bottom: 'calc(34% - 18px)', size: 44, tilt: 22, float: true }]
-  if (shape === 'submarine') return [{ left: '8%', bottom: '2%', size: 132, tilt: 28 }, { left: '80%', bottom: '5%', size: 58, tilt: -34 }]
-  if (horizon) return [{ left: '6%', bottom: '1%', size: 140, tilt: -26 }, { left: '82%', bottom: '4%', size: 56, tilt: 18 }]
-  return [{ left: '6%', bottom: '2%', size: 128, tilt: -22 }, { left: '84%', bottom: '24%', size: 46, tilt: 14 }]
-}
 
 export function OutsideScene() {
   const { theme } = useBackground()
@@ -42,24 +22,9 @@ export function OutsideScene() {
           <Cloud top="16%" scale={0.8} duration={200} delay={-150} />
         </Box>
       )}
+      {!night && sky !== 'none' && <Birds />}
       <FloatingParticles />
       <Horizon shape={shape} night={night} horizon={horizon} />
-      {spots(shape, horizon).map((s, i) => (
-        <Box key={i} sx={{
-          position: 'absolute', left: s.left, bottom: s.bottom, zIndex: 2, transformOrigin: 'bottom left',
-          display: i > 0 ? { xs: 'none', sm: 'block' } : 'block',
-          transform: { xs: 'scale(0.68)', sm: 'none' },
-        }}>
-          <Box sx={{
-            '--tilt': `${s.tilt}deg`, transform: `rotate(${s.tilt}deg)`, transformOrigin: 'bottom center',
-            animation: `${s.float ? bob : sway} ${s.float ? 4 + i : 7 + i * 2}s ease-in-out infinite`,
-            filter: 'drop-shadow(4px 6px 0 rgba(0,0,0,0.18))',
-            '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
-          }}>
-            <PotinhoMark size={s.size} />
-          </Box>
-        </Box>
-      ))}
     </Box>
   )
 }
@@ -67,11 +32,16 @@ export function OutsideScene() {
 export function ViewPicker() {
   const { theme, themeKey, setThemeKey } = useBackground()
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, px: 2, pt: 1, pb: 1.4, background: theme.surfaceBg, border: `1.5px solid ${theme.surfaceBorder}`, borderRadius: '6px', boxShadow: '3px 4px 0 rgba(0,0,0,0.16)', transform: 'rotate(-1deg)' }}>
-      <Typography sx={{ fontFamily: font.hand, fontSize: '1.25rem', lineHeight: 1, color: theme.textOnBgMuted }}>
-        troca a vista
+    <Box sx={{
+      position: 'relative', mx: { xs: -2.5, sm: -4 }, mb: -2.5, mt: 1.6, px: 2, pt: 1.4, pb: 'max(14px, env(safe-area-inset-bottom))',
+      borderTop: `2.5px dashed color-mix(in srgb, var(--pd-text-primary) 28%, transparent)`, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1.1,
+      background: 'color-mix(in srgb, var(--pd-text-primary) 4%, transparent)',
+    }}>
+      <ContentCutIcon aria-hidden sx={{ position: 'absolute', top: -11, left: 14, fontSize: 18, color: 'color-mix(in srgb, var(--pd-text-primary) 45%, transparent)', background: theme.surfaceBg, px: '2px', boxSizing: 'content-box' }} />
+      <Typography sx={{ fontFamily: font.hand, fontSize: '1.35rem', lineHeight: 1, color: theme.textOnBgMuted, transform: 'rotate(-2deg)' }}>
+        troca a vista: <Box component="span" sx={{ color: colors.primary.text, fontWeight: 700 }}>{theme.label}</Box>
       </Typography>
-      <Box role="radiogroup" aria-label="Tema" sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 1, maxWidth: { xs: 300, sm: 600 } }}>
+      <Box role="radiogroup" aria-label="Tema" sx={{ display: 'grid', gridTemplateColumns: 'repeat(6, 40px)', justifyContent: 'center', gap: 1 }}>
         {backgroundThemes.map((t) => {
           const sel = t.key === themeKey
           return (
@@ -85,14 +55,31 @@ export function ViewPicker() {
                   width: 40, height: 40, borderRadius: '50%', background: t.sky,
                   border: `2px solid ${sel ? '#fffdf7' : 'rgba(42,36,29,0.45)'}`,
                   boxShadow: sel ? `0 0 0 2.5px ${t.ink}, 2px 3px 0 rgba(0,0,0,0.2)` : '1px 2px 0 rgba(0,0,0,0.15)',
-                  transform: sel ? 'scale(1.15)' : 'none', transition: 'transform 0.15s, box-shadow 0.15s',
-                  '&:hover': { transform: 'scale(1.1)' },
-                  '&:focus-visible': { outline: '2px dashed #fffdf7', outlineOffset: 3 },
+                  transform: sel ? 'scale(1.1)' : 'none', transition: 'transform 0.15s, box-shadow 0.15s',
+                  '&:hover': { transform: 'scale(1.08)' },
+                  '&:focus-visible': { outline: `2px dashed ${colors.text.primary}`, outlineOffset: 3 },
                 }}
               />
             </Tooltip>
           )
         })}
+      </Box>
+    </Box>
+  )
+}
+
+export function Postmark({ label }: { label: string }) {
+  return (
+    <Box aria-hidden sx={{ position: 'absolute', top: { xs: 14, sm: 18 }, right: { xs: 12, sm: 18 }, display: 'flex', alignItems: 'center', transform: 'rotate(10deg)', opacity: 0.85, pointerEvents: 'none' }}>
+      <Box component="svg" viewBox="0 0 40 24" sx={{ width: { xs: 30, sm: 40 }, mr: '-4px' }}>
+        {[5, 12, 19].map((y) => <path key={y} d={`M0 ${y} q 5 -4 10 0 t 10 0 t 10 0 t 10 0`} fill="none" stroke={colors.primary.text} strokeWidth="1.6" />)}
+      </Box>
+      <Box sx={{
+        width: { xs: 58, sm: 70 }, height: { xs: 58, sm: 70 }, borderRadius: '50%', border: `2px solid ${colors.primary.text}`, outline: `1px solid ${colors.primary.text}`, outlineOffset: '3px',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: colors.primary.text, textAlign: 'center',
+      }}>
+        <Typography sx={{ fontSize: '0.5rem', fontWeight: 700, letterSpacing: '0.22em', lineHeight: 1 }}>VISTA</Typography>
+        <Typography sx={{ fontFamily: font.hand, fontSize: { xs: '0.85rem', sm: '1rem' }, fontWeight: 700, lineHeight: 1.05, px: 0.5 }}>{label}</Typography>
       </Box>
     </Box>
   )

@@ -2,18 +2,16 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, Stack, Typography } from '@mui/material'
 import { colors, font, ink, radius } from '../../design-system'
 import { linkifyText } from '../../utils/linkify'
-import { useBackground } from '../../context/BackgroundContext'
 import type { CollectionNoteView, RarityConfig } from '../../types/note'
 import { HAND_MESSAGE_SX, rarityCardSx as paperCardSx } from '../../components/collection/RewardCard'
 
-function rarityCardSx(r?: RarityConfig, compact = false, isDark = false) {
-  return { ...paperCardSx(r, compact, isDark), cursor: 'pointer' }
+function rarityCardSx(r?: RarityConfig, compact = false) {
+  return { ...paperCardSx(r, compact), cursor: 'pointer' }
 }
 
 export function ReaderNoteCard({ note, rarity, onClick }: { note: CollectionNoteView; rarity?: RarityConfig; onClick: () => void }) {
-  const { theme, maskLightCards } = useBackground()
   return (
-    <Box onClick={onClick} sx={rarityCardSx(rarity, false, theme.isDark && maskLightCards)}>
+    <Box onClick={onClick} sx={rarityCardSx(rarity, false)}>
       <Box sx={{ position: 'relative', zIndex: 1 }}>
         <Stack spacing={0.8}>
           <Stack direction="row" alignItems="flex-start" justifyContent="space-between" spacing={0.5}>
@@ -45,9 +43,8 @@ export function ReaderNoteCard({ note, rarity, onClick }: { note: CollectionNote
 }
 
 export function ReaderNoteRow({ note, rarity, onClick }: { note: CollectionNoteView; rarity?: RarityConfig; onClick: () => void }) {
-  const { theme, maskLightCards } = useBackground()
   return (
-    <Box onClick={onClick} sx={{ ...rarityCardSx(rarity, true, theme.isDark && maskLightCards), py: 1, px: 1.4 }}>
+    <Box onClick={onClick} sx={{ ...rarityCardSx(rarity, true), py: 1, px: 1.4 }}>
       <Box sx={{ position: 'relative', zIndex: 1 }}>
         <Stack direction="row" alignItems="center" spacing={1.2}>
           {rarity && (

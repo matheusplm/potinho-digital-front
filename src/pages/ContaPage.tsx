@@ -147,7 +147,7 @@ export function ContaPage() {
   return (
     <Box sx={{ height: '100%', position: 'relative', ...clipOverflow, background: theme.gradient }}>
 
-      <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
+      <ScrollablePage narrow sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
         <Stack spacing={0.3} sx={{ mb: 2.5 }}>
           <Typography sx={{ fontFamily: font.hand, fontSize: '1.3rem', color: colors.primary.text, lineHeight: 1 }}>
             seus dados
@@ -419,7 +419,7 @@ export function ContaPage() {
               <SupportAgentOutlinedIcon sx={{ fontSize: 17 }} />
               Falar com o suporte
               {supportUnread > 0 && (
-                <Box component="span" sx={{ ml: 0.4, px: 0.8, py: 0.1, borderRadius: radius.full, fontSize: '0.68rem', fontWeight: 800, color: theme.onAccent, background: theme.accent }}>
+                <Box component="span" sx={{ ml: 0.4, px: 0.8, py: 0.1, borderRadius: radius.full, fontSize: '0.68rem', fontWeight: 700, color: theme.onAccent, background: theme.accent }}>
                   {supportUnread === 1 ? 'nova resposta' : `${supportUnread} respostas`}
                 </Box>
               )}
