@@ -101,7 +101,7 @@ export function Door({ height = 200, ajar = false, mat = 'bem-vindo', furnished 
   const width = Math.round(height * (shape === 'round' ? 0.82 : shape === 'hatch' ? 0.64 : 0.56))
   const frame = shape === 'hatch' ? '#3c464f' : shape === 'ship' ? '#7a5a3a' : night ? '#2b241d' : '#fbf6ea'
   const line = '#2a241d'
-  const paint = shape === 'hatch' ? STEEL : shape === 'cabin' ? '#6b4a2e' : shape === 'greenhouse' ? '#e9efe6' : `color-mix(in srgb, ${themeInk.ink} 82%, #2a1d12)`
+  const paint = shape === 'hatch' ? STEEL : shape === 'cabin' ? '#6b4a2e' : shape === 'greenhouse' ? '#e9efe6' : theme.key === 'romance' ? `color-mix(in srgb, ${themeInk.ink} 55%, #f6d3db)` : `color-mix(in srgb, ${themeInk.ink} 82%, #2a1d12)`
   const top = shape === 'arch' ? '50% 50% 2px 2px / 30% 30% 2px 2px' : shape === 'round' ? '50% 50% 4px 4px / 55% 55% 4px 4px' : shape === 'hatch' ? '38% 38% 30% 30% / 26% 26% 22% 22%' : '3px 3px 0 0'
   const panel = { position: 'absolute', left: '16%', right: '16%', border: '1.5px solid rgba(0,0,0,0.28)', borderRadius: '2px', boxShadow: 'inset 2px 2px 0 rgba(255,255,255,0.12), inset -2px -2px 0 rgba(0,0,0,0.18)' } as const
   const surface: Record<Shape, ReactNode> = {

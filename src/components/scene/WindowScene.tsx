@@ -5,24 +5,13 @@ import { useBackground } from '../../context/BackgroundContext'
 import { themeInk } from '../../design-system'
 import { FloatingParticles } from '../FloatingParticles'
 import { sceneLook, type Shape } from './sceneLook'
+import { Celestial, Horizon } from './Horizons'
 
 const drift = keyframes`
   from { transform: translateX(-140px); }
   to   { transform: translateX(calc(100cqw + 40px)); }
 `
 
-const sea = keyframes`
-  0%, 100% { transform: translateX(0); }
-  50%      { transform: translateX(-24px); }
-`
-
-const kelp = keyframes`
-  0%, 100% { transform: skewX(-4deg); }
-  50%      { transform: skewX(5deg); }
-`
-
-const ROOFS = 'M0 60 V38 H18 V30 L30 20 L42 30 V38 H58 V26 H74 V34 H92 V22 L104 14 L116 22 V36 H134 V28 H150 V18 H166 V32 H184 V24 L198 16 L212 24 V36 H230 V30 H246 V20 H262 V34 H280 V26 H300 V60 Z'
-const LIT = [[22, 33], [64, 30], [98, 26], [108, 30], [140, 32], [154, 22], [170, 36], [202, 28], [236, 34], [252, 25], [286, 30]]
 const ROUND: Shape[] = ['round', 'porthole', 'submarine']
 
 export function Cloud({ top, scale, duration, delay }: { top: string; scale: number; duration: number; delay: number }) {
@@ -37,63 +26,6 @@ export function Cloud({ top, scale, duration, delay }: { top: string; scale: num
         '&::before': { content: '""', position: 'absolute', left: 18, top: -12, width: 34, height: 30, borderRadius: '50%', background: 'inherit' },
         '&::after': { content: '""', position: 'absolute', left: 44, top: -18, width: 40, height: 36, borderRadius: '50%', background: 'inherit' },
       }} />
-    </Box>
-  )
-}
-
-function Pines({ night }: { night: boolean }) {
-  const far = night ? 'rgba(10,30,18,0.85)' : 'rgba(70,120,80,0.55)'
-  const near = night ? '#06140b' : '#3f6b45'
-  const tree = (x: number, h: number, w: number) => `M${x} 60 L${x} ${60 - h * 0.15} L${x - w} ${60 - h * 0.15} L${x} ${60 - h} L${x + w} ${60 - h * 0.15} L${x} ${60 - h * 0.15} Z`
-  return (
-    <Box component="svg" aria-hidden viewBox="0 0 300 60" preserveAspectRatio="xMidYMax slice" sx={{ position: 'absolute', left: 0, right: 0, bottom: 0, width: '100%', height: '46%', zIndex: 1 }}>
-      <path d={[14, 40, 66, 96, 122, 150, 178, 204, 232, 258, 286].map((x, i) => tree(x, 34 + (i % 3) * 6, 11)).join(' ')} fill={far} />
-      <path d={[0, 28, 58, 84, 112, 140, 168, 196, 224, 252, 280, 300].map((x, i) => tree(x, 44 + ((i * 7) % 14), 14)).join(' ')} fill={near} />
-      <rect x="0" y="56" width="300" height="4" fill={near} />
-    </Box>
-  )
-}
-
-function Trees() {
-  return (
-    <Box component="svg" aria-hidden viewBox="0 0 300 60" preserveAspectRatio="xMidYMax slice" sx={{ position: 'absolute', left: 0, right: 0, bottom: 0, width: '100%', height: '40%', zIndex: 1 }}>
-      <path d="M0 60 V40 Q 60 26 130 38 T 300 34 V60 Z" fill="rgba(120,170,120,0.55)" />
-      {[[30, 34, 16], [74, 30, 20], [118, 38, 14], [170, 28, 22], [222, 36, 15], [268, 30, 19]].map(([x, y, r]) => (
-        <g key={x}><rect x={x - 2} y={y} width="4" height={60 - y} fill="#5e3f27" /><circle cx={x} cy={y} r={r} fill="#5a9d62" /><circle cx={x - r * 0.45} cy={y + r * 0.2} r={r * 0.7} fill="#4f8f58" /></g>
-      ))}
-      <rect x="0" y="54" width="300" height="6" fill="#4f8f58" />
-    </Box>
-  )
-}
-
-export function Horizon({ shape, night, horizon }: { shape: Shape; night: boolean; horizon?: 'pines' | 'trees' }) {
-  if (horizon === 'pines') return <Pines night={night} />
-  if (horizon === 'trees') return <Trees />
-  if (shape === 'submarine') {
-    return (
-      <>
-        <Box aria-hidden sx={{ position: 'absolute', inset: 0, zIndex: 1, background: 'repeating-linear-gradient(100deg, transparent 0 22px, rgba(180,230,255,0.07) 22px 34px, transparent 34px 60px)', maskImage: 'linear-gradient(180deg, #000, transparent 75%)', WebkitMaskImage: 'linear-gradient(180deg, #000, transparent 75%)' }} />
-        <Box component="svg" aria-hidden viewBox="0 0 200 60" preserveAspectRatio="xMidYMax slice" sx={{ position: 'absolute', left: 0, right: 0, bottom: 0, width: '100%', height: '42%', zIndex: 1, transformOrigin: 'bottom', animation: `${kelp} 6s ease-in-out infinite` }}>
-          <path d="M0 60 Q 20 48 36 54 T 80 50 T 130 55 T 200 48 V60 Z" fill="rgba(0,0,0,0.5)" />
-          {[[24, 18], [44, 6], [120, 14], [150, 2], [176, 20]].map(([x, top]) => (
-            <path key={x} d={`M${x} 60 C ${x - 8} 46, ${x + 8} 34, ${x} ${top + 10} C ${x - 6} ${top + 4}, ${x + 4} ${top}, ${x + 2} ${top}`} fill="none" stroke="rgba(30,90,80,0.75)" strokeWidth="4" strokeLinecap="round" />
-          ))}
-        </Box>
-      </>
-    )
-  }
-  if (shape === 'porthole') {
-    return (
-      <Box aria-hidden sx={{ position: 'absolute', left: -30, right: -30, bottom: 0, height: '34%', zIndex: 1, animation: `${sea} 7s ease-in-out infinite` }}>
-        <Box sx={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, #4f93b8, #2d6c8f)' }} />
-        <Box sx={{ position: 'absolute', left: 0, right: 0, top: -6, height: 12, background: 'radial-gradient(circle at 10px 12px, transparent 9px, #4f93b8 9.5px) 0 0 / 20px 12px repeat-x' }} />
-      </Box>
-    )
-  }
-  return (
-    <Box component="svg" aria-hidden viewBox="0 0 300 60" preserveAspectRatio="xMidYMax slice" sx={{ position: 'absolute', left: 0, right: 0, bottom: 0, width: '100%', height: '30%', zIndex: 1 }}>
-      <path d={ROOFS} fill={night ? 'rgba(0,0,0,0.42)' : 'rgba(255,253,247,0.45)'} />
-      {night && LIT.map(([x, y]) => <rect key={`${x}-${y}`} x={x} y={y} width="4" height="5" fill="#f7d98a" opacity="0.85" />)}
     </Box>
   )
 }
@@ -195,7 +127,7 @@ export function WindowScene({ width, height, children, shelves = true, sx }: {
   sx?: SxProps<Theme>
 }) {
   const { theme } = useBackground()
-  const { shape, decor, horizon } = sceneLook(theme.key)
+  const { shape, decor, horizon, sky, stained } = sceneLook(theme.key)
   const night = theme.isDark
   const round = ROUND.includes(shape)
   const frame = shape === 'porthole' ? '#c2964a' : shape === 'submarine' ? '#4d5862' : night ? '#2b241d' : '#fbf6ea'
@@ -221,12 +153,8 @@ export function WindowScene({ width, height, children, shelves = true, sx }: {
         {shape === 'porthole' && <Rivets count={8} color="#d9b46a" inset={ring / 2 + 2} />}
         {shape === 'submarine' && <Rivets count={12} color="#8d99a3" inset={ring / 2 + 2} />}
         <Box sx={{ position: 'relative', height: '100%', overflow: 'hidden', background: theme.sky, border: `1.5px solid ${line}`, borderRadius: innerRadius, containerType: 'inline-size' }}>
-          {shape !== 'submarine' && (night ? (
-            <Box aria-hidden sx={{ position: 'absolute', top: '14%', right: '22%', width: 30, height: 30, borderRadius: '50%', boxShadow: '9px 5px 0 0 #f3ead2', filter: 'drop-shadow(0 0 10px rgba(243,234,210,0.45))' }} />
-          ) : (
-            <Box aria-hidden sx={{ position: 'absolute', top: '14%', right: '20%', width: 42, height: 42, borderRadius: '50%', background: 'radial-gradient(circle at 40% 40%, #fff7da, #f7d27a)', boxShadow: '0 0 0 8px rgba(255,236,170,0.35), 0 0 30px rgba(255,220,140,0.6)' }} />
-          ))}
-          {!night && shape !== 'submarine' && (
+          <Celestial sky={sky} night={night} />
+          {!night && sky !== 'none' && (
             <>
               <Cloud top="20%" scale={0.9} duration={70} delay={-12} />
               <Cloud top="40%" scale={0.6} duration={95} delay={-55} />
@@ -235,6 +163,7 @@ export function WindowScene({ width, height, children, shelves = true, sx }: {
           <FloatingParticles />
           <Horizon shape={shape} night={night} horizon={horizon} />
           {(decor === 'flowers' || decor === 'plants') && <FlowerBox flowers={decor === 'flowers'} />}
+          {stained && <Box aria-hidden sx={{ position: 'absolute', left: 0, right: 0, top: 0, height: '54%', zIndex: 2, pointerEvents: 'none', opacity: 0.62, background: 'repeating-linear-gradient(45deg, rgba(20,8,10,0.85) 0 2px, transparent 2px 20px), repeating-linear-gradient(-45deg, rgba(20,8,10,0.85) 0 2px, transparent 2px 20px), conic-gradient(from 30deg at 50% 70%, #b3263f, #e0a73a, #2f6f73, #6b3f8a, #b3263f)' }} />}
           <Box aria-hidden sx={{ position: 'absolute', inset: 0, zIndex: 2, background: round ? 'radial-gradient(circle at 32% 28%, rgba(255,255,255,0.22), transparent 34%)' : 'linear-gradient(125deg, transparent 30%, rgba(255,255,255,0.14) 38%, transparent 46%)', pointerEvents: 'none' }} />
           {(shape === 'sash' || shape === 'arch' || shape === 'round') && (
             <>

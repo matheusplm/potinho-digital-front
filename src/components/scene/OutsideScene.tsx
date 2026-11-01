@@ -4,7 +4,8 @@ import { useBackground } from '../../context/BackgroundContext'
 import { backgroundThemes, font } from '../../design-system'
 import { FloatingParticles } from '../FloatingParticles'
 import { PotinhoMark } from '../PotinhoMark'
-import { Cloud, Horizon } from './WindowScene'
+import { Cloud } from './WindowScene'
+import { Celestial, Horizon } from './Horizons'
 import { sceneLook } from './sceneLook'
 
 const bob = keyframes`
@@ -28,18 +29,13 @@ function spots(shape: string, horizon?: string): Spot[] {
 
 export function OutsideScene() {
   const { theme } = useBackground()
-  const { shape, horizon } = sceneLook(theme.key)
+  const { shape, horizon, sky } = sceneLook(theme.key)
   const night = theme.isDark
-  const underwater = shape === 'submarine'
 
   return (
     <Box aria-hidden sx={{ position: 'fixed', inset: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none', background: theme.sky, transition: 'background 0.5s ease' }}>
-      {!underwater && (night ? (
-        <Box sx={{ position: 'absolute', top: '9%', right: '14%', width: 64, height: 64, borderRadius: '50%', boxShadow: '18px 10px 0 0 #f3ead2', filter: 'drop-shadow(0 0 22px rgba(243,234,210,0.45))' }} />
-      ) : (
-        <Box sx={{ position: 'absolute', top: '8%', right: '12%', width: 92, height: 92, borderRadius: '50%', background: 'radial-gradient(circle at 40% 40%, #fff7da, #f7d27a)', boxShadow: '0 0 0 18px rgba(255,236,170,0.3), 0 0 80px rgba(255,220,140,0.6)' }} />
-      ))}
-      {!night && !underwater && (
+      <Celestial sky={sky} night={night} scale={2.1} />
+      {!night && sky !== 'none' && (
         <Box sx={{ position: 'absolute', inset: 0, containerType: 'inline-size' }}>
           <Cloud top="10%" scale={1.6} duration={120} delay={-30} />
           <Cloud top="24%" scale={1.1} duration={160} delay={-90} />

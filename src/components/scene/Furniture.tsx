@@ -40,9 +40,9 @@ const SETS: Record<string, { left: Piece[]; right: Piece[]; extra: Piece; wall: 
   mint: { left: ['monstera'], right: ['table-vase', 'fern'], extra: 'table-books', wall: 'frame', rug: false },
   peach: { left: ['armchair'], right: ['table-vase'], extra: 'fern', wall: 'frame', rug: true },
   lavender: { left: ['bookshelf'], right: ['beanbag'], extra: 'table-lamp', wall: 'lights', rug: true },
-  midnight: { left: ['telescope'], right: ['table-lamp'], extra: 'bookshelf', wall: 'clock', rug: false },
-  velvet: { left: ['armchair'], right: ['candelabra'], extra: 'bookshelf', wall: 'frame', rug: true },
-  'rose-night': { left: ['table-vase'], right: ['armchair'], extra: 'fern', wall: 'heart-frame', rug: true },
+  midnight: { left: ['armchair'], right: ['table-lamp'], extra: 'bookshelf', wall: 'clock', rug: true },
+  velvet: { left: ['telescope'], right: ['bookshelf'], extra: 'table-lamp', wall: 'lights', rug: true },
+  'rose-night': { left: ['candelabra'], right: ['armchair'], extra: 'table-vase', wall: 'heart-frame', rug: true },
   'deep-ocean': { left: ['chest'], right: ['pipes'], extra: 'barrel', wall: 'gauge', rug: false },
   'forest-night': { left: ['stove'], right: ['armchair'], extra: 'table-lamp', wall: 'frame', rug: true },
 }
