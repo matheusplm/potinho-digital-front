@@ -219,6 +219,8 @@ export function themeCssVars(theme: Omit<BackgroundTheme, 'onAccent'>): Record<s
     '--pd-sky': theme.sky,
     '--pd-accent': theme.accent,
     '--pd-ink': theme.ink,
+    '--pd-button': theme.isDark ? theme.accent : theme.ink,
+    '--pd-on-button': theme.isDark ? '#16120e' : '#fffcf5',
     '--pd-primary-text': onPage,
     '--pd-rose-text': onPage,
     '--pd-text-primary': theme.textOnBg,

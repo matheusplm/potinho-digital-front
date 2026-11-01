@@ -78,8 +78,8 @@ export function MainPackButton({ pack, collectionEmoji, mainCanOpen, remainingLa
                     <Box sx={{
                       position: 'absolute', left: '50%', top: '58%', transform: 'translate(-50%,-50%)',
                       width: size * 0.3, height: size * 0.3, borderRadius: '47% 53% 50% 50% / 52% 48% 52% 48%',
-                      background: `radial-gradient(circle at 38% 34%, color-mix(in srgb, ${SEAL} 78%, #fff), ${SEAL} 60%, color-mix(in srgb, ${SEAL} 72%, #000))`,
-                      boxShadow: 'inset 0 0 0 4px rgba(0,0,0,0.08), 1px 2px 0 rgba(60,42,20,0.25)',
+                      background: SEAL, border: '2px solid #2a241d',
+                      boxShadow: '2px 3px 0 rgba(42,36,29,0.25)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
                       <Box sx={{ width: '70%', height: '70%', borderRadius: '50%', border: '1.5px solid rgba(255,240,230,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

@@ -75,7 +75,7 @@ export function ViewPicker() {
       <Typography sx={{ fontFamily: font.hand, fontSize: '1.25rem', lineHeight: 1, color: theme.textOnBgMuted }}>
         troca a vista
       </Typography>
-      <Box role="radiogroup" aria-label="Tema" sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 0.9, maxWidth: 470 }}>
+      <Box role="radiogroup" aria-label="Tema" sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 1, maxWidth: { xs: 300, sm: 600 } }}>
         {backgroundThemes.map((t) => {
           const sel = t.key === themeKey
           return (
@@ -86,7 +86,7 @@ export function ViewPicker() {
                 aria-label={t.label}
                 onClick={() => setThemeKey(t.key)}
                 sx={{
-                  width: 30, height: 30, borderRadius: '50%', background: t.sky,
+                  width: 40, height: 40, borderRadius: '50%', background: t.sky,
                   border: `2px solid ${sel ? '#fffdf7' : 'rgba(42,36,29,0.45)'}`,
                   boxShadow: sel ? `0 0 0 2.5px ${t.ink}, 2px 3px 0 rgba(0,0,0,0.2)` : '1px 2px 0 rgba(0,0,0,0.15)',
                   transform: sel ? 'scale(1.15)' : 'none', transition: 'transform 0.15s, box-shadow 0.15s',

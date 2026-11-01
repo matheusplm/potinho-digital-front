@@ -1,5 +1,5 @@
 import { Button as MuiButton, CircularProgress, type ButtonProps } from '@mui/material'
-import { colors, gradients, radius, shadow } from '../../design-system'
+import { colors, gradients, radius, shadow, themeInk } from '../../design-system'
 
 type AppVariant = 'primary' | 'rose' | 'purple' | 'ghost'
 
@@ -18,7 +18,7 @@ const PRESS = {
 function inked(color: string) {
   return {
     background: color,
-    color: '#fffcf5',
+    color: themeInk.onButton,
     border: '1.5px solid #2a241d',
     boxShadow: shadow.primary,
     ...PRESS,

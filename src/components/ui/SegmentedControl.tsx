@@ -25,7 +25,7 @@ export function SegmentedControl<T extends string>({ options, value, onChange }:
     }}>
       {options.map((opt) => {
         const active = value === opt.id
-        const color = active ? '#fffcf5' : theme.textOnBgMuted
+        const color = active ? themeInk.onButton : theme.textOnBgMuted
         return (
           <Box
             key={opt.id}
@@ -34,7 +34,7 @@ export function SegmentedControl<T extends string>({ options, value, onChange }:
             sx={{
               flex: '1 1 28%', py: 1, px: 1.2, cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.7,
-              bgcolor: active ? opt.activeColor ?? themeInk.ink : 'transparent',
+              bgcolor: active ? opt.activeColor ?? themeInk.button : 'transparent',
               boxShadow: `inset 0 0 0 0.75px ${theme.surfaceBorder}`,
               transition: 'background 0.15s',
               '&:hover': active ? {} : { bgcolor: colors.fill.subtle },

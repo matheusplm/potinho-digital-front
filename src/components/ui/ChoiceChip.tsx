@@ -18,7 +18,7 @@ const SIZES = {
   lg: { height: 30, fontSize: '0.78rem', px: 1.4 },
 }
 
-const PRIMARY: ChoiceTone = { bg: themeInk.ink, border: themeInk.ink, text: '#fffcf5' }
+const PRIMARY: ChoiceTone = { bg: themeInk.button, border: themeInk.button, text: themeInk.onButton }
 
 export function ChoiceChip({ label, selected, onClick, size = 'sm', surface = 'card', tone, disabled = false, sx }: {
   label: ReactNode

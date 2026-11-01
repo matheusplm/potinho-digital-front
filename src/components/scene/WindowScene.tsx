@@ -199,7 +199,7 @@ export function WindowScene({ width, height, children, shelves = true, sx }: {
   const night = theme.isDark
   const round = ROUND.includes(shape)
   const frame = shape === 'porthole' ? '#c2964a' : shape === 'submarine' ? '#4d5862' : night ? '#2b241d' : '#fbf6ea'
-  const line = round && shape !== 'round' ? 'rgba(20,16,12,0.7)' : night ? 'rgba(250,246,238,0.28)' : 'rgba(42,36,29,0.6)'
+  const line = '#2a241d'
   const ring = shape === 'submarine' ? 22 : shape === 'porthole' ? 16 : 9
   const outerRadius = round ? '50%' : shape === 'arch' ? '50% 50% 6px 6px / 38% 38% 6px 6px' : '8px 8px 0 0'
   const innerRadius = round ? '50%' : shape === 'arch' ? '50% 50% 3px 3px / 36% 36% 3px 3px' : '3px'

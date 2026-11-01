@@ -29,14 +29,16 @@ export const ink = {
 
 export const themeInk = {
   ink: 'var(--pd-ink)',
+  button: 'var(--pd-button)',
+  onButton: 'var(--pd-on-button)',
   accent: 'var(--pd-accent)',
   sky: 'var(--pd-sky)',
   page: 'var(--pd-page-base)',
 }
 
 export const gradients = {
-  primary: 'var(--pd-ink)',
-  rose:    'var(--pd-ink)',
+  primary: 'var(--pd-button)',
+  rose:    'var(--pd-button)',
   purple:  colors.purple.main,
   brand:   '#efe4cf',
   accent:  colors.rose.main,

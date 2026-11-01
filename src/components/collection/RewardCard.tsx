@@ -52,7 +52,7 @@ function CardChips({ r, isNew }: { r?: RarityConfig; isNew: boolean }) {
   )
 }
 
-export const HAND_MESSAGE_SX = { fontFamily: font.hand, fontWeight: 500, fontSize: '1.32rem', color: ink.primary, lineHeight: 1.25, fontStyle: 'normal' } as const
+export const HAND_MESSAGE_SX = { fontFamily: font.hand, fontWeight: 600, fontSize: '1.36rem', color: ink.primary, lineHeight: 1.25, fontStyle: 'normal' } as const
 
 function CardTextBox({ title, message, children, expanded }: { title: string; message: string; children?: React.ReactNode; expanded?: boolean }) {
   const clampTitle = expanded ? {} : { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }

@@ -461,14 +461,14 @@ export function SimulatedReaderHomePage() {
               { value: achievementsUnlocked, label: achievementsUnlocked === 1 ? 'conquista' : 'conquistas', to: '/conquistas' },
             ].map((stat, i) => (
               <Box key={stat.to} role="link" onClick={() => navigate(stat.to)} sx={{
-                flex: 1, py: 1, px: 1.2, cursor: 'pointer', display: 'flex', alignItems: 'baseline', gap: 0.7, justifyContent: 'center',
+                flex: 1, py: 1.2, px: 1, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.4, minHeight: 64,
                 borderLeft: i === 0 ? 'none' : `1px solid ${theme.surfaceBorder}`,
                 '&:hover .pd-stat-label': { textDecoration: 'underline', textUnderlineOffset: 3 },
               }}>
-                <Typography sx={{ fontFamily: font.serif, fontWeight: 500, fontSize: '1.45rem', color: theme.textOnBg, lineHeight: 1 }}>
+                <Typography sx={{ fontFamily: font.serif, fontWeight: 500, fontSize: '1.7rem', color: theme.textOnBg, lineHeight: 1 }}>
                   {stat.value}
                 </Typography>
-                <Typography className="pd-stat-label" sx={{ fontSize: '0.8rem', color: theme.textOnBgMuted }}>
+                <Typography className="pd-stat-label" sx={{ fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: theme.textOnBgMuted }}>
                   {stat.label}
                 </Typography>
               </Box>
@@ -491,7 +491,7 @@ export function SimulatedReaderHomePage() {
                       </Typography>
                     </Stack>
                     <LinearProgress variant="determinate" value={completion} sx={{
-                      height: 5,
+                      height: 8,
                       borderRadius: radius.sm,
                       bgcolor: colors.fill.medium,
                       '& .MuiLinearProgress-bar': { borderRadius: radius.sm, background: theme.accent },
