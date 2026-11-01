@@ -29,7 +29,6 @@ function AchievementToastContent({ emoji, label, description, duration }: { emoj
       position: 'relative',
       overflow: 'hidden',
       background: 'linear-gradient(135deg, rgba(255,251,235,0.98), rgba(255,247,237,0.98))',
-      backdropFilter: 'blur(16px)',
       border: '1.5px solid rgba(245,158,11,0.35)',
       borderRadius: radius.lg,
       boxShadow: '0 16px 44px rgba(120,53,15,0.2), 0 0 30px rgba(245,158,11,0.22)',
@@ -102,7 +101,6 @@ function ToastContent({ icon, title, description, accent, bg, border }: ToastCon
   return (
     <Box sx={{
       background: bg,
-      backdropFilter: 'blur(16px)',
       border: `1.5px solid ${border}`,
       borderRadius: radius.lg,
       boxShadow: shadow.lg,

@@ -158,7 +158,6 @@ export function UserDrawer({ user, onClose }: { user: AdminUserRow | null; onClo
             borderRadius: isDesktop ? `${radius.xl} 0 0 ${radius.xl}` : `${radius.xl} ${radius.xl} 0 0`,
             background: theme.isDark ? 'rgba(17,22,38,0.97)' : 'rgba(255,255,255,0.98)',
             backgroundImage: `linear-gradient(160deg, ${theme.accent}14, transparent 40%)`,
-            backdropFilter: 'blur(20px)',
             borderLeft: isDesktop ? `1px solid ${theme.surfaceBorder}` : 'none',
           },
         },

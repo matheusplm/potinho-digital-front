@@ -93,7 +93,6 @@ export function FloatingMenu() {
           sx={{
             width: 36, height: 36, borderRadius: '50%',
             bgcolor: open ? theme.accent : theme.surfaceBg,
-            backdropFilter: 'blur(12px)',
             boxShadow: open ? `0 4px 16px ${theme.accent}55` : '0 2px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.08)',
             border: `1px solid ${theme.surfaceBorder}`,
             color: open ? theme.onAccent : theme.textOnBg,
@@ -120,7 +119,7 @@ export function FloatingMenu() {
         {open && (
           <Box sx={{
             position: 'absolute', top: 44, right: 0, width: 256,
-            background: theme.surfaceBg, backdropFilter: 'blur(24px)',
+            background: theme.surfaceBg,
             borderRadius: radius.lg,
             boxShadow: `0 16px 48px rgba(0,0,0,${theme.isDark ? '0.48' : '0.16'}), 0 2px 8px rgba(0,0,0,0.08)`,
             border: `1px solid ${theme.surfaceBorder}`,

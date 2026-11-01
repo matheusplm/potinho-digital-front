@@ -86,8 +86,6 @@ function ShowcasePanel() {
       display: 'flex', flexDirection: 'column',
       p: { xs: 2.5, md: 3 }, minHeight: { xs: 230, md: 480 },
     }}>
-      <Box sx={{ position: 'absolute', top: -70, right: -70, width: 220, height: 220, borderRadius: '50%', background: 'radial-gradient(circle, rgba(29,78,216,0.14) 0%, transparent 70%)', pointerEvents: 'none' }} />
-      <Box sx={{ position: 'absolute', bottom: -60, left: -60, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(225,29,72,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
       <BrandMark logo={30} size="1.05rem" color={ink.primary} onLight sx={{ position: 'relative', zIndex: 1 }} />
 

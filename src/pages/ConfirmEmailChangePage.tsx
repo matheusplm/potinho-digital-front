@@ -50,8 +50,6 @@ export function ConfirmEmailChangePage() {
       overflow: 'hidden',
       background: gradients.page,
     }}>
-      <Box sx={{ position: 'absolute', top: -120, right: -120, width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(29,78,216,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
-      <Box sx={{ position: 'absolute', bottom: -80, left: -80, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(34,197,94,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
       {HEARTS.map((h, i) => (
         <FavoriteIcon key={i} sx={{
           position: 'absolute', bottom: -8, left: h.left, fontSize: h.size, zIndex: 0,

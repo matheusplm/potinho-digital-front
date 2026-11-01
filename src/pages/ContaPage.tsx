@@ -12,7 +12,6 @@ import { Box, CircularProgress, Collapse, Divider, Stack, Typography } from '@mu
 import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useBackground } from '../context/BackgroundContext'
-import { FloatingParticles } from '../components/FloatingParticles'
 import { DeleteAccountDialog } from '../components/DeleteAccountDialog'
 import { useUser } from '../context/UserContext'
 import { api } from '../services/api'
@@ -147,21 +146,19 @@ export function ContaPage() {
 
   return (
     <Box sx={{ height: '100%', position: 'relative', ...clipOverflow, background: theme.gradient }}>
-      <FloatingParticles />
-      <AccountCircleOutlinedIcon sx={{ position: 'absolute', bottom: -70, right: -60, fontSize: 420, color: `${theme.accent}08`, pointerEvents: 'none' }} />
 
-      <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
+      <ScrollablePage narrow sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
         <Stack spacing={0.3} sx={{ mb: 2.5 }}>
-          <Typography variant="md" sx={{ color: theme.textOnBgMuted, fontWeight: 700 }}>
-            👤 Conta
+          <Typography sx={{ fontFamily: font.hand, fontSize: '1.3rem', color: colors.primary.text, lineHeight: 1 }}>
+            seus dados
           </Typography>
-          <Typography sx={{ fontFamily: font.serif, fontWeight: 850, fontSize: '1.6rem', color: theme.textOnBg, lineHeight: 1.1 }}>
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 500, fontSize: '1.9rem', letterSpacing: '-0.02em', color: theme.textOnBg, lineHeight: 1.05 }}>
             Minha conta
           </Typography>
         </Stack>
 
         <Stack spacing={2}>
-          <Box sx={{ background: surfaceBg, backdropFilter: 'blur(16px)', borderRadius: radius.lg, border: `1px solid ${borderColor}`, overflow: 'hidden' }}>
+          <Box sx={{ background: surfaceBg, borderRadius: radius.lg, border: `1px solid ${borderColor}`, overflow: 'hidden' }}>
             <Stack
               direction="row" alignItems="center" spacing={1.5}
               onClick={() => {
@@ -232,7 +229,7 @@ export function ContaPage() {
             </Collapse>
           </Box>
 
-          <Box sx={{ background: surfaceBg, backdropFilter: 'blur(16px)', borderRadius: radius.lg, border: `1px solid ${borderColor}`, overflow: 'hidden' }}>
+          <Box sx={{ background: surfaceBg, borderRadius: radius.lg, border: `1px solid ${borderColor}`, overflow: 'hidden' }}>
             <Stack
               direction="row" alignItems="center" spacing={1.5}
               onClick={() => {
@@ -330,7 +327,7 @@ export function ContaPage() {
             </Collapse>
           </Box>
 
-          <Box sx={{ background: surfaceBg, backdropFilter: 'blur(16px)', borderRadius: radius.lg, border: `1px solid ${borderColor}`, overflow: 'hidden' }}>
+          <Box sx={{ background: surfaceBg, borderRadius: radius.lg, border: `1px solid ${borderColor}`, overflow: 'hidden' }}>
             <Stack
               direction="row" alignItems="center" spacing={1.5}
               onClick={() => {
@@ -422,7 +419,7 @@ export function ContaPage() {
               <SupportAgentOutlinedIcon sx={{ fontSize: 17 }} />
               Falar com o suporte
               {supportUnread > 0 && (
-                <Box component="span" sx={{ ml: 0.4, px: 0.8, py: 0.1, borderRadius: radius.full, fontSize: '0.68rem', fontWeight: 800, color: theme.onAccent, background: theme.accent }}>
+                <Box component="span" sx={{ ml: 0.4, px: 0.8, py: 0.1, borderRadius: radius.full, fontSize: '0.68rem', fontWeight: 700, color: theme.onAccent, background: theme.accent }}>
                   {supportUnread === 1 ? 'nova resposta' : `${supportUnread} respostas`}
                 </Box>
               )}

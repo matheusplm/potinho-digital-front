@@ -8,14 +8,15 @@ interface ThemeParticles {
 }
 
 const THEMES: Record<string, ThemeParticles> = {
+  papel: { behavior: 'hearts', colors: ['#c0392b', '#d9584a', '#e8a09a', '#3d5aa8'] },
   romance: { behavior: 'hearts', colors: ['#f472b6', '#fb7185', '#f9a8d4', '#e879f9'] },
   sunset: { behavior: 'hearts', colors: ['#fb923c', '#f97316', '#fdba74', '#fb7185'] },
-  lavender: { behavior: 'hearts', colors: ['#a78bfa', '#c4b5fd', '#8b5cf6', '#f0abfc'] },
+  lavender: { behavior: 'petals', colors: ['#b9a6e0', '#9c86c9', '#e9d5ff', '#d8c7f2'] },
   ocean: { behavior: 'bubbles', colors: ['#0ea5e9', '#38bdf8', '#22d3ee'] },
   'deep-ocean': { behavior: 'bubbles', colors: ['#38bdf8', '#67e8f9', '#a5f3fc'] },
   mint: { behavior: 'leaves', colors: ['#34d399', '#10b981', '#6ee7b7', '#a3e635'] },
   'forest-night': { behavior: 'leaves', colors: ['#4ade80', '#22c55e', '#86efac', '#bef264', '#16a34a'], fireflies: true },
-  peach: { behavior: 'petals', colors: ['#fda4af', '#fecdd3', '#fdba74', '#fbcfe8'] },
+  peach: { behavior: 'leaves', colors: ['#d9792f', '#c4512b', '#e3a83a', '#a8432a'] },
   'rose-night': { behavior: 'petals', colors: ['#fb7185', '#f43f5e', '#fda4af', '#e11d48'] },
   midnight: { behavior: 'stars', colors: ['#fde68a', '#ffffff', '#bfdbfe'], shootingStar: true },
   velvet: { behavior: 'stars', colors: ['#f0abfc', '#e879f9', '#fbcfe8', '#ffffff'] },

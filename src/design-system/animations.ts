@@ -64,27 +64,9 @@ export const packCtaFloat = keyframes`
   50%     { transform: translateY(-4px) scale(1.055); }
 `
 
-export const heartPulseAura = keyframes`
-  from { opacity: 0.42; transform: scale(0.88); }
-  to   { opacity: 0; transform: scale(1.3); }
-`
-
 export const ghostPulse = keyframes`
   0%, 100% { transform: scale(1);   box-shadow: 0 0 0 0 rgba(0,0,0,0.12); }
   50%       { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(0,0,0,0); }
-`
-
-export const dropFade = keyframes`
-  0%   { opacity: 0; transform: translateY(0);    }
-  16%  { opacity: 1; transform: translateY(0);    }
-  80%  { opacity: 0; transform: translateY(54vh); }
-  100% { opacity: 0; transform: translateY(0);    }
-`
-
-export const heartBeat = keyframes`
-  0%,100% { transform: scale(1);    }
-  30%     { transform: scale(1.22); }
-  60%     { transform: scale(0.94); }
 `
 
 export const chevronPulse = keyframes`

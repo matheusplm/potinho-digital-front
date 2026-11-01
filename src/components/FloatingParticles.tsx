@@ -24,6 +24,12 @@ function Art({ behavior, particle, prefix, colors }: { behavior: Behavior; parti
 
 export function FloatingParticles({ fixed = false }: { fixed?: boolean }) {
   const { theme } = useBackground()
+  if (!theme.particle) return null
+  return <ThemeParticlesLayer fixed={fixed} />
+}
+
+function ThemeParticlesLayer({ fixed }: { fixed: boolean }) {
+  const { theme } = useBackground()
   const prefix = `pt${useId().replace(/[^a-zA-Z0-9]/g, '')}`
   const config = themeParticles(theme.key, theme.accent)
   const { behavior, colors } = config

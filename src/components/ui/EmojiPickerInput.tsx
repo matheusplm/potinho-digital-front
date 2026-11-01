@@ -33,7 +33,6 @@ export function EmojiPickerInput({ label, value, onChange }: EmojiPickerInputPro
           borderRadius: radius.lg,
           border: `1.5px solid ${colors.border.subtle}`,
           bgcolor: colors.surface.base,
-          backdropFilter: 'blur(10px)',
           cursor: 'pointer',
           fontSize: '1.35rem',
           lineHeight: 1,

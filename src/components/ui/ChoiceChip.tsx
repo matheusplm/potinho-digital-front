@@ -2,7 +2,7 @@ import { Chip, type SxProps, type Theme } from '@mui/material'
 import type { SystemStyleObject } from '@mui/system'
 import type { ReactNode } from 'react'
 import { useBackground } from '../../context/BackgroundContext'
-import { colors } from '../../design-system'
+import { colors, themeInk } from '../../design-system'
 import { mergeSx } from './sx'
 
 export interface ChoiceTone {
@@ -18,7 +18,7 @@ const SIZES = {
   lg: { height: 30, fontSize: '0.78rem', px: 1.4 },
 }
 
-const PRIMARY: ChoiceTone = { bg: colors.primary.main, border: colors.primary.main, text: '#fff' }
+const PRIMARY: ChoiceTone = { bg: themeInk.button, border: themeInk.button, text: themeInk.onButton }
 
 export function ChoiceChip({ label, selected, onClick, size = 'sm', surface = 'card', tone, disabled = false, sx }: {
   label: ReactNode
@@ -33,11 +33,11 @@ export function ChoiceChip({ label, selected, onClick, size = 'sm', surface = 'c
   const { theme } = useBackground()
   const { height, fontSize, px } = SIZES[size]
   const idle = {
-    card: { bg: colors.fill.medium, text: colors.text.secondary, border: colors.border.subtle },
-    raised: { bg: colors.surface.overlay, text: colors.text.secondary, border: colors.border.subtle },
-    page: { bg: theme.surfaceBg, text: theme.textOnBgMuted, border: theme.surfaceBorder },
+    card: { bg: 'transparent', text: colors.text.secondary, border: colors.border.medium },
+    raised: { bg: 'transparent', text: colors.text.secondary, border: colors.border.medium },
+    page: { bg: 'transparent', text: theme.textOnBgMuted, border: theme.surfaceBorder },
   }[surface]
-  const active = tone ?? (surface === 'page' ? { bg: theme.accent, border: theme.accent, text: theme.onAccent } : PRIMARY)
+  const active = tone ?? PRIMARY
   const background = selected ? active.bg : idle.bg
   return (
     <Chip
@@ -45,11 +45,10 @@ export function ChoiceChip({ label, selected, onClick, size = 'sm', surface = 'c
       label={label}
       onClick={disabled ? undefined : onClick}
       sx={mergeSx({
-        height, fontSize, fontWeight: 800, background, cursor: disabled ? 'not-allowed' : 'pointer',
+        height, fontSize, fontWeight: 600, borderRadius: '3px', background, cursor: disabled ? 'not-allowed' : 'pointer',
         border: `1.5px solid ${selected ? active.border ?? 'transparent' : idle.border}`,
-        backdropFilter: surface === 'page' ? 'blur(10px)' : undefined,
         transition: 'background 0.15s, border-color 0.15s',
-        '&:hover': { background, filter: disabled ? 'none' : 'brightness(0.96)' },
+        '&:hover': { background: selected ? background : colors.fill.subtle, borderColor: selected ? undefined : colors.text.muted },
         '& .MuiChip-label': { px, ...(selected ? { color: active.text, ...active.label } : { color: idle.text }) },
       }, sx)}
     />

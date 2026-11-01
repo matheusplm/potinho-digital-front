@@ -26,7 +26,6 @@ export function CollectionsFilterBar({ sort, setSort, search, setSearch, view, c
   const chipBase = {
     px: 1.1, py: 0.5, borderRadius: radius.full, flexShrink: 0,
     cursor: 'pointer', transition: 'all 0.16s',
-    backdropFilter: 'blur(8px)',
   }
 
   return (
@@ -34,7 +33,7 @@ export function CollectionsFilterBar({ sort, setSort, search, setSearch, view, c
       <Box sx={{
         display: 'flex', alignItems: 'center', gap: 1,
         px: 1.4, py: 0.85,
-        background: colors.glass.bg, backdropFilter: 'blur(12px)',
+        background: colors.glass.bg,
         border: `1.5px solid ${colors.glass.border}`,
         borderRadius: radius.xl, mb: 1.2,
         transition: 'border-color 0.15s, background 0.15s',
@@ -80,7 +79,7 @@ export function CollectionsFilterBar({ sort, setSort, search, setSearch, view, c
             <Box key={mode} onClick={() => changeView(mode)} sx={{
               width: 34, height: 34, borderRadius: '50%',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', transition: 'all 0.15s', backdropFilter: 'blur(8px)',
+              cursor: 'pointer', transition: 'all 0.15s',
               background: view === mode ? colors.glass.strong : colors.glass.bg,
               border: `1.5px solid ${view === mode ? accent : colors.glass.border}`,
               boxShadow: view === mode ? `0 2px 8px ${accent}22` : 'none',

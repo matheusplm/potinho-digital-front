@@ -62,7 +62,7 @@ function LayoutSelectorPreview() {
   const [selected, setSelected] = useState<NoteImageLayout>('banner')
 
   return (
-    <Stack spacing={2} sx={{ background: 'rgba(255,255,255,0.6)', borderRadius: radius.xl, p: 2.5, backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.5)' }}>
+    <Stack spacing={2} sx={{ background: 'rgba(255,255,255,0.6)', borderRadius: radius.xl, p: 2.5, border: '1px solid rgba(255,255,255,0.5)' }}>
       <Typography variant="xs" sx={{ fontWeight: 900, letterSpacing: 1.4, color: colors.text.muted, textTransform: 'uppercase' }}>Seletor de layout</Typography>
 
       <Stack spacing={0.5}>

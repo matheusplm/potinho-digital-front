@@ -4,7 +4,7 @@ import { Box, IconButton, Stack, Typography } from '@mui/material'
 import { useState, useEffect } from 'react'
 import { usePush } from '../hooks/usePush'
 import { Button } from './ui'
-import { colors, radius } from '../design-system'
+import { colors, font, radius, themeInk } from '../design-system'
 import { useBackground } from '../context/BackgroundContext'
 
 const SEEN_KEY = 'push-prompt-seen'
@@ -27,29 +27,29 @@ export function PushPrompt() {
   if (dismissed || state !== 'default') return null
 
   return (
-    <Box sx={{
+    <Box role="status" sx={{
       position: 'fixed',
-      top: 10,
-      left: '50%',
-      transform: 'translateX(-50%)',
-      width: 'calc(100% - 40px)',
+      bottom: { xs: 'calc(env(safe-area-inset-bottom, 0px) + 84px)', md: 24 },
+      left: { xs: '50%', md: 'auto' },
+      right: { xs: 'auto', md: 24 },
+      transform: { xs: 'translateX(-50%) rotate(-0.6deg)', md: 'rotate(-0.6deg)' },
+      width: { xs: 'calc(100% - 32px)', md: 380 },
       maxWidth: 440,
       zIndex: 1200,
-      background: `${theme.accent}18`,
-      backdropFilter: 'blur(20px)',
-      border: `1.5px solid ${theme.accent}30`,
-      borderLeft: `3px solid ${theme.accent}`,
-      borderRadius: radius.xl,
-      px: 2, py: 1.4,
-      boxShadow: `0 4px 24px ${theme.accent}20`,
+      background: theme.surfaceBg,
+      border: `1.5px solid ${theme.surfaceBorder}`,
+      borderLeft: `4px solid ${themeInk.ink}`,
+      borderRadius: radius.md,
+      pl: 2, pr: 1, py: 1.2,
+      boxShadow: '3px 4px 0 rgba(0,0,0,0.16), 0 18px 30px -18px rgba(0,0,0,0.45)',
     }}>
       <Stack direction="row" alignItems="center" spacing={1.5}>
-        <NotificationsNoneIcon sx={{ fontSize: 22, color: theme.accent, flexShrink: 0 }} />
+        <NotificationsNoneIcon sx={{ fontSize: 22, color: colors.primary.text, flexShrink: 0 }} />
         <Box sx={{ flex: 1 }}>
-          <Typography variant="md" sx={{ fontWeight: 700, color: theme.textOnBg, lineHeight: 1.2 }}>
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 600, fontSize: '1rem', color: colors.text.primary, lineHeight: 1.2 }}>
             Ativar notificações
           </Typography>
-          <Typography variant="sm" sx={{ color: theme.textOnBgMuted, lineHeight: 1.4, mt: 0.2 }}>
+          <Typography variant="sm" sx={{ color: colors.text.secondary, lineHeight: 1.4, mt: 0.2 }}>
             Avise quando o pacotinho do dia estiver disponível.
           </Typography>
         </Box>
@@ -63,11 +63,11 @@ export function PushPrompt() {
             Ativar
           </Button>
           <IconButton
-            size="small"
+            aria-label="Fechar aviso"
             onClick={dismiss}
-            sx={{ color: colors.text.muted, p: 0.4 }}
+            sx={{ color: colors.text.muted, width: 40, height: 40 }}
           >
-            <CloseIcon sx={{ fontSize: 16 }} />
+            <CloseIcon sx={{ fontSize: 18 }} />
           </IconButton>
         </Stack>
       </Stack>

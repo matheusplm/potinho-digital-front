@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Box, Typography } from '@mui/material'
-import { colors, font, radius, shadow, ink } from '../design-system'
+import { colors, font, radius, ink } from '../design-system'
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined
 const GIS_SRC = 'https://accounts.google.com/gsi/client?hl=pt-BR'
@@ -48,7 +48,7 @@ function GoogleGlyph() {
   )
 }
 
-export function GoogleSignInButton({ onCredential, disabled, dividerLabel = 'ou entre com email' }: {
+export function GoogleSignInButton({ onCredential, disabled, dividerLabel = 'ou com email' }: {
   onCredential: (idToken: string) => void
   disabled?: boolean
   dividerLabel?: string
@@ -105,11 +105,10 @@ export function GoogleSignInButton({ onCredential, disabled, dividerLabel = 'ou 
           opacity: disabled ? 0.55 : 1,
           transition: 'opacity 0.16s ease',
           '&:hover .pd-google-face': disabled ? {} : {
-            boxShadow: '0 8px 24px rgba(30,58,95,0.16)',
-            borderColor: 'rgba(30,58,95,0.24)',
-            transform: 'translateY(-1px)',
+            boxShadow: '3px 3px 0 rgba(42,36,29,0.9)',
+            transform: 'translate(-1px,-1px)',
           },
-          '&:active .pd-google-face': disabled ? {} : { transform: 'translateY(0)' },
+          '&:active .pd-google-face': disabled ? {} : { transform: 'translate(1px,1px)', boxShadow: '0 0 0 rgba(42,36,29,0.9)' },
         }}
       >
         <Box ref={hostRef} sx={{ opacity: 0, display: 'flex', justifyContent: 'center', pointerEvents: disabled ? 'none' : 'auto', colorScheme: 'light' }} />
@@ -124,24 +123,24 @@ export function GoogleSignInButton({ onCredential, disabled, dividerLabel = 'ou 
             alignItems: 'center',
             justifyContent: 'center',
             gap: 1.2,
-            borderRadius: radius.full,
-            background: '#ffffff',
-            border: '1.5px solid rgba(30,58,95,0.16)',
-            boxShadow: shadow.sm,
+            borderRadius: radius.md,
+            background: '#fffdf8',
+            border: '1.5px solid #2a241d',
+            boxShadow: '2px 2px 0 rgba(42,36,29,0.9)',
             transition: 'box-shadow 0.16s ease, border-color 0.16s ease, transform 0.16s ease',
           }}
         >
           <GoogleGlyph />
-          <Typography variant="xl" sx={{ fontFamily: font.sans, fontWeight: 700, color: ink.primary, letterSpacing: '0.01em' }}>
+          <Typography variant="xl" sx={{ fontFamily: font.sans, fontWeight: 600, color: ink.primary, letterSpacing: '0.01em' }}>
             Continuar com o Google
           </Typography>
         </Box>
       </Box>
 
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, my: 2.5 }}>
-        <Box sx={{ flex: 1, height: '1px', background: `linear-gradient(90deg, transparent, ${colors.border.medium})` }} />
-        <Typography variant="sm" sx={{ fontFamily: font.sans, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: colors.text.muted }}>{dividerLabel}</Typography>
-        <Box sx={{ flex: 1, height: '1px', background: `linear-gradient(90deg, ${colors.border.medium}, transparent)` }} />
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, my: 2 }}>
+        <Box sx={{ flex: 1, borderTop: `1.5px dashed ${colors.border.medium}` }} />
+        <Typography sx={{ fontFamily: font.hand, fontSize: '1.2rem', lineHeight: 1, color: colors.text.secondary }}>{dividerLabel}</Typography>
+        <Box sx={{ flex: 1, borderTop: `1.5px dashed ${colors.border.medium}` }} />
       </Box>
     </Box>
   )

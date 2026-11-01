@@ -1,11 +1,9 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, IconButton, Stack, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Button, LoadingState, PageTitle, ScrollablePage, SegmentedControl, toast } from '../components/ui'
 import { useBackground } from '../context/BackgroundContext'
-import { FloatingParticles } from '../components/FloatingParticles'
 import { useUser } from '../context/UserContext'
 import { fadeIn, colors, font } from '../design-system'
 import { isCollectionOwner } from '../utils/collectionAccess'
@@ -77,7 +75,6 @@ export function CollectionManagePage() {
   if (collectionsLoading || (collection && !canManage)) {
     return (
       <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>
-        <FloatingParticles />
         <ScrollablePage sx={{ px: 2.5, py: 2.5 }}>
           <LoadingState label="Carregando coleção" accent={theme.accent} textColor={theme.textOnBg} mutedColor={theme.textOnBgMuted} sx={{ minHeight: 360 }} />
         </ScrollablePage>
@@ -88,7 +85,6 @@ export function CollectionManagePage() {
   if (!collection) {
     return (
       <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>
-        <FloatingParticles />
         <ScrollablePage sx={{ px: 2.5, py: 2.5 }}>
           <Box sx={{ textAlign: 'center', py: 8 }}>
             <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '1.1rem', color: theme.textOnBg, mb: 1 }}>
@@ -103,8 +99,6 @@ export function CollectionManagePage() {
 
   return (
     <Box sx={{ height: '100%', position: 'relative', background: theme.gradient }}>
-      <FloatingParticles />
-      <FavoriteIcon sx={{ position: 'absolute', bottom: -60, right: -60, fontSize: 400, color: 'rgba(225,29,72,0.04)', pointerEvents: 'none' }} />
 
       <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.35s ease` }}>
         <Stack direction="row" alignItems="center" spacing={1.2} sx={{ mb: 2.5, pr: { xs: 6, md: 0 } }}>
@@ -114,8 +108,7 @@ export function CollectionManagePage() {
             onClick={() => navigate('/colecoes')}
             sx={{
               width: 38, height: 38, color: theme.textOnBg,
-              background: theme.surfaceBg, border: `1.5px solid ${theme.surfaceBorder}`,
-              backdropFilter: 'blur(14px)', boxShadow: '0 8px 24px rgba(15,23,42,0.08)',
+              background: theme.surfaceBg, border: `1.5px solid ${theme.surfaceBorder}`, boxShadow: '0 8px 24px rgba(15,23,42,0.08)',
               transition: 'transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease',
               '&:hover': { background: colors.glass.strong, transform: 'translateX(-2px) scale(1.04)', boxShadow: '0 10px 28px rgba(15,23,42,0.12)' },
               '&:active': { transform: 'translateX(-1px) scale(0.98)' },

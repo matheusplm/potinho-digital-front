@@ -1,7 +1,7 @@
 import { Box, LinearProgress, Stack, Typography } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { Button, Card } from '../../components/ui'
-import { brandGradient, colors, font, liftOnDark, radius } from '../../design-system'
+import { brandGradient, colors, font, liftOnDark, radius, themeInk } from '../../design-system'
 import { withAlpha } from '../../utils/colorUtils'
 import { timeAgo } from '../../utils/timeAgo'
 import { readerPath, rhythmLabel, stockLabel, type ReaderSummary, type StockLevel } from './insights'
@@ -33,8 +33,7 @@ export function ReaderCard({ reader, onGift }: { reader: ReaderSummary; onGift: 
         <Stack direction="row" spacing={1.3} alignItems="center">
           <Box sx={{
             width: 42, height: 42, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: brandGradient(true), color: '#fff', fontFamily: font.serif, fontWeight: 700, fontSize: '1.15rem',
-            boxShadow: '0 6px 16px rgba(124,58,237,0.25)',
+            background: brandGradient(true), color: '#fffcf5', fontFamily: font.serif, fontWeight: 500, fontSize: '1.15rem',
           }}>
             {reader.name.charAt(0)}
           </Box>
@@ -66,7 +65,7 @@ export function ReaderCard({ reader, onGift }: { reader: ReaderSummary; onGift: 
           </Stack>
           <LinearProgress variant="determinate" value={completion} sx={{
             height: 7, borderRadius: radius.full, bgcolor: colors.fill.medium,
-            '& .MuiLinearProgress-bar': { borderRadius: radius.full, background: `linear-gradient(90deg, ${colors.primary.main}, ${colors.purple.main})` },
+            '& .MuiLinearProgress-bar': { borderRadius: radius.sm, background: themeInk.ink },
           }} />
         </Stack>
 

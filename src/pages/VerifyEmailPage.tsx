@@ -8,7 +8,7 @@ import { api } from '../services/api'
 import { useRetryAfter } from '../hooks/useRetryAfter'
 import { Button, toast } from '../components/ui'
 import { BrandLogo } from '../components/Brand'
-import { colors, fadeSlide, floatHeart, font, gradients } from '../design-system'
+import { colors, fadeSlide, floatHeart, font, gradients, themeInk } from '../design-system'
 
 const HEARTS = [
   { size: 20, left: '8%',  delay: '0s',   dur: '13s' },
@@ -79,8 +79,6 @@ export function VerifyEmailPage() {
       overflow: 'hidden',
       background: gradients.page,
     }}>
-      <Box sx={{ position: 'absolute', top: -120, right: -120, width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(29,78,216,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
-      <Box sx={{ position: 'absolute', bottom: -80, left: -80, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(225,29,72,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
       {HEARTS.map((h, i) => (
         <FavoriteIcon key={i} sx={{
           position: 'absolute', bottom: -8, left: h.left, fontSize: h.size, zIndex: 0,
@@ -132,7 +130,7 @@ export function VerifyEmailPage() {
             <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2rem', color: colors.text.primary, textAlign: 'center', letterSpacing: '-0.5px' }}>
               Verifique seu email
             </Typography>
-            <Box sx={{ width: 40, height: 3, borderRadius: 2, background: 'linear-gradient(90deg, #1d4ed8, #e11d48)' }} />
+            <Box sx={{ width: 40, height: 3, borderRadius: 2, background: themeInk.ink }} />
             <Typography variant="lg" sx={{ color: colors.text.secondary, textAlign: 'center', lineHeight: 1.6 }}>
               Enviamos um link de confirmação para{' '}
               {emailFromState && <strong>{emailFromState}</strong>}.

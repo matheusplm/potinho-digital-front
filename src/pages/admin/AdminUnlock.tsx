@@ -31,7 +31,7 @@ export function AdminUnlock() {
   return (
     <Box sx={{
       width: '100%', maxWidth: 420, mx: 'auto', mt: { xs: 1, md: 4 }, p: { xs: 2.4, md: 3 }, borderRadius: radius.xl,
-      background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}`, backdropFilter: 'blur(12px)',
+      background: theme.surfaceBg, border: `1px solid ${theme.surfaceBorder}`,
     }}>
       <Stack alignItems="center" spacing={1.2} sx={{ textAlign: 'center', mb: 2.4 }}>
         <Box sx={{

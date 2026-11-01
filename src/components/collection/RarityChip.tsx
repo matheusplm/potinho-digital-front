@@ -10,7 +10,7 @@ const SIZES = {
   md: { height: 22, fontSize: '0.72rem', px: 1 },
 }
 
-export function RarityChip({ rarity, size = 'sm', bordered = false, uppercase = false, sx }: {
+export function RarityChip({ rarity, size = 'sm', uppercase = false, sx }: {
   rarity: ChipRarity
   size?: keyof typeof SIZES
   bordered?: boolean
@@ -23,8 +23,9 @@ export function RarityChip({ rarity, size = 'sm', bordered = false, uppercase = 
       size="small"
       label={`${rarity.emoji} ${uppercase ? rarity.label.toUpperCase() : rarity.label}`}
       sx={mergeSx({
-        height, fontSize, fontWeight: 800, background: rarity.chipBg,
-        border: bordered ? `1px solid ${rarity.borderColor}` : 'none',
+        height, fontSize, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', borderRadius: '3px',
+        background: `color-mix(in srgb, ${rarity.borderColor} 14%, #fffdf7)`,
+        border: `1.5px solid color-mix(in srgb, ${rarity.borderColor} 70%, #2a241d)`,
         '& .MuiChip-label': { px, ...gradientTextSx(rarity.chipColor) },
       }, sx)}
     />

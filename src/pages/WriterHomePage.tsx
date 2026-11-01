@@ -1,4 +1,3 @@
-import FavoriteIcon from '@mui/icons-material/Favorite'
 import { Box, Menu, MenuItem, Skeleton, Stack, Typography } from '@mui/material'
 import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
@@ -7,8 +6,8 @@ import { useUser } from '../context/UserContext'
 import { Button, EmptyState, LoadingState, ScrollablePage, SectionLabel } from '../components/ui'
 import { SendGiftDialog, type GiftTarget } from '../components/manage/SendGiftDialog'
 import { colors, fadeIn, font, clipOverflow } from '../design-system'
+import { RoomGutters } from '../components/scene/RoomGutters'
 import { useBackground } from '../context/BackgroundContext'
-import { FloatingParticles } from '../components/FloatingParticles'
 import { queryKeys } from '../hooks/useNotes'
 import type { CollectionPack } from '../types/note'
 import { managePath, type ReaderSummary } from './writer-home/insights'
@@ -50,11 +49,7 @@ export function WriterHomePage() {
 
   return (
     <Box sx={{ height: '100%', position: 'relative', ...clipOverflow, background: theme.gradient }}>
-      <FloatingParticles />
-      <FavoriteIcon sx={{
-        position: 'absolute', bottom: -80, right: -80,
-        fontSize: 500, color: 'rgba(29,78,216,0.05)', pointerEvents: 'none',
-      }} />
+      <RoomGutters />
 
       <ScrollablePage sx={{ px: 2.5, py: 2.5, animation: `${fadeIn} 0.4s ease` }}>
         <Stack spacing={3} sx={{ width: '100%', maxWidth: 760, mx: 'auto', pb: 3 }}>

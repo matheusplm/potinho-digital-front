@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../services/api'
 import { Button, Input, toast } from '../components/ui'
-import { colors, fadeSlide, floatHeart, font, gradients } from '../design-system'
+import { colors, fadeSlide, floatHeart, font, gradients, themeInk } from '../design-system'
 
 const HEARTS = [
   { size: 16, left: '6%',  delay: '0s',   dur: '13s' },
@@ -52,8 +52,6 @@ export function ResetPasswordPage() {
       overflow: 'hidden',
       background: gradients.page,
     }}>
-      <Box sx={{ position: 'absolute', top: -120, right: -120, width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(29,78,216,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
-      <Box sx={{ position: 'absolute', bottom: -80, left: -80, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(225,29,72,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
       {HEARTS.map((h, i) => (
         <FavoriteIcon key={i} sx={{
           position: 'absolute', bottom: -8, left: h.left, fontSize: h.size, zIndex: 0,
@@ -71,7 +69,7 @@ export function ResetPasswordPage() {
           <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2rem', lineHeight: 1, color: colors.primary.text, textAlign: 'center', letterSpacing: '-0.5px', mb: 1.5 }}>
             senha
           </Typography>
-          <Box sx={{ width: 40, height: 3, borderRadius: 2, background: 'linear-gradient(90deg, #1d4ed8, #e11d48)', mb: 3.5 }} />
+          <Box sx={{ width: 40, height: 3, borderRadius: 2, background: themeInk.ink, mb: 3.5 }} />
 
           {!token ? (
             <Stack alignItems="center" spacing={2}>

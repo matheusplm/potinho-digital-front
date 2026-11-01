@@ -1,6 +1,7 @@
 import { Stack, Typography, type SxProps } from '@mui/material'
 import { colors, font } from '../../design-system'
 import { Card } from './Card'
+import { SillScene } from '../scene/WindowScene'
 
 interface EmptyStateProps {
   emoji?: string
@@ -15,10 +16,8 @@ export function EmptyState({ emoji, title, description, action, accent, sx }: Em
   return (
     <Card accent={accent} sx={{ p: 2.5, textAlign: 'center', ...sx }}>
       <Stack spacing={0.5} alignItems="center">
-        {emoji && (
-          <Typography sx={{ fontSize: '2rem', lineHeight: 1, mb: 0.5 }}>{emoji}</Typography>
-        )}
-        <Typography sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary }}>
+        <SillScene emoji={emoji} height={90} />
+        <Typography sx={{ fontFamily: font.serif, fontWeight: 600, fontSize: '1.1rem', color: colors.text.primary }}>
           {title}
         </Typography>
         {description && (

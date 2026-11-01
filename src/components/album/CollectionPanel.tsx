@@ -48,10 +48,10 @@ export function CollectionPanel({ play, rarities }: {
             {play.owned} de {play.total} coletados
           </Typography>
           <LinearProgress variant="determinate" value={completion} sx={{
-            flex: 1, height: 4, borderRadius: radius.full, bgcolor: colors.fill.medium,
-            '& .MuiLinearProgress-bar': { borderRadius: radius.full, background: theme.accent },
+            flex: 1, height: 5, borderRadius: radius.sm, bgcolor: colors.fill.medium,
+            '& .MuiLinearProgress-bar': { borderRadius: radius.sm, background: theme.accent },
           }} />
-          <Typography variant="sm" sx={{ color: theme.textOnBg, fontWeight: 800 }}>{completion}%</Typography>
+          <Typography variant="sm" sx={{ color: theme.textOnBg, fontWeight: 700 }}>{completion}%</Typography>
           {expandable && (
             <ExpandMoreIcon sx={{ fontSize: 18, color: theme.textOnBgMuted, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
           )}
@@ -65,7 +65,7 @@ export function CollectionPanel({ play, rarities }: {
               alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center',
               px: 1, py: 0.4, borderRadius: radius.full,
               background: rarest.chipBg, border: `1px solid ${rarest.borderColor}`,
-              fontSize: '0.68rem', fontWeight: 800,
+              fontSize: '0.68rem', fontWeight: 700,
             }}>
               <Box component="span" sx={gradientTextSx(rarest.chipColor)}>⭐ mais rara: {rarest.emoji} {rarest.label}</Box>
             </Box>
@@ -78,13 +78,13 @@ export function CollectionPanel({ play, rarities }: {
                   <Typography variant="sm" sx={{ fontWeight: 700, color: theme.textOnBg }}>
                     {r.emoji} {r.label}
                   </Typography>
-                  <Typography variant="xs" sx={{ fontWeight: 800, color: theme.textOnBgMuted }}>
+                  <Typography variant="xs" sx={{ fontWeight: 700, color: theme.textOnBgMuted }}>
                     {owned}/{total}
                   </Typography>
                 </Stack>
                 <LinearProgress variant="determinate" value={pct} sx={{
-                  height: 4, borderRadius: radius.full, bgcolor: colors.fill.medium,
-                  '& .MuiLinearProgress-bar': { borderRadius: radius.full, background: r.chipColor || colors.primary.main },
+                  height: 5, borderRadius: radius.sm, bgcolor: colors.fill.medium,
+                  '& .MuiLinearProgress-bar': { borderRadius: radius.sm, background: r.chipColor || colors.primary.main },
                 }} />
               </Box>
             )

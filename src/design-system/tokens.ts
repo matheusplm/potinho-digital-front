@@ -1,7 +1,7 @@
 export const colors = {
-  primary:   { main: '#1d4ed8', light: '#3b82f6', glow: 'rgba(29,78,216,0.32)', text: 'var(--pd-primary-text)' },
-  rose:      { main: '#e11d48', light: '#fb7185', glow: 'rgba(225,29,72,0.32)', text: 'var(--pd-rose-text)' },
-  purple:    { main: '#4f46e5', light: '#7c3aed', glow: 'rgba(79,70,229,0.32)' },
+  primary:   { main: '#27408b', light: '#3d5aa8', glow: 'rgba(39,64,139,0.22)', text: 'var(--pd-primary-text)' },
+  rose:      { main: '#c0392b', light: '#d9584a', glow: 'rgba(192,57,43,0.22)', text: 'var(--pd-rose-text)' },
+  purple:    { main: '#5b3f8a', light: '#7a5ca8', glow: 'rgba(91,63,138,0.22)' },
   text:      { primary: 'var(--pd-text-primary)', secondary: 'var(--pd-text-secondary)', muted: 'var(--pd-text-muted)' },
   surface:   { base: 'var(--pd-surface-base)', overlay: 'var(--pd-surface-overlay)', paper: 'var(--pd-surface-paper)' },
   border:    { subtle: 'var(--pd-border-subtle)', medium: 'var(--pd-border-medium)' },
@@ -19,20 +19,29 @@ export const colors = {
 }
 
 export const ink = {
-  primary: '#1e3a5f',
-  secondary: '#64748b',
-  muted: '#7d8ba1',
-  surface: 'rgba(255,253,251,0.95)',
-  borderSubtle: 'rgba(0,0,0,0.07)',
-  borderMedium: 'rgba(0,0,0,0.1)',
+  primary: '#2a241d',
+  secondary: '#5e5446',
+  muted: '#8a7e6c',
+  surface: '#fffcf5',
+  borderSubtle: 'rgba(60,42,20,0.12)',
+  borderMedium: 'rgba(60,42,20,0.2)',
+}
+
+export const themeInk = {
+  ink: 'var(--pd-ink)',
+  button: 'var(--pd-button)',
+  onButton: 'var(--pd-on-button)',
+  accent: 'var(--pd-accent)',
+  sky: 'var(--pd-sky)',
+  page: 'var(--pd-page-base)',
 }
 
 export const gradients = {
-  primary: `linear-gradient(135deg, ${colors.primary.main} 0%, ${colors.primary.light} 100%)`,
-  rose:    `linear-gradient(135deg, ${colors.rose.main} 0%, ${colors.rose.light} 100%)`,
-  purple:  `linear-gradient(135deg, ${colors.purple.main} 0%, ${colors.purple.light} 100%)`,
-  brand:   'linear-gradient(160deg, #dbeafe 0%, #fce7f3 55%, #ede9fe 100%)',
-  accent:  `linear-gradient(90deg, ${colors.primary.main}, ${colors.rose.main})`,
+  primary: 'var(--pd-button)',
+  rose:    'var(--pd-button)',
+  purple:  colors.purple.main,
+  brand:   '#efe4cf',
+  accent:  colors.rose.main,
   page:    'var(--pd-page-bg)',
 }
 
@@ -41,25 +50,26 @@ export function liftOnDark(color: string) {
 }
 
 export const radius = {
-  sm:   '6px',
-  md:   '10px',
-  lg:   '12px',
-  xl:   '16px',
+  sm:   '3px',
+  md:   '6px',
+  lg:   '8px',
+  xl:   '10px',
   full: '9999px',
 }
 
 export const shadow = {
-  sm:      '0 2px 8px rgba(0,0,0,0.08)',
-  md:      '0 4px 20px rgba(0,0,0,0.06)',
-  lg:      '0 8px 32px rgba(0,0,0,0.1)',
-  primary: `0 6px 20px ${colors.primary.glow}`,
-  rose:    `0 6px 20px ${colors.rose.glow}`,
-  purple:  `0 6px 20px ${colors.purple.glow}`,
+  sm:      '1px 2px 0 rgba(60,42,20,0.12)',
+  md:      '2px 3px 0 rgba(60,42,20,0.12), 0 6px 14px -8px rgba(60,42,20,0.25)',
+  lg:      '3px 4px 0 rgba(60,42,20,0.14), 0 12px 24px -12px rgba(60,42,20,0.3)',
+  primary: '2px 2px 0 rgba(42,36,29,0.9)',
+  rose:    '2px 2px 0 rgba(42,36,29,0.9)',
+  purple:  '2px 2px 0 rgba(42,36,29,0.9)',
 }
 
 export const font = {
-  serif: '"Playfair Display", "Georgia", serif',
-  sans:  '"Nunito", "Roboto", sans-serif',
+  serif: '"Fraunces", "Georgia", serif',
+  sans:  '"Libre Franklin", "Helvetica Neue", Arial, sans-serif',
+  hand:  '"Caveat", "Segoe Print", cursive',
 }
 
 export const clipOverflow = {

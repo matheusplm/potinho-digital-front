@@ -1,23 +1,15 @@
 import { Box, Stack, Typography, type SxProps, type Theme } from '@mui/material'
 import { BRAND_TAGLINE, brandAccent, colors, font } from '../design-system'
 import { mergeSx } from './ui/sx'
+import { PotinhoMark } from './PotinhoMark'
 
 const COPYRIGHT_YEAR = new Date().getFullYear()
 
 export function BrandLogo({ size = 36, sx }: { size?: number; sx?: SxProps<Theme> }) {
   return (
-    <Box
-      component="img"
-      src="/potinho-icon.svg"
-      alt=""
-      aria-hidden
-      width={size}
-      height={size}
-      sx={mergeSx({
-        width: size, height: size, flexShrink: 0, display: 'block',
-        filter: 'drop-shadow(0 4px 12px rgba(139,92,246,0.28))',
-      }, sx)}
-    />
+    <Box sx={mergeSx({ width: size, height: size, flexShrink: 0, display: 'block' }, sx)}>
+      <PotinhoMark size={size} />
+    </Box>
   )
 }
 
@@ -33,11 +25,17 @@ export function BrandName({ size = '1.15rem', color = colors.text.primary, onLig
     <Typography
       component="span"
       sx={mergeSx({
-        display: 'block', fontFamily: font.serif, fontWeight: 700, fontSize: size,
-        lineHeight: 1.15, letterSpacing: '-0.01em', color, whiteSpace: 'nowrap',
+        display: 'block', fontFamily: font.serif, fontWeight: 600, fontSize: size,
+        lineHeight: 1.15, letterSpacing: '-0.015em', color, whiteSpace: 'nowrap',
       }, sx)}
     >
-      Potinho <Box component="span" sx={brandAccent(onLight)}>Digital</Box>
+      Potinho{' '}
+      <Box component="span" sx={{
+        ...brandAccent(onLight), fontFamily: font.hand, fontStyle: 'normal', fontWeight: 700, fontSize: '1.22em',
+        display: 'inline-block', transform: 'rotate(-5deg) translateY(-0.06em)', letterSpacing: 0, pr: 0,
+      }}>
+        digital
+      </Box>
     </Typography>
   )
 }

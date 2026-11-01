@@ -1,4 +1,3 @@
-import { colors } from '../../design-system'
 import type { CollectionDailyReward, NoteImageLayout, NoteTypeConfig, RarityConfig } from '../../types/note'
 
 export interface DemoNote {
@@ -13,33 +12,33 @@ export interface DemoNote {
 export const DEMO_RARITIES: RarityConfig[] = [
   {
     id: 'comum', label: 'Comum', emoji: '🩶', odds: 60, order: 1,
-    cardBg: 'linear-gradient(135deg,#ffffff,#f8fafc)', textColor: '#334155', captionColor: '#94a3b8',
-    borderColor: 'rgba(148,163,184,0.25)', shadow: '0 4px 16px rgba(15,23,42,0.06)', glowColor: '',
-    chipBg: '#f1f5f9', chipColor: '#64748b',
+    cardBg: '#fffdf7', textColor: '#2a241d', captionColor: '#8a7e6c',
+    borderColor: '#8a7e6c', shadow: '', glowColor: '',
+    chipBg: '#fffdf7', chipColor: '#5e5446',
   },
   {
     id: 'incomum', label: 'Incomum', emoji: '💚', odds: 25, order: 2,
-    cardBg: 'linear-gradient(135deg,#f0fdf4,#dcfce7)', textColor: '#14532d', captionColor: '#4d7c5a',
-    borderColor: 'rgba(34,197,94,0.3)', shadow: '0 4px 18px rgba(34,197,94,0.12)', glowColor: '',
-    chipBg: '#dcfce7', chipColor: '#15803d',
+    cardBg: '#fffdf7', textColor: '#2a241d', captionColor: '#8a7e6c',
+    borderColor: '#4f7d52', shadow: '', glowColor: '',
+    chipBg: '#fffdf7', chipColor: '#3a6340',
   },
   {
     id: 'raro', label: 'Raro', emoji: '💙', odds: 10, order: 3,
-    cardBg: 'linear-gradient(135deg,#eff6ff,#dbeafe)', textColor: '#1e3a8a', captionColor: '#3b6fb5',
-    borderColor: 'rgba(59,130,246,0.35)', shadow: '0 6px 20px rgba(59,130,246,0.16)', glowColor: 'rgba(59,130,246,0.25)',
-    chipBg: '#dbeafe', chipColor: '#1d4ed8',
+    cardBg: '#fffdf7', textColor: '#2a241d', captionColor: '#8a7e6c',
+    borderColor: '#3d5aa8', shadow: '', glowColor: '',
+    chipBg: '#fffdf7', chipColor: '#27408b',
   },
   {
     id: 'mitico', label: 'Mítico', emoji: '🔮', odds: 4, order: 4,
-    cardBg: 'linear-gradient(135deg,#faf5ff,#f3e8ff)', textColor: '#581c87', captionColor: '#7e3aa8',
-    borderColor: 'rgba(168,85,247,0.4)', shadow: '0 8px 24px rgba(168,85,247,0.2)', glowColor: 'rgba(168,85,247,0.32)',
-    chipBg: '#f3e8ff', chipColor: '#7c3aed',
+    cardBg: '#fffdf7', textColor: '#2a241d', captionColor: '#8a7e6c',
+    borderColor: '#7a5ca8', shadow: '', glowColor: '',
+    chipBg: '#fffdf7', chipColor: '#5b3f8a',
   },
   {
     id: 'lendario', label: 'Lendário', emoji: '👑', odds: 1, order: 5,
-    cardBg: 'linear-gradient(135deg,#fff7ed,#ffe4e6)', textColor: '#9f1239', captionColor: '#be5a6f',
-    borderColor: 'rgba(244,63,94,0.45)', shadow: '0 10px 28px rgba(244,63,94,0.22)', glowColor: 'rgba(251,113,133,0.4)',
-    chipBg: 'linear-gradient(135deg,#fde68a,#fbcfe8)', chipColor: '#9f1239',
+    cardBg: '#fffdf7', textColor: '#2a241d', captionColor: '#8a7e6c',
+    borderColor: '#c0392b', shadow: '', glowColor: '',
+    chipBg: '#fffdf7', chipColor: '#a32d22',
   },
 ]
 
@@ -85,34 +84,22 @@ export const DEMO_NOTES: DemoNote[] = [
 export const RARITY_FILTERS = ['Todos', 'Comum', 'Incomum', 'Raro', 'Mítico', 'Lendário']
 
 export const RARITY_COLOR: Record<string, string> = {
-  Todos: colors.primary.main, Comum: '#64748b', Incomum: '#16a34a',
-  Raro: '#1d4ed8', Mítico: '#7c3aed', Lendário: '#be123c',
+  Todos: '#2a241d', Comum: '#5e5446', Incomum: '#3a6340',
+  Raro: '#27408b', Mítico: '#5b3f8a', Lendário: '#a32d22',
 }
 
-export const FEATURES = [
-  { emoji: '🎴', title: 'Bilhetes com raridades', desc: 'Do comum ao lendário: cada bilhete tem brilho, cor e peso únicos.', color: colors.primary.main },
-  { emoji: '📦', title: 'Um pacotinho por dia', desc: 'Abertura diária com antecipação e surpresa, como cartas esperadas.', color: colors.rose.main },
-  { emoji: '🏆', title: 'Conquistas desbloqueáveis', desc: 'Metas personalizadas que se revelam à medida que a coleção cresce.', color: '#d97706' },
-  { emoji: '❤️', title: 'Favoritos e álbum', desc: 'Favorite os mais especiais e reveja toda a coleção quando quiser.', color: colors.purple.main },
-]
-
 export const STEPS = [
-  { emoji: '✍️', n: 1, title: 'Você escreve', desc: 'Crie bilhetes: memórias, poemas, declarações. Defina a raridade de cada um do seu jeito.', color: colors.primary.main },
-  { emoji: '🎁', n: 2, title: 'Monta os pacotinhos', desc: 'Configure pacotinhos diários, bônus e especiais com cooldown, raridades e regras únicas.', color: colors.rose.main },
-  { emoji: '💌', n: 3, title: 'Libera o acesso', desc: 'Adiciona quem vai receber pelo email. Aí é só abrir os pacotinhos e começar a colecionar.', color: colors.purple.main },
-  { emoji: '✨', n: 4, title: 'A magia acontece', desc: 'Conquistas, álbum completo, favoritos: cada abertura é uma surpresa nova e especial.', color: '#d97706' },
+  'Você escreve os bilhetes e escolhe a raridade de cada um.',
+  'Junta tudo em pacotinhos e chama a pessoa pelo email.',
+  'Ela abre um por dia, sem saber qual vem, e vai montando o álbum.',
 ]
 
-export const CUSTOMIZATIONS = [
-  { emoji: '🎨', title: 'Raridades 100% suas', desc: 'Você define quantas existem, o nome, a cor, o gradiente e a probabilidade de sair nos pacotinhos.', color: colors.rose.main,    bg: 'rgba(225,29,72,0.05)',    chips: ['💎 Mítico', '🌟 Divino', '🌸 Poético', '🔥 Lendário'] },
-  { emoji: '🏷️', title: 'Tipos criados por você', desc: 'Categorias que façam sentido para a sua história: memórias, poesias, declarações, humor, reflexões.', color: colors.primary.main, bg: 'rgba(29,78,216,0.05)',    chips: ['💭 Memória', '✍️ Poesia', '💕 Declaração', '😄 Humor'] },
-  { emoji: '📦', title: 'Pacotinhos com regras únicas', desc: 'Cooldown em horas, limite de aberturas, quais raridades podem sair, raridade garantida: você controla tudo.', color: colors.purple.main,  bg: 'rgba(124,58,237,0.05)',   chips: ['🌙 Pack Noturno', '👑 Pack Épico', '🎯 Garantido', '💫 Surpresa'] },
-  { emoji: '🏆', title: 'Conquistas personalizadas', desc: 'Metas únicas: coletar N bilhetes, ter todos de uma raridade, completar a coleção, favoritar X...', color: '#d97706',            bg: 'rgba(217,119,6,0.05)',    chips: ['🎯 50 bilhetes', '👑 Todos os épicos', '🌈 Rainbow', '⭐ Completo'] },
-  { emoji: '🔐', title: 'Controle por leitor', desc: 'Libere pacotinhos específicos por pessoa, adicione bônus individualmente e revogue quando quiser.', color: '#0891b2',            bg: 'rgba(8,145,178,0.05)',    chips: ['👤 Acesso individual', '🎁 Bônus extra', '🔒 Revogar'] },
+export const DETAILS = [
+  { title: 'Raridades', desc: 'Quantas quiser, com nome, cor e chance de sair. Do comum que aparece sempre ao lendário que sai uma vez na vida.' },
+  { title: 'Tipos de bilhete', desc: 'Memória, poesia, piada interna, saudade. As categorias são as da história de vocês.' },
+  { title: 'Pacotinhos', desc: 'Um por dia, bônus de fim de semana, pacote especial de aniversário. Você define o intervalo e o que pode sair.' },
+  { title: 'Conquistas', desc: 'Metas que aparecem conforme o álbum cresce: juntar dez bilhetes, achar todos os raros, completar a coleção.' },
+  { title: 'Quem recebe o quê', desc: 'Cada pessoa tem o próprio álbum. Dá pra liberar um pacote só pra uma, dar um bônus ou tirar o acesso.' },
 ]
 
-export const AUDIENCES = [
-  { emoji: '💑', label: 'Casais', desc: 'Bilhetes de amor, memórias do relacionamento e declarações que ficam para sempre.' },
-  { emoji: '👯', label: 'Amigos', desc: 'Homenagens, piadas internas e os melhores momentos vividos juntos.' },
-  { emoji: '👨‍👩‍👧', label: 'Família', desc: 'Mensagens carinhosas para datas especiais, aniversários e dias comuns.' },
-]
+export const AUDIENCES = ['namoro', 'amizade de dez anos', 'mãe que mora longe', 'irmão que nunca responde mensagem']

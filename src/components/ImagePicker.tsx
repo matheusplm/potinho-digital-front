@@ -152,7 +152,6 @@ export function ImagePicker({ value, onChange, mediaType = 'gifs', label }: Prop
               background: 'rgba(0,0,0,0.55)', color: '#fff',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer', fontSize: '0.65rem', fontWeight: 800,
-              backdropFilter: 'blur(4px)',
               '&:hover': { background: 'rgba(0,0,0,0.8)' },
               transition: 'background 0.15s',
             }}

@@ -10,7 +10,7 @@ import { Box, Dialog, DialogContent, IconButton, Stack, Typography } from '@mui/
 import { useMemo, useState } from 'react'
 import { Card, ChoiceChip } from '../../components/ui'
 import { NoteCard } from '../../components/collection/NoteCard'
-import { colors, font, radius } from '../../design-system'
+import { colors, font, radius, themeInk } from '../../design-system'
 import type { BackgroundTheme } from '../../design-system'
 import type { CollectionNoteView, NoteTypeConfig, RarityConfig } from '../../types/note'
 import { rarityTone } from '../../components/collection/rarityTone'
@@ -98,9 +98,9 @@ export function AlbumSection({
 
   return (
     <Stack spacing={1.2}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 1.3, py: 0.82, background: colors.glass.bg, backdropFilter: 'blur(14px)', border: `1.5px solid ${colors.glass.border}`, borderRadius: radius.xl }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 1.3, py: 0.82, background: colors.glass.bg, border: `1.5px solid ${colors.border.medium}`, borderRadius: radius.md, boxShadow: 'inset 1px 1px 0 rgba(42,36,29,0.06)' }}>
         <SearchIcon sx={{ fontSize: 17, color: theme.textOnBgMuted, flexShrink: 0 }} />
-        <Box component="input" value={search} onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearch(event.target.value)} placeholder="Buscar cartinha..." sx={{ flex: 1, minWidth: 0, border: 'none', outline: 'none', background: 'transparent', color: theme.textOnBg, fontFamily: 'inherit', fontSize: '0.84rem', '&::placeholder': { color: theme.textOnBgMuted } }} />
+        <Box component="input" value={search} onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearch(event.target.value)} placeholder="Buscar bilhete..." sx={{ flex: 1, minWidth: 0, border: 'none', outline: 'none', background: 'transparent', color: theme.textOnBg, fontFamily: 'inherit', fontSize: '0.95rem', '&::placeholder': { color: theme.textOnBgMuted } }} />
         {search && (
           <Box onClick={() => setSearch('')} sx={{ display: 'flex', color: theme.textOnBgMuted, cursor: 'pointer', flexShrink: 0 }}>
             <CloseIcon sx={{ fontSize: 16 }} />
@@ -114,13 +114,13 @@ export function AlbumSection({
             { id: 'all' as AlbumFilter, label: 'Todas' },
             ...(hasFavorites ? [{ id: 'favorites' as AlbumFilter, label: 'Favoritas' }] : []),
           ].map((item) => (
-            <Box key={item.id} onClick={() => setFilter(item.id)} sx={{ px: 1.1, py: 0.52, borderRadius: radius.full, cursor: 'pointer', flexShrink: 0, fontSize: '0.72rem', fontWeight: 800, color: filter === item.id ? theme.onAccent : theme.textOnBgMuted, background: filter === item.id ? theme.accent : colors.glass.bg, border: `1px solid ${filter === item.id ? theme.accent : colors.glass.border}`, backdropFilter: 'blur(10px)' }}>
+            <Box key={item.id} onClick={() => setFilter(item.id)} sx={{ px: 1.1, py: 0.52, borderRadius: '4px', cursor: 'pointer', flexShrink: 0, fontSize: '0.72rem', fontWeight: 600, color: filter === item.id ? themeInk.onButton : theme.textOnBgMuted, background: filter === item.id ? themeInk.button : colors.glass.bg, border: `1px solid ${filter === item.id ? themeInk.button : colors.glass.border}` }}>
               {item.label}
             </Box>
           ))}
         </Box>
         {(discoveredRarities.length > 0 || discoveredTypes.length > 0) && (
-          <Box onClick={() => setFilterSheetOpen(true)} sx={{ display: 'flex', alignItems: 'center', gap: 0.4, px: 1, py: 0.52, borderRadius: radius.full, cursor: 'pointer', flexShrink: 0, fontSize: '0.72rem', fontWeight: 800, color: activeFilterCount > 0 ? theme.onAccent : theme.textOnBgMuted, background: activeFilterCount > 0 ? theme.accent : colors.glass.bg, border: `1px solid ${activeFilterCount > 0 ? theme.accent : colors.glass.border}`, backdropFilter: 'blur(10px)' }}>
+          <Box onClick={() => setFilterSheetOpen(true)} sx={{ display: 'flex', alignItems: 'center', gap: 0.4, px: 1, py: 0.52, borderRadius: '4px', cursor: 'pointer', flexShrink: 0, fontSize: '0.72rem', fontWeight: 600, color: activeFilterCount > 0 ? themeInk.onButton : theme.textOnBgMuted, background: activeFilterCount > 0 ? themeInk.button : colors.glass.bg, border: `1px solid ${activeFilterCount > 0 ? themeInk.button : colors.glass.border}` }}>
             <TuneIcon sx={{ fontSize: 14 }} />
             {activeFilterCount > 0 ? `Filtros (${activeFilterCount})` : 'Filtros'}
           </Box>
@@ -134,12 +134,12 @@ export function AlbumSection({
             { id: 'grid' as AlbumView, Icon: GridViewIcon },
             { id: 'folders' as AlbumView, Icon: FolderOutlinedIcon },
           ]).map(({ id, Icon }) => (
-            <Box key={id} role="button" aria-label={`Exibição ${id}`} onClick={() => setView(id)} sx={{ width: 32, height: 32, borderRadius: radius.md, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: view === id ? theme.onAccent : theme.textOnBgMuted, background: view === id ? theme.accent : colors.glass.bg, border: `1px solid ${view === id ? theme.accent : colors.glass.border}`, backdropFilter: 'blur(10px)', transition: 'all 0.15s' }}>
+            <Box key={id} role="button" aria-label={`Exibição ${id}`} onClick={() => setView(id)} sx={{ width: 32, height: 32, borderRadius: radius.md, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: view === id ? themeInk.onButton : theme.textOnBgMuted, background: view === id ? themeInk.button : colors.glass.bg, border: `1px solid ${view === id ? themeInk.button : colors.glass.border}`, transition: 'all 0.15s' }}>
               <Icon sx={{ fontSize: 16 }} />
             </Box>
           ))}
         </Box>
-        <Box role="button" aria-label="ordenar" onClick={() => setSort(SORT_CYCLE[(SORT_CYCLE.indexOf(sort) + 1) % SORT_CYCLE.length])} sx={{ display: 'flex', alignItems: 'center', gap: 0.4, px: 1.1, py: 0.5, borderRadius: radius.full, cursor: 'pointer', fontSize: '0.72rem', fontWeight: 800, color: theme.textOnBgMuted, background: colors.glass.bg, border: `1px solid ${colors.glass.border}`, backdropFilter: 'blur(10px)' }}>
+        <Box role="button" aria-label="ordenar" onClick={() => setSort(SORT_CYCLE[(SORT_CYCLE.indexOf(sort) + 1) % SORT_CYCLE.length])} sx={{ display: 'flex', alignItems: 'center', gap: 0.4, px: 1.1, py: 0.5, borderRadius: '4px', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 600, color: theme.textOnBgMuted, background: colors.glass.bg, border: `1px solid ${colors.glass.border}` }}>
           <SwapVertIcon sx={{ fontSize: 15 }} />
           {SORT_LABEL[sort]}
         </Box>
@@ -147,7 +147,7 @@ export function AlbumSection({
 
       <Dialog open={filterSheetOpen} onClose={() => setFilterSheetOpen(false)} fullWidth maxWidth="sm" slotProps={{ paper: { sx: { borderRadius: `${radius.xl} ${radius.xl} 0 0`, mx: 0, maxWidth: 480, width: '100%', position: 'fixed', bottom: 0, m: 0 } } }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ px: 2.5, pt: 2, pb: 1 }}>
-          <Typography sx={{ fontFamily: font.serif, fontWeight: 800, fontSize: '1.1rem', color: colors.text.primary }}>Filtros</Typography>
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 600, fontSize: '1.1rem', color: colors.text.primary }}>Filtros</Typography>
           <Stack direction="row" spacing={1} alignItems="center">
             {activeFilterCount > 0 && (
               <Box onClick={() => { setRarity('all'); setType('all') }} sx={{ fontSize: '0.72rem', fontWeight: 700, color: colors.rose.text, cursor: 'pointer', px: 0.5 }}>
@@ -175,11 +175,11 @@ export function AlbumSection({
               <Box>
                 <Typography variant="label" sx={{ mb: 1 }}>Tipo</Typography>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.7 }}>
-                  <Box onClick={() => setType('all')} sx={{ px: 1.2, py: 0.55, borderRadius: radius.full, cursor: 'pointer', fontSize: '0.78rem', fontWeight: 800, color: type === 'all' ? '#fff' : colors.text.secondary, background: type === 'all' ? colors.purple.main : colors.surface.overlay, border: `1.5px solid ${type === 'all' ? colors.purple.main : colors.border.subtle}` }}>
+                  <Box onClick={() => setType('all')} sx={{ px: 1.2, py: 0.55, borderRadius: '4px', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600, color: type === 'all' ? themeInk.onButton : colors.text.secondary, background: type === 'all' ? themeInk.button : colors.surface.overlay, border: `1.5px solid ${type === 'all' ? themeInk.button : colors.border.subtle}` }}>
                     Todos
                   </Box>
                   {discoveredTypes.map((t) => (
-                    <Box key={t.id} onClick={() => setType(type === t.id ? 'all' : t.id)} sx={{ px: 1.2, py: 0.55, borderRadius: radius.full, cursor: 'pointer', fontSize: '0.78rem', fontWeight: 800, color: type === t.id ? t.tagColor : colors.text.secondary, background: type === t.id ? t.tagBg : colors.surface.overlay, border: `1.5px solid ${type === t.id ? `${t.accentColor}66` : colors.border.subtle}` }}>
+                    <Box key={t.id} onClick={() => setType(type === t.id ? 'all' : t.id)} sx={{ px: 1.2, py: 0.55, borderRadius: '4px', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600, color: type === t.id ? t.tagColor : colors.text.secondary, background: type === t.id ? t.tagBg : colors.surface.overlay, border: `1.5px solid ${type === t.id ? `${t.accentColor}66` : colors.border.subtle}` }}>
                       {t.emoji} {t.label}
                     </Box>
                   ))}
@@ -194,7 +194,7 @@ export function AlbumSection({
                     { id: 'rarity' as AlbumGroup, label: 'Por raridade' },
                     { id: 'type' as AlbumGroup, label: 'Por tipo' },
                   ]).map((g) => (
-                    <Box key={g.id} onClick={() => setGroup(g.id)} sx={{ px: 1.2, py: 0.55, borderRadius: radius.full, cursor: 'pointer', fontSize: '0.78rem', fontWeight: 800, color: group === g.id ? '#fff' : colors.text.secondary, background: group === g.id ? colors.purple.main : colors.surface.overlay, border: `1.5px solid ${group === g.id ? colors.purple.main : colors.border.subtle}` }}>
+                    <Box key={g.id} onClick={() => setGroup(g.id)} sx={{ px: 1.2, py: 0.55, borderRadius: '4px', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600, color: group === g.id ? themeInk.onButton : colors.text.secondary, background: group === g.id ? themeInk.button : colors.surface.overlay, border: `1.5px solid ${group === g.id ? themeInk.button : colors.border.subtle}` }}>
                       {g.label}
                     </Box>
                   ))}
@@ -207,7 +207,7 @@ export function AlbumSection({
 
       {items.length === 0 ? (
         <Card sx={{ p: 2, textAlign: 'center' }}>
-          <Typography sx={{ fontFamily: font.serif, fontWeight: 800, color: colors.text.primary, mb: 0.3 }}>Nenhuma cartinha encontrada</Typography>
+          <Typography sx={{ fontFamily: font.serif, fontWeight: 600, color: colors.text.primary, mb: 0.3 }}>Nenhum bilhete por aqui</Typography>
           <Typography variant="md" sx={{ color: colors.text.secondary }}>{emptyHint}</Typography>
         </Card>
       ) : view === 'folders' ? (
@@ -216,13 +216,13 @@ export function AlbumSection({
             const isCollapsed = collapsed[g.key]
             return (
               <Box key={g.key}>
-                <Stack direction="row" alignItems="center" spacing={0.8} onClick={() => setCollapsed((c) => ({ ...c, [g.key]: !c[g.key] }))} sx={{ px: 1.2, py: 0.8, mb: 0.8, borderRadius: radius.lg, cursor: 'pointer', background: colors.glass.bg, border: `1px solid ${g.accent}`, backdropFilter: 'blur(10px)' }}>
+                <Stack direction="row" alignItems="center" spacing={0.8} onClick={() => setCollapsed((c) => ({ ...c, [g.key]: !c[g.key] }))} sx={{ px: 1.2, py: 0.8, mb: 0.8, borderRadius: radius.lg, cursor: 'pointer', background: colors.glass.bg, border: `1px solid ${g.accent}` }}>
                   <ExpandMoreIcon sx={{ fontSize: 18, color: theme.textOnBgMuted, transition: 'transform 0.18s', transform: isCollapsed ? 'rotate(-90deg)' : 'none' }} />
-                  <Typography variant="md" sx={{ flex: 1, fontWeight: 800, color: theme.textOnBg }}>{g.label}</Typography>
-                  <Typography variant="sm" sx={{ fontWeight: 800, color: theme.textOnBgMuted }}>{g.items.length}</Typography>
+                  <Typography variant="md" sx={{ flex: 1, fontWeight: 600, color: theme.textOnBg }}>{g.label}</Typography>
+                  <Typography variant="sm" sx={{ fontWeight: 600, color: theme.textOnBgMuted }}>{g.items.length}</Typography>
                 </Stack>
                 {!isCollapsed && (
-                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1, mb: 0.5 }}>
+                  <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 1, mb: 0.5 }}>
                     {g.items.map((note) => renderCard(note, 'grid'))}
                   </Box>
                 )}
@@ -233,10 +233,10 @@ export function AlbumSection({
       ) : (
         <Stack spacing={1}>
           <Typography variant="sm" sx={{ fontWeight: 900, letterSpacing: 1.1, color: theme.textOnBgMuted, textTransform: 'uppercase' }}>
-            Cartinhas da coleção · {sorted.length}
+            Bilhetes da coleção · {sorted.length}
           </Typography>
           {view === 'grid' ? (
-            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1 }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 1 }}>
               {sorted.map((note) => renderCard(note, 'grid'))}
             </Box>
           ) : (

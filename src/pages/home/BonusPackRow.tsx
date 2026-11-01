@@ -96,7 +96,6 @@ export function BonusPackRow({ bonusPacks, isRealReader, packOpens, packAvailabl
                 inset: 0,
                 borderRadius: radius.full,
                 background: 'rgba(15,23,42,0.46)',
-                backdropFilter: 'blur(1px)',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
@@ -105,7 +104,7 @@ export function BonusPackRow({ bonusPacks, isRealReader, packOpens, packAvailabl
                 color: '#fff',
               }}>
                 <AccessTimeRoundedIcon sx={{ fontSize: 17, filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.4))' }} />
-                <Typography sx={{ fontSize: '0.5rem', fontWeight: 800, lineHeight: 1, textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
+                <Typography sx={{ fontSize: '0.5rem', fontWeight: 700, lineHeight: 1, textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
                   {formatCooldownBadge(cooldownMs)}
                 </Typography>
               </Box>
@@ -116,7 +115,7 @@ export function BonusPackRow({ bonusPacks, isRealReader, packOpens, packAvailabl
                 background: '#fff', border: `1.5px solid ${pack.accent}`, display: 'flex', alignItems: 'center',
                 justifyContent: 'center', px: 0.4, boxShadow: '0 1px 4px rgba(0,0,0,0.18)',
               }}>
-                <Typography variant="xs" sx={{ fontWeight: 900, color: pack.accent, lineHeight: 1 }}>
+                <Typography variant="xs" sx={{ fontWeight: 700, color: pack.accent, lineHeight: 1 }}>
                   {packOpens?.[pack.id] ?? 0}
                 </Typography>
               </Box>
@@ -127,7 +126,7 @@ export function BonusPackRow({ bonusPacks, isRealReader, packOpens, packAvailabl
                 background: pack.accent, display: 'flex', alignItems: 'center', justifyContent: 'center',
                 px: 0.4, boxShadow: '0 1px 4px rgba(0,0,0,0.25)',
               }}>
-                <Typography variant="xs" sx={{ fontWeight: 900, color: '#fff', lineHeight: 1 }}>
+                <Typography variant="xs" sx={{ fontWeight: 700, color: '#fff', lineHeight: 1 }}>
                   {packAvailableCounts[pack.id]}x
                 </Typography>
               </Box>

@@ -36,7 +36,7 @@ export function TouchedSection({ readers, raritiesByCollection }: { readers: Rea
               aria-label={`${note.title ?? 'Bilhete'}, favorito de ${reader.name}`}
               onClick={() => navigate(readerPath(reader.slug, reader.email))}
               sx={{
-                ...rarityCardSx(rarity, true, theme.isDark),
+                ...rarityCardSx(rarity, true),
                 boxShadow: shadow,
                 '&:hover': { transform: 'translateY(-2px)', boxShadow: shadow },
                 width: '100%', textAlign: 'left', cursor: 'pointer', font: 'inherit',

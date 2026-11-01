@@ -1,3 +1,5 @@
+import ContentCutIcon from '@mui/icons-material/ContentCut'
+import TouchAppOutlinedIcon from '@mui/icons-material/TouchAppOutlined'
 import { Box, Typography } from '@mui/material'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { font } from '../../design-system'
@@ -13,6 +15,7 @@ const WIDTH = 216
 const HEIGHT = 300
 const STRIP = 54
 const TEETH = 18
+const GRAIN = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .2 0 0 0 0 .14 0 0 0 0 .06 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")"
 
 function crimp(edge: 'top' | 'bottom', depth = 7): string {
   const points: string[] = []
@@ -125,8 +128,8 @@ export function PackPouch({ gradient, accent, emoji, look, name, state, onTorn, 
           sx={{
             position: 'relative', width: '100%', height: '100%', cursor: torn ? 'default' : 'grab', touchAction: 'none', WebkitUserSelect: 'none', userSelect: 'none', WebkitTouchCallout: 'none',
             transform: 'perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg))', transition: 'transform 0.18s ease-out',
-            filter: `drop-shadow(0 24px 34px ${withAlpha(accent, 35)}) drop-shadow(0 6px 10px rgba(15,23,42,0.18))`,
-            outline: 'none', '&:focus-visible': { filter: `drop-shadow(0 0 0 3px ${accent}) drop-shadow(0 24px 34px ${withAlpha(accent, 35)})` },
+            filter: 'drop-shadow(3px 4px 0 rgba(60,42,20,0.2)) drop-shadow(0 18px 22px rgba(60,42,20,0.22))',
+            outline: 'none', '&:focus-visible': { filter: 'drop-shadow(0 0 0 3px #2a241d) drop-shadow(3px 4px 0 rgba(60,42,20,0.2))' },
             '&:active': { cursor: torn ? 'default' : 'grabbing' },
           }}
         >
@@ -136,7 +139,7 @@ export function PackPouch({ gradient, accent, emoji, look, name, state, onTorn, 
             transform: torn ? undefined : `translate3d(0, ${-progress * 9}px, 0) rotate(${-progress * 6}deg)`,
             animation: torn ? `${stripFly} 0.75s cubic-bezier(.3,.6,.4,1) both` : 'none',
             zIndex: 2,
-            '&::after': { content: '""', position: 'absolute', inset: 0, background: `linear-gradient(180deg, rgba(255,255,255,0.45), ${withAlpha(accent, 25)})` },
+            '&::after': { content: '""', position: 'absolute', inset: 0, background: `${GRAIN}, linear-gradient(180deg, rgba(255,255,255,0.12), rgba(0,0,0,0.08))` },
           }} />
 
           <Box sx={{
@@ -144,29 +147,28 @@ export function PackPouch({ gradient, accent, emoji, look, name, state, onTorn, 
             clipPath: torn ? TORN_EDGE : crimp('bottom'),
           }}>
             {pattern !== 'none' && <Box sx={{ position: 'absolute', inset: 0, background: PATTERN_BACKGROUNDS[pattern], opacity: 0.55 }} />}
-            <Box sx={{ position: 'absolute', inset: 0, background: `linear-gradient(160deg, transparent 35%, ${withAlpha(accent, 38)} 100%)` }} />
-            <Box sx={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 25% 12%, rgba(255,255,255,0.75), transparent 45%), radial-gradient(circle at 85% 95%, rgba(0,0,0,0.16), transparent 50%)' }} />
-            <Box sx={{ position: 'absolute', inset: 0, boxShadow: `inset 10px 0 18px -10px rgba(255,255,255,0.9), inset -12px 0 20px -10px ${withAlpha(accent, 45)}` }} />
+            <Box sx={{ position: 'absolute', inset: 0, background: GRAIN }} />
+            <Box sx={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(0,0,0,0.05), transparent 12%, transparent 88%, rgba(0,0,0,0.07))' }} />
             {shine && <Box sx={{
               position: 'absolute', top: 0, bottom: 0, left: 0, width: '45%',
               background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)',
               animation: reducedMotion ? 'none' : `${foilSweep} 3.6s ease-in-out 1s infinite`,
             }} />}
-            <Box sx={{ position: 'absolute', inset: '12px 12px 18px', borderRadius: '16px', border: '1.5px solid rgba(255,255,255,0.65)' }} />
+            <Box sx={{ position: 'absolute', inset: '12px 12px 18px', borderRadius: '3px', border: '1.5px dashed rgba(255,253,247,0.7)' }} />
             <Box sx={{
               position: 'absolute', left: '50%', top: showName ? '43%' : '50%', transform: 'translate(-50%, -50%)',
-              width: 112, height: 112, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: 'radial-gradient(circle at 35% 30%, rgba(255,255,255,0.95), rgba(255,255,255,0.55))',
-              boxShadow: `inset 0 -6px 14px ${withAlpha(accent, 22)}, 0 10px 24px ${withAlpha(accent, 25)}`,
-              fontSize: '3.6rem', lineHeight: 1,
+              width: 108, height: 108, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: '#fffdf7', border: '1.5px solid rgba(42,36,29,0.75)', borderRadius: '4px',
+              boxShadow: '2px 3px 0 rgba(42,36,29,0.22)', rotate: '-3deg',
+              fontSize: '3.4rem', lineHeight: 1,
             }}>
-              <PackIcon emoji={emoji} imageUrl={imageUrl} size={84} />
+              <PackIcon emoji={emoji} imageUrl={imageUrl} size={74} />
             </Box>
             {showName && <Box sx={{ position: 'absolute', left: 0, right: 0, bottom: 34, display: 'flex', justifyContent: 'center', px: 2 }}>
               <Typography variant="xl" sx={{
-                px: 1.4, py: 0.45, borderRadius: 99, maxWidth: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                fontFamily: font.serif, fontWeight: 800, color: '#1e293b',
-                background: 'rgba(255,255,255,0.82)', boxShadow: '0 4px 12px rgba(15,23,42,0.12)',
+                px: 1.4, py: 0.35, borderRadius: '2px', maxWidth: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                fontFamily: font.serif, fontWeight: 600, color: '#2a241d',
+                background: '#fffdf7', border: '1px solid rgba(42,36,29,0.5)', boxShadow: '1px 2px 0 rgba(42,36,29,0.18)',
               }}>
                 {name}
               </Typography>
@@ -175,24 +177,24 @@ export function PackPouch({ gradient, accent, emoji, look, name, state, onTorn, 
 
           {!torn && (
             <Box sx={{ position: 'absolute', left: 10, right: 10, top: STRIP - 3, height: 6, zIndex: 3, pointerEvents: 'none' }}>
-              <Box sx={{ position: 'absolute', inset: '2px 0', borderTop: '2px dashed rgba(255,255,255,0.85)' }} />
+              <Box sx={{ position: 'absolute', inset: '2px 0', borderTop: '2px dashed rgba(255,253,247,0.9)' }} />
               <Box sx={{
-                position: 'absolute', left: 0, top: 0, height: 6, width: `${progress * 100}%`, borderRadius: 6,
-                background: `linear-gradient(90deg, #fff, ${accent})`, boxShadow: `0 0 12px ${accent}, 0 0 4px #fff`,
+                position: 'absolute', left: 0, top: 2, height: 2, width: `${progress * 100}%`,
+                background: '#2a241d',
               }} />
               <Box sx={{
                 position: 'absolute', top: '50%', left: `${progress * 100}%`, width: 30, height: 30, borderRadius: '50%',
-                transform: 'translate(-50%, -50%)', background: '#fff', boxShadow: `0 4px 14px ${withAlpha(accent, 55)}`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.95rem',
+                transform: 'translate(-50%, -50%)', background: '#fffdf7', border: '1.5px solid #2a241d', boxShadow: '1px 2px 0 rgba(42,36,29,0.3)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2a241d',
               }}>
-                ✂️
+                <ContentCutIcon sx={{ fontSize: 15, transform: 'rotate(90deg)' }} />
               </Box>
               {progress === 0 && !reducedMotion && (
                 <Box sx={{
-                  position: 'absolute', top: 14, left: 0, fontSize: '1.5rem', '--track': `${WIDTH - 50}px`,
-                  animation: `${hintSlide} 2.4s ease-in-out 1s infinite`, filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.25))',
+                  position: 'absolute', top: 14, left: 0, '--track': `${WIDTH - 50}px`, color: '#fffdf7',
+                  animation: `${hintSlide} 2.4s ease-in-out 1s infinite`, filter: 'drop-shadow(1px 2px 0 rgba(42,36,29,0.45))',
                 }}>
-                  👆
+                  <TouchAppOutlinedIcon sx={{ fontSize: 28 }} />
                 </Box>
               )}
             </Box>

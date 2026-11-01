@@ -8,16 +8,18 @@ import { api, ApiRequestError } from '../services/api'
 import { safeRedirect } from '../utils/safeRedirect'
 import { Button, Input, PasswordInput, toast } from '../components/ui'
 import { GoogleSignInButton } from '../components/GoogleSignInButton'
-import { FloatingParticles } from '../components/FloatingParticles'
 import { useBackground } from '../context/BackgroundContext'
-import { BrandLogo, Copyright } from '../components/Brand'
-import { BRAND_TAGLINE, brandAccent, brandGradient, colors, fadeSlide, font, gradients } from '../design-system'
+import { BrandName, Copyright } from '../components/Brand'
+import { PotinhoMark } from '../components/PotinhoMark'
+import { OutsideScene, Postmark, ViewPicker } from '../components/scene/OutsideScene'
+import { BRAND_TAGLINE, colors, fadeSlide, font, radius } from '../design-system'
 
 const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined
 
 
 export function LoginPage() {
-  const darkTheme = useBackground().theme.isDark
+  const { theme } = useBackground()
+  const darkTheme = theme.isDark
   const { setUser } = useUser()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -80,37 +82,45 @@ export function LoginPage() {
       position: 'relative',
       overflowX: 'hidden',
       overflowY: 'auto',
-      background: gradients.page,
     }}>
-      <Box sx={{ position: 'absolute', top: -120, right: -120, width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(29,78,216,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
-      <Box sx={{ position: 'absolute', bottom: -80, left: -80, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(225,29,72,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
+      <OutsideScene />
 
-      <FloatingParticles />
+      <Stack sx={{
+        flex: 1, justifyContent: 'center', position: 'relative', zIndex: 1, animation: `${fadeSlide} 0.5s ease both`,
+        alignItems: 'center', px: 2, pt: { xs: '18vh', md: 11 }, pb: { xs: 6, md: 3 },
+      }} spacing={2.5}>
+        <Stack sx={{
+          position: 'relative', width: '100%', maxWidth: 420, px: { xs: 2.5, sm: 4 }, pt: { xs: 3, sm: 3.5 }, pb: 2.5,
+          background: theme.surfaceBg, border: `1.5px solid ${theme.surfaceBorder}`, borderRadius: radius.md,
+          boxShadow: '2px 3px 0 rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.04), 0 10px 20px rgba(0,0,0,0.08), 0 25px 45px rgba(0,0,0,0.12)',
+          transform: 'rotate(-0.6deg)',
+        }}>
+          <Box aria-hidden sx={{ position: 'absolute', top: -11, left: 28, width: 92, height: 22, background: `color-mix(in srgb, ${theme.accent} 45%, transparent)`, transform: 'rotate(-4deg)', boxShadow: '0 1px 0 rgba(0,0,0,0.08)' }} />
+          <Box aria-hidden sx={{ position: 'absolute', top: -9, right: 40, width: 64, height: 20, background: `color-mix(in srgb, ${theme.accent} 22%, rgba(243,234,216,0.85))`, transform: 'rotate(5deg)' }} />
+          <Postmark label={theme.label} />
+          <Box aria-hidden sx={{ position: 'absolute', top: -5, right: { xs: 110, sm: 132 }, width: 54, height: 9, borderRadius: '50%', background: 'rgba(0,0,0,0.2)', filter: 'blur(3px)', pointerEvents: 'none' }} />
+          <Box aria-hidden sx={{ position: 'absolute', top: { xs: -62, sm: -74 }, right: { xs: 96, sm: 118 }, transform: 'rotate(-10deg)', transformOrigin: 'bottom center', filter: 'drop-shadow(2px 3px 0 rgba(0,0,0,0.14))', pointerEvents: 'none' }}>
+            <PotinhoMark size={84} />
+          </Box>
 
-      <Stack sx={{ flex: 1, alignItems: 'center', justifyContent: 'center', px: 3, py: 2, position: 'relative', zIndex: 1, animation: `${fadeSlide} 0.5s ease both` }} spacing={0}>
-        <BrandLogo size={72} sx={{ mb: 3 }} />
-
-        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2.8rem', lineHeight: 1, color: colors.text.primary, textAlign: 'center', letterSpacing: '-0.5px' }}>
-          Potinho
-        </Typography>
-        <Typography sx={{ fontFamily: font.serif, fontWeight: 700, fontSize: '2.8rem', lineHeight: 1.05, textAlign: 'center', letterSpacing: '-0.5px', mb: 1.5, ...brandAccent() }}>
-          Digital
-        </Typography>
-
-        <Box sx={{ width: 40, height: 3, borderRadius: 2, background: brandGradient(), mb: 1.5 }} />
-
-        <Typography variant="lg" sx={{ color: colors.text.secondary, fontStyle: 'italic', mb: 4 }}>
-          {BRAND_TAGLINE}
-        </Typography>
+          <Typography sx={{ fontFamily: font.hand, fontSize: '1.35rem', lineHeight: 1, color: colors.primary.text, transform: 'rotate(-2deg)', transformOrigin: 'left', mb: 0.6 }}>
+            que bom te ver
+          </Typography>
+          <Typography component="h1" sx={{ m: 0 }}>
+            <BrandName size="clamp(1.9rem, 7vw, 2.3rem)" />
+          </Typography>
+          <Typography sx={{ fontFamily: font.hand, fontSize: '1.3rem', color: colors.text.secondary, mt: 0.3, mb: 1.6 }}>
+            {BRAND_TAGLINE}
+          </Typography>
 
         <GoogleSignInButton onCredential={handleGoogle} disabled={loading} />
 
         <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%', maxWidth: 320 }}>
           <Stack spacing={2}>
-            <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" fullWidth required />
+            <Input lined label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" fullWidth required />
             <Box>
-              <PasswordInput label="Senha" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Sua senha" autoComplete="current-password" fullWidth required />
-              <Typography sx={{ mt: 0.5, textAlign: 'right' }}>
+              <PasswordInput lined label="Senha" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Sua senha" autoComplete="current-password" fullWidth required />
+              <Typography sx={{ mt: 1, mb: 1.4, textAlign: 'right' }}>
                 <Link to="/esqueci-minha-senha" style={{ color: colors.primary.text, fontSize: '0.78rem', textDecoration: 'none', fontWeight: 600 }}>
                   Esqueci minha senha
                 </Link>
@@ -151,11 +161,13 @@ export function LoginPage() {
           </Stack>
         </Box>
 
-        <Typography variant="body2" sx={{ mt: 3.5, color: colors.text.secondary, fontSize: '0.85rem' }}>
+        <Typography variant="body2" sx={{ mt: 2.2, mb: { xs: 1.5, sm: 0 }, color: colors.text.secondary, fontSize: '0.85rem' }}>
           Ainda não tem conta?{' '}
           <Link to="/register" style={{ color: colors.primary.text, fontWeight: 700, textDecoration: 'none' }}>Criar conta</Link>
         </Typography>
-        <Copyright sx={{ mt: 4 }} />
+          <Copyright sx={{ mt: 1.2 }} />
+          <ViewPicker />
+        </Stack>
       </Stack>
     </Box>
   )

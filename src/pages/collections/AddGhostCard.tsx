@@ -1,6 +1,6 @@
 import AddIcon from '@mui/icons-material/Add'
 import { Box, Typography } from '@mui/material'
-import { font, ghostPulse, radius } from '../../design-system'
+import { colors, font, ghostPulse, radius, themeInk } from '../../design-system'
 
 type ViewMode = 'cards' | 'grid' | 'list'
 
@@ -8,7 +8,7 @@ function PlusCircle({ size = 44, accent }: { size?: number; accent: string }) {
   return (
     <Box sx={{
       width: size, height: size, borderRadius: '50%', flexShrink: 0,
-      background: `linear-gradient(135deg, ${accent}, ${accent}bb)`,
+      background: themeInk.ink,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       boxShadow: `0 4px 16px ${accent}55`,
       animation: `${ghostPulse} 2.4s ease-in-out infinite`,
@@ -32,8 +32,7 @@ export function AddGhostCard({ view, onClick, accent }: { view: ViewMode; onClic
       <Box data-tour="new-collection" onClick={onClick} sx={{
         ...base, display: 'flex', alignItems: 'center', gap: 1.4,
         px: 1.4, py: 1.1, borderRadius: radius.lg,
-        background: `linear-gradient(135deg, ${accent}08, ${accent}04)`,
-        backdropFilter: 'blur(8px)',
+        background: 'transparent',
       }}>
         <PlusCircle size={40} accent={accent} />
         <Box>
@@ -51,7 +50,7 @@ export function AddGhostCard({ view, onClick, accent }: { view: ViewMode; onClic
   if (view === 'grid') {
     return (
       <Box data-tour="new-collection" onClick={onClick} sx={{ ...base, borderRadius: radius.xl, overflow: 'hidden', background: `${accent}06` }}>
-        <Box sx={{ aspectRatio: '4/3', background: `linear-gradient(135deg, ${accent}18, ${accent}30)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Box sx={{ aspectRatio: '4/3', background: colors.fill.subtle, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <PlusCircle size={42} accent={accent} />
         </Box>
         <Box sx={{ px: 1.2, py: 1 }}>
@@ -70,7 +69,7 @@ export function AddGhostCard({ view, onClick, accent }: { view: ViewMode; onClic
     <Box data-tour="new-collection" onClick={onClick} sx={{ ...base, borderRadius: radius.xl, overflow: 'hidden', background: `${accent}06` }}>
       <Box sx={{
         height: 84, position: 'relative', overflow: 'hidden',
-        background: `linear-gradient(135deg, ${accent}18, ${accent}32)`,
+        background: colors.fill.subtle,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
         <Box sx={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.18) 0%, transparent 70%)', pointerEvents: 'none' }} />
@@ -83,7 +82,7 @@ export function AddGhostCard({ view, onClick, accent }: { view: ViewMode; onClic
         <Typography variant="sm" sx={{ color: accent, opacity: 0.55, mt: 0.2 }}>
           Toque para criar
         </Typography>
-        <Box sx={{ height: '3px', borderRadius: 2, background: `linear-gradient(90deg, ${accent}66, ${accent}22)`, mt: 1.2 }} />
+        <Box sx={{ height: '3px', borderRadius: 2, background: colors.border.subtle, mt: 1.2 }} />
       </Box>
     </Box>
   )
