@@ -4,6 +4,8 @@
 
 Quem escreve cria coleções de bilhetes com raridades e tipos, define os pacotinhos (diário, bônus ou temáticos) e convida os leitores por e-mail. Quem lê abre os pacotinhos, coleciona os bilhetes, favorita os preferidos e desbloqueia conquistas. As áreas logadas são privadas e não devem ser rastreadas.
 
+O Potinho Digital é um produto da [Apotheosys](https://www.apotheosys.com.br/), empresa de software sob medida.
+
 ## Páginas públicas
 
 - [Início](https://www.potinhodigital.com.br/): o que é o Potinho Digital e como funciona

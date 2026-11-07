@@ -1,5 +1,5 @@
 import LinkedInIcon from '@mui/icons-material/LinkedIn'
-import InstagramIcon from '@mui/icons-material/Instagram'
+import LanguageIcon from '@mui/icons-material/Language'
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
 import { Box, ButtonBase, IconButton, Stack, Tooltip, Typography, useMediaQuery } from '@mui/material'
 import { useState } from 'react'
@@ -9,7 +9,7 @@ import { brandAccent, colors, fadeInHero, fadeInRight, font, gradients, themeInk
 import { AUDIENCES, DEMO_NOTES, DEMO_RARITIES, DETAILS, RARITY_COLOR, RARITY_FILTERS, STEPS } from './landing/landingData'
 import { SectionTitle } from './landing/SectionTitle'
 import { DemoNoteCard } from './landing/DemoNoteCard'
-import { BrandLogo, BrandName, Copyright } from '../components/Brand'
+import { APOTHEOSYS_URL, ApotheosysCredit, BrandLogo, BrandName, Copyright } from '../components/Brand'
 import { HeroCardStack } from './landing/HeroCardStack'
 import { HandArrow, Squiggle } from './landing/Doodles'
 import { Door } from '../components/scene/Door'
@@ -229,22 +229,20 @@ export function LandingPage() {
               <BrandLogo size={24} />
               <BrandName size="1rem" />
             </Stack>
-            <Typography sx={{ fontSize: '0.8rem', color: colors.text.muted }}>
-              Feito por Matheus Pereira Lopes de Morais.
-            </Typography>
+            <ApotheosysCredit />
           </Box>
           <Stack direction="row" spacing={2.5} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 1, '& a': { color: colors.text.muted, fontSize: '0.8rem', textDecoration: 'none', '&:hover': { color: colors.text.primary } } }}>
             <Box component="a" {...linkTo('/termos')}>Termos de uso</Box>
             <Box component="a" {...linkTo('/privacidade')}>Privacidade</Box>
             <Stack direction="row" spacing={0.25}>
               <Tooltip title="LinkedIn">
-                <IconButton component="a" href="https://www.linkedin.com/in/matheus-pereira-lopes/" target="_blank" rel="noopener noreferrer" size="small" aria-label="LinkedIn" sx={{ color: colors.text.muted }}>
+                <IconButton component="a" href="https://www.linkedin.com/company/apotheosystems/" target="_blank" rel="noopener noreferrer" size="small" aria-label="LinkedIn" sx={{ color: colors.text.muted }}>
                   <LinkedInIcon sx={{ fontSize: 17 }} />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Instagram">
-                <IconButton component="a" href="https://www.instagram.com/matheusplm96/" target="_blank" rel="noopener noreferrer" size="small" aria-label="Instagram" sx={{ color: colors.text.muted }}>
-                  <InstagramIcon sx={{ fontSize: 17 }} />
+              <Tooltip title="Site da Apotheosys">
+                <IconButton component="a" href={APOTHEOSYS_URL} target="_blank" rel="noopener noreferrer" size="small" aria-label="Site da Apotheosys" sx={{ color: colors.text.muted }}>
+                  <LanguageIcon sx={{ fontSize: 17 }} />
                 </IconButton>
               </Tooltip>
               <Tooltip title="matheusmty@gmail.com">

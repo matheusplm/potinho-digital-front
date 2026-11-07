@@ -26,7 +26,7 @@
       content="potinho digital, bilhetes digitais, álbum afetivo, pacotinhos surpresa, presente romântico, mensagens de amor, coleção de memórias, bilhetes personalizados, cartas digitais"
     />
     <meta name="robots" content="index, follow" />
-    <meta name="author" content="Potinho Digital" />
+    <meta name="author" content="Apotheosys" />
     <meta name="copyright" content="© 2026 Potinho Digital. Todos os direitos reservados." />
 
     <meta property="og:type" content="website" />
@@ -66,14 +66,23 @@
           "name": "Potinho Digital",
           "alternateName": "Potinho",
           "inLanguage": "pt-BR",
-          "publisher": { "@id": "https://www.potinhodigital.com.br/#organization" }
+          "publisher": { "@id": "https://www.apotheosys.com.br/#organization" }
         },
         {
           "@type": "Organization",
           "@id": "https://www.potinhodigital.com.br/#organization",
           "name": "Potinho Digital",
           "url": "https://www.potinhodigital.com.br/",
-          "logo": "https://www.potinhodigital.com.br/icon-512.png"
+          "logo": "https://www.potinhodigital.com.br/icon-512.png",
+          "parentOrganization": { "@id": "https://www.apotheosys.com.br/#organization" }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://www.apotheosys.com.br/#organization",
+          "name": "Apotheosys",
+          "logo": "https://www.apotheosys.com.br/logo-mark.png",
+          "url": "https://www.apotheosys.com.br/",
+          "sameAs": ["https://www.linkedin.com/company/apotheosystems/"]
         },
         {
           "@type": "WebApplication",
@@ -85,7 +94,8 @@
           "operatingSystem": "Web",
           "inLanguage": "pt-BR",
           "isPartOf": { "@id": "https://www.potinhodigital.com.br/#website" },
-          "copyrightHolder": { "@id": "https://www.potinhodigital.com.br/#organization" },
+          "creator": { "@id": "https://www.apotheosys.com.br/#organization" },
+          "copyrightHolder": { "@id": "https://www.apotheosys.com.br/#organization" },
           "copyrightYear": 2026,
           "offers": {
             "@type": "Offer",

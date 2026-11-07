@@ -13,7 +13,7 @@ interface Section {
   body: ReactNode[]
 }
 
-const UPDATED_AT = '29 de setembro de 2026'
+const UPDATED_AT = '6 de novembro de 2026'
 const CONTACT_EMAIL = 'matheusmty@gmail.com'
 const CONTROLLER = 'Matheus Pereira Lopes de Morais'
 
@@ -86,7 +86,7 @@ const PRIVACY: Section[] = [
     title: 'Quem cuida dos seus dados',
     body: [
       <>
-        O Potinho Digital é mantido por <strong>{CONTROLLER}</strong>, que é o responsável (controlador) pelos seus dados e também quem atende pedidos
+        O Potinho Digital é um produto da Apotheosys, mantido por <strong>{CONTROLLER}</strong>, que é o responsável (controlador) pelos seus dados e também quem atende pedidos
         sobre eles (encarregado). Você fala com ele {contact}.
       </>,
     ],

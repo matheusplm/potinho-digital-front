@@ -1,9 +1,10 @@
 import { Box, Stack, Typography, type SxProps, type Theme } from '@mui/material'
-import { BRAND_TAGLINE, brandAccent, colors, font } from '../design-system'
+import { BRAND_TAGLINE, brandAccent, colors, font, liftOnDark } from '../design-system'
 import { mergeSx } from './ui/sx'
 import { PotinhoMark } from './PotinhoMark'
 
 const COPYRIGHT_YEAR = new Date().getFullYear()
+export const APOTHEOSYS_URL = 'https://www.apotheosys.com.br/'
 
 export function BrandLogo({ size = 36, sx }: { size?: number; sx?: SxProps<Theme> }) {
   return (
@@ -62,10 +63,31 @@ export function BrandMark({ logo = 36, size, color, mutedColor = colors.text.mut
   )
 }
 
+export function ApotheosysCredit({ sx }: { sx?: SxProps<Theme> }) {
+  return (
+    <Box
+      component="a"
+      href={APOTHEOSYS_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      sx={mergeSx({ display: 'inline-flex', alignItems: 'center', gap: 0.8, textDecoration: 'none', color: colors.text.muted, fontSize: '0.8rem' }, sx)}
+    >
+      um produto
+      <Box component="span" sx={{ width: 32, height: 32, borderRadius: '50%', background: '#2b2340', border: '1.5px solid color-mix(in srgb, var(--pd-text-primary) 30%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <Box component="img" src="/apotheosys-mark.webp" alt="" width={24} height={24} loading="lazy" sx={{ width: 24, height: 'auto', display: 'block' }} />
+      </Box>
+      <Box component="span" sx={{ fontWeight: 700, letterSpacing: '0.08em', color: colors.text.primary }}>
+        APOTHEO<Box component="span" sx={{ color: liftOnDark('#0b7c8a') }}>SYS</Box>
+      </Box>
+    </Box>
+  )
+}
+
 export function Copyright({ color = colors.text.muted, sx }: { color?: string; sx?: SxProps<Theme> }) {
   return (
     <Typography variant="xs" sx={mergeSx({ color, textAlign: 'center', lineHeight: 1.5 }, sx)}>
-      © {COPYRIGHT_YEAR} Potinho Digital.{' '}
+      © {COPYRIGHT_YEAR}{' '}
+      <Box component="a" href={APOTHEOSYS_URL} target="_blank" rel="noopener noreferrer" sx={{ color: 'inherit', textDecoration: 'underline', textUnderlineOffset: 2 }}>Apotheosys</Box>.{' '}
       <Box component="span" sx={{ whiteSpace: 'nowrap' }}>Todos os direitos reservados.</Box>
     </Typography>
   )
