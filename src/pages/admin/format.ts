@@ -20,7 +20,7 @@ function validTime(iso: string | null): number | null {
 
 export function shortDate(iso: string | null): string {
   const time = validTime(iso)
-  if (time === null) return '—'
+  if (time === null) return '-'
   const date = new Date(time)
   const sameYear = date.getFullYear() === new Date().getFullYear()
   return `${date.getDate()} ${MONTHS[date.getMonth()]}${sameYear ? '' : ` ${date.getFullYear()}`}`
@@ -28,7 +28,7 @@ export function shortDate(iso: string | null): string {
 
 export function dateTime(iso: string | null): string {
   const time = validTime(iso)
-  if (time === null) return '—'
+  if (time === null) return '-'
   return `${shortDate(iso)}, ${new Date(time).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`
 }
 

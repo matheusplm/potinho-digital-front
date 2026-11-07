@@ -208,7 +208,7 @@ export function RhythmPanel({ rhythm }: { rhythm?: AdminRhythm }) {
 
           <Box>
             <Typography variant="md" sx={{ mb: 1, fontWeight: 800, color: theme.textOnBg }}>
-              📅 Dia favorito: {peakDay >= 0 ? WEEKDAYS_LONG[peakDay] : '—'}
+              📅 Dia favorito: {peakDay >= 0 ? WEEKDAYS_LONG[peakDay] : '-'}
             </Typography>
             <Stack spacing={0.6}>
               {[1, 2, 3, 4, 5, 6, 0].map((day) => (
