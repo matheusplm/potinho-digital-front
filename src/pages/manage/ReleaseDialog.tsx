@@ -71,7 +71,7 @@ export function ReleaseDialog({ cid, notes, rarities, open, onClose }: {
         }
         const details = [
           notified ? 'Os leitores foram avisados.' : null,
-          bonusReady ? (bonusOk ? 'Brinde enviado! 🎁' : 'O brinde falhou — tenta de novo em Acessos.') : null,
+          bonusReady ? (bonusOk ? 'Brinde enviado! 🎁' : 'O brinde falhou, tenta de novo em Acessos.') : null,
         ].filter(Boolean).join(' ')
         toast.success(`${count} bilhete${count === 1 ? '' : 's'} lançado${count === 1 ? '' : 's'}! 🚀`, details ? { description: details } : undefined)
         onClose()

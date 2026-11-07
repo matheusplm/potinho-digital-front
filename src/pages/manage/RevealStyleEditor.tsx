@@ -241,7 +241,7 @@ export function RevealStyleEditor({ cid, form, rarities, onStyle, onField }: {
               ) : (
                 <EmojiPickerInput label="Emoji do efeito" value={effect.media} onChange={(emoji) => onField('revealMedia', emoji)} />
               )}
-              <HintText sx={{ mt: 1 }}>Figurinhas com fundo transparente ficam bem melhores — a busca já filtra por elas.</HintText>
+              <HintText sx={{ mt: 1 }}>Figurinhas com fundo transparente ficam bem melhores. A busca já filtra por elas.</HintText>
             </Box>
           )}
         </Box>

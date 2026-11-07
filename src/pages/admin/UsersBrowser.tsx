@@ -102,7 +102,7 @@ function TableRow({ user, onOpen }: { user: AdminUserRow; onOpen: () => void }) 
       </Box>
       <Typography variant="md" sx={{ color: theme.textOnBg }}>{shortDate(user.createdAt)}</Typography>
       <Typography variant="md" sx={{ color: theme.textOnBg }}>
-        {user.collectionsOwned || user.collectionsReading ? `✍️ ${user.collectionsOwned} · 📖 ${user.collectionsReading}` : '—'}
+        {user.collectionsOwned || user.collectionsReading ? `✍️ ${user.collectionsOwned} · 📖 ${user.collectionsReading}` : '-'}
       </Typography>
       <Box sx={{ textAlign: 'right' }}>
         <Typography variant="lg" sx={{ fontWeight: 800, color: theme.textOnBg }}>{formatNumber(user.collected)}</Typography>
