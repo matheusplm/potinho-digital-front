@@ -25,3 +25,12 @@ dist-ssr
 *.sw?
 .env
 *.md
+
+*.keystore
+*.jks
+twa/app-release*
+twa/*.apk
+twa/*.aab
+twa/app/
+twa/build/
+twa/.gradle/

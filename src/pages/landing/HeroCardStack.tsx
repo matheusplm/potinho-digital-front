@@ -1,6 +1,6 @@
 import { Box } from '@mui/material'
 import { useEffect, useRef, useState, type PointerEvent } from 'react'
-import { hintWiggle, sway } from '../../design-system'
+import { colors, hintWiggle, sway } from '../../design-system'
 import { DemoNoteCard } from './DemoNoteCard'
 import { DEMO_NOTES } from './landingData'
 
@@ -149,6 +149,7 @@ export function HeroCardStack() {
               : `${sway} 3s ease-in-out infinite`,
             cursor: isDragging ? 'grabbing' : 'grab',
             outline: 'none',
+            '&:focus-visible': { outline: `2px dashed ${colors.text.primary}`, outlineOffset: 6 },
           })}
         >
           <DemoNoteCard note={n0} eager fill />
