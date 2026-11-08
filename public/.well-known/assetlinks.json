@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "br.com.potinhodigital.app",
+      "sha256_cert_fingerprints": [
+        "CD:BA:90:BF:64:8A:F0:E2:80:6D:46:ED:84:46:AD:EF:93:E9:CC:1B:B4:C9:6B:40:79:67:45:3B:A7:81:4E:69"
+      ]
+    }
+  }
+]

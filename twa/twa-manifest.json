@@ -1,0 +1,38 @@
+{
+    "packageId":  "br.com.potinhodigital.app",
+    "host":  "www.potinhodigital.com.br",
+    "name":  "Potinho Digital",
+    "launcherName":  "Potinho",
+    "display":  "standalone",
+    "orientation":  "portrait",
+    "themeColor":  "#f4ede0",
+    "themeColorDark":  "#f4ede0",
+    "navigationColor":  "#f4ede0",
+    "navigationColorDark":  "#f4ede0",
+    "navigationDividerColor":  "#f4ede0",
+    "navigationDividerColorDark":  "#f4ede0",
+    "backgroundColor":  "#f4ede0",
+    "enableNotifications":  true,
+    "startUrl":  "/home",
+    "iconUrl":  "https://www.potinhodigital.com.br/icon-512.png",
+    "maskableIconUrl":  "https://www.potinhodigital.com.br/icon-maskable-512.png",
+    "webManifestUrl":  "https://www.potinhodigital.com.br/site.webmanifest",
+    "fullScopeUrl":  "https://www.potinhodigital.com.br/",
+    "appVersion":  "1.0.0",
+    "appVersionCode":  1,
+    "signingKey":  {
+                       "path":  "./potinho-upload.keystore",
+                       "alias":  "potinho-upload"
+                   },
+    "fallbackType":  "customtabs",
+    "features":  {
+
+                 },
+    "isChromeOSOnly":  false,
+    "isMetaQuest":  false,
+    "minSdkVersion": 24,
+    "targetSdkVersion":  35,
+    "generatorApp":  "bubblewrap-cli",
+    "splashScreenFadeOutDuration":  300
+}
+
